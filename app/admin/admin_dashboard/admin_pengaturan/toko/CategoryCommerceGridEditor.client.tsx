@@ -285,9 +285,9 @@ function SortRow({
 
   const dropStyle: React.CSSProperties = isDragOver
     ? {
-        background: "rgba(212, 175, 55, 0.12)",
-        borderColor: "rgba(212, 175, 55, 0.6)",
-      }
+      background: "rgba(212, 175, 55, 0.12)",
+      borderColor: "rgba(212, 175, 55, 0.6)",
+    }
     : {};
 
   return (
@@ -314,7 +314,7 @@ function SortRow({
       }}
     >
       <button type="button" className={ui.handle} aria-label="Drag" {...attributes} {...listeners}>
-        
+
       </button>
 
       <div className={ui.rowMain}>
@@ -374,15 +374,15 @@ function SortRow({
               action={uploadAction}
               sectionId={sectionId}
               attach={`CATEGORY_GRID_COMMERCE:icon:${item.kategoriId}`}
-            endpoint="/api/admin/admin_dashboard/admin_galeri/list_gambar?png=1"
-            limit={60}
-            buttonLabel="Pilih/Upload PNG"
-            allowUpload
-            autoApplyOnSelect
-            accept="image/png"
-            skipRefresh
-            onAppliedImageId={(id) => onUpdate(item.key, { imageId: id })}
-          />
+              endpoint="/api/admin/admin_dashboard/admin_galeri/list_gambar?png=1"
+              limit={60}
+              buttonLabel="Pilih/Upload PNG"
+              allowUpload
+              autoApplyOnSelect
+              accept="image/png"
+              skipRefresh
+              onAppliedImageId={(id) => onUpdate(item.key, { imageId: id })}
+            />
           ) : (
             <ImagePickerCaptcha
               action={uploadAction}
@@ -608,7 +608,7 @@ export default function CategoryCommerceGridEditor({
           return { ...it, label: nextLabel || "", imageId: finalImageId, imageUrl: nextImageUrl };
         }
 
-        const cat = catById.get(it.kategoriId);
+        const cat = typeof it.kategoriId === "number" ? catById.get(it.kategoriId) : undefined;
         if (!cat) return it;
 
         const baseRaw = getCatLabel(cat);
@@ -891,7 +891,7 @@ export default function CategoryCommerceGridEditor({
               <SortableContext items={items.map((it) => String(it.key))} strategy={verticalListSortingStrategy}>
                 <div className={ui.sortList}>
                   {items.map((it) => {
-                    const cat = it.type === "category" ? catById.get(it.kategoriId) : null;
+                    const cat = it.type === "category" && typeof it.kategoriId === "number" ? catById.get(it.kategoriId) : null;
                     const label = it.type === "category"
                       ? cat
                         ? getCatLabel(cat)
@@ -901,11 +901,11 @@ export default function CategoryCommerceGridEditor({
                     const iconUrl =
                       it.type === "custom"
                         ? (it.imageId
-                            ? imageById.get(Number(it.imageId))?.url ?? null
-                            : it.imageUrl || null)
+                          ? imageById.get(Number(it.imageId))?.url ?? null
+                          : it.imageUrl || null)
                         : it.imageId
-                        ? imageById.get(Number(it.imageId))?.url ?? null
-                        : null;
+                          ? imageById.get(Number(it.imageId))?.url ?? null
+                          : null;
                     return (
                       <SortRow
                         key={String(it.key)}

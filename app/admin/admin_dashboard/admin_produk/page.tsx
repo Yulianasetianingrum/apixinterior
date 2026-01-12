@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import styles from "../admin_dashboard.module.css";
 import LogoutButton from "../LogoutButton";
 
-type MenuKey = "home" | "produk" | "galeri" | "pengaturan" | "statistik";
+type MenuKey = "home" | "produk" | "galeri" | "pengaturan" | "konten" | "statistik";
 
 const produkSubMenus = [
   {
