@@ -384,7 +384,8 @@ async function fetchThemeData(themeKey: string, isPublished: boolean) {
   };
 }
 
-searchParams,
+export default async function HomePage({
+  searchParams,
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
