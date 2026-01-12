@@ -426,11 +426,9 @@ const formFocusScript = `
 export default async function TokoPengaturanPage({
   searchParams,
 }: {
-  // Next versi tertentu bisa mengirim searchParams sebagai Promise.
-  searchParams?: Record<string, string | string[] | undefined> | Promise<Record<string, any>>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const spAny: any = searchParams as any;
-  const sp = spAny && typeof spAny.then === "function" ? await spAny : (searchParams as any);
+  const sp = await searchParams;
 
   const noticeRaw = typeof sp?.notice === "string" ? sp.notice : "";
   const errorRaw = typeof sp?.error === "string" ? sp.error : "";
