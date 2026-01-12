@@ -631,12 +631,11 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PUT(
-  req: NextRequest,
-  ctx: { params: Promise<{ id: string }> }
+  req: NextRequest
 ) {
   try {
-    const params = await ctx.params;
-    const id = Number(params.id);
+    const searchParams = req.nextUrl.searchParams;
+    const id = Number(searchParams.get("id"));
     if (!Number.isFinite(id) || id <= 0) {
       return NextResponse.json({ error: "ID produk tidak valid." }, { status: 400 });
     }
