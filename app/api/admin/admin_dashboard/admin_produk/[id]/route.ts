@@ -470,13 +470,12 @@ async function upsertVariasi(
 
 async function parseId(
   req: NextRequest,
-  ctx: { params?: any }
+  paramsPromise: Promise<{ id: string }>
 ): Promise<{ id: number; raw: string }> {
   let raw = "";
   try {
-    const p = ctx?.params;
-    const awaited = p && typeof p.then === "function" ? await p : p;
-    raw = awaited?.id ?? "";
+    const params = await paramsPromise;
+    raw = params?.id ?? "";
   } catch {
     raw = "";
   }
@@ -491,10 +490,10 @@ async function parseId(
 
 export async function GET(
   req: NextRequest,
-  ctx: { params?: { id?: string } | Promise<{ id?: string }> }
+  ctx: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id, raw } = await parseId(req, ctx as any);
+    const { id, raw } = await parseId(req, ctx.params);
     if (!Number.isFinite(id) || id <= 0) {
       return NextResponse.json(
         { error: "ID produk tidak valid.", received: raw },
@@ -582,10 +581,10 @@ export async function GET(
 
 export async function PATCH(
   req: NextRequest,
-  ctx: { params?: { id?: string } | Promise<{ id?: string }> }
+  ctx: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id, raw } = await parseId(req, ctx as any);
+    const { id, raw } = await parseId(req, ctx.params);
     if (!Number.isFinite(id) || id <= 0) {
       return NextResponse.json(
         { error: "ID produk tidak valid.", received: raw },
@@ -631,10 +630,10 @@ export async function PATCH(
 
 export async function PUT(
   req: NextRequest,
-  ctx: { params?: { id?: string } | Promise<{ id?: string }> }
+  ctx: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id, raw } = await parseId(req, ctx as any);
+    const { id, raw } = await parseId(req, ctx.params);
     if (!Number.isFinite(id) || id <= 0) {
       return NextResponse.json(
         { error: "ID produk tidak valid.", received: raw },
@@ -949,12 +948,13 @@ export async function PUT(
 }
 
 export async function DELETE(
-  req: Request,
-  ctx: { params?: { id?: string } }
+  req: NextRequest,
+  ctx: { params: Promise<{ id: string }> }
 ) {
   try {
     // Lebih robust: kadang params.id bisa aneh/undefined, jadi fallback ke path URL
-    const rawFromParams = ctx?.params?.id ?? "";
+    const params = await ctx.params;
+    const rawFromParams = params?.id ?? "";
     const url = new URL(req.url);
     const rawFromPath = url.pathname.split("/").filter(Boolean).pop() ?? "";
     const raw = String(rawFromParams || rawFromPath).trim();
