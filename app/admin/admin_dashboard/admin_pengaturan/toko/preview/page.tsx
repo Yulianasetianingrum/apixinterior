@@ -656,13 +656,11 @@ async function fetchPreviewTheme(themeKey: string) {
 
 
 
-export default async function TokoPreviewDraftPage({
-  searchParams,
+searchParams,
 }: {
-  searchParams?: Record<string, string | string[] | undefined> | Promise<Record<string, any>>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const spAny: any = searchParams as any;
-  const sp = spAny && typeof spAny.then === "function" ? await spAny : spAny;
+  const sp = await searchParams;
 
   const themeKey = normalizeThemeKey(readSp(sp, "theme") || "theme_1");
   const focus = upperType(readSp(sp, "focus"));
