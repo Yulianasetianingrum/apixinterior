@@ -1,0 +1,258 @@
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.section:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.title {
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #64748b;
+    letter-spacing: 0.05em;
+}
+
+.searchInput {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.searchInput:focus {
+    border-color: #D4AF37;
+    box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.1);
+}
+
+.categoryList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.categoryItem {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    color: #334155;
+    cursor: pointer;
+    transition: color 0.1s;
+}
+
+.categoryItem:hover {
+    color: #D4AF37;
+}
+
+.checkbox {
+    width: 16px;
+    height: 16px;
+    accent-color: #D4AF37;
+    cursor: pointer;
+}
+
+.priceInputs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.priceInput {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 13px;
+    outline: none;
+}
+
+.priceInput:focus {
+    border-color: #D4AF37;
+}
+
+.divider {
+    color: #94a3b8;
+}
+
+.select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    background-color: white;
+    cursor: pointer;
+}
+
+.select:focus {
+    border-color: #D4AF37;
+}
+
+.applyBtn {
+    width: 100%;
+    padding: 12px;
+    background-color: #D4AF37;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-top: 10px;
+}
+
+.applyBtn:hover {
+    background-color: #bfa34b;
+}
+
+.resetLink {
+    text-align: center;
+    font-size: 13px;
+    color: #94a3b8;
+    text-decoration: underline;
+    cursor: pointer;
+    margin-top: 8px;
+    background: none;
+    border: none;
+}
+
+.resetLink:hover {
+    color: #64748b;
+}
+
+.activeCategory {
+    color: #D4AF37;
+    font-weight: 600;
+}
+
+/* Mobile Responsive Drawer */
+.mobileToggle {
+    display: none;
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #D4AF37;
+    border: none;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 20px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+    z-index: 990;
+    /* Below backdrop (999) */
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s;
+}
+
+.mobileToggle:hover {
+    transform: scale(1.05);
+    background: #bfa34b;
+}
+
+.mobileToggle:active {
+    transform: scale(0.95);
+}
+
+.closeBtn {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #64748b;
+    padding: 4px;
+}
+
+.headerMobile {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e2e8f0;
+    margin-bottom: 20px;
+}
+
+.mobileTitle {
+    font-size: 18px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.backdrop {
+    display: none;
+}
+
+@media (max-width: 1024px) {
+    .mobileToggle {
+        display: flex;
+    }
+
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 300px;
+        /* Drawer width */
+        max-width: 85vw;
+        background: white;
+        z-index: 1000;
+        padding: 24px;
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        overflow-y: auto;
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
+    }
+
+    .backdrop {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 999;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+    }
+
+    .backdrop.open {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .closeBtn,
+    .headerMobile {
+        display: flex;
+    }
+}

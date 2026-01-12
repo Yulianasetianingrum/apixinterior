@@ -1,0 +1,466 @@
+/* MODE SIANG/MALAM MAIN AREA */
+.mainDay {
+  background: #f9fafb;
+  color: #0b1531;
+}
+
+.mainNight {
+  background: #020617;
+  color: #f5c542;
+}
+
+.pageTitleOutside {
+}
+
+.pageSubtitleOutside {
+}
+
+.mainDay .pageTitleOutside {
+  color: #0b1531;
+}
+
+.mainNight .pageTitleOutside {
+  color: #f5c542;
+}
+
+.mainDay .pageSubtitleOutside {
+  color: #4b5563;
+}
+
+.mainNight .pageSubtitleOutside {
+  color: #f5c542;
+}
+
+/* BRAND ATAS KANAN */
+.desktopTopBar {
+  display: none;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}
+
+
+/* ===== TAMBAHAN: MODE MALAM BIAR KEBACA ===== */
+
+/* Judul & teks info dalam card */
+.mainNight .listTitle,
+.mainNight .statusText,
+.mainNight .infoText,
+.mainNight .editingInfo {
+  color: #f9fafb;
+}
+
+/* List item di mode malam: background gelap + teks terang */
+.mainNight .listItem {
+  background: #020617; /* selaras dengan cardNight */
+  border-color: rgba(248, 250, 252, 0.12);
+}
+
+/* Link URL di mode malam: biru terang */
+.mainNight .listUrl {
+  color: #93c5fd;
+}
+
+/* Optional: badge Prioritas biar lebih kontras di malam */
+.mainNight .priorityBadge {
+  background: #f97316;
+  color: #fff;
+}
+
+
+@media (min-width: 1024px) {
+  .desktopTopBar {
+    display: flex;
+  }
+}
+
+.desktopBrand,
+.topRightBrand {
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #f5c542;
+}
+
+.desktopBrandNight,
+.topRightBrandNight {
+  color: #ffffff !important;
+}
+
+.topRightBrand {
+  margin-left: auto;
+  font-size: 14px;
+}
+
+/* CARD BESAR AREA */
+.cardArea {
+  padding: 8px 0 24px;
+}
+
+.cardAreaDay {
+  background: transparent;
+}
+
+.cardAreaNight {
+  background: transparent;
+}
+
+.cardWrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.card {
+  max-width: 1100px;
+  width: 100%;
+  border-radius: 24px;
+  transition: none;
+}
+
+.cardDay {
+  background: #f5c542; /* kuning */
+}
+
+.cardNight {
+  background: #020617; /* biru gelap */
+}
+
+.noCardHover:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* TOMBOL X DI SIDEBAR (MOBILE) */
+.closeSidebarButton {
+  border: none;
+  background: transparent;
+  color: #f5c542;
+  font-size: 22px;
+  margin-left: auto;
+  cursor: pointer;
+}
+
+@media (min-width: 1024px) {
+  .closeSidebarButton {
+    display: none;
+  }
+}
+
+/* TOMBOL KEMBALI DI BAWAH SIDEBAR */
+.sidebarBackWrapper {
+  padding: 12px 16px 20px;
+}
+
+.sidebarBackButton {
+  width: 100%;
+  border-radius: 999px;
+  border: 1px solid #f5c542;
+  background: transparent;
+  color: #f5c542;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 8px 0;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+.sidebarBackButton:hover {
+  background: #f5c542;
+  color: #0b1531;
+}
+
+/* KONTEN DALAM CARD */
+.contentInner {
+  padding: 18px 20px 22px;
+}
+
+/* FORM */
+.formRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 10px;
+  align-items: flex-end;
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #0b1531;
+}
+
+.mainNight .label {
+  color: #f5f5f5;
+}
+
+.platformWrapper {
+  position: relative;
+}
+
+/* INPUT: WARNA FIX SUPAYA TIDAK HILANG DI MODE MALAM */
+.input {
+  padding: 9px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(15, 23, 42, 0.18);
+  min-width: 260px;
+  font-size: 14px;
+  background: #ffffff;
+  color: #111827; /* teks selalu gelap */
+}
+
+.input::placeholder {
+  color: #9ca3af;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #0b1531;
+  box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.15);
+}
+
+/* TOMBOL */
+.button {
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: none;
+  background: #0b1531;
+  color: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.infoText {
+  font-size: 13px;
+  color: #1f2937;
+  margin-bottom: 8px;
+}
+
+.editingInfo {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 12px;
+}
+
+/* SUGGESTION DROPDOWN */
+.suggestionList {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 115%;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.18);
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+  z-index: 20;
+  color: #111827;
+}
+
+.suggestionItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.suggestionItem:hover {
+  background: #f3f4f6;
+}
+
+.suggestionIcon {
+  font-size: 18px;
+}
+
+/* LIST MEDIA SOSIAL */
+.listWrapper {
+  margin-top: 12px;
+}
+
+.listTitle {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #000000;
+}
+
+.statusText {
+  font-size: 13px;
+  color: #374151;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.listItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #fefce8;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  margin-bottom: 8px;
+}
+
+/* ICON + TEKS UTAMA */
+.listMain {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.iconBubble {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: #0f172a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #f5c542;
+}
+
+.iconSvg {
+  font-size: 18px;
+}
+
+.iconFallback {
+  font-size: 16px;
+}
+
+.listText {
+  display: flex;
+  flex-direction: column;
+}
+
+.listName {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.listUrl {
+  font-size: 12px;
+  color: #1d4ed8;
+  text-decoration: underline;
+  word-break: break-all;
+}
+
+.priorityBadge {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #f97316;
+  color: white;
+  margin-left: 8px;
+}
+
+/* BAGIAN KANAN: PRIORITAS + TOMBOL */
+.listActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* === FIX UTAMA: WARNA TEKS TIDAK IKUT KETIMPA === */
+
+/* Prioritas label */
+.priorityToggle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #0b1531 !important; /* siang: gelap, biar kebaca di kuning */
+}
+
+.mainNight .priorityToggle {
+  color: #f5f5f5 !important; /* malam: terang, kebaca di biru tua */
+}
+
+/* Tombol Edit */
+.secondaryButton {
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: none;
+  background: #e5e7eb;
+  font-size: 12px;
+  cursor: pointer;
+  color: #0b1531 !important; /* fix text hilang */
+}
+
+.secondaryButton:hover {
+  background: #d1d5db;
+  color: #0b1531 !important;
+}
+
+/* Tombol Hapus */
+.dangerButton {
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: none;
+  background: #fee2e2;
+  color: #b91c1c !important;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.dangerButton:hover {
+  background: #fecaca;
+  color: #7f1d1d !important;
+}
+
+/* WARNA TEKS DALAM LIST SECARA UMUM */
+.mainDay .listItem,
+.mainDay .listName,
+.mainDay .listUrl {
+  color: #0b1531;
+}
+
+.mainNight .listItem,
+.mainNight .listName,
+.mainNight .listUrl {
+  color: #f9fafb;
+}
+
+
+/* ===== RESPONSIVE: TABLET & HP ===== */
+@media (max-width: 1024px) {
+  .listItem {
+    flex-direction: column;      /* dari row -> column */
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .listMain {
+    width: 100%;                 /* teks & link full width */
+  }
+
+  .listActions {
+    width: 100%;
+    margin-top: 8px;             /* geser ke bawah link */
+    justify-content: flex-start; /* tombol mulai dari kiri */
+    flex-wrap: wrap;             /* kalau sempit boleh turun baris lagi */
+    gap: 6px;
+  }
+
+  .priorityToggle,
+  .secondaryButton,
+  .dangerButton {
+    font-size: 12px;             /* sedikit lebih kecil di mobile */
+  }
+}

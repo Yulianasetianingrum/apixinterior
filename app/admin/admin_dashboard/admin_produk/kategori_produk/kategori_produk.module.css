@@ -1,0 +1,874 @@
+/* =========================
+   LIST KATEGORI (CARD UTAMA)
+   ========================= */
+
+/* Kartu kategori di dalam baseStyles.item */
+.categoryCard {
+  background: #ffffff;
+  border-radius: 1.25rem;
+  padding: 1rem;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  /* bikin card memanjang full ke kanan */
+  width: 100%;
+  flex: 0 0 auto; /* jangan isi tinggi wrapper */
+  min-width: 0;
+}
+
+/* Baris atas: icon drag + teks */
+.categoryHeaderRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.categoryDragHandle {
+  font-size: 1.15rem;
+  cursor: grab;
+  color: #9ca3af;
+  user-select: none;
+}
+
+.categoryDragHandle:active {
+  cursor: grabbing;
+}
+
+.categoryInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.categoryName {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.categoryCount {
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+/* Strip thumbnail kecil di bawah judul */
+.thumbStrip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.25rem;
+}
+
+.thumbItem {
+  width: 56px;
+  height: 56px;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background: #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.thumbItem img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thumbMore {
+  width: 56px;
+  height: 56px;
+  border-radius: 0.75rem;
+  border: 1px dashed #9ca3af;
+  background: #f3f4f6;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.noImg {
+  font-size: 0.7rem;
+  color: #6b7280;
+}
+
+.cardButtons {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+/* ==============================
+   MODAL FULLSCREEN KELOLA PRODUK
+   ============================== */
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.modal {
+  width: 95%;
+  max-width: 960px;
+  max-height: 90vh;
+  background: #ffffff;
+  border-radius: 1.25rem;
+  padding: 1rem 1.25rem 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.modalClose {
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+  line-height: 1;
+}
+
+/* isi modal: dua kolom (produk kiri, selected kanan) */
+.modalContent {
+  margin-top: 0.75rem;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  gap: 1rem;
+}
+
+/* KIRI: filter + grid produk */
+.modalLeft {
+  flex: 2;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* KANAN: list produk dalam kategori (drag & drop) */
+.modalRight {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Baris filter atas (search + sort, lalu kategori + subkategori) */
+.filterRow {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.select {
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.85rem;
+  background: #f9fafb;
+}
+
+/* Grid produk di sisi kiri modal */
+.modalGrid {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.75rem;
+  padding-right: 0.25rem;
+}
+
+.modalItem {
+  background: #f9fafb;
+  border-radius: 1rem;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+}
+
+.modalItem input[type="checkbox"] {
+  margin-bottom: 0.25rem;
+}
+
+.modalThumb {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background: #e5e7eb;
+}
+
+.modalThumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.modalName {
+  font-weight: 600;
+}
+
+.modalPrice {
+  font-size: 0.8rem;
+  color: #4b5563;
+}
+
+.modalMeta {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+/* Kanan: selected list (produk dalam kategori) */
+
+.selectedHeader {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.85rem;
+  gap: 0.15rem;
+}
+
+.selectedHint {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.selectedList {
+  flex: 1;
+  min-height: 0;
+  margin-top: 0.25rem;
+  border-radius: 0.75rem;
+  border: 1px dashed #e5e7eb;
+  padding: 0.5rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  background: #f9fafb;
+}
+
+.selectedItem {
+  background: #ffffff;
+  border-radius: 0.75rem;
+  padding: 0.35rem 0.4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06);
+  cursor: grab;
+}
+
+.selectedItem:active {
+  cursor: grabbing;
+}
+
+.selectedThumb {
+  width: 56px;
+  height: 56px;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background: #e5e7eb;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.selectedThumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.selectedInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.selectedName {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.selectedPrice {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.selectedRemove {
+  border: none;
+  background: none;
+  font-size: 1rem;
+  cursor: pointer;
+  color: #ef4444;
+}
+
+/* Footer modal */
+.modalFooter {
+  border-top: 1px solid #e2e8f0;
+  padding-top: 0.5rem;
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.85rem;
+}
+
+/* ==============================
+   RESPONSIVE (TABLET / HP)
+   ============================== */
+
+@media (max-width: 768px) {
+  .modal {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    border-radius: 0;
+  }
+
+  .modalContent {
+    flex-direction: column;
+  }
+
+  /* di HP, list produk terpilih muncul di atas */
+  .modalRight {
+    order: -1;
+  }
+}
+
+/* ==============================
+   RESPONSIVE (TABLET / HP)
+   ============================== */
+
+/* anggap tablet kecil + hp sebagai layout "stack" */
+@media (max-width: 1024px) {
+  .modalOverlay {
+    align-items: stretch;
+    justify-content: stretch;
+  }
+
+  .modal {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    border-radius: 0;
+    padding: 0.75rem 0.75rem 0.9rem;
+    /* INI PENTING: seluruh modal boleh discroll */
+    overflow-y: auto;
+  }
+
+  .modalContent {
+    flex-direction: column;
+    gap: 0.75rem;
+    /* jangan paksa tinggi fix */
+    flex: 0 0 auto;
+    min-height: auto;
+  }
+
+  /* kiri & kanan jadi section biasa (stack), tidak membagi tinggi 50:50 */
+  .modalLeft,
+  .modalRight {
+    flex: 0 0 auto;
+    min-height: auto;
+  }
+
+  /* grid produk ikut tinggi konten, kalau panjang scroll via .modal */
+  .modalGrid {
+    max-height: none;
+  }
+
+  /* list produk dipilih juga fleksibel */
+  .selectedList {
+    max-height: none;
+  }
+
+  /* supaya di HP list produk dipilih muncul di atas */
+  .modalRight {
+    order: -1;
+  }
+}
+
+
+/* ==============================
+   DROP ALL (HAPUS SEMUA KATEGORI)
+   ============================== */
+
+.dropAllButton {
+  white-space: nowrap;
+}
+
+.dropAllButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.dropProgress {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+/* ==============================
+   AI GENERATE MODAL - ENHANCANCEMENT
+   ============================== */
+
+.modalOverlay { backdrop-filter: blur(6px); }
+
+.modal {
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.18);
+  overflow: hidden;
+  animation: modalPop 160ms ease-out;
+}
+
+@keyframes modalPop {
+  from { transform: translateY(10px) scale(0.99); opacity: 0.85; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.modalHeader {
+  padding: 0.25rem 0 0.75rem;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.9);
+}
+
+.modalHeader h2 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.modalClose {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #111827;
+  transition: background 120ms ease, transform 120ms ease, opacity 120ms ease;
+}
+
+.modalClose:hover { background: rgba(15, 23, 42, 0.08); transform: scale(1.03); }
+.modalClose:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.modalFooter {
+  padding-top: 0.75rem;
+  margin-top: 0.75rem;
+  border-top: 1px solid rgba(226, 232, 240, 0.9);
+}
+
+.aiResultBox {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.04), rgba(15, 23, 42, 0.02));
+}
+
+.aiResultBox ul { margin: 0; }
+.aiResultBox li { margin: 4px 0; }
+
+.selectedList {
+  border: 1px dashed rgba(148, 163, 184, 0.55);
+  background: linear-gradient(180deg, rgba(249, 250, 251, 1), rgba(249, 250, 251, 0.75));
+}
+
+@media (max-width: 768px) {
+  .modalHeader { padding-bottom: 0.6rem; }
+  .modalClose { width: 36px; height: 36px; }
+  .aiResultBox { border-radius: 12px; }
+}
+/* ==============================
+   DROP ALL PROGRESS - STYLING
+   (supaya state "Menghapus..." terlihat rapi)
+   ============================== */
+
+.dropAllButton {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  line-height: 1.1;
+}
+
+.dropProgress {
+  margin: 0;
+  padding: 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  opacity: 0.85;
+  max-width: 220px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* kalau progress agak panjang, biar tetap terbaca di mobile */
+@media (max-width: 768px) {
+  .dropProgress {
+    max-width: 160px;
+  }
+}
+
+
+/* ==============================
+   AI MODAL (Generate Otomatis)
+   styling khusus biar modal AI lebih premium
+   ============================== */
+
+.aiOverlay {
+  background: rgba(2, 6, 23, 0.35);
+}
+
+.aiModal {
+  max-width: 980px;
+  width: min(980px, calc(100vw - 32px));
+  border-radius: 18px;
+}
+
+/* header & footer sticky biar tombol gak loncat */
+.aiModalHeader {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(10px);
+  padding: 16px 18px;
+}
+
+.aiModalContent {
+  gap: 16px;
+  padding-top: 12px;
+}
+
+.aiModalLeft,
+.aiModalRight {
+  min-height: 320px;
+}
+
+/* panel kanan jadi "summary card" */
+.aiModalRight {
+  border-left: 1px solid rgba(226, 232, 240, 0.9);
+  padding-left: 14px;
+}
+
+/* group input lebih rapih */
+.aiFieldGroup {
+  margin-top: 10px;
+}
+
+/* progress bar halus */
+.aiProgressBarWrap {
+  height: 6px;
+  width: 100%;
+  background: rgba(15, 23, 42, 0.08);
+  border-radius: 999px;
+  overflow: hidden;
+  margin: 0 18px 6px;
+}
+
+.aiProgressBar {
+  height: 100%;
+  width: 40%;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.35);
+  animation: aiBar 900ms ease-in-out infinite;
+}
+
+@keyframes aiBar {
+  0% { transform: translateX(-80%); }
+  50% { transform: translateX(120%); }
+  100% { transform: translateX(-80%); }
+}
+
+.aiModalFooter {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(10px);
+  padding: 12px 18px;
+}
+
+/* responsive: stack layout */
+@media (max-width: 880px) {
+  .aiModal {
+    width: calc(100vw - 24px);
+  }
+  .aiModalContent {
+    flex-direction: column;
+  }
+  .aiModalRight {
+    border-left: none;
+    border-top: 1px solid rgba(226, 232, 240, 0.9);
+    padding-left: 0;
+    padding-top: 12px;
+  }
+  .aiProgressBarWrap {
+    margin: 0 14px 6px;
+  }
+}
+
+
+
+/* ==============================
+   CONFIRM MODAL (Hapus Semua)
+   ============================== */
+.confirmOverlay {
+  background: rgba(2, 6, 23, 0.45);
+}
+
+.confirmModal {
+  max-width: 680px;
+  width: min(680px, calc(100vw - 28px));
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.confirmHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(10px);
+}
+
+.confirmTitle {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}
+
+.confirmSubtitle {
+  margin-top: 4px;
+  font-size: 13px;
+  opacity: 0.8;
+  line-height: 1.35;
+}
+
+.confirmClose {
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 10px;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.confirmClose:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.confirmProgressWrap {
+  height: 6px;
+  width: 100%;
+  background: rgba(15, 23, 42, 0.08);
+}
+
+.confirmProgressBar {
+  height: 100%;
+  width: 40%;
+  background: rgba(220, 38, 38, 0.45);
+  animation: confirmBar 900ms ease-in-out infinite;
+}
+
+@keyframes confirmBar {
+  0% { transform: translateX(-80%); }
+  50% { transform: translateX(120%); }
+  100% { transform: translateX(-80%); }
+}
+
+.confirmBody {
+  padding: 14px 18px 16px;
+}
+
+.confirmWarning {
+  border: 1px solid rgba(220, 38, 38, 0.18);
+  background: rgba(220, 38, 38, 0.08);
+  border-radius: 14px;
+  padding: 12px;
+}
+
+.confirmBadge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(220, 38, 38, 0.18);
+}
+
+.confirmText {
+  margin-top: 8px;
+  font-size: 13px;
+  line-height: 1.4;
+  opacity: 0.9;
+}
+
+.confirmStatus {
+  margin-top: 12px;
+  font-size: 13px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.05);
+}
+
+.confirmHint {
+  margin-top: 12px;
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.confirmFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(10px);
+}
+
+.confirmCancelBtn {
+  background: rgba(15, 23, 42, 0.06);
+  border: 1px solid rgba(15, 23, 42, 0.10);
+}
+
+.confirmDangerBtn {
+  background: rgba(220, 38, 38, 0.90);
+  color: #fff;
+  border: 1px solid rgba(220, 38, 38, 0.55);
+}
+
+.confirmDangerBtn:disabled {
+  opacity: 0.65;
+}
+
+@media (max-width: 520px) {
+  .confirmFooter {
+    flex-direction: column;
+  }
+  .confirmCancelBtn,
+  .confirmDangerBtn {
+    width: 100%;
+  }
+}
+
+
+/* ==============================
+   TOAST (ganti alert() browser)
+   ============================== */
+.toastWrap {
+  position: fixed;
+  z-index: 9999;
+  top: 18px;
+  right: 18px;
+  width: min(420px, calc(100vw - 36px));
+  pointer-events: none;
+}
+
+.toastCard {
+  pointer-events: auto;
+  border-radius: 16px;
+  padding: 12px 12px 12px;
+  box-shadow: 0 18px 50px rgba(2, 6, 23, 0.22);
+  border: 1px solid rgba(15, 23, 42, 0.10);
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(12px);
+  animation: toastIn 180ms ease-out;
+}
+
+@keyframes toastIn {
+  from { transform: translateY(-8px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.toastHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.toastTitle {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}
+
+.toastClose {
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 10px;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.toastMessage {
+  margin-top: 8px;
+  font-size: 13px;
+  line-height: 1.35;
+  white-space: pre-wrap;
+  opacity: 0.92;
+}
+
+/* Variants */
+.toast_success .toastCard {
+  border-color: rgba(16, 185, 129, 0.25);
+  box-shadow: 0 18px 50px rgba(16, 185, 129, 0.12);
+}
+
+.toast_error .toastCard {
+  border-color: rgba(220, 38, 38, 0.25);
+  box-shadow: 0 18px 50px rgba(220, 38, 38, 0.12);
+}
+
+.toast_warn .toastCard {
+  border-color: rgba(245, 158, 11, 0.28);
+  box-shadow: 0 18px 50px rgba(245, 158, 11, 0.12);
+}
+
+.toast_info .toastCard {
+  border-color: rgba(59, 130, 246, 0.22);
+  box-shadow: 0 18px 50px rgba(59, 130, 246, 0.10);
+}
+
+@media (max-width: 520px) {
+  .toastWrap {
+    top: 12px;
+    right: 12px;
+    left: 12px;
+    width: auto;
+  }
+}

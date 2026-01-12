@@ -1,0 +1,210 @@
+/* app/globals.css
+   Global baseline styles for Apix Interior (Next.js App Router)
+   Theme colors: bright gold, navy, white, black
+*/
+
+:root {
+  /* Brand */
+  --apix-gold: #d4af37;
+  --apix-navy: #0b1f3b;
+  --apix-white: #ffffff;
+  --apix-black: #0b0b0b;
+
+  /* Neutrals */
+  --apix-bg: #ffffff;
+  --apix-surface: #ffffff;
+  --apix-text: #0b0b0b;
+  --apix-muted: rgba(11, 11, 11, .68);
+  --apix-border: rgba(11, 11, 11, .10);
+
+  /* Radii + shadows */
+  --apix-radius: 16px;
+  --apix-radius-sm: 12px;
+  --apix-shadow: 0 10px 26px rgba(11, 31, 59, .12);
+  --apix-shadow-soft: 0 6px 18px rgba(11, 31, 59, .10);
+
+  /* Spacing */
+  --apix-container: 1120px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  background: #ffffff !important;
+}
+
+body {
+  background: var(--apix-bg);
+  color: var(--apix-text);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: none;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+::selection {
+  background: rgba(212, 175, 55, .25);
+}
+
+/* Generic container helper (optional) */
+.apix-container {
+  width: min(var(--apix-container), calc(100% - 32px));
+  margin-inline: auto;
+}
+
+/* Minimal button baseline (optional) */
+.apix-btn {
+  appearance: none;
+  border: 1px solid var(--apix-border);
+  background: var(--apix-white);
+  color: var(--apix-text);
+  border-radius: 999px;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: transform .08s ease, box-shadow .12s ease, border-color .12s ease;
+}
+
+.apix-btn:hover {
+  box-shadow: var(--apix-shadow-soft);
+  border-color: rgba(11, 11, 11, .18);
+}
+
+.apix-btn:active {
+  transform: translateY(1px);
+}
+
+.apix-btn-primary {
+  background: var(--apix-navy);
+  border-color: var(--apix-navy);
+  color: var(--apix-white);
+}
+
+.apix-btn-accent {
+  background: var(--apix-gold);
+  border-color: var(--apix-gold);
+  color: var(--apix-black);
+}
+
+/* Swipeable horizontal row utility (works great for carousels) */
+.apix-hscroll {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.apix-hscroll>* {
+  scroll-snap-align: start;
+}
+
+.apix-hscroll::-webkit-scrollbar {
+  height: 10px;
+}
+
+.apix-hscroll::-webkit-scrollbar-thumb {
+  background: rgba(11, 11, 11, .18);
+  border-radius: 999px;
+}
+
+.apix-hscroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Hide scrollbar utility (optional) */
+.apix-hide-scrollbar {
+  scrollbar-width: none;
+}
+
+.apix-hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Simple card baseline (optional) */
+.apix-card {
+  background: var(--apix-surface);
+  border: 1px solid var(--apix-border);
+  border-radius: var(--apix-radius);
+  box-shadow: none;
+}
+
+.apix-card-shadow {
+  box-shadow: var(--apix-shadow);
+}
+
+/* Form baseline (optional) */
+.apix-input,
+.apix-select,
+.apix-textarea {
+  width: 100%;
+  border: 1px solid var(--apix-border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: var(--apix-white);
+  color: var(--apix-text);
+}
+
+.apix-input:focus,
+.apix-select:focus,
+.apix-textarea:focus {
+  outline: none;
+  border-color: rgba(11, 31, 59, .45);
+  box-shadow: 0 0 0 4px rgba(11, 31, 59, .12);
+}
+
+/* Reduce motion */
+@media (prefers-reduced-motion:reduce) {
+  * {
+    scroll-behavior: auto !important;
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+
+/* Carousel utilities */
+
+/* Hide scrollbar + enforce snap behavior for SwipeCarousel */
+[data-apix-carousel] {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+[data-apix-carousel]::-webkit-scrollbar {
+  display: none;
+}
+
+[data-apix-carousel]>* {
+  scroll-snap-stop: always;
+}

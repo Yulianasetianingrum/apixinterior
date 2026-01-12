@@ -1,0 +1,642 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id           Int      @id @default(autoincrement())
+  username     String   @unique
+  passwordHash String
+  role         String? // optional: "superadmin", "editor", dll
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+//
+// ============ KATEGORI UTAMA ============
+//
+
+model Category {
+  id            Int            @id @default(autoincrement())
+  name          String         @unique // contoh: "Furniture Rumah"
+  subcategories Subcategory[]
+  gambar        GambarUpload[]
+}
+
+//
+// ============ SUBKATEGORI ============
+//
+
+model Subcategory {
+  id         Int            @id @default(autoincrement())
+  name       String
+  categoryId Int
+  category   Category       @relation(fields: [categoryId], references: [id])
+  gambar     GambarUpload[]
+
+  @@unique([categoryId, name])
+}
+
+//
+// ============ TABEL GAMBAR_UPLOAD ============
+//
+
+model GambarUpload {
+  id            Int                @id @default(autoincrement())
+  url           String
+  title         String?
+  tags          String             @default("")
+  categoryId    Int?
+  subcategoryId Int?
+  category      Category?          @relation(fields: [categoryId], references: [id])
+  subcategory   Subcategory?       @relation(fields: [subcategoryId], references: [id])
+  createdAt     DateTime           @default(now())
+  produkMain    Produk[]           @relation("ProdukMainImage")
+  variasiMain   VariasiProduk[]    @relation("VariationMainImage")
+  kombinasiFoto VariasiKombinasi[] @relation("KombinasiImage")
+  produkGaleri  ProdukGaleri[]     @relation("ProdukGaleriImage")
+  variasiGaleri VariasiGaleri[]    @relation("VariasiGaleriImage")
+
+  @@map("gambar_upload") // nama tabel di MySQL
+}
+
+//
+// ============ TABEL PRODUK (DAFTAR PRODUK) ============
+//
+
+// (opsional) biar jelas mode harga
+enum PriceMode {
+  UNIT
+  PER_METER
+  PER_M2
+  PER_TITIK
+}
+
+model Produk {
+  id          Int     @id @default(autoincrement())
+  nama        String
+  slug        String  @unique
+  kategori    String?
+  subkategori String?
+
+  // Harga & status
+  harga      Int
+  promoAktif Boolean @default(false)
+  promoTipe  String?
+  promoValue Int?
+
+  hargaTipe          String?
+  tipeOrder          String?
+  estimasiPengerjaan String?
+
+  // Deskripsi
+  deskripsiSingkat String? @db.LongText
+  deskripsiLengkap String? @db.LongText
+
+  // Spesifikasi teknis
+  panjang   Int?
+  lebar     Int?
+  tinggi    Int?
+  material  String?
+  finishing String?
+  warna     String?
+  berat     Int?
+  garansi   String?
+
+  // Layanan
+  isCustom         Boolean @default(false)
+  bisaCustomUkuran Boolean @default(false)
+  jasaPasang       String?
+
+  // Lain-lain
+  catatanKhusus   String?
+  tags            String?
+  metaTitle       String?
+  metaDescription String?
+
+  // Media
+  mainImageId Int?
+  galeri      ProdukGaleri[]
+
+  // Kategori linkage (tanpa relation)
+  categoryId    Int?
+  subcategoryId Int?
+
+  // Urutan di daftar_produk (buat drag & drop)
+  urutan Int @default(0)
+
+  createdAt DateTime @default(now())
+
+  // relasi ke kategori_produk_item (pivot kategori ↔ produk)
+  kategoriProdukItems KategoriProdukItem[]
+
+  // Relasi ke GambarUpload
+  mainImage GambarUpload? @relation("ProdukMainImage", fields: [mainImageId], references: [id], onDelete: SetNull)
+
+  // ✅ INI WAJIB kalau kamu punya model VariasiProduk yang relation ke Produk
+  // ✅ INI WAJIB kalau kamu punya model VariasiProduk yang relation ke Produk
+  variasiProduk VariasiProduk[] @relation("ProdukVariasi")
+
+  // Analytics relations
+  views         ProductView[]        @relation("ProductViews")
+  cardClicks    ProductCardClick[]   @relation("ProductCardClicks")
+  contactClicks ProductContactClick[] @relation("ProductContactClicks")
+
+  @@map("produk")
+}
+
+model VariasiProduk {
+  id       Int @id @default(autoincrement())
+  produkId Int
+
+  produk Produk @relation("ProdukVariasi", fields: [produkId], references: [id], onDelete: Cascade)
+
+  nama    String
+  options Json?
+
+  priceMode PriceMode @default(UNIT)
+
+  // ✅ ini nyawa harga (base)
+  harga Int
+
+  // promo base (opsional, boleh dipakai atau kamu bisa ignore)
+  promoAktif Boolean @default(false)
+  promoTipe  String?
+  promoValue Int?
+
+  imageId Int?
+
+  // kalau kamu memang udah fix "ga usah stok", hapus aja field ini
+  stok  Int?
+  aktif Boolean @default(true)
+
+  urutan    Int      @default(0)
+  createdAt DateTime @default(now())
+
+  // ✅ relasi ke kombinasi level 1..3
+  kombinasi VariasiKombinasi[]
+
+  // Relasi ke GambarUpload
+  mainImage GambarUpload?   @relation("VariationMainImage", fields: [imageId], references: [id], onDelete: SetNull)
+  galeri    VariasiGaleri[]
+
+  @@unique([produkId, nama], name: "uniq_variasi_produk_nama")
+  @@index([produkId, urutan])
+  @@map("variasi_produk")
+}
+
+model VariasiKombinasi {
+  id              Int @id @default(autoincrement())
+  variasiProdukId Int
+
+  variasiProduk VariasiProduk @relation(fields: [variasiProdukId], references: [id], onDelete: Cascade)
+
+  // level 1..3
+  level Int
+
+  // contoh: "Warna" / "Ukuran" / "Bonus"
+  nama String
+
+  // contoh: "Pink" / "L" / "Bonus Desain"
+  nilai String
+
+  // tambahan harga (nullable = tidak nambah)
+  tambahHarga Int?
+
+  // promo (hanya dipakai kalau tambahHarga terisi > 0)
+  promoAktif Boolean @default(false)
+  promoTipe  String?
+  promoValue Int?
+
+  // gambar opsional
+  imageId Int?
+  image   GambarUpload? @relation("KombinasiImage", fields: [imageId], references: [id], onDelete: SetNull)
+
+  urutan    Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@unique([variasiProdukId, level, nama], name: "uniq_variasi_kombinasi")
+  @@index([variasiProdukId, level, urutan])
+  @@map("variasi_kombinasi")
+}
+
+model ProdukGaleri {
+  id       Int @id @default(autoincrement())
+  produkId Int
+  gambarId Int
+  urutan   Int @default(0)
+
+  produk Produk       @relation(fields: [produkId], references: [id], onDelete: Cascade)
+  gambar GambarUpload @relation("ProdukGaleriImage", fields: [gambarId], references: [id])
+
+  @@unique([produkId, gambarId], name: "uniq_produk_galeri")
+  @@index([produkId, urutan])
+  @@map("produk_galeri")
+}
+
+model VariasiGaleri {
+  id              Int @id @default(autoincrement())
+  variasiProdukId Int
+  gambarId        Int
+  urutan          Int @default(0)
+
+  variasiProduk VariasiProduk @relation(fields: [variasiProdukId], references: [id], onDelete: Cascade)
+  gambar        GambarUpload  @relation("VariasiGaleriImage", fields: [gambarId], references: [id])
+
+  @@unique([variasiProdukId, gambarId], name: "uniq_variasi_galeri")
+  @@index([variasiProdukId, urutan])
+  @@map("variasi_galeri")
+}
+
+//
+// ============ HUBUNGI ============
+//
+
+model Hubungi {
+  id        Int      @id @default(autoincrement())
+  nomor     String
+  prioritas Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("hubungi") // nama tabel di MySQL: hubungi
+}
+
+//
+// ============ MEDIA SOSIAL ============
+//
+
+model MediaSosial {
+  id        Int      @id @default(autoincrement())
+  nama      String // Nama platform: Instagram, TikTok, dll
+  iconKey   String // Key icon: instagram, tiktok, dll
+  url       String // URL penuh
+  prioritas Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("media_sosial")
+}
+
+//
+// ============ INFORMASI TOKO (SINGLETON) ============
+//
+
+model InformasiToko {
+  id        Int      @id @default(1)
+  namaToko  String
+  deskripsi String
+  logoUrl   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("informasi_toko")
+}
+
+//
+// ============ CABANG TOKO ============
+//
+
+model CabangToko {
+  id         Int      @id @default(autoincrement())
+  namaCabang String
+  mapsUrl    String  @db.Text // bisa link google maps biasa atau embed src
+  urutan     Int? // optional urutan cabang
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("cabang_toko")
+}
+
+//
+// ============ KATEGORI PRODUK (CUSTOM OLEH ADMIN) ============
+//
+
+model KategoriProduk {
+  id         Int      @id @default(autoincrement())
+  nama       String
+  slug       String
+  isUnggulan Boolean  @default(false)
+  isPromo    Boolean  @default(false) // <-- tambah ini
+  urutan     Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  items KategoriProdukItem[]
+  @@unique([slug], name: "kategori_produk_slug_key")
+  @@map("kategori_produk")
+}
+
+
+
+
+//
+// ============ ITEM KATEGORI ↔ PRODUK (PIVOT) ============
+//
+
+model KategoriProdukItem {
+  id         Int @id @default(autoincrement())
+  kategoriId Int
+  produkId   Int
+  urutan     Int @default(0)
+
+  kategori KategoriProduk @relation(fields: [kategoriId], references: [id], onDelete: Cascade)
+  produk   Produk         @relation(fields: [produkId], references: [id], onDelete: Cascade)
+
+  @@unique([kategoriId, produkId], name: "uniq_kategori_produk")
+  @@map("kategori_produk_item")
+}
+
+enum HomepageSectionType {
+  HERO // Hero / Banner Utama
+  TEXT_SECTION // Text Section
+  CATEGORY_GRID // Grid Kategori Produk
+  CATEGORY_GRID_COMMERCE // Grid Category Commerce
+  PRODUCT_CAROUSEL // Carousel Produk
+  PRODUCT_LISTING // Product Listing (Grid Produk)
+  HIGHLIGHT_COLLECTION // Koleksi Furnitur & Dekor Pilihan
+  ROOM_CATEGORY // Kategori Ruangan
+  GALLERY // Galeri / Kolase Foto Proyek
+  BRANCHES // Cabang Toko / Showroom
+  CONTACT // Hubungi Kami
+  SOCIAL // Media Sosial
+  CUSTOM_PROMO // Custom / Promo Section
+  FOOTER // Footer Section
+}
+
+enum HomepageSectionItemType {
+  MENU_ITEM
+  BANNER_SLIDE
+  CATEGORY_ITEM
+}
+
+model HomepageSection {
+  id          Int                 @id @default(autoincrement())
+  type        HomepageSectionType
+  title       String
+  description String?
+  slug        String?
+  enabled     Boolean             @default(true)
+  sortOrder   Int
+  config      Json                @default("{}")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items HomepageSectionItem[]
+}
+
+enum NavbarPosition {
+  MAIN
+  FOOTER
+  BOTTOM
+}
+
+model NavbarItem {
+  id       Int            @id @default(autoincrement())
+  label    String
+  href     String
+  position NavbarPosition @default(MAIN)
+
+  enabled   Boolean @default(true)
+  sortOrder Int     @default(0)
+
+  isExternal Boolean @default(false)
+  iconKey    String?
+  showSearch Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AdminMenuItem {
+  id      Int     @id @default(autoincrement())
+  label   String
+  path    String
+  iconKey String?
+
+  parentId Int?
+  parent   AdminMenuItem?  @relation("AdminMenuChildren", fields: [parentId], references: [id])
+  children AdminMenuItem[] @relation("AdminMenuChildren")
+
+  enabled   Boolean @default(true)
+  sortOrder Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum ThemeColor {
+  GOLD
+  NAVY
+  BLACK
+  WHITE
+}
+
+model ThemeSettings {
+  id             Int        @id @default(1)
+  navbarBg       ThemeColor @default(NAVY)
+  navbarText     ThemeColor @default(WHITE)
+  sidebarBg      ThemeColor @default(BLACK)
+  sidebarText    ThemeColor @default(WHITE)
+  primaryColor   ThemeColor @default(GOLD)
+  secondaryColor ThemeColor @default(BLACK)
+  updatedAt      DateTime   @updatedAt
+}
+
+enum NavbarTheme {
+  NAVY_GOLD
+  WHITE_GOLD
+  NAVY_WHITE
+  GOLD_NAVY
+  GOLD_WHITE
+  WHITE_NAVY
+}
+
+model NavbarSetting {
+  id        Int         @id @default(1)
+  theme     NavbarTheme @default(NAVY_GOLD)
+  backgroundTheme String? @default("NAVY_GOLD")
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+model BannerPromo {
+  id          Int     @id @default(autoincrement())
+  title       String // Judul besar promo (headline)
+  subtitle    String? // Teks singkat di bawah judul
+  imageUrl    String // URL gambar banner (hasil upload)
+  buttonLabel String? // Teks tombol CTA, misal: "Lihat Promo"
+  buttonHref  String? // Link tombol, bisa /promo atau link WA
+  isActive    Boolean @default(true) // Banner aktif atau tidak
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("banner_promo") // nama tabel di MySQL
+}
+
+model HomepageSectionDraft {
+  id          Int                 @id @default(autoincrement())
+  type        HomepageSectionType
+  title       String
+  description String?
+  slug        String?
+  enabled     Boolean             @default(true)
+  sortOrder   Int                 @default(1)
+  config      Json                @default("{}")
+  heroHeadline    String?
+  heroSubheadline String?
+  heroCtaLabel    String?
+  heroCtaHref     String?
+  heroContent     Json?
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+}
+
+model HomepageSectionPublished {
+  id          Int                 @id @default(autoincrement())
+  type        HomepageSectionType
+  title       String
+  description String?
+  slug        String?
+  enabled     Boolean             @default(true)
+  sortOrder   Int                 @default(1)
+  config      Json                @default("{}")
+  heroHeadline    String?
+  heroSubheadline String?
+  heroCtaLabel    String?
+  heroCtaHref     String?
+  heroContent     Json?
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+}
+
+model HomepageSectionItem {
+  id Int @id @default(autoincrement())
+
+  homepageSectionId Int
+  homepageSection   HomepageSection @relation(fields: [homepageSectionId], references: [id], onDelete: Cascade)
+
+  type HomepageSectionItemType
+
+  label      String?
+  subtitle   String?
+  imageUrl   String?
+  url        String?
+  priceText  String?
+  promoLabel String?
+
+  sortOrder Int     @default(0)
+  enabled   Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+//
+// ============ DYNAMIC PAGES (FAQ, TERMS, PRIVACY) ============
+//
+
+model DynamicPage {
+  id          Int      @id @default(autoincrement())
+  title       String
+  slug        String   @unique
+  content     String   @db.LongText // HTML content
+  isPublished Boolean  @default(true)
+  
+  seoTitle       String?
+  seoDescription String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("dynamic_pages")
+}
+
+//
+// ============ BLOG / CONTENT POSTS ============
+//
+
+model Post {
+  id          Int      @id @default(autoincrement())
+  title       String
+  slug        String   @unique
+  excerpt     String?  @db.Text
+  content     String   @db.LongText
+  coverImage  String?
+  isPublished Boolean  @default(true)
+  author      String?
+  
+  seoTitle       String?
+  seoDescription String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("posts")
+}
+
+//
+// ============ ANALYTICS & TRACKING ============
+//
+
+// Track product card views (impressions - when card appears on screen)
+model ProductView {
+  id        Int      @id @default(autoincrement())
+  produkId  Int
+  produk    Produk   @relation("ProductViews", fields: [produkId], references: [id], onDelete: Cascade)
+  viewType  String   // "card_view" or "detail_view"
+  ipAddress String?
+  userAgent String?  @db.Text
+  createdAt DateTime @default(now())
+
+  @@index([produkId])
+  @@index([viewType])
+  @@index([createdAt])
+  @@map("product_views")
+}
+
+// Track product card clicks (when user clicks card to go to detail page)
+model ProductCardClick {
+  id        Int      @id @default(autoincrement())
+  produkId  Int
+  produk    Produk   @relation("ProductCardClicks", fields: [produkId], references: [id], onDelete: Cascade)
+  ipAddress String?
+  userAgent String?  @db.Text
+  createdAt DateTime @default(now())
+
+  @@index([produkId])
+  @@index([createdAt])
+  @@map("product_card_clicks")
+}
+
+// Track "Hubungi Sekarang" button clicks
+model ProductContactClick {
+  id        Int      @id @default(autoincrement())
+  produkId  Int
+  produk    Produk   @relation("ProductContactClicks", fields: [produkId], references: [id], onDelete: Cascade)
+  ipAddress String?
+  userAgent String?  @db.Text
+  createdAt DateTime @default(now())
+
+  @@index([produkId])
+  @@index([createdAt])
+  @@map("product_contact_clicks")
+}
+
+// Track page views (for total pengunjung)
+model PageView {
+  id        Int      @id @default(autoincrement())
+  path      String   // e.g., "/", "/produk", "/produk/meja-kantor"
+  ipAddress String?
+  userAgent String?  @db.Text
+  createdAt DateTime @default(now())
+
+  @@index([path])
+  @@index([createdAt])
+  @@map("page_views")
+}

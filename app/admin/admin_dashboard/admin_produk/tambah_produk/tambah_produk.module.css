@@ -1,0 +1,674 @@
+
+.previewItem {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 120px;
+}
+
+.previewRemove {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(15, 23, 42, 0.85);
+  color: #f5c542;
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+
+/* ========== MODAL OVERLAY (POPUP GAYA CAPTCHA) ========== */
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999;              /* di atas semuanya */
+  background: rgba(15, 23, 42, 0.6);  /* gelap transparan */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* BOX MODAL */
+.modal {
+  background: #0b1531;       /* biru gelap biar nyambung tema */
+  color: #f5c542;
+  border-radius: 18px;
+  padding: 12px 14px 14px;
+  width: 90%;
+  max-width: 820px;
+  max-height: 80vh;
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.7);
+  display: flex;
+  flex-direction: column;
+}
+
+/* HEADER MODAL */
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.modalTitle {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.modalCloseBtn {
+  border: none;
+  background: transparent;
+  color: #f5c542;
+  font-size: 20px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+/* SEARCH BAR DI DALAM MODAL */
+.modalSearch {
+  width: 100%;
+  border-radius: 999px;
+  border: 1px solid rgba(245, 197, 66, 0.7);
+  padding: 6px 12px;
+  font-size: 13px;
+  background: #020617;
+  color: #f5c542;
+  margin-bottom: 8px;
+}
+
+.modalSearch::placeholder {
+  color: rgba(248, 250, 252, 0.6);
+}
+
+/* STATUS TEXT (loading / kosong) */
+.modalStatus {
+  font-size: 13px;
+  color: #e5e7eb;
+  padding: 4px 2px;
+}
+
+/* GRID GALERI DI DALAM MODAL */
+.modalGrid {
+  flex: 1;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 8px;
+  padding: 2px 1px 6px;
+}
+
+/* ITEM FOTO DI MODAL */
+.modalItem {
+  border-radius: 12px;
+  border: 1px solid transparent;
+  padding: 4px;
+  background: #020617;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+}
+
+.modalItem img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.modalItemMeta {
+  font-size: 11px;
+}
+
+.modalItemTitle {
+  font-weight: 600;
+  margin-bottom: 2px;
+  color: #fefce8;
+}
+
+.modalItemTags {
+  color: #e5e7eb;
+  opacity: 0.8;
+}
+
+/* STATE TERPILIH */
+.modalItemActive {
+  border-color: #f5c542;
+  box-shadow: 0 0 0 1px rgba(245, 197, 66, 0.6);
+}
+
+/* FOOTER BUTTON MODAL */
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.modalCancel,
+.modalConfirm {
+  border-radius: 999px;
+  border: 1px solid #f5c542;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  background: transparent;
+  color: #f5c542;
+}
+
+.modalConfirm {
+  background: #f5c542;
+  color: #0b1531;
+}
+
+.modalConfirm:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* TOMBOL "Pilih dari Kolase Foto" DI FORM */
+.smallBtn {
+  width: 100%;
+  border-radius: 999px;
+  border: 1px solid #0b1531;
+  background: #f9fafb;
+  color: #0b1531;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 10px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.smallBtn:hover {
+  background: #0b1531;
+  color: #f5c542;
+}
+
+/* PREVIEW DI ATAS CARD (setelah milih foto) */
+.previewBox {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.previewItem {
+  display: flex;
+  flex-direction: column;
+  width: 120px;
+}
+
+.previewImage {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid rgba(15, 23, 42, 0.2);
+}
+
+.previewMeta {
+  font-size: 11px;
+  margin-top: 2px;
+}
+
+.previewTitle {
+  font-weight: 600;
+}
+
+.previewTags {
+  opacity: 0.7;
+}
+
+
+
+/* ===========================
+   MAIN LAYOUT DAY / NIGHT
+   =========================== */
+
+.mainDay {
+  background: #f9fafb; /* putih terang */
+  color: #0b1531;
+}
+
+.mainNight {
+  background: #020617; /* biru dongker */
+  color: #f5c542; /* text luar card = golden */
+}
+
+/* judul & subjudul di luar card */
+.pageTitleOutside {
+}
+.pageSubtitleOutside {
+}
+
+.mainDay .pageTitleOutside {
+  color: #0b1531;
+}
+
+.mainNight .pageTitleOutside {
+  color: #f5c542;
+}
+
+.mainDay .pageSubtitleOutside {
+  color: #4b5563;
+}
+
+.mainNight .pageSubtitleOutside {
+  color: #f5c542;
+}
+
+/* ===========================
+   BRAND (APIX INTERIOR)
+   =========================== */
+
+.desktopBrand,
+.topRightBrand {
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #f5c542;
+}
+
+.desktopBrandNight,
+.topRightBrandNight {
+  color: #ffffff !important;
+}
+
+.desktopTopBar {
+  display: none;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}
+
+@media (min-width: 1024px) {
+  .desktopTopBar {
+    display: flex;
+  }
+}
+
+/* ===========================
+   AREA CARD
+   =========================== */
+
+.cardArea {
+  padding: 8px 0 24px;
+}
+
+.cardAreaDay {
+  background: transparent;
+}
+
+.cardAreaNight {
+  background: transparent;
+}
+
+.cardWrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.card {
+  width: 100%;
+  max-width: 720px;
+  border-radius: 24px;
+  transition: none;
+}
+
+.cardDay {
+  background: #f5c542;
+}
+
+.cardNight {
+  background: #020617;
+}
+
+.noCardHover:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* ===========================
+   FORM & INPUT
+   =========================== */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed rgba(15, 23, 42, 0.25);
+}
+
+.section:last-of-type {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.sectionTitle {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.formDay .label {
+  color: #7a4b00;
+}
+.formDay .input,
+.formDay .inputFile,
+.formDay .textarea,
+.formDay .select {
+  color: #7a4b00;
+}
+
+.formNight .label {
+  color: #0b1531;
+}
+.formNight .input,
+.formNight .inputFile,
+.formNight .textarea,
+.formNight .select {
+  color: #0b1531;
+}
+
+.fieldRow {
+  display: grid;
+  gap: 10px;
+}
+
+@media (min-width: 768px) {
+  .fieldRow {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.input,
+.inputFile,
+.select,
+.textarea {
+  width: 100%;
+  border-radius: 16px;
+  border: 1px solid rgba(15, 23, 42, 0.25);
+  padding: 8px 12px;
+  font-size: 14px;
+  background: #ffffff;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.select {
+  appearance: none;
+}
+
+.input:focus,
+.inputFile:focus,
+.select:focus,
+.textarea:focus {
+  outline: none;
+  border-color: #f5c542;
+  box-shadow: 0 0 0 2px rgba(245, 197, 66, 0.25);
+}
+
+/* checkbox & radio */
+
+.checkboxRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.checkboxLabel {
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.checkbox {
+  width: 14px;
+  height: 14px;
+}
+
+.radioRow {
+  display: flex;
+  gap: 16px;
+  margin-top: 4px;
+}
+
+.radioLabel {
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.radio {
+  width: 14px;
+  height: 14px;
+}
+
+/* ===========================
+   TOMBOL SUBMIT
+   =========================== */
+
+.submitWrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.submitBtn {
+  min-width: 200px;
+  padding: 10px 28px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease,
+    transform 0.08s ease;
+}
+
+/* MODE SIANG */
+.submitBtnLight {
+  background: #0b1531;
+  color: #f5c542;
+  border-color: #0b1531;
+}
+
+.submitBtnLight:hover:not(:disabled),
+.submitBtnLight:active:not(:disabled) {
+  background: #ffffff;
+  color: #0b1531;
+  border-color: #0b1531;
+  transform: translateY(-1px);
+}
+
+/* MODE MALAM */
+.submitBtnDark {
+  background: #0b1531;
+  color: #f5c542;
+  border-color: #0b1531;
+}
+
+.submitBtnDark:hover:not(:disabled),
+.submitBtnDark:active:not(:disabled) {
+  background: #ffffff;
+  color: #0b1531;
+  border-color: #f5c542;
+  transform: translateY(-1px);
+}
+
+/* ===========================
+   SIDEBAR
+   =========================== */
+
+.closeSidebarButton {
+  border: none;
+  background: transparent;
+  color: #f5c542;
+  font-size: 22px;
+  margin-left: auto;
+  cursor: pointer;
+}
+
+@media (min-width: 1024px) {
+  .closeSidebarButton {
+    display: none;
+  }
+}
+
+.sidebarBackWrapper {
+  padding: 12px 16px 20px;
+}
+
+.sidebarBackButton {
+  width: 100%;
+  border-radius: 999px;
+  border: 1px solid #f5c542;
+  background: transparent;
+  color: #f5c542;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 8px 0;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+.sidebarBackButton:hover {
+  background: #f5c542;
+  color: #0b1531;
+}
+
+/* Input generic (dipakai di beberapa section termasuk VARIASI) */
+.input{
+  width: 100%;
+  border: 1px solid rgba(15, 23, 42, 0.18);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: #fff;
+  color: #0b1531;
+  font-size: 14px;
+}
+.input:focus{
+  outline: none;
+  border-color: rgba(11, 21, 49, 0.45);
+  box-shadow: 0 0 0 3px rgba(11, 21, 49, 0.08);
+}
+
+/* =========================================================
+   KHUSUS VARIASI PRODUK (OPSIONAL)
+   Tatanan ala e-commerce: Media -> Variasi -> Harga
+   Catatan: pastikan wrapper variasi pakai:
+   <div className={`${styles.section} ${styles.variasiScope}`}> ... </div>
+   ========================================================= */
+
+.variasiScope{
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 16px;
+  padding: 16px;
+  background: #ffffff;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+}
+
+.variasiScope .sectionTitle{
+  margin: 0 0 10px;
+  color: #0b1531;
+  font-weight: 900;
+  letter-spacing: 0.2px;
+}
+
+.variasiScope .checkboxRow{
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px dashed rgba(15, 23, 42, 0.18);
+  background: rgba(15, 23, 42, 0.03);
+}
+
+.variasiScope .checkboxLabel{
+  font-size: 13px;
+  color: #0b1531;
+  font-weight: 700;
+}
+
+.variasiScope .field{
+  margin-top: 8px;
+}
+
+.variasiScope .fieldRow{
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 780px){
+  .variasiScope .fieldRow{
+    grid-template-columns: 1fr;
+  }
+}
+
+.variasiScope .label{
+  color: #0b1531;
+  font-weight: 800;
+  font-size: 13px;
+}
+
+.variasiScope .select{
+  width: 100%;
+  border: 1px solid rgba(15, 23, 42, 0.18);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: #fff;
+  color: #0b1531;
+  font-size: 14px;
+}
+
+.variasiScope .select:focus{
+  outline: none;
+  border-color: rgba(11, 21, 49, 0.45);
+  box-shadow: 0 0 0 3px rgba(11, 21, 49, 0.08);
+}
+
+.variasiScope .smallBtn{
+  width: auto;
+  padding: 10px 14px;
+  border-radius: 999px;
+}
+
+.variasiScope .checkboxRow .smallBtn{
+  flex: 1 1 170px;
+}

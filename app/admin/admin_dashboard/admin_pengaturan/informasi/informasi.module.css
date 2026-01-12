@@ -1,0 +1,517 @@
+/* MODE SIANG/MALAM MAIN AREA */
+.mainDay {
+  background: #f9fafb;
+  color: #0b1531;
+}
+
+.mainNight {
+  background: #020617;
+  color: #f5c542;
+}
+
+.pageTitleOutside {
+}
+
+.pageSubtitleOutside {
+}
+
+.mainDay .pageTitleOutside {
+  color: #0b1531;
+}
+
+.mainNight .pageTitleOutside {
+  color: #f5c542;
+}
+
+.mainDay .pageSubtitleOutside {
+  color: #4b5563;
+}
+
+.mainNight .pageSubtitleOutside {
+  color: #f5c542;
+}
+
+/* BRAND ATAS KANAN */
+.desktopTopBar {
+  display: none;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}
+
+
+/* tombol hapus logo */
+.logoDeleteButton {
+  margin-top: 4px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: none;
+  background: #fee2e2;
+  color: #b91c1c;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.logoDeleteButton:hover {
+  background: #fecaca;
+  color: #7f1d1d;
+}
+
+/* baris tombol simpan + hapus */
+.infoButtonsRow {
+  margin-top: 4px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* tombol hapus informasi */
+.infoDeleteButton {
+  padding: 9px 14px;
+  border-radius: 999px;
+  border: none;
+  background: #fee2e2;
+  color: #b91c1c;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.infoDeleteButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+
+@media (min-width: 1024px) {
+  .desktopTopBar {
+    display: flex;
+  }
+}
+
+.desktopBrand,
+.topRightBrand {
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #f5c542;
+}
+
+.desktopBrandNight,
+.topRightBrandNight {
+  color: #ffffff !important;
+}
+
+.topRightBrand {
+  margin-left: auto;
+  font-size: 14px;
+}
+
+/* CARD AREA */
+.cardArea {
+  padding: 8px 0 24px;
+}
+
+.cardAreaDay {
+  background: transparent;
+}
+
+.cardAreaNight {
+  background: transparent;
+}
+
+.cardWrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.card {
+  max-width: 1100px;
+  width: 100%;
+  border-radius: 24px;
+  transition: none;
+}
+
+.cardDay {
+  background: #f5c542;
+}
+
+.cardNight {
+  background: #020617;
+}
+
+.noCardHover:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* SIDEBAR CLOSE BUTTON */
+.closeSidebarButton {
+  border: none;
+  background: transparent;
+  color: #f5c542;
+  font-size: 22px;
+  margin-left: auto;
+  cursor: pointer;
+}
+
+@media (min-width: 1024px) {
+  .closeSidebarButton {
+    display: none;
+  }
+}
+
+/* SIDEBAR BACK BUTTON */
+.sidebarBackWrapper {
+  padding: 12px 16px 20px;
+}
+
+.sidebarBackButton {
+  width: 100%;
+  border-radius: 999px;
+  border: 1px solid #f5c542;
+  background: transparent;
+  color: #f5c542;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 8px 0;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+.sidebarBackButton:hover {
+  background: #f5c542;
+  color: #0b1531;
+}
+
+/* CONTENT */
+.contentInner {
+  padding: 18px 20px 22px;
+}
+
+.section {
+  margin-bottom: 20px;
+}
+
+.sectionTitle {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: #0b1531;
+}
+
+.mainNight .sectionTitle {
+  color: #f5f5f5;
+}
+
+/* INFORMASI TOKO LAYOUT */
+.infoLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 260px) minmax(0, 1fr);
+  gap: 16px;
+
+}
+
+@media (max-width: 768px) {
+  .infoLayout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* LOGO */
+.logoColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.logoPreviewWrapper {
+  width: 160px;
+  height: 160px;
+  border-radius: 24px;
+  overflow: hidden;
+  background: #0b1531;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logoImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.logoPlaceholder {
+  color: #f5c542;
+  font-size: 13px;
+  text-align: center;
+  padding: 10px;
+}
+
+.logoUploadButton {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: none;
+  background: #0b1531;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.logoUploadButton:hover {
+  background: #020617;
+}
+
+.logoFileInput {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.logoHint {
+  font-size: 11px;
+  color: #1f2937;
+}
+
+.mainNight .logoHint {
+  color: #e5e7eb;
+}
+
+/* FORM INFORMASI */
+.infoForm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fieldGroupSmall {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 70px;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #0b1531;
+}
+
+.mainNight .label {
+  color: #f5f5f5;
+}
+
+.textInput {
+  padding: 9px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(15, 23, 42, 0.18);
+  font-size: 14px;
+  background: #ffffff;
+  color: #111827;
+}
+
+.textInput::placeholder {
+  color: #9ca3af;
+}
+
+.textInput:focus {
+  outline: none;
+  border-color: #0b1531;
+  box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.15);
+}
+
+.textArea {
+  min-height: 90px;
+  padding: 9px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(15, 23, 42, 0.18);
+  font-size: 14px;
+  resize: vertical;
+  background: #ffffff;
+  color: #111827;
+}
+
+.textArea::placeholder {
+  color: #9ca3af;
+}
+
+.textArea:focus {
+  outline: none;
+  border-color: #0b1531;
+  box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.15);
+}
+
+.infoButton {
+  margin-top: 4px;
+  align-self: flex-start;
+  padding: 9px 16px;
+  border-radius: 999px;
+  border: none;
+  background: #0b1531;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.infoButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* CABANG FORM */
+.branchFormRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 2fr) 80px 110px;
+  gap: 10px;
+  align-items: flex-end;
+  margin-bottom: 8px;
+}
+
+@media (max-width: 900px) {
+  .branchFormRow {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.branchButton {
+  padding: 9px 14px;
+  border-radius: 999px;
+  border: none;
+  background: #0b1531;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.branchButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* STATUS */
+.statusText {
+  font-size: 13px;
+  color: #374151;
+}
+
+/* LIST CABANG */
+.branchListWrapper {
+  margin-top: 10px;
+}
+
+.branchListTitle {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #0b1531;
+}
+
+.mainNight .branchListTitle {
+  color: #f5f5f5;
+}
+
+.branchList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.branchItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #fefce8;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  margin-bottom: 8px;
+}
+
+.branchMain {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.branchBadge {
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  background: #0b1531;
+  color: #f5c542;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.branchText {
+  display: flex;
+  flex-direction: column;
+}
+
+.branchName {
+  font-weight: 600;
+  font-size: 14px;
+  color: #0b1531;
+}
+
+.branchMaps {
+  font-size: 12px;
+  color: #1d4ed8;
+  text-decoration: underline;
+  word-break: break-all;
+}
+
+.branchActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* TOMBOL LIST: pastikan teks tidak menghilang */
+.branchEditButton {
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: none;
+  background: #e5e7eb;
+  font-size: 12px;
+  cursor: pointer;
+  color: #0b1531 !important;
+}
+
+.branchEditButton:hover {
+  background: #d1d5db;
+  color: #0b1531 !important;
+}
+
+.branchDeleteButton {
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: none;
+  background: #fee2e2;
+  font-size: 12px;
+  cursor: pointer;
+  color: #b91c1c !important;
+}
+
+.branchDeleteButton:hover {
+  background: #fecaca;
+  color: #7f1d1d !important;
+}

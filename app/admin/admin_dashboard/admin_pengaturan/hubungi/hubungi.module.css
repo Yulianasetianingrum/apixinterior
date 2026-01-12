@@ -1,0 +1,556 @@
+/* ===========================
+   MAIN LAYOUT DAY / NIGHT
+   =========================== */
+
+.mainDay {
+  background: #f9fafb;
+  color: #0b1531;
+}
+
+.mainNight {
+  background: #020617;
+  color: #f5c542;
+}
+
+.pageTitleOutside {
+}
+
+.pageSubtitleOutside {
+}
+
+.mainDay .pageTitleOutside {
+  color: #0b1531;
+}
+
+.mainNight .pageTitleOutside {
+  color: #f5c542;
+}
+
+.mainDay .pageSubtitleOutside {
+  color: #4b5563;
+}
+
+.mainNight .pageSubtitleOutside {
+  color: #f5c542;
+}
+
+/* ===========================
+   BRAND (APIX INTERIOR)
+   =========================== */
+
+.desktopBrand,
+.topRightBrand {
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #f5c542;
+}
+
+.desktopBrandNight,
+.topRightBrandNight {
+  color: #ffffff !important;
+}
+
+.desktopTopBar {
+  display: none;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}
+
+@media (min-width: 1024px) {
+  .desktopTopBar {
+    display: flex;
+  }
+}
+
+.topRightBrand {
+  margin-left: auto;
+  font-size: 14px;
+}
+
+/* ===========================
+   AREA CARD BESAR
+   =========================== */
+
+.cardArea {
+  padding: 8px 0 24px;
+}
+
+.cardAreaDay {
+  background: transparent;
+}
+
+.cardAreaNight {
+  background: transparent;
+}
+
+.cardWrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.card {
+  max-width: 1100px;
+  width: 100%;
+  border-radius: 24px;
+  transition: none;
+}
+
+/* SIANG: card besar golden */
+.cardDay {
+  background: #f5c542;
+}
+
+/* MALAM: card besar biru dongker */
+.cardNight {
+  background: #020617;
+}
+
+.noCardHover:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* ===========================
+   STATUS TEXT
+   =========================== */
+
+.statusText {
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+/* ===========================
+   SIDEBAR (PERSIS KOLASE)
+   =========================== */
+
+.closeSidebarButton {
+  border: none;
+  background: transparent;
+  color: #f5c542;
+  font-size: 22px;
+  margin-left: auto;
+  cursor: pointer;
+}
+
+@media (min-width: 1024px) {
+  .closeSidebarButton {
+    display: none;
+  }
+}
+
+.sidebarBackWrapper {
+  padding: 12px 16px 20px;
+}
+
+.sidebarBackButton {
+  width: 100%;
+  border-radius: 999px;
+  border: 1px solid #f5c542;
+  background: transparent;
+  color: #f5c542;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 8px 0;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+.sidebarBackButton:hover {
+  background: #f5c542;
+  color: #0b1531;
+}
+
+/* ===========================
+   PENGATURAN WHATSAPP
+   =========================== */
+
+.settingsInner {
+  padding: 16px 18px 20px;
+}
+
+/* form baris input + tombol */
+.formRow {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.input {
+  padding: 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(15, 23, 42, 0.18);
+  min-width: 260px;
+  font-size: 14px;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #0b1531;
+  box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.15);
+}
+
+.button {
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: none;
+  background: #0b1531;
+  color: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.infoText {
+  font-size: 13px;
+  color: #1f2937;
+  margin-bottom: 8px;
+}
+
+.editingInfo {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 12px;
+}
+
+/* list nomor */
+.listWrapper {
+  margin-top: 12px;
+}
+
+.listTitle {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #020617;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.listItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #fefce8;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  margin-bottom: 8px;
+}
+
+.listMain {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.listNumber {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.priorityBadge {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #f97316;
+  color: white;
+}
+
+.listActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.priorityToggle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #020617;
+}
+
+.secondaryButton {
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: none;
+  background: #e5e7eb;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.dangerButton {
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: none;
+  background: #fee2e2;
+  color: #b91c1c;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+
+/* ============================================================
+   MODE SIANG / MALAM – WARNA GLOBAL
+============================================================ */
+
+.mainDay {
+  background: #f9fafb;
+  color: #0b1531;
+}
+
+.mainNight {
+  background: #020617;
+  color: #f8fafc;
+}
+
+/* Title & Subtitle */
+.mainDay .pageTitleOutside {
+  color: #0b1531;
+}
+.mainNight .pageTitleOutside {
+  color: #f8fafc;
+}
+
+.mainDay .pageSubtitleOutside {
+  color: #4b5563;
+}
+.mainNight .pageSubtitleOutside {
+  color: #cbd5e1;
+}
+
+/* Brand */
+.desktopBrand,
+.topRightBrand {
+  font-weight: 700;
+  color: #f5c542;
+}
+
+.desktopBrandNight,
+.topRightBrandNight {
+  color: white !important;
+}
+
+/* ============================================================
+   CARD AREA (kuning siang, biru malam)
+============================================================ */
+
+.cardArea {
+  padding: 8px 0 24px;
+}
+
+.cardDay {
+  background: #f5c542;
+}
+
+.cardNight {
+  background: #0d1220;
+}
+
+/* ============================================================
+   FORM INPUT
+============================================================ */
+
+.input {
+  padding: 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(15, 23, 42, 0.2);
+  min-width: 260px;
+  font-size: 14px;
+  background: white;
+  color: #0b1531;
+}
+
+.mainNight .input {
+  background: #1e293b;
+  color: #f8fafc;
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.input:focus {
+  outline: none;
+  border-color: #0b1531;
+}
+
+.mainNight .input:focus {
+  border-color: #f5c542;
+}
+
+/* Tombol */
+.button {
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: #0b1531;
+  color: white;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+}
+.button:disabled {
+  opacity: 0.6;
+}
+
+/* ============================================================
+   TEXT INFO
+============================================================ */
+
+.infoText {
+  font-size: 13px;
+  margin-top: 4px;
+  margin-bottom: 8px;
+  color: #1f2937;
+}
+.mainNight .infoText {
+  color: #cbd5e1;
+}
+
+.editingInfo {
+  font-size: 13px;
+  color: #6b7280;
+}
+.mainNight .editingInfo {
+  color: #94a3b8;
+}
+
+/* ============================================================
+   LIST WA
+============================================================ */
+
+.listWrapper {
+  margin-top: 12px;
+}
+
+.listTitle {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #020617;
+}
+.mainNight .listTitle {
+  color: white;
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Item */
+.listItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: #fefce8;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  margin-bottom: 10px;
+}
+
+.mainNight .listItem {
+  background: #1e293b;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+/* Nomor */
+.listNumber {
+  font-weight: 600;
+  font-size: 15px;
+  color: #0b1531;
+}
+
+.mainNight .listNumber {
+  color: #f8fafc;
+}
+
+/* Badge Prioritas */
+.priorityBadge {
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #f97316;
+  color: white;
+}
+
+/* ============================================================
+   ACTION BUTTONS / TOGGLE
+============================================================ */
+
+.listActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.priorityToggle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: #020617;
+}
+
+.mainNight .priorityToggle {
+  color: #f8fafc;
+}
+
+/* Tombol Edit */
+.secondaryButton {
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #e5e7eb;
+  border: none;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.mainNight .secondaryButton {
+  background: #334155;
+  color: #f1f5f9;
+}
+
+/* Tombol Hapus */
+.dangerButton {
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: none;
+  background: #fee2e2;
+  color: #b91c1c;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.mainNight .dangerButton {
+  background: #7f1d1d;
+  color: #fecaca;
+}
+
+/* ============================================================
+   RESPONSIVE (HP & TABLET)
+============================================================ */
+
+@media (max-width: 1024px) {
+  .listItem {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .listActions {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+}

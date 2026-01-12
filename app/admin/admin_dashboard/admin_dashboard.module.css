@@ -1,0 +1,522 @@
+/* app/admin/admin_dashboard/admin_dashboard.module.css */
+
+.dashboard {
+  display: flex;
+  min-height: 100vh;
+  background: #f4f6fb;
+  color: #0b1531;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+}
+
+/* DARK MODE */
+.dashboardDark {
+  background: #050814;
+  color: #f9fafb;
+}
+
+/* TOP BAR (mobile & tablet) */
+.mobileTopBar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  background: #0b1531;
+  color: #ffffff;
+  z-index: 30;
+}
+
+.mobileMenuButton {
+  border: none;
+  background: #f5c542;
+  color: #0b1531;
+  font-weight: 700;
+  font-size: 20px;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobileTitle {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* Overlay ketika sidebar dibuka di mobile */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.48);
+  z-index: 35;
+}
+
+/* SIDEBAR */
+.sidebar {
+  position: fixed;
+  inset-block: 0;
+  left: 0;
+  width: 260px;
+  background: radial-gradient(circle at top, #1c2a5b 0, #050814 55%, #020410);
+  color: #ffffff;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  z-index: 40;
+  box-shadow: 0 0 0 transparent;
+  transform: translateX(-100%);
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+/* saat sidebar dibuka di mobile */
+.sidebarOpen {
+  transform: translateX(0);
+  box-shadow: 8px 0 24px rgba(0, 0, 0, 0.45);
+}
+
+/* Desktop: sidebar selalu terbuka */
+@media (min-width: 1024px) {
+  .mobileTopBar {
+    display: none;
+  }
+
+  .overlay {
+    display: none;
+  }
+
+  .sidebar {
+    transform: translateX(0);
+    box-shadow: 12px 0 30px rgba(0, 0, 0, 0.35);
+  }
+}
+
+/* Header sidebar */
+.sidebarHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.backButton {
+  border: none;
+  background: rgba(245, 197, 66, 0.12);
+  color: #f5c542;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* di desktop, tombol back tidak perlu */
+@media (min-width: 1024px) {
+  .backButton {
+    display: none;
+  }
+}
+
+/* branding */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brandLogo {
+  width: 32px;
+  height: 32px;
+  border-radius: 11px;
+  background: linear-gradient(135deg, #f5c542, #ffe497);
+  color: #0b1531;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.brandText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.brandTitle {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.brandSubtitle {
+  font-size: 11px;
+  opacity: 0.8;
+}
+
+/* MENU LIST */
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.menuItem {
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.85);
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background 0.18s ease, color 0.18s ease, transform 0.12s ease;
+}
+
+.menuItem::after {
+  content: "›";
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.menuItem:hover {
+  background: rgba(245, 197, 66, 0.16);
+  color: #ffffff;
+  transform: translateX(2px);
+}
+
+.menuItemActive {
+  background: linear-gradient(135deg, #f5c542, #ffdd7a);
+  color: #0b1531;
+}
+
+/* Theme switch */
+.themeSwitchWrapper {
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* Logout tepat di bawah switch tema (bukan di paling bawah sidebar) */
+.logoutInlineWrapper {
+  margin-top: 8px;
+}
+
+
+.themeLabel {
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+.themeSwitch {
+  position: relative;
+  width: 54px;
+  height: 28px;
+  border-radius: 999px;
+  border: 1px solid rgba(245, 197, 66, 0.6);
+  background: rgba(0, 0, 0, 0.45);
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.themeSwitchOn {
+  background: linear-gradient(135deg, #f5c542, #ffe08d);
+  border-color: #f5c542;
+  justify-content: flex-end;
+}
+
+.themeThumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+
+/* SIDEBAR FOOTER (logout) */
+.sidebarFooter {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* kalau mau styling tombol LogoutButton, bisa pakai global className di komponen itu */
+
+
+/* MAIN CONTENT */
+.main {
+  flex: 1;
+  padding: 80px 18px 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* di desktop, main geser karena ada sidebar kiri */
+@media (min-width: 1024px) {
+  .main {
+    margin-left: 260px;
+    padding: 28px 32px 32px;
+  }
+}
+
+.mainHeader {
+  margin-bottom: 18px;
+}
+
+.pageTitle {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 4px;
+}
+
+.pageSubtitle {
+  margin: 0;
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+/* CARDS GRID */
+.cardsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .cardsGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 16px 16px 14px;
+  box-shadow: 0 10px 25px rgba(9, 20, 64, 0.08);
+  border: 1px solid rgba(11, 21, 49, 0.06);
+}
+
+.dashboardDark .card {
+  background: rgba(11, 21, 49, 0.85);
+  border-color: rgba(245, 197, 66, 0.16);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+}
+
+.cardTitle {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 0 10px;
+  color: #0b1531;
+}
+
+.dashboardDark .cardTitle {
+  color: #f9fafb;
+}
+
+.cardList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.cardLink {
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  padding: 8px 0;
+  font-size: 14px;
+  cursor: pointer;
+  color: #0b1531;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: color 0.18s ease, transform 0.12s ease;
+}
+
+.cardLink::after {
+  content: "→";
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.cardLink:hover {
+  color: #c49110;
+  transform: translateX(2px);
+}
+
+.dashboardDark .cardLink {
+  color: #f4f4ff;
+}
+
+/* STATISTIK */
+.statsSection {
+  margin-top: 24px;
+}
+
+.statsTitle {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+@media (min-width: 600px) {
+  .statsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.statCard {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 14px 16px;
+  box-shadow: 0 8px 20px rgba(9, 20, 64, 0.06);
+  border: 1px solid rgba(11, 21, 49, 0.06);
+}
+
+.dashboardDark .statCard {
+  background: rgba(11, 21, 49, 0.9);
+  border-color: rgba(245, 197, 66, 0.18);
+}
+
+.statLabel {
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+.statValue {
+  display: block;
+  margin-top: 4px;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.statHint {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  opacity: 0.77;
+}
+
+/* ----------------------------- */
+/* HOVER & ACTIVE STATE – LIGHT MODE */
+/* ----------------------------- */
+.card:hover,
+.card:active {
+  background: #f5c542 !important;
+  /* golden terang */
+  color: #ffffff !important;
+  /* teks putih */
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+.card:hover .cardTitle,
+.card:hover .cardLink,
+.card:active .cardTitle,
+.card:active .cardLink {
+  color: #ffffff !important;
+  /* judul & link putih */
+}
+
+
+/* ----------------------------- */
+/* HOVER & ACTIVE – DARK MODE */
+/* ----------------------------- */
+
+.dashboardDark .card:hover,
+.dashboardDark .card:active {
+  background: #ffffff !important;
+  /* putih */
+  color: #0b1531 !important;
+  /* teks biru dongker */
+}
+
+.dashboardDark .card:hover .cardTitle,
+.dashboardDark .card:hover .cardLink,
+.dashboardDark .card:active .cardTitle,
+.dashboardDark .card:active .cardLink {
+  color: #0b1531 !important;
+  /* biru dongker */
+}
+
+
+/* Arrow ikon ikut berubah */
+.cardLink:hover::after,
+.cardLink:active::after {
+  color: #ffffff !important;
+}
+
+.dashboardDark .cardLink:hover::after,
+.dashboardDark .cardLink:active::after {
+  color: #0b1531 !important;
+}
+
+/* ===========================
+   SHARED SIDEBAR BUTTONS
+   =========================== */
+
+.closeSidebarButton {
+  border: none;
+  background: transparent;
+  color: #f5c542;
+  font-size: 22px;
+  margin-left: auto;
+  cursor: pointer;
+}
+
+@media (min-width: 1024px) {
+  .closeSidebarButton {
+    display: none;
+  }
+}
+
+.sidebarBackWrapper {
+  padding: 12px 16px 20px;
+}
+
+.sidebarBackButton {
+  width: 100%;
+  border-radius: 999px;
+  border: 1px solid #f5c542;
+  background: transparent;
+  color: #f5c542;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 8px 0;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+.sidebarBackButton:hover {
+  background: #f5c542;
+  color: #0b1531;
+}

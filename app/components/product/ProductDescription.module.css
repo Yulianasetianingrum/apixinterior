@@ -1,0 +1,10 @@
+.truncated {
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    /* Approx 70 words usually fits in 5-6 lines depending on width */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* Optional: Fallback max-height if line-clamp fails */
+    max-height: 140px;
+}

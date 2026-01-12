@@ -1,0 +1,286 @@
+.main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 3rem;
+}
+
+/* Header */
+
+.headerSection {
+  margin-bottom: 1.75rem;
+}
+
+.title {
+  font-size: clamp(1.8rem, 3vw, 2.2rem);
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.subtitle {
+  margin-top: 0.5rem;
+  font-size: 0.95rem;
+  color: #4b5563;
+  max-width: 40rem;
+}
+
+/* WA utama */
+
+.waSection {
+  margin-bottom: 2rem;
+}
+
+.waCard {
+  border-radius: 1.25rem;
+  border: 1px solid #e5e7eb;
+  padding: 1.25rem 1.1rem;
+  background: #ecfdf5;
+}
+
+.waHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+.waTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #064e3b;
+}
+
+.badge {
+  font-size: 0.75rem;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  background: #22c55e;
+  color: #f9fafb;
+  font-weight: 600;
+}
+
+.waNumber {
+  font-weight: 600;
+  color: #047857;
+  margin-top: 0.35rem;
+}
+
+.waText {
+  margin-top: 0.25rem;
+  font-size: 0.9rem;
+  color: #065f46;
+}
+
+.waButton {
+  margin-top: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  border-radius: 999px;
+  background: #16a34a;
+  color: #f9fafb;
+  font-weight: 500;
+  font-size: 0.95rem;
+  text-decoration: none;
+}
+
+.waButton:hover {
+  background: #15803d;
+}
+
+.waIcon {
+  font-size: 1.1rem;
+}
+
+/* Section generic */
+
+.section {
+  margin-bottom: 2rem;
+}
+
+.sectionTitle {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.sectionSubtitle {
+  margin-top: 0.25rem;
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+/* Nomor lain */
+
+.numberGrid {
+  margin-top: 0.9rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.75rem;
+}
+
+.numberCard {
+  border-radius: 0.9rem;
+  border: 1px solid #e5e7eb;
+  padding: 0.8rem 0.9rem;
+  background: #f9fafb;
+}
+
+.number {
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 0.3rem;
+}
+
+.numberButton {
+  display: inline-flex;
+  margin-top: 0.25rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  border: none;
+  background: #111827;
+  color: #f9fafb;
+  font-size: 0.85rem;
+  text-decoration: none;
+}
+
+/* Media sosial */
+
+.emptyText {
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.sosmedGrid {
+  margin-top: 0.9rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 0.75rem;
+}
+
+.sosmedCard {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-radius: 0.9rem;
+  border: 1px solid #e5e7eb;
+  padding: 0.7rem 0.85rem;
+  background: #f9fafb;
+  text-decoration: none;
+}
+
+.sosmedIconBubble {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  background: #0f172a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fbbf24;
+}
+
+.sosmedIcon {
+  font-size: 18px;
+}
+
+.sosmedIconFallback {
+  font-size: 16px;
+}
+
+.sosmedText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.sosmedName {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #111827;
+}
+
+.sosmedUrl {
+  font-size: 0.8rem;
+  color: #1d4ed8;
+  text-decoration: underline;
+  word-break: break-all;
+}
+
+.sosmedBadge {
+  margin-left: auto;
+  font-size: 0.75rem;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  background: #f97316;
+  color: #fff;
+}
+
+/* Cabang */
+
+.cabangGrid {
+  margin-top: 0.9rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+
+.cabangCard {
+  border-radius: 0.9rem;
+  border: 1px solid #e5e7eb;
+  padding: 0.7rem 0.85rem;
+  background: #f9fafb;
+}
+
+.cabangName {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
+/* Bottom info */
+
+.bottomInfo {
+  margin-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 1.2rem;
+}
+
+.bottomTitle {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.bottomText {
+  margin-top: 0.25rem;
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.backHomeLink {
+  display: inline-block;
+  margin-top: 0.6rem;
+  font-size: 0.9rem;
+  color: #111827;
+  text-decoration: none;
+}
+
+.backHomeLink:hover {
+  text-decoration: underline;
+}
+
+/* Responsive */
+
+@media (min-width: 768px) {
+  .main {
+    padding: 2rem 1.5rem 3rem;
+  }
+
+  .waCard {
+    padding: 1.5rem 1.4rem;
+  }
+}

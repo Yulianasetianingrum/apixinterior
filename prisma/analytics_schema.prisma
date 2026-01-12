@@ -1,0 +1,30 @@
+//
+// ============ ANALYTICS & TRACKING ============
+//
+
+// Track product clicks (for "Hubungi Sekarang" button)
+model ProductClick {
+  id        Int      @id @default(autoincrement())
+  produkId  Int
+  produk    Produk   @relation(fields: [produkId], references: [id], onDelete: Cascade)
+  ipAddress String?  // Optional: untuk tracking unique visitors
+  userAgent String?  @db.Text // Optional: browser info
+  createdAt DateTime @default(now())
+
+  @@index([produkId])
+  @@index([createdAt])
+  @@map("product_clicks")
+}
+
+// Track page views (for total pengunjung)
+model PageView {
+  id        Int      @id @default(autoincrement())
+  path      String   // e.g., "/", "/produk", "/produk/meja-kantor"
+  ipAddress String?
+  userAgent String?  @db.Text
+  createdAt DateTime @default(now())
+
+  @@index([path])
+  @@index([createdAt])
+  @@map("page_views")
+}

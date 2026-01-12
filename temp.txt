@@ -1,0 +1,31 @@
+    defaultSlug: "promo",
+    defaultConfig: {
+      layout: "carousel",
+      sectionBgTheme: "FOLLOW_NAVBAR",
+      voucherImageIds: [],
+    },
+  },
+];
+
+
+const SECTION_ICON: Record<string, string> = {
+  HERO: "🖼️",
+  CATEGORY_GRID: "🧩",
+  PRODUCT_CAROUSEL: "🎠",
+  HIGHLIGHT_COLLECTION: "⭐",
+  ROOM_CATEGORY: "🛋️",
+  GALLERY: "🖼️",
+  BRANCHES: "🏬",
+  CONTACT: "☎️",
+  SOCIAL: "💬",
+  CUSTOM_PROMO: "🎯",
+};
+
+
+function slugify(input: string): string {
+  return input
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9-]/g, "");
+}
