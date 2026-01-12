@@ -242,8 +242,8 @@ async function upsertVariasi(
     const galeriIds =
       Array.isArray(v.gallery) && v.gallery.length
         ? v.gallery
-            .map((g: any) => toIntOrNull(g?.id))
-            .filter((n): n is number => Number.isFinite(n as number))
+          .map((g: any) => toIntOrNull(g?.id))
+          .filter((n): n is number => Number.isFinite(n as number))
         : [];
 
     if (imageId) collectedImageIds.add(imageId);
@@ -522,9 +522,9 @@ export async function POST(req: NextRequest) {
       const kolaseGalleryIds = String(formData.get("kolaseGalleryIds") || "").trim();
       galleryIds = kolaseGalleryIds
         ? kolaseGalleryIds
-            .split(",")
-            .map((x) => Number(x.trim()))
-            .filter((n) => Number.isFinite(n) && n > 0)
+          .split(",")
+          .map((x) => Number(x.trim()))
+          .filter((n) => Number.isFinite(n) && n > 0)
         : [];
 
       mainImageId = kolaseMainId;
@@ -571,13 +571,13 @@ export async function POST(req: NextRequest) {
         mainImageId,
         ...(galleryIds.length
           ? {
-              galeri: {
-                create: galleryIds.map((gid, idx) => ({
-                  gambarId: gid,
-                  urutan: idx,
-                })),
-              },
-            }
+            galeri: {
+              create: galleryIds.map((gid, idx) => ({
+                gambarId: gid,
+                urutan: idx,
+              })),
+            },
+          }
           : {}),
 
         categoryId,
@@ -626,15 +626,18 @@ export async function POST(req: NextRequest) {
       { error: err?.message || "Gagal menambahkan produk." },
       { status: 500 }
     );
+    { status: 500 }
+    );
   }
 }
 
 export async function PUT(
   req: NextRequest,
-  ctx: { params: { id: string } }
+  ctx: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = Number(ctx.params.id);
+    const params = await ctx.params;
+    const id = Number(params.id);
     if (!Number.isFinite(id) || id <= 0) {
       return NextResponse.json({ error: "ID produk tidak valid." }, { status: 400 });
     }
@@ -837,9 +840,9 @@ export async function PUT(
       const kolaseGalleryIds = String(formData.get("kolaseGalleryIds") || "").trim();
       const galleryIds = kolaseGalleryIds
         ? kolaseGalleryIds
-            .split(",")
-            .map((x) => Number(x.trim()))
-            .filter((n) => Number.isFinite(n) && n > 0)
+          .split(",")
+          .map((x) => Number(x.trim()))
+          .filter((n) => Number.isFinite(n) && n > 0)
         : [];
 
       nextMainImageId = kolaseMainId;

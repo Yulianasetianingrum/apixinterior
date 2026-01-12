@@ -22,10 +22,10 @@ function contentTypeByExt(ext: string) {
 
 export async function GET(
   _req: Request,
-  ctx: { params: { filename: string } | Promise<{ filename: string }> }
+  ctx: { params: Promise<{ filename: string }> }
 ) {
   try {
-    const { filename } = await Promise.resolve(ctx.params as any);
+    const { filename } = await ctx.params;
 
     if (
       !filename ||
