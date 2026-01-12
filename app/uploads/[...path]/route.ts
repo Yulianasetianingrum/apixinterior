@@ -26,9 +26,10 @@ function safeJoin(base: string, targetParts: string[]) {
 
 export async function GET(
   _req: NextRequest,
-  ctx: { params: { path: string[] } }
+  ctx: { params: Promise<{ path: string[] }> }
 ) {
-  const parts = Array.isArray(ctx.params?.path) ? ctx.params.path : [];
+  const params = await ctx.params;
+  const parts = Array.isArray(params?.path) ? params.path : [];
   const decoded = parts
     .map((p) => {
       try {
