@@ -1,7 +1,7 @@
 
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import Navbar from "@/app/navbar/page";
+import Navbar from "@/app/navbar/Navbar";
 import GlobalFooter from "@/app/components/GlobalFooter";
 import Image from "next/image";
 

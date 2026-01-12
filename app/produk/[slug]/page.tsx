@@ -3,7 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import Image from "next/image";
 import { prisma } from "@/lib/prisma";
 import styles from "./produk-detail.module.css";
-import Navbar from "@/app/navbar/page"; // Import Navbar (server component)
+import Navbar from "@/app/navbar/Navbar"; // Import Navbar (server component)
 import GlobalFooter from "@/app/components/GlobalFooter";
 import { formatIDR, normalizePublicUrl, computeHargaSetelahPromo } from "@/lib/product-utils";
 import ProductDetailClient from "@/app/components/product/ProductDetailClient";

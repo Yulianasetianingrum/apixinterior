@@ -384,12 +384,11 @@ async function fetchThemeData(themeKey: string, isPublished: boolean) {
   };
 }
 
-export default async function HomePage({
-  searchParams,
+searchParams,
 }: {
-  searchParams?: Promise<Record<string, string | string[] | undefined>> | Record<string, string | string[] | undefined>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const resolvedParams = searchParams instanceof Promise ? await searchParams : (searchParams ?? {});
+  const resolvedParams = await searchParams;
   const requestedThemeKey = Array.isArray(resolvedParams.theme)
     ? resolvedParams.theme[0]
     : (resolvedParams.theme ?? "");

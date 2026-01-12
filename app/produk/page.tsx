@@ -1,4 +1,4 @@
-import Navbar from "@/app/navbar/page";
+import Navbar from "@/app/navbar/Navbar";
 import { prisma } from "@/lib/prisma";
 import ProductCard from "@/app/components/product/ProductCard.client";
 import ProductFilter from "@/app/components/product/ProductFilter.client";

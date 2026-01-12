@@ -1,5 +1,5 @@
 
-import Navbar from "@/app/navbar/page";
+import Navbar from "@/app/navbar/Navbar";
 import GlobalFooter from "@/app/components/GlobalFooter";
 import WishlistPageClient from "./WishlistPage.client";
 

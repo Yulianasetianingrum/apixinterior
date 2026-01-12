@@ -1,5 +1,5 @@
 
-import Navbar from "@/app/navbar/page";
+import Navbar from "@/app/navbar/Navbar";
 import CartPageClient from "./CartPage.client";
 import { prisma } from "@/lib/prisma";
 

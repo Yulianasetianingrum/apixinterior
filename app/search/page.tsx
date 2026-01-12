@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import Navbar from "@/app/navbar/page";
+import Navbar from "@/app/navbar/Navbar";
 import GlobalFooter from "@/app/components/GlobalFooter";
 import ProductCard from "@/app/components/product/ProductCard.client";
 import Fuse from "fuse.js";

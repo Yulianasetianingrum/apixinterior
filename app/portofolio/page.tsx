@@ -1,4 +1,4 @@
-import Navbar from "@/app/navbar/page";
+import Navbar from "@/app/navbar/Navbar";
 import GlobalFooter from "@/app/components/GlobalFooter";
 import PortfolioGallery from "@/app/components/portfolio/PortfolioGallery.client";
 import { prisma } from "@/lib/prisma";

@@ -1,5 +1,5 @@
 
-import Navbar from "@/app/navbar/page";
+import Navbar from "@/app/navbar/Navbar";
 import FavoritePageClient from "./FavoritePage.client";
 
 export const metadata = {
