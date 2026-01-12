@@ -626,8 +626,7 @@ export async function POST(req: NextRequest) {
       { error: err?.message || "Gagal menambahkan produk." },
       { status: 500 }
     );
-    { status: 500 }
-    );
+
   }
 }
 
