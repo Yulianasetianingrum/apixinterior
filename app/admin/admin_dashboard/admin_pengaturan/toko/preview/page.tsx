@@ -656,7 +656,8 @@ async function fetchPreviewTheme(themeKey: string) {
 
 
 
-searchParams,
+export default async function TokoPreviewDraftPage({
+  searchParams,
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
