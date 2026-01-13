@@ -186,6 +186,37 @@ export const SECTION_DEFS: SectionDef[] = [
             voucherImageIds: [],
         },
     },
+    {
+        type: "FOOTER",
+        label: "Footer Section",
+        description: "Kontak (WA, Email, Alamat), Sosmed, dan Link Menu di bagian bawah.",
+        defaultSlug: "footer",
+        defaultConfig: {
+            sectionTheme: "FOLLOW_NAVBAR",
+            whatsapp: "",
+            email: "",
+            address: "",
+            instagram: "",
+            facebook: "",
+            useGlobalContact: true,
+            useGlobalSocial: true,
+            menuLinks: [
+                { label: "Hubungi Kami", url: "/hubungi" },
+                { label: "Koleksi Terbaru", url: "/produk" },
+                { label: "Tentang Kami", url: "/tentang" }
+            ],
+            footerTags: [
+                { label: "Interior Design Jakarta", url: "" },
+                { label: "Jasa Interior Rumah", url: "" },
+                { label: "Mebel Kayu Jepara", url: "" },
+                { label: "Furniture Kantor Murah", url: "" },
+                { label: "Kitchen Set Minimalis", url: "" },
+                { label: "Sofa Tamu Modern", url: "" },
+                { label: "Lemari Pakaian Custom", url: "" },
+                { label: "Meja Makan Mewah", url: "" }
+            ],
+        },
+    },
 ];
 
 export const SECTION_ICON: Record<string, string> = {
@@ -291,8 +322,23 @@ export function defaultThemeName(themeKey: ThemeKey) {
 
 export async function ensureThemeMeta(themeKey: ThemeKey, themeName?: string) {
     const slug = themeMetaSlug(themeKey);
-    const existing = await prisma.homepageSectionDraft.findFirst({ where: { slug } });
 
+    // Safer cleanup: Find all rows that look like theme meta for this themeKey
+    const allDrafts = await prisma.homepageSectionDraft.findMany({});
+    const duplicates = allDrafts.filter(d => {
+        const rowTk = getThemeKeyFromRow(d);
+        const isMeta = isThemeMetaRow(d);
+        // It's a duplicate if it's meta for this themeKey but NOT the official slug-based row
+        return isMeta && rowTk === themeKey && d.slug !== slug;
+    });
+
+    if (duplicates.length) {
+        await prisma.homepageSectionDraft.deleteMany({
+            where: { id: { in: duplicates.map(d => d.id) } }
+        });
+    }
+
+    const existing = await prisma.homepageSectionDraft.findFirst({ where: { slug } });
     if (existing) {
         if (themeName && typeof themeName === "string") {
             const cfg = (existing.config ?? {}) as any;
@@ -310,7 +356,7 @@ export async function ensureThemeMeta(themeKey: ThemeKey, themeName?: string) {
             title: "__THEME_META__",
             slug,
             enabled: false,
-            sortOrder: 0,
+            sortOrder: -999,
             config: { __isThemeMeta: true, __themeKey: themeKey, themeName: (themeName || defaultThemeName(themeKey)).trim() },
         },
     });
@@ -453,6 +499,7 @@ export function legacyToNewConfig(type: string, cfg: any) {
 
     if (type === "HERO") {
         return {
+            ...(cfg ?? {}),
             sectionTheme: String(cfg.sectionTheme ?? cfg.heroTheme ?? "FOLLOW_NAVBAR"),
             headline: String(cfg.headline ?? "").trim(),
             subheadline: String(cfg.subheadline ?? "").trim(),
@@ -465,6 +512,7 @@ export function legacyToNewConfig(type: string, cfg: any) {
 
     if (type === "PRODUCT_CAROUSEL") {
         return {
+            ...(cfg ?? {}),
             sectionTheme: String(cfg.sectionTheme ?? "FOLLOW_NAVBAR"),
             title: String(cfg.title ?? "").trim(),
             description: String(cfg.description ?? "").trim(),
@@ -479,12 +527,14 @@ export function legacyToNewConfig(type: string, cfg: any) {
         const ids = parseNumArray(cfg.kategoriIds);
         if (ids.length && !cfg.items) {
             return {
+                ...(cfg ?? {}),
                 sectionTheme: String(cfg.sectionTheme ?? "FOLLOW_NAVBAR"),
                 layout: { columns: 3, maxItems: ids.length || 6 },
                 items: ids.map((id: number) => ({ kategoriId: id, coverImageId: null })),
             };
         }
         return {
+            ...(cfg ?? {}),
             sectionTheme: String(cfg.sectionTheme ?? "FOLLOW_NAVBAR"),
             sectionBgTheme: parseCustomPromoBgTheme(cfg.sectionBgTheme),
             titleTextColor: String(cfg.titleTextColor ?? "").trim(),
@@ -495,6 +545,7 @@ export function legacyToNewConfig(type: string, cfg: any) {
 
     if (type === "PRODUCT_LISTING") {
         return {
+            ...(cfg ?? {}),
             sectionTheme: String(cfg.sectionTheme ?? "FOLLOW_NAVBAR"),
             sectionBgTheme: parseCustomPromoBgTheme(cfg.sectionBgTheme),
             title: String(cfg.title ?? "").trim(),
@@ -504,6 +555,7 @@ export function legacyToNewConfig(type: string, cfg: any) {
 
     if (type === "HIGHLIGHT_COLLECTION") {
         return {
+            ...(cfg ?? {}),
             sectionTheme: String(cfg.sectionTheme ?? "FOLLOW_NAVBAR"),
             mode: String(cfg.mode ?? "products"),
             layout: String(cfg.layout ?? "FEATURED_LEFT"),
@@ -514,6 +566,22 @@ export function legacyToNewConfig(type: string, cfg: any) {
             heroImageId: parseNum(cfg.heroImageId),
             productIds: parseNumArray(cfg.productIds),
             items: Array.isArray(cfg.items) ? cfg.items : [],
+        };
+    }
+
+    if (type === "FOOTER") {
+        return {
+            ...(cfg ?? {}),
+            sectionTheme: String(cfg.sectionTheme ?? "FOLLOW_NAVBAR"),
+            whatsapp: String(cfg.whatsapp ?? "").trim(),
+            email: String(cfg.email ?? "").trim(),
+            address: String(cfg.address ?? "").trim(),
+            instagram: String(cfg.instagram ?? "").trim(),
+            facebook: String(cfg.facebook ?? "").trim(),
+            useGlobalContact: cfg.useGlobalContact !== false,
+            useGlobalSocial: cfg.useGlobalSocial !== false,
+            menuLinks: Array.isArray(cfg.menuLinks) ? cfg.menuLinks : [],
+            footerTags: Array.isArray(cfg.footerTags) ? cfg.footerTags : [],
         };
     }
 

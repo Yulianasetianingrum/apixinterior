@@ -56,22 +56,12 @@ export async function updateBackgroundTheme(formData: FormData) {
     const allowed = ["FOLLOW_NAVBAR", "NAVY_GOLD", "WHITE_GOLD", "NAVY_WHITE", "GOLD_NAVY", "GOLD_WHITE", "WHITE_NAVY"];
     if (!allowed.includes(picked)) return;
 
-    const themeKey = await getThemeKeyFromReferer();
+    const rawTk = (formData.get("themeKey") as string | null)?.trim();
+    const themeKey = rawTk ? normalizeThemeKey(rawTk) : await getThemeKeyFromReferer();
     const slug = themeMetaSlug(themeKey);
 
-    let meta = await prisma.homepageSectionDraft.findFirst({ where: { slug } });
-    if (!meta) {
-        meta = await prisma.homepageSectionDraft.create({
-            data: {
-                type: "THEME_META" as any,
-                title: `Theme Meta ${themeKey}`,
-                slug,
-                enabled: true,
-                sortOrder: -999,
-                config: { __isThemeMeta: true, __themeKey: themeKey },
-            },
-        });
-    }
+    await ensureThemeMeta(themeKey);
+    const meta = await prisma.homepageSectionDraft.findFirst({ where: { slug } });
     if (!meta) return redirectBack({ error: encodeURIComponent("Theme meta tidak ditemukan.") });
 
     const cfg = (meta.config ?? {}) as any;
@@ -2204,6 +2194,25 @@ export async function autoGenerateThemeContent(formData: FormData) {
         heroTheme: "FOLLOW_NAVBAR",
         sectionTheme: "FOLLOW_NAVBAR",
         imageId: Number.isFinite(Number(heroImageId)) ? Number(heroImageId) : null,
+        badges: ["Ready Stock", "Kurasi Interior", "Material Premium"],
+        highlights: ["Gratis konsultasi styling", "Pilihan warna netral hangat", "Cocok untuk ruang kecil"],
+        trustChips: ["Pembayaran Aman", "Garansi", "Support CS"],
+        miniInfo: [
+            { title: " 4.8", desc: "Rating pelanggan" },
+            { title: " 1.2k+", desc: "Produk tersedia" },
+            { title: " Fast", desc: "Respon CS" },
+        ],
+        heroContent: {
+            eyebrow: themeName,
+            badges: ["Ready Stock", "Kurasi Interior", "Material Premium"],
+            highlights: ["Gratis konsultasi styling", "Pilihan warna netral hangat", "Cocok untuk ruang kecil"],
+            trustChips: ["Pembayaran Aman", "Garansi", "Support CS"],
+            miniInfo: [
+                { title: " 4.8", desc: "Rating pelanggan" },
+                { title: " 1.2k+", desc: "Produk tersedia" },
+                { title: " Fast", desc: "Respon CS" },
+            ],
+        }
     };
 
     const textBlocks = [

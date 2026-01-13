@@ -1081,7 +1081,7 @@ export default async function TokoPengaturanPage({
           </button>
         </div>
 
-        {(() => { console.log(`🖼️ [Admin] Rendering ${draftSectionsForTheme.length} sections for theme: ${activeThemeKey}`); return null; })()}
+        {(() => { console.log(`🖼️ [Admin] SECTION_DEFS count: ${SECTION_DEFS.length}, Draft count: ${draftSectionsForTheme.length} for theme: ${activeThemeKey}`); return null; })()}
         {draftSectionsForTheme.length === 0 ? (
           <p className={styles.emptyText}>
             Belum ada section draft. Tambahkan dulu minimal 1 section di tab Organize.
