@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import Navbar from "@/app/navbar/Navbar";
 import Image from "next/image";
 import Link from "next/link";
+import styles from "./article.module.css";
 
 // Force dynamic rendering to ensure fresh data
 export const dynamic = "force-dynamic";
@@ -56,25 +57,25 @@ export default async function ArticlePage({ params }: Props) {
         notFound();
     }
 
-    // --- STYLES ---
+    // --- INLINE STYLES FOR SERVER COMPONENT ---
     const mainWrapperStyle = {
         minHeight: "100vh",
-        backgroundColor: "#f9fafb", // Slightly warmer/cleaner background
-        paddingTop: "110px", // More space for fixed Navbar
+        backgroundColor: "#f9fafb",
+        paddingTop: "110px",
         paddingBottom: "80px",
     };
 
     const containerStyle = {
         maxWidth: "840px",
         margin: "0 auto",
-        padding: "0 12px", // Outer padding for mobile
+        padding: "0 12px",
         fontFamily: "'Outfit', 'Inter', sans-serif",
     };
 
     const articleCardStyle = {
         backgroundColor: "#ffffff",
         borderRadius: "20px",
-        padding: "clamp(24px, 6vw, 56px) clamp(16px, 5vw, 48px)", // Balanced padding
+        padding: "clamp(24px, 6vw, 56px) clamp(16px, 5vw, 48px)",
         boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05)",
         overflow: "hidden",
     };
@@ -93,7 +94,7 @@ export default async function ArticlePage({ params }: Props) {
     };
 
     const titleStyle = {
-        fontSize: "clamp(22px, 5vw, 32px)", // Scaled down for better balance
+        fontSize: "clamp(22px, 5vw, 32px)",
         fontWeight: "800",
         color: "#0f172a",
         lineHeight: "1.25",
@@ -225,7 +226,7 @@ async function RecommendedPosts({ currentSlug }: { currentSlug: string }) {
                 </h3>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "32px" }}>
                     {others.map((p: any) => (
-                        <Link key={p.id} href={`/artikel/${p.slug}`} style={{ textDecoration: "none", color: "inherit", display: "flex", flexDirection: "column", gap: "16px", background: "#fff", borderRadius: "16px", padding: "16px", boxShadow: "0 1px 2px 0 rgba(0,0,0,0.05)", transition: "transform 0.2s ease, box-shadow 0.2s ease" }} className="hover-card">
+                        <Link key={p.id} href={`/artikel/${p.slug}`} className={styles.hoverCard}>
                             <div style={{ aspectRatio: "16/9", background: "#f1f5f9", borderRadius: "10px", overflow: "hidden", position: "relative" }}>
                                 {p.coverImage ? (
                                     <Image src={p.coverImage} alt={p.title} fill style={{ objectFit: "cover" }} sizes="(max-width: 1000px) 100vw, 33vw" />
@@ -236,8 +237,8 @@ async function RecommendedPosts({ currentSlug }: { currentSlug: string }) {
                                 )}
                             </div>
                             <div>
-                                <h4 style={{ fontSize: "18px", fontWeight: "700", marginBottom: "8px", lineHeight: "1.4", color: "#1e293b" }}>{p.title}</h4>
-                                <div style={{ fontSize: "14px", color: "#64748b" }}>
+                                <h4 className={styles.title}>{p.title}</h4>
+                                <div className={styles.meta}>
                                     {new Date(p.createdAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
                                 </div>
                             </div>
@@ -245,12 +246,6 @@ async function RecommendedPosts({ currentSlug }: { currentSlug: string }) {
                     ))}
                 </div>
             </div>
-            <style jsx>{`
-                .hover-card:hover {
-                    transform: translateY(-4px);
-                    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-                }
-            `}</style>
         </section>
     );
 }
