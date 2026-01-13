@@ -1141,7 +1141,8 @@ export default async function HomePage({
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 30 }}>
                     {(() => {
                       const tags = Array.isArray(cfg.footerTags) ? cfg.footerTags : [];
-                      if (tags.length === 0) return null;
+                      // Allow rendering even if tags are empty (so logo/contact still shows)
+                      // if (tags.length === 0) return null; 
 
                       const mid = Math.ceil(tags.length / 2);
                       const leftTags = tags.slice(0, mid);
