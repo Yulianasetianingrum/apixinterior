@@ -17,8 +17,8 @@ export async function POST(req: Request) {
     const ids =
       Array.isArray(idsRaw) && idsRaw.length
         ? idsRaw
-            .map((v) => (typeof v === "number" ? v : Number(v)))
-            .filter((v) => Number.isFinite(v))
+          .map((v) => (typeof v === "number" ? v : Number(v)))
+          .filter((v) => Number.isFinite(v))
         : [];
 
     if (!ids.length) {
@@ -31,7 +31,7 @@ export async function POST(req: Request) {
       select: { id: true },
     });
 
-    const existingSet = new Set(existing.map((x) => x.id));
+    const existingSet = new Set(existing.map((x: any) => x.id));
     const missing = ids.filter((id) => !existingSet.has(id));
     if (missing.length) {
       return NextResponse.json(

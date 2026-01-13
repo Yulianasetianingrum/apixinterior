@@ -10,9 +10,10 @@ interface Props {
 export const dynamic = "force-dynamic";
 
 export default async function CategoryProductPage(props: Props) {
-    const params = await props.params;
-    const searchParams = await props.searchParams;
-    const slug = params.slug;
+    const { params, searchParams } = props;
+    const resolvedParams = await params;
+    const resolvedSearchParams = await searchParams;
+    const slug = resolvedParams.slug;
 
     // Find the category by slug to get the actual name stored in products
     const category = await prisma.kategoriProduk.findFirst({
@@ -26,7 +27,7 @@ export default async function CategoryProductPage(props: Props) {
     // Merge the category from slug into the searchParams
     // We treat the slug as the 'cat' filter
     const mergedSearchParams = {
-        ...searchParams,
+        ...resolvedSearchParams,
         cat: categoryName
     };
 

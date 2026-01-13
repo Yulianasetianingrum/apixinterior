@@ -44,7 +44,7 @@ export default async function PortfolioPage() {
     // Let's passed the mapped images to ensure they match the valid IDs.
 
     // Dedup images just in case
-    const uniqueImages = Array.from(new Map(images.map(item => [item.id, item])).values());
+    const uniqueImages = Array.from(new Map(images.map((item: any) => [item.id, item])).values());
 
     return (
         <div style={{ background: "#ffffff", minHeight: "100vh", fontFamily: "Inter, sans-serif", paddingTop: "90px" }}>

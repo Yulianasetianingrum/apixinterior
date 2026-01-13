@@ -275,7 +275,7 @@ async function upsertVariasi(
 
     if (galeriIds.length) {
       await tx.variasiGaleri.createMany({
-        data: galeriIds.map((gid, i) => ({
+        data: galeriIds.map((gid: number, i: number) => ({
           variasiProdukId: createdVar.id,
           gambarId: gid,
           urutan: i,
@@ -610,7 +610,7 @@ export async function POST(req: NextRequest) {
       const toInsert = [...varImageIds].filter((id) => !exists.has(id));
       if (toInsert.length) {
         await prisma.produkGaleri.createMany({
-          data: toInsert.map((gid, idx) => ({
+          data: toInsert.map((gid: number, idx: number) => ({
             produkId: created.id,
             gambarId: gid,
             urutan: galleryIds.length + idx,
@@ -849,7 +849,7 @@ export async function PUT(
 
     // update media kalau ada perubahan yang dihitung
     if (nextMainImageId !== undefined || nextGalleryIds !== undefined) {
-      await prisma.$transaction(async (tx) => {
+      await prisma.$transaction(async (tx: any) => {
         if (nextMainImageId !== undefined) {
           await tx.produk.update({
             where: { id },
@@ -906,7 +906,7 @@ export async function PUT(
       const exists = new Set<number>();
       const currentMain = nextMainImageId !== undefined ? nextMainImageId : existing.mainImageId;
       if (currentMain) exists.add(currentMain);
-      existingGaleri.forEach((g) => exists.add(g.gambarId));
+      existingGaleri.forEach((g: any) => exists.add(g.gambarId));
 
       const toInsert = [...varImageIds].filter((gid) => !exists.has(gid));
       if (toInsert.length) {

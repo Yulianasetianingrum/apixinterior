@@ -343,123 +343,123 @@ export default function DaftarProdukPage() {
 
 
 
-// ===== UI POPUP (Confirm + Message) & Toast =====
+  // ===== UI POPUP (Confirm + Message) & Toast =====
 
-type ConfirmTone = "primary" | "danger";
+  type ConfirmTone = "primary" | "danger";
 
-type ConfirmState = {
+  type ConfirmState = {
 
-  open: boolean;
+    open: boolean;
 
-  title: string;
+    title: string;
 
-  description: string;
+    description: string;
 
-  confirmText: string;
+    confirmText: string;
 
-  cancelText: string;
+    cancelText: string;
 
-  tone: ConfirmTone;
+    tone: ConfirmTone;
 
-};
+  };
 
 
 
-type MessageState = {
+  type MessageState = {
 
-  open: boolean;
+    open: boolean;
 
-  title: string;
+    title: string;
 
-  description: string;
+    description: string;
 
-  detail: string;
+    detail: string;
 
-  okText: string;
+    okText: string;
 
-};
+  };
 
 
 
-type ToastType = "success" | "error" | "info";
+  type ToastType = "success" | "error" | "info";
 
-type ToastItem = { id: string; type: ToastType; message: string };
+  type ToastItem = { id: string; type: ToastType; message: string };
 
 
 
-const [confirmState, setConfirmState] = useState<ConfirmState | null>(null);
+  const [confirmState, setConfirmState] = useState<ConfirmState | null>(null);
 
-const confirmResolveRef = useRef<((v: boolean) => void) | null>(null);
+  const confirmResolveRef = useRef<((v: boolean) => void) | null>(null);
 
 
 
-const [messageState, setMessageState] = useState<MessageState | null>(null);
+  const [messageState, setMessageState] = useState<MessageState | null>(null);
 
 
 
-const [toasts, setToasts] = useState<ToastItem[]>([]);
+  const [toasts, setToasts] = useState<ToastItem[]>([]);
 
 
 
-function pushToast(message: string, type: ToastType = "info") {
+  function pushToast(message: string, type: ToastType = "info") {
 
-  const id = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    const id = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
-  setToasts((prev) => [...prev, { id, type, message }]);
+    setToasts((prev) => [...prev, { id, type, message }]);
 
-  window.setTimeout(() => {
+    window.setTimeout(() => {
 
-    setToasts((prev) => prev.filter((t) => t.id !== id));
+      setToasts((prev) => prev.filter((t) => t.id !== id));
 
-  }, 3500);
-
-}
-
-
-
-function removeToast(id: string) {
-
-  setToasts((prev) => prev.filter((t) => t.id !== id));
-
-}
-
-
-
-function openMessage(opts: Omit<MessageState, "open">) {
-
-  setMessageState({ open: true, ...opts });
-
-}
-
-
-
-function openConfirm(opts: Omit<ConfirmState, "open">) {
-
-  return new Promise<boolean>((resolve) => {
-
-    confirmResolveRef.current = resolve;
-
-    setConfirmState({ open: true, ...opts });
-
-  });
-
-}
-
-
-
-function closeConfirm(result: boolean) {
-
-  if (confirmResolveRef.current) {
-
-    confirmResolveRef.current(result);
-
-    confirmResolveRef.current = null;
+    }, 3500);
 
   }
 
-  setConfirmState(null);
 
-}
+
+  function removeToast(id: string) {
+
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+
+  }
+
+
+
+  function openMessage(opts: Omit<MessageState, "open">) {
+
+    setMessageState({ open: true, ...opts });
+
+  }
+
+
+
+  function openConfirm(opts: Omit<ConfirmState, "open">) {
+
+    return new Promise<boolean>((resolve) => {
+
+      confirmResolveRef.current = resolve;
+
+      setConfirmState({ open: true, ...opts });
+
+    });
+
+  }
+
+
+
+  function closeConfirm(result: boolean) {
+
+    if (confirmResolveRef.current) {
+
+      confirmResolveRef.current(result);
+
+      confirmResolveRef.current = null;
+
+    }
+
+    setConfirmState(null);
+
+  }
 
   const [search, setSearch] = useState("");
 
@@ -703,7 +703,7 @@ function closeConfirm(result: boolean) {
 
 
 
-try {
+    try {
 
       const res = await fetch(
 
@@ -739,221 +739,221 @@ try {
 
   const handleDropAll = async () => {
 
-  if (droppingAll) return;
+    if (droppingAll) return;
 
 
 
-  if (!products.length) {
+    if (!products.length) {
 
-    pushToast("Tidak ada produk untuk dihapus.", "info");
+      pushToast("Tidak ada produk untuk dihapus.", "info");
 
-    return;
-
-  }
-
-
-
-  const ok = await openConfirm({
-
-    title: "Hapus semua produk",
-
-    description: `Ini akan menghapus SEMUA produk (total: ${products.length}) dan tidak bisa dibatalkan.`,
-
-    confirmText: "Hapus semua",
-
-    cancelText: "Batal",
-
-    tone: "danger",
-
-  });
-
-  if (!ok) return;
-
-
-
-  // tutup preview biar aman kalau lagi kebuka
-
-  closePreview();
-
-
-
-  const failedIds: number[] = [];
-
-  const failedErrors: string[] = [];
-
-
-
-  // Validasi ID dulu (hindari HTTP 400 "ID tidak valid")
-
-  const rawIds = products.map((p) => (p as any).id);
-
-  const ids: number[] = [];
-
-  const invalidIdStrings: string[] = [];
-
-  for (const v of rawIds) {
-
-    const n = Number(v);
-
-    if (Number.isFinite(n) && n > 0) ids.push(n);
-
-    else invalidIdStrings.push(String(v));
-
-  }
-
-
-
-  if (invalidIdStrings.length) {
-
-    failedErrors.push(
-
-      ...invalidIdStrings.map((v) => `ID tidak valid (frontend): ${v}`)
-
-    );
-
-  }
-
-
-
-  if (!ids.length) {
-
-    openMessage({
-
-      title: "Drop all dibatalkan",
-
-      description: "Tidak ada ID produk valid untuk dihapus.",
-
-      detail: invalidIdStrings.length
-
-        ? invalidIdStrings.slice(0, 50).join("\n")
-
-        : "ID produk kosong/invalid.",
-
-      okText: "Oke",
-
-    });
-
-    return;
-
-  }
-
-
-
-  try {
-
-    setDroppingAll(true);
-
-    setDropProgress({ done: 0, total: ids.length });
-
-
-
-    for (const id of ids) {
-
-      try {
-
-        const res = await fetch(`/api/admin/admin_dashboard/admin_produk/${id}`, {
-
-          method: "DELETE",
-
-        });
-
-
-
-        if (!res.ok) {
-
-          let body = "";
-
-          try {
-
-            body = await res.text();
-
-          } catch {}
-
-
-
-          throw new Error(
-
-            body?.trim()
-
-              ? `HTTP ${res.status}: ${body}`
-
-              : `HTTP ${res.status}: Gagal menghapus produk`
-
-          );
-
-        }
-
-      } catch (err: any) {
-
-        console.error(err);
-
-        failedIds.push(id);
-
-        failedErrors.push(`ID ${id}  ${err?.message ?? "Unknown error"}`);
-
-      } finally {
-
-        setDropProgress((prev) =>
-
-          prev ? { ...prev, done: prev.done + 1 } : prev
-
-        );
-
-      }
+      return;
 
     }
 
 
 
-    if (failedIds.length === 0) {
+    const ok = await openConfirm({
 
-      setProducts([]);
+      title: "Hapus semua produk",
 
-      pushToast("Drop all selesai. Semua produk terhapus.", "success");
+      description: `Ini akan menghapus SEMUA produk (total: ${products.length}) dan tidak bisa dibatalkan.`,
 
-    } else {
+      confirmText: "Hapus semua",
 
-      await fetchProducts();
+      cancelText: "Batal",
 
+      tone: "danger",
 
+    });
 
-      const maxLines = 30;
-
-      const detail =
-
-        failedErrors.slice(0, maxLines).join("\n") +
-
-        (failedErrors.length > maxLines
-
-          ? `\n...dan ${failedErrors.length - maxLines} error lagi`
-
-          : "");
+    if (!ok) return;
 
 
+
+    // tutup preview biar aman kalau lagi kebuka
+
+    closePreview();
+
+
+
+    const failedIds: number[] = [];
+
+    const failedErrors: string[] = [];
+
+
+
+    // Validasi ID dulu (hindari HTTP 400 "ID tidak valid")
+
+    const rawIds = products.map((p) => (p as any).id);
+
+    const ids: number[] = [];
+
+    const invalidIdStrings: string[] = [];
+
+    for (const v of rawIds) {
+
+      const n = Number(v);
+
+      if (Number.isFinite(n) && n > 0) ids.push(n);
+
+      else invalidIdStrings.push(String(v));
+
+    }
+
+
+
+    if (invalidIdStrings.length) {
+
+      failedErrors.push(
+
+        ...invalidIdStrings.map((v) => `ID tidak valid (frontend): ${v}`)
+
+      );
+
+    }
+
+
+
+    if (!ids.length) {
 
       openMessage({
 
-        title: "Drop all selesai",
+        title: "Drop all dibatalkan",
 
-        description: `Ada ${failedIds.length} produk yang gagal dihapus.`,
+        description: "Tidak ada ID produk valid untuk dihapus.",
 
-        detail,
+        detail: invalidIdStrings.length
+
+          ? invalidIdStrings.slice(0, 50).join("\n")
+
+          : "ID produk kosong/invalid.",
 
         okText: "Oke",
 
       });
 
+      return;
+
     }
 
-  } finally {
 
-    setDroppingAll(false);
 
-    setDropProgress(null);
+    try {
 
-  }
+      setDroppingAll(true);
 
-};
+      setDropProgress({ done: 0, total: ids.length });
+
+
+
+      for (const id of ids) {
+
+        try {
+
+          const res = await fetch(`/api/admin/admin_dashboard/admin_produk/${id}`, {
+
+            method: "DELETE",
+
+          });
+
+
+
+          if (!res.ok) {
+
+            let body = "";
+
+            try {
+
+              body = await res.text();
+
+            } catch { }
+
+
+
+            throw new Error(
+
+              body?.trim()
+
+                ? `HTTP ${res.status}: ${body}`
+
+                : `HTTP ${res.status}: Gagal menghapus produk`
+
+            );
+
+          }
+
+        } catch (err: any) {
+
+          console.error(err);
+
+          failedIds.push(id);
+
+          failedErrors.push(`ID ${id}  ${err?.message ?? "Unknown error"}`);
+
+        } finally {
+
+          setDropProgress((prev) =>
+
+            prev ? { ...prev, done: prev.done + 1 } : prev
+
+          );
+
+        }
+
+      }
+
+
+
+      if (failedIds.length === 0) {
+
+        setProducts([]);
+
+        pushToast("Drop all selesai. Semua produk terhapus.", "success");
+
+      } else {
+
+        await fetchProducts();
+
+
+
+        const maxLines = 30;
+
+        const detail =
+
+          failedErrors.slice(0, maxLines).join("\n") +
+
+          (failedErrors.length > maxLines
+
+            ? `\n...dan ${failedErrors.length - maxLines} error lagi`
+
+            : "");
+
+
+
+        openMessage({
+
+          title: "Drop all selesai",
+
+          description: `Ada ${failedIds.length} produk yang gagal dihapus.`,
+
+          detail,
+
+          okText: "Oke",
+
+        });
+
+      }
+
+    } finally {
+
+      setDroppingAll(false);
+
+      setDropProgress(null);
+
+    }
+
+  };
 
 
 
@@ -1189,11 +1189,9 @@ try {
   };
 
   // ========== WRAPPER CLASS (SIANG / MALAM) ==========
-  const wrapperClass = `${styles.wrapper} ${
+  const wrapperClass = `${styles.wrapper} ${isDark ? styles.wrapperDark : styles.wrapperLight
 
-    isDark ? styles.wrapperDark : styles.wrapperLight
-
-  }`;
+    }`;
 
 
 
@@ -1251,7 +1249,7 @@ try {
 
             }>
 
-          Daftar Produk
+            Daftar Produk
 
           </button>
 
@@ -1269,7 +1267,7 @@ try {
 
             }>
 
-          Tambah Produk
+            Tambah Produk
 
           </button>
 
@@ -1291,7 +1289,7 @@ try {
 
             }>
 
-          Kategori Produk
+            Kategori Produk
 
           </button>
 
@@ -1311,11 +1309,9 @@ try {
 
             type="button"
 
-            className={`${styles.themeSwitch} ${
+            className={`${styles.themeSwitch} ${isDark ? styles.themeSwitchOn : ""
 
-              isDark ? styles.themeSwitchOn : ""
-
-            }`}
+              }`}
 
             onClick={() => setIsDark((prev) => !prev)}>
             <span className={styles.themeThumb} />
@@ -1336,7 +1332,7 @@ try {
 
             onClick={() => router.push("/admin/admin_dashboard")}>
 
-          KEMBALI
+            KEMBALI
           </button>
 
         </div>
@@ -1469,7 +1465,7 @@ try {
 
               }>
 
-            Drop All
+              Drop All
             </button>
 
           </div>
@@ -1502,7 +1498,7 @@ try {
 
               onClick={() => fetchProducts()}>
 
-            Coba lagi
+              Coba lagi
             </button>
 
           </div>
@@ -1579,11 +1575,9 @@ try {
 
                   key={p.id}
 
-                  className={`${styles.item} ${
+                  className={`${styles.item} ${draggingId === p.id ? styles.itemDragging : ""
 
-                    draggingId === p.id ? styles.itemDragging : ""
-
-                  }`}
+                    }`}
 
                   draggable
 
@@ -1614,7 +1608,7 @@ try {
 
                             onClick={() => openPreview(p, idx)}>
 
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
 
                             <img
 
@@ -1644,7 +1638,7 @@ try {
 
                       <div className={styles.mediaBadge}>
 
-                            | {mediaCount} foto
+                        | {mediaCount} foto
 
                       </div>
 
@@ -1694,7 +1688,7 @@ try {
 
                               }}>
 
-                            {formatRupiah(pr.hargaAsli)}
+                              {formatRupiah(pr.hargaAsli)}
                             </span>
 
                             <span style={{ marginLeft: 10, fontWeight: 800 }}>
@@ -1716,7 +1710,7 @@ try {
                           </>
                         )}
 
-                          {mediaCount > 0 && (
+                        {mediaCount > 0 && (
                           <span className={styles.productMediaInfo}>
                             | {mediaCount} foto
                             {variationCount > 0 ? ` · ${variationCount} variasi` : ""}
@@ -1726,7 +1720,7 @@ try {
                           </span>
                         )}
 
-                      
+
 
                       </div>
 
@@ -1746,7 +1740,7 @@ try {
 
                         disabled={droppingAll}>
 
-                      Edit
+                        Edit
                       </button>
 
                       <button
@@ -1759,7 +1753,7 @@ try {
 
                         disabled={droppingAll}>
 
-                      Hapus
+                        Hapus
                       </button>
 
                     </div>
@@ -1852,9 +1846,8 @@ try {
                         <button
                           key={idx}
                           type="button"
-                          className={`${styles.previewThumb} ${
-                            idx === previewIndex ? styles.previewThumbActive : ""
-                          }`}
+                          className={`${styles.previewThumb} ${idx === previewIndex ? styles.previewThumbActive : ""
+                            }`}
                           onClick={() => setPreviewIndex(idx)}
                           aria-label={`Gambar ${idx + 1}`}
                         >
@@ -1917,9 +1910,8 @@ try {
                         <button
                           type="button"
                           key={v.id}
-                          className={`${styles.variationPill} ${
-                            isActiveVar ? styles.variationPillActive : ""
-                          }`}
+                          className={`${styles.variationPill} ${isActiveVar ? styles.variationPillActive : ""
+                            }`}
                           onClick={() => {
                             setSelectedVarId(v.id);
                             setSelectedComboIds({ 1: null, 2: null, 3: null });
@@ -1956,11 +1948,10 @@ try {
                                 <button
                                   type="button"
                                   key={cid}
-                                  className={`${styles.variationPill} ${
-                                    isActive ? styles.variationPillActive : ""
-                                  }`}
+                                  className={`${styles.variationPill} ${isActive ? styles.variationPillActive : ""
+                                    }`}
                                   onClick={() => {
-                                    selectCombo(lvl, isActive ? null : cid);
+                                    selectCombo(lvl, isActive ? null : Number(cid));
                                     if (c.imageUrl) focusPreviewImage(c.imageUrl);
                                   }}
                                 >
@@ -1999,7 +1990,7 @@ try {
                                 textDecoration: "line-through",
                                 opacity: 0.7,
                               }}>
-                            {formatRupiah(pr.hargaAsli)}
+                              {formatRupiah(pr.hargaAsli)}
                             </span>
                             <span
                               style={{
@@ -2012,14 +2003,14 @@ try {
                                 opacity: 0.9,
                                 display: "inline-block",
                               }}>
-                            {pr.promoLabel}
+                              {pr.promoLabel}
                             </span>
                           </>
                         ) : (
                           <span>{formatRupiah(pr.hargaAsli)}</span>
                         )}
                         <span style={{ marginLeft: 10 }}>
-                           ID {previewProduct.id}
+                          ID {previewProduct.id}
                         </span>
                       </>
                     );
@@ -2129,196 +2120,196 @@ try {
 
 
 
-{/* Toasts */}
+      {/* Toasts */}
 
-{toasts.length > 0 && (
+      {toasts.length > 0 && (
 
-  <div className={styles.toastWrap} aria-live="polite">
+        <div className={styles.toastWrap} aria-live="polite">
 
-    {toasts.map((t) => (
+          {toasts.map((t) => (
 
-      <div
+            <div
 
-        key={t.id}
+              key={t.id}
 
-        className={[
+              className={[
 
-          styles.toast,
+                styles.toast,
 
-          t.type === "success"
+                t.type === "success"
 
-            ? styles.toastSuccess
+                  ? styles.toastSuccess
 
-            : t.type === "error"
+                  : t.type === "error"
 
-              ? styles.toastError
+                    ? styles.toastError
 
-              : styles.toastInfo,
+                    : styles.toastInfo,
 
-        ].join(" ")}>
-        <div className={styles.toastMsg}>{t.message}</div>
+              ].join(" ")}>
+              <div className={styles.toastMsg}>{t.message}</div>
 
-        <button
+              <button
 
-          className={styles.toastClose}
+                className={styles.toastClose}
 
-          onClick={() => removeToast(t.id)}
+                onClick={() => removeToast(t.id)}
 
-          aria-label="Tutup"
+                aria-label="Tutup"
 
-          type="button">
-        </button>
+                type="button">
+              </button>
 
-      </div>
+            </div>
 
-    ))}
+          ))}
 
-  </div>
-
-)}
-
-
-
-{/* Confirm Modal */}
-
-{confirmState?.open && (
-
-  <div className={styles.confirmOverlay} role="presentation">
-
-    <div className={styles.confirmCard} role="dialog" aria-modal="true">
-
-      <div className={styles.confirmHead}>
-
-        <div className={styles.confirmTitle}>{confirmState.title}</div>
-
-        <button
-
-          className={styles.confirmClose}
-
-          type="button"
-
-          onClick={() => closeConfirm(false)}
-
-          aria-label="Tutup">
-        </button>
-
-      </div>
-
-
-
-      {confirmState.description && (
-
-        <div className={styles.confirmDesc}>{confirmState.description}</div>
+        </div>
 
       )}
 
 
 
-      <div className={styles.confirmActions}>
+      {/* Confirm Modal */}
 
-        <button
+      {confirmState?.open && (
 
-          className={styles.editButton}
+        <div className={styles.confirmOverlay} role="presentation">
 
-          type="button"
+          <div className={styles.confirmCard} role="dialog" aria-modal="true">
 
-          onClick={() => closeConfirm(false)}>
+            <div className={styles.confirmHead}>
 
-        {confirmState.cancelText ?? "Batal"}
-        </button>
+              <div className={styles.confirmTitle}>{confirmState.title}</div>
 
-        <button
+              <button
 
-          className={
+                className={styles.confirmClose}
 
-            confirmState.tone === "danger"
+                type="button"
 
-              ? styles.deleteButton
+                onClick={() => closeConfirm(false)}
 
-              : styles.primaryButton
+                aria-label="Tutup">
+              </button>
 
-          }
-
-          type="button"
-
-          onClick={() => closeConfirm(true)}>
-
-        {confirmState.confirmText ?? "OK"}
-        </button>
-
-      </div>
-
-    </div>
-
-  </div>
-
-)}
+            </div>
 
 
 
-{/* Message Modal */}
+            {confirmState.description && (
 
-{messageState?.open && (
+              <div className={styles.confirmDesc}>{confirmState.description}</div>
 
-  <div className={styles.confirmOverlay} role="presentation">
-
-    <div className={styles.messageCard} role="dialog" aria-modal="true">
-
-      <div className={styles.confirmHead}>
-
-        <div className={styles.confirmTitle}>{messageState.title}</div>
-
-        <button
-
-          className={styles.confirmClose}
-
-          type="button"
-
-          onClick={() => setMessageState(null)}
-
-          aria-label="Tutup">
-        </button>
-
-      </div>
+            )}
 
 
 
-      {messageState.description && (
+            <div className={styles.confirmActions}>
 
-        <div className={styles.confirmDesc}>{messageState.description}</div>
+              <button
 
-      )}
+                className={styles.editButton}
 
+                type="button"
 
+                onClick={() => closeConfirm(false)}>
 
-      {messageState.detail && (
+                {confirmState.cancelText ?? "Batal"}
+              </button>
 
-        <pre className={styles.messageDetail}>{messageState.detail}</pre>
+              <button
+
+                className={
+
+                  confirmState.tone === "danger"
+
+                    ? styles.deleteButton
+
+                    : styles.primaryButton
+
+                }
+
+                type="button"
+
+                onClick={() => closeConfirm(true)}>
+
+                {confirmState.confirmText ?? "OK"}
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
 
       )}
 
 
 
-      <div className={styles.confirmActions}>
+      {/* Message Modal */}
 
-        <button
+      {messageState?.open && (
 
-          className={styles.primaryButton}
+        <div className={styles.confirmOverlay} role="presentation">
 
-          type="button"
+          <div className={styles.messageCard} role="dialog" aria-modal="true">
 
-          onClick={() => setMessageState(null)}>
+            <div className={styles.confirmHead}>
 
-        {messageState.okText ?? "Oke"}
-        </button>
+              <div className={styles.confirmTitle}>{messageState.title}</div>
 
-      </div>
+              <button
 
-    </div>
+                className={styles.confirmClose}
 
-  </div>
+                type="button"
 
-)}
+                onClick={() => setMessageState(null)}
+
+                aria-label="Tutup">
+              </button>
+
+            </div>
+
+
+
+            {messageState.description && (
+
+              <div className={styles.confirmDesc}>{messageState.description}</div>
+
+            )}
+
+
+
+            {messageState.detail && (
+
+              <pre className={styles.messageDetail}>{messageState.detail}</pre>
+
+            )}
+
+
+
+            <div className={styles.confirmActions}>
+
+              <button
+
+                className={styles.primaryButton}
+
+                type="button"
+
+                onClick={() => setMessageState(null)}>
+
+                {messageState.okText ?? "Oke"}
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      )}
 
     </div>
 

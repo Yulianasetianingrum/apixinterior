@@ -378,7 +378,7 @@ export async function saveSocialConfig(formData: FormData) {
         select: { iconKey: true, nama: true }
     });
     const selected = iconKeys.map(k => {
-        const r = rows.find(x => x.iconKey === k);
+        const r = rows.find((x: any) => x.iconKey === k);
         return { iconKey: k, nama: r?.nama ?? k };
     });
 
@@ -494,7 +494,7 @@ export async function publishDraftToWebsite(formData: FormData) {
     if (!meta) return { ok: false, error: "Belum ada theme aktif." };
 
     const allDrafts = await prisma.homepageSectionDraft.findMany({ orderBy: { sortOrder: "asc" } });
-    const drafts = allDrafts.filter((d) => {
+    const drafts = allDrafts.filter((d: any) => {
         // Include meta rows ONLY if they match this specific theme
         if (isThemeMetaRow(d)) {
             return d.slug === themeMetaSlug(themeKey);
@@ -516,7 +516,7 @@ export async function publishDraftToWebsite(formData: FormData) {
     // Transaction: Delete old published sections, Insert new sections, AND Update NavbarSetting
     const transactionOps: any[] = [
         prisma.homepageSectionPublished.deleteMany({}),
-        ...drafts.map((d) =>
+        ...drafts.map((d: any) =>
             prisma.homepageSectionPublished.create({
                 data: {
                     type: d.type as any,
@@ -942,7 +942,7 @@ export async function pickAllProductListingProducts(formData: FormData) {
         select: { id: true },
     });
 
-    const productIds = latestProducts.map((p) => Number(p.id));
+    const productIds = latestProducts.map((p: any) => Number(p.id));
 
     await updateDraftConfigPreserveTheme(id, { productIds });
     revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko");
@@ -1567,7 +1567,7 @@ export async function uploadImageToGalleryAndAttach(formData: FormData): Promise
             }
 
             const cards = normalizeRoomCards(cfg?.cards);
-            const next = cards.map((c) => (c.key === safeKey ? { ...c, imageId: imageIdToUse } : c));
+            const next = cards.map((c: any) => (c.key === safeKey ? { ...c, imageId: imageIdToUse } : c));
             cfg = { ...(cfg ?? {}), cards: next };
 
         } else {
@@ -1682,7 +1682,7 @@ export async function addRoomCategoryCard(formData: FormData) {
         return redirectBack({ error: encodeURIComponent(`Maksimal ${MAX_ROOM_CARDS} kartu.`) });
     }
 
-    const key = makeRoomCardKey();
+    const key = makeRoomCardKey(`card_${Date.now()}`);
     const next: any[] = [...cards, { key, title: "", description: "", badge: "", kategoriId: null, imageId: null }];
 
     await updateDraftConfigPreserveTheme(id, { cards: next });
@@ -1883,7 +1883,7 @@ export async function duplicateDraft(formData: FormData) {
     const titleBase = String(existing.title ?? "Section").trim() || "Section";
     const nextTitle = `${titleBase} (copy)`;
 
-    const created = await prisma.$transaction(async (tx) => {
+    const created = await prisma.$transaction(async (tx: any) => {
         for (const row of toShift) {
             await tx.homepageSectionDraft.update({
                 where: { id: Number(row.id) },
@@ -2298,7 +2298,7 @@ export async function autoGenerateThemeContent(formData: FormData) {
     let sortOrder = last ? Number(last.sortOrder ?? 0) + 1 : 1;
 
     const created = await prisma.$transaction(
-        sectionsToCreate.map((s) =>
+        sectionsToCreate.map((s: any) =>
             prisma.homepageSectionDraft.create({
                 data: {
                     type: s.type as any,

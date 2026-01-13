@@ -110,7 +110,7 @@ export default async function HubungiPage() {
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "24px" }}>
-              {cabangToko.map((cabang) => (
+              {cabangToko.map((cabang: any) => (
                 <a
                   key={cabang.id}
                   href={cabang.mapsUrl}
@@ -209,7 +209,7 @@ export default async function HubungiPage() {
               Ikuti keseharian kami dan dapatkan inspirasi desain terbaru di platform favorit Anda.
             </p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "12px" }}>
-              {mediaSosial.map(m => {
+              {mediaSosial.map((m: any) => {
                 const Icon = sosmedIconMap[m.iconKey] ?? null;
                 return (
                   <a

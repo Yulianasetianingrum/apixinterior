@@ -50,17 +50,17 @@ export async function GET(_req: NextRequest) {
         where: { id: { in: Array.from(ids) } },
         select: { id: true, url: true },
       });
-      imageMap = new Map(imgRows.map((img) => [img.id, img.url]));
+      imageMap = new Map(imgRows.map((img: any) => [img.id, img.url]));
     }
 
-    const categories = kategoriList.map((cat) => ({
+    const categories = kategoriList.map((cat: any) => ({
       id: cat.id,
       nama: cat.nama,
       slug: cat.slug,
       urutan: cat.urutan,
       isUnggulan: !!(cat as any).isUnggulan,
       isPromo: !!(cat as any).isPromo,
-      items: cat.items.map((item) => {
+      items: cat.items.map((item: any) => {
         const p: any = item.produk;
         const url =
           p?.mainImageId && imageMap.has(p.mainImageId)
@@ -150,13 +150,11 @@ export async function POST(req: NextRequest) {
   } catch (err: any) {
     console.error("POST /kategori_produk ERROR:", err);
 
-    if (err instanceof Prisma.PrismaClientKnownRequestError) {
-      if (err.code === "P2002") {
-        return NextResponse.json(
-          { error: "Slug kategori sudah dipakai, coba nama lain." },
-          { status: 400 }
-        );
-      }
+    if (err?.code === "P2002") {
+      return NextResponse.json(
+        { error: "Slug kategori sudah dipakai, coba nama lain." },
+        { status: 400 }
+      );
     }
 
     return NextResponse.json(

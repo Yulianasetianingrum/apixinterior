@@ -28,7 +28,7 @@ export default async function KategoriPage() {
     });
 
     // 2. Map data for display
-    const categoryData = categories.map((c) => {
+    const categoryData = categories.map((c: any) => {
         // Try to get image from the first item in the category
         let imageUrl = c.items?.[0]?.produk?.mainImage?.url;
 
@@ -47,7 +47,7 @@ export default async function KategoriPage() {
                 <p className={styles.subtitle}>Temukan koleksi furniture terbaik berdasarkan kategori</p>
 
                 <div className={styles.grid}>
-                    {categoryData.map((cat) => (
+                    {categoryData.map((cat: any) => (
                         <Link
                             href={`/kategori/${cat.slug}`}
                             key={cat.slug}

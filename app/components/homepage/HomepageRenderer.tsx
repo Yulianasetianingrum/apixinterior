@@ -68,13 +68,13 @@ type RendererProps = {
   scope: SectionScope;
 };
 
-async function getImageMap(imageIds: number[]) {
+async function getImageMap(imageIds: number[]): Promise<Map<number, { url: string; title: string | null }>> {
   if (!imageIds.length) return new Map<number, { url: string; title: string | null }>();
   const rows = await prisma.gambarUpload.findMany({
     where: { id: { in: imageIds } },
     select: { id: true, url: true, title: true },
   });
-  return new Map(rows.map((r) => [r.id, { url: r.url, title: r.title }]));
+  return new Map(rows.map((r: any) => [r.id, { url: r.url, title: r.title }]));
 }
 
 async function getBannerPromoFallback(bannerPromoId: number) {
@@ -82,7 +82,7 @@ async function getBannerPromoFallback(bannerPromoId: number) {
     // Optional legacy fallback table
     const row = await prisma.bannerPromo.findUnique({
       where: { id: bannerPromoId },
-      select: { id: true, title: true, subtitle: true, buttonLabel: true, buttonHref: true, imageId: true },
+      select: { id: true, title: true, subtitle: true, buttonLabel: true, buttonHref: true, imageUrl: true },
     });
     return row;
   } catch {
@@ -206,13 +206,13 @@ export default async function HomepageRenderer({ scope }: RendererProps) {
     refs.hubungiIds.length
       ? prisma.hubungi.findMany({
         where: { id: { in: refs.hubungiIds } },
-        select: { id: true, label: true, value: true },
+        select: { id: true, nomor: true },
       })
       : Promise.resolve([]),
     refs.branchIds.length
       ? prisma.cabangToko.findMany({
         where: { id: { in: refs.branchIds } },
-        select: { id: true, nama: true, alamat: true },
+        select: { id: true, namaCabang: true, mapsUrl: true },
       })
       : Promise.resolve([]),
     prisma.mediaSosial.findMany({
@@ -220,11 +220,11 @@ export default async function HomepageRenderer({ scope }: RendererProps) {
     }),
   ]);
 
-  const produkMap = new Map(produkRows.map((p) => [p.id, p]));
-  const kategoriMap = new Map(kategoriRows.map((k) => [k.id, k]));
-  const hubungiMap = new Map(hubungiRows.map((h) => [h.id, h]));
-  const cabangMap = new Map(cabangRows.map((c) => [c.id, c]));
-  const mediaMap = new Map(mediaRows.map((m) => [String(m.iconKey).toLowerCase(), m]));
+  const produkMap = new Map<number, any>(produkRows.map((p: any) => [p.id, p]));
+  const kategoriMap = new Map<number, any>(kategoriRows.map((k: any) => [k.id, k]));
+  const hubungiMap = new Map<number, any>(hubungiRows.map((h: any) => [h.id, h]));
+  const cabangMap = new Map<number, any>(cabangRows.map((c: any) => [c.id, c]));
+  const mediaMap = new Map<string, any>(mediaRows.map((m: any) => [String(m.iconKey).toLowerCase(), m]));
 
   // Optional legacy banner_promo fallback for CUSTOM_PROMO if config.bannerPromoId exists.
   const bannerPromoMap = new Map<number, any>();
@@ -406,8 +406,8 @@ export default async function HomepageRenderer({ scope }: RendererProps) {
               subtitle = b.subtitle ?? subtitle;
               buttonLabel = b.buttonLabel ?? buttonLabel;
               buttonHref = b.buttonHref ?? buttonHref;
-              if (!imageUrl && typeof b.imageId === "number") {
-                imageUrl = imageMap.get(b.imageId)?.url ?? null;
+              if (!imageUrl && b.imageUrl) {
+                imageUrl = b.imageUrl;
               }
             }
           }
@@ -443,7 +443,7 @@ export default async function HomepageRenderer({ scope }: RendererProps) {
           const branches = ids
             .map((id) => cabangMap.get(id))
             .filter(Boolean)
-            .map((b: any) => ({ id: b.id, name: b.nama, address: b.alamat }));
+            .map((b: any) => ({ id: b.id, name: b.namaCabang, address: b.mapsUrl }));
 
           return <BranchesSection key={s.id} branches={branches} layout={layout} />;
         }
@@ -454,7 +454,7 @@ export default async function HomepageRenderer({ scope }: RendererProps) {
           const contacts = ids
             .map((id) => hubungiMap.get(id))
             .filter(Boolean)
-            .map((h: any) => ({ id: h.id, label: h.label, value: h.value }));
+            .map((h: any) => ({ id: h.id, label: h.nomor, value: h.nomor }));
 
           return <ContactSection key={s.id} contacts={contacts} primaryOnly={primaryOnly} />;
         }

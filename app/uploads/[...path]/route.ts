@@ -31,7 +31,7 @@ export async function GET(
   const params = await ctx.params;
   const parts = Array.isArray(params?.path) ? params.path : [];
   const decoded = parts
-    .map((p) => {
+    .map((p: string) => {
       try {
         return decodeURIComponent(p);
       } catch {
@@ -55,7 +55,7 @@ export async function GET(
   const ext = path.extname(filePath).toLowerCase();
   const contentType = MIME[ext] ?? "application/octet-stream";
 
-  return new NextResponse(data, {
+  return new NextResponse(new Uint8Array(data), {
     status: 200,
     headers: {
       "Content-Type": contentType,

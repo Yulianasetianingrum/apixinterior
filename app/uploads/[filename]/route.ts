@@ -42,7 +42,7 @@ export async function GET(
     const ext = path.extname(filename).toLowerCase();
     const ct = contentTypeByExt(ext);
 
-    return new NextResponse(data, {
+    return new NextResponse(new Uint8Array(data), {
       headers: {
         "Content-Type": ct,
         "Cache-Control": "public, max-age=31536000, immutable",

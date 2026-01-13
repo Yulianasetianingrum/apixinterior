@@ -12,7 +12,8 @@ type Props = {
 
 // 1. SEO Metadata
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-    const { slug } = await params;
+    const resolvedParams = await params;
+    const slug = resolvedParams.slug;
 
     const post = await prisma.post.findUnique({
         where: { slug: slug },
@@ -40,7 +41,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 // 2. Main Page Component
 export default async function ArticlePage({ params }: Props) {
-    const { slug } = await params;
+    const resolvedParams = await params;
+    const slug = resolvedParams.slug;
 
     // Fetch Post
     const post = await prisma.post.findUnique({
@@ -197,7 +199,7 @@ async function RecommendedPosts({ currentSlug }: { currentSlug: string }) {
                     Artikel Lainnya
                 </h3>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "30px" }}>
-                    {others.map(p => (
+                    {others.map((p: any) => (
                         <a key={p.id} href={`/artikel/${p.slug}`} style={{ textDecoration: "none", color: "inherit", display: "flex", flexDirection: "column", gap: "16px", background: "#fff", borderRadius: "12px", padding: "16px", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.05)" }}>
                             <div style={{ aspectRatio: "16/9", background: "#e2e8f0", borderRadius: "8px", overflow: "hidden", position: "relative" }}>
                                 {p.coverImage ? (

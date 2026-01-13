@@ -104,16 +104,16 @@ export async function getSections(scope: SectionScope): Promise<SectionRow[]> {
   if (scope === "legacy") {
     // Legacy fallback table: `homepagesection`
     // If your legacy table name differs, adjust here.
-    const rows = await prisma.$queryRawUnsafe<any[]>(
+    const rows = (await prisma.$queryRawUnsafe(
       `SELECT id,type,title,slug,enabled,sortOrder,config FROM homepagesection ORDER BY sortOrder ASC`
-    );
+    )) as any[];
     return rows.map(normalizeSectionRow);
   }
 
   const table = TABLE_BY_SCOPE[scope];
-  const rows = await prisma.$queryRawUnsafe<any[]>(
+  const rows = (await prisma.$queryRawUnsafe(
     `SELECT id,type,title,slug,enabled,sortOrder,config FROM ${table} ORDER BY sortOrder ASC`
-  );
+  )) as any[];
   return rows.map(normalizeSectionRow);
 }
 
@@ -164,7 +164,7 @@ export async function createDraftSection(input: {
     configJson
   );
 
-  const res = await prisma.$queryRawUnsafe<any[]>(`SELECT LAST_INSERT_ID() AS id`);
+  const res = (await prisma.$queryRawUnsafe(`SELECT LAST_INSERT_ID() AS id`)) as any[];
   return Number(res?.[0]?.id ?? 0);
 }
 

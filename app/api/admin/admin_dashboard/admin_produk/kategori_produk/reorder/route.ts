@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
         }
 
         // Use transaction to ensure data integrity
-        await prisma.$transaction(async (tx) => {
+        await prisma.$transaction(async (tx: any) => {
             for (let i = 0; i < categoryIds.length; i++) {
                 const id = Number(categoryIds[i]);
                 if (id && Number.isFinite(id)) {

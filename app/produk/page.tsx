@@ -84,7 +84,7 @@ export default async function ProductListingPage(props: {
     const sort = getString(searchParams?.sort) ?? "latest";
 
     // B. Build Where Clause
-    const whereClause: Prisma.ProdukWhereInput = {};
+    const whereClause: any = {};
 
     // Name search
     if (q) {
@@ -126,7 +126,7 @@ export default async function ProductListingPage(props: {
     }
 
     // C. Build Sort Clause
-    let orderBy: Prisma.ProdukOrderByWithRelationInput = {};
+    let orderBy: any = {};
     switch (sort) {
         case "price_asc":
             orderBy = { harga: "asc" };
@@ -173,8 +173,8 @@ export default async function ProductListingPage(props: {
     ]);
 
     // Process unique filters
-    const uniqueCategories = allCategories.map(c => c.nama);
-    const uniqueTags = Array.from(new Set(allProductsMeta.flatMap(p => p.tags ? p.tags.split(',').map(t => t.trim()) : []).filter(Boolean))) as string[];
+    const uniqueCategories = allCategories.map((c: any) => c.nama);
+    const uniqueTags = Array.from(new Set(allProductsMeta.flatMap((p: any) => p.tags ? p.tags.split(',').map((t: any) => t.trim()) : []).filter(Boolean))) as string[];
 
     // Dynamic Title
     let pageTitle = "Semua Produk";
@@ -205,7 +205,7 @@ export default async function ProductListingPage(props: {
                     <div className={styles.mainContent}>
                         {products.length > 0 ? (
                             <div className={styles.grid}>
-                                {products.map((p, idx) => (
+                                {products.map((p: any, idx: number) => (
                                     <ProductCard
                                         key={p.id}
                                         product={p}

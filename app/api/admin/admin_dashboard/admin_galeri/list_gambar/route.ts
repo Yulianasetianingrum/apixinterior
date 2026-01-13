@@ -12,7 +12,7 @@ export async function GET(req: Request) {
   });
 
   const filtered = onlyPng
-    ? data.filter((it) => /\.png(\?|#|$)/i.test(String(it.url ?? "")))
+    ? data.filter((it: any) => /\.png(\?|#|$)/i.test(String(it.url ?? "")))
     : data;
 
   return NextResponse.json({ data: filtered });

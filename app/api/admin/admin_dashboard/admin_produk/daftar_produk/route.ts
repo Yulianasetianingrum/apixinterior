@@ -28,11 +28,11 @@ export async function GET() {
       },
     });
 
-    const products = produkList.map((p) => {
+    const products = produkList.map((p: any) => {
       const mainImageUrl = p.mainImage ? p.mainImage.url : null;
 
       const galleryImageUrls: string[] = (p.galeri || [])
-        .map((g) => g.gambar?.url || null)
+        .map((g: any) => g.gambar?.url || null)
         .filter(Boolean) as string[];
 
       const mediaCount = (mainImageUrl ? 1 : 0) + (galleryImageUrls?.length ?? 0);
@@ -67,11 +67,11 @@ export async function GET() {
         galleryImageUrls,
         mediaCount,
         variations:
-          p.variasiProduk?.map((v) => {
+          p.variasiProduk?.map((v: any) => {
             const vMain = v.mainImage ? v.mainImage.url : null;
             const vGaleri =
-              v.galeri?.map((g) => g.gambar?.url || null).filter(Boolean) || [];
-            const combos = (v.kombinasi || []).map((k) => ({
+              v.galeri?.map((g: any) => g.gambar?.url || null).filter(Boolean) || [];
+            const combos = (v.kombinasi || []).map((k: any) => ({
               id: k.id,
               level: k.level,
               nama: k.nama,

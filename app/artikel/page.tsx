@@ -31,7 +31,7 @@ export default async function ArtikelIndexPage() {
                     </div>
                 ) : (
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "30px" }}>
-                        {posts.map((post) => (
+                        {posts.map((post: any) => (
                             <Link
                                 href={`/artikel/${post.slug}`}
                                 key={post.id}

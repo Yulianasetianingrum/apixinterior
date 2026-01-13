@@ -68,7 +68,7 @@ export default async function PromoPage() {
                     <section className={styles.section}>
                         <div className={styles.sectionTitle}>Kategori Pilihan</div>
                         <div className={styles.catGrid}>
-                            {promoCategories.map((cat) => {
+                            {promoCategories.map((cat: any) => {
                                 const bgImage =
                                     cat.items[0]?.produk?.mainImage?.url || "/placeholder-image.jpg";
                                 return (
@@ -102,7 +102,7 @@ export default async function PromoPage() {
                     <div className={styles.sectionTitle}>Produk Diskon</div>
                     {promoProducts.length > 0 ? (
                         <div className={styles.prodGrid}>
-                            {promoProducts.map((p) => {
+                            {promoProducts.map((p: any) => {
                                 const promoData = computeHargaSetelahPromo(p as any);
                                 const hasDiscount =
                                     promoData.isPromo && (promoData.hargaFinal ?? 0) < p.harga;

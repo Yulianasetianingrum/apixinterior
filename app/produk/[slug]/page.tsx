@@ -15,12 +15,12 @@ import { Metadata } from "next";
 import { ProductSchema, BreadcrumbSchema } from "@/app/components/seo/StructuredData";
 
 type PageProps = {
-  params: { slug?: string } | Promise<{ slug?: string }>;
+  params: Promise<{ slug?: string }>;
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const p = await Promise.resolve(params as any);
-  const slug = typeof p?.slug === "string" ? decodeURIComponent(p.slug) : "";
+  const resolvedParams = await params;
+  const slug = typeof resolvedParams?.slug === "string" ? decodeURIComponent(resolvedParams.slug) : "";
 
   if (!slug) {
     return {
@@ -91,8 +91,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function ProdukDetailPage({ params }: PageProps) {
-  const p = await Promise.resolve(params as any);
-  const slug = typeof p?.slug === "string" ? decodeURIComponent(p.slug) : "";
+  const resolvedParams = await params;
+  const slug = typeof resolvedParams?.slug === "string" ? decodeURIComponent(resolvedParams.slug) : "";
   if (!slug) return notFound();
 
   // Fetch product with everything
@@ -121,10 +121,10 @@ export default async function ProdukDetailPage({ params }: PageProps) {
   // TRANSFORM FOR CLIENT (Flatten Image URLs)
   const productForClient = {
     ...produk,
-    variasiProduk: produk.variasiProduk.map((v) => ({
+    variasiProduk: produk.variasiProduk.map((v: any) => ({
       ...v,
       imageUrl: normalizePublicUrl(v.mainImage?.url || null),
-      kombinasi: v.kombinasi.map((k) => ({
+      kombinasi: v.kombinasi.map((k: any) => ({
         ...k,
         imageUrl: normalizePublicUrl(k.image?.url || null),
       })),
@@ -163,8 +163,8 @@ export default async function ProdukDetailPage({ params }: PageProps) {
 
   const mainImageUrl = normalizePublicUrl(produk.mainImage?.url || null);
   const galleryImageUrls = (produk.galeri || [])
-    .map((g) => normalizePublicUrl(g.gambar?.url || null))
-    .filter((u): u is string => !!u);
+    .map((g: any) => normalizePublicUrl(g.gambar?.url || null))
+    .filter((u: any): u is string => !!u);
 
   // Default Price (if no variation selected)
   const harga = typeof produk.harga === "number" ? produk.harga : 0;

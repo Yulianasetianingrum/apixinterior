@@ -2,7 +2,7 @@
 import { prisma } from "@/lib/prisma";
 
 
-import Navbar from "./navbar/page";
+import Navbar from "./navbar/Navbar";
 import styles from "./page.module.css";
 import { CategoryGridPreview } from "./admin/admin_dashboard/admin_pengaturan/toko/preview/CategoryGridPreview";
 import CategoryCommerceColumns from "./components/homepage/CategoryCommerceColumns.client";
@@ -46,7 +46,7 @@ async function fetchThemeData(themeKey: string, isPublished: boolean) {
 
   // Filter sections for this specific theme
   const sections: SectionRow[] = rawSections
-    .filter((d) => {
+    .filter((d: any) => {
       const isMeta = isThemeMetaRow(d);
       const tk = getThemeKeyFromConfig(d?.config);
       const matches = tk === themeKey;
@@ -59,7 +59,7 @@ async function fetchThemeData(themeKey: string, isPublished: boolean) {
 
       return !isMeta && matches && isEnabled;
     })
-    .map((d) => ({
+    .map((d: any) => ({
       id: Number(d.id),
       type: String(d.type),
       title: d.title ?? null,
@@ -232,7 +232,7 @@ async function fetchThemeData(themeKey: string, isPublished: boolean) {
       });
 
       const coverImageIds = new Set<number>();
-      firstProdukIdByKategori.forEach((pid) => {
+      firstProdukIdByKategori.forEach((pid: number) => {
         const p = prodMap.get(pid);
         if (p) {
           const mainId = p.mainImageId ? Number(p.mainImageId) : null;
@@ -247,7 +247,7 @@ async function fetchThemeData(themeKey: string, isPublished: boolean) {
         const imgUrlMap = new Map<number, string>();
         matchingImages.forEach((m: any) => imgUrlMap.set(Number(m.id), String(m.url)));
 
-        firstProdukIdByKategori.forEach((pid, kid) => {
+        firstProdukIdByKategori.forEach((pid: number, kid: number) => {
           const p = prodMap.get(pid);
           if (p) {
             const mainId = p.mainImageId ? Number(p.mainImageId) : null;
@@ -333,20 +333,20 @@ async function fetchThemeData(themeKey: string, isPublished: boolean) {
   const cabangMap = new Map<number, any>();
   if (uniqBranchIds.length) {
     const rows = await prisma.cabangToko.findMany({ where: { id: { in: uniqBranchIds } } });
-    rows.forEach((r) => cabangMap.set(Number(r.id), r));
+    rows.forEach((r: any) => cabangMap.set(Number(r.id), r));
   } else {
     // Fetch all for global usage anyway? preview does
     const rows = await prisma.cabangToko.findMany({});
-    rows.forEach((r) => cabangMap.set(Number(r.id), r));
+    rows.forEach((r: any) => cabangMap.set(Number(r.id), r));
   }
 
   const hubungiById = new Map<number, any>();
   if (uniqHubungiIds.length) {
     const rows = await prisma.hubungi.findMany({ where: { id: { in: uniqHubungiIds } }, orderBy: { id: "asc" } });
-    rows.forEach((r) => hubungiById.set(Number(r.id), r));
+    rows.forEach((r: any) => hubungiById.set(Number(r.id), r));
   } else {
     const rows = await prisma.hubungi.findMany({ orderBy: { id: "asc" } });
-    rows.forEach((r) => hubungiById.set(Number(r.id), r));
+    rows.forEach((r: any) => hubungiById.set(Number(r.id), r));
   }
 
   const mediaSosialByKey = new Map<string, any>();
@@ -360,7 +360,7 @@ async function fetchThemeData(themeKey: string, isPublished: boolean) {
 
   // Get theme meta for this specific theme
   const metaSlug = themeMetaSlug(themeKey);
-  const themeMetaRow = rawSections.find((d) => String(d?.slug ?? "") === metaSlug);
+  const themeMetaRow = rawSections.find((d: any) => String(d?.slug ?? "") === metaSlug);
   const themeMetaCfg = (themeMetaRow?.config ?? {}) as any;
 
   const navbarTheme = themeMetaCfg.navbarTheme || "NAVY_GOLD";
@@ -380,7 +380,7 @@ async function fetchThemeData(themeKey: string, isPublished: boolean) {
     cabangMap,
     hubungiById,
     mediaSosialByKey,
-    rawRowsInfo: rawSections.map(r => ({ id: r.id, type: r.type, title: r.title, theme: getThemeKeyFromConfig(r?.config) }))
+    rawRowsInfo: rawSections.map((r: any) => ({ id: r.id, type: r.type, title: r.title, theme: getThemeKeyFromConfig(r?.config) }))
   };
 }
 
@@ -515,7 +515,7 @@ export default async function HomePage({
                 style={!customPalette ? {
                   ["--cg-card-bg" as any]: vars.cardBg, ["--cg-card-fg" as any]: vars.insideText, ["--cg-element" as any]: vars.outsideText, ["--cg-title-color" as any]: titleTextColor ?? vars.outsideText, ["--cg-card-border" as any]: vars.border,
                 } : {
-                  ["--cg-card-bg" as any]: vars.cardBg, ["--cg-card-fg" as any]: vars.insideText, ["--cg-element" as any]: vars.outsideText, ["--cg-title-color" as any]: titleTextColor ?? customPalette.text, ["--cg-card-border" as any]: vars.border,
+                  ["--cg-card-bg" as any]: vars.cardBg, ["--cg-card-fg" as any]: vars.insideText, ["--cg-element" as any]: vars.outsideText, ["--cg-title-color" as any]: titleTextColor ?? customPalette.fg, ["--cg-card-border" as any]: vars.border,
                   width: "100%", maxWidth: 1200, margin: "0 auto", padding: "0 24px"
                 }}
               >
@@ -525,7 +525,7 @@ export default async function HomePage({
 
             if (customPalette) {
               return (
-                <div key={section.id} className={styles.previewSectionFull} style={{ background: customPalette.bg, color: customPalette.text }}>
+                <div key={section.id} className={styles.previewSectionFull} style={{ background: customPalette.bg, color: customPalette.fg }}>
                   {content}
                 </div>
               );
@@ -556,7 +556,7 @@ export default async function HomePage({
               const useSectionTheme = sectionBg === "FOLLOW_NAVBAR";
               // Use section theme tokens if standard theme is rendering (i.e. not using a custom bg override)
               const finalBg = useSectionTheme ? sectionThemeTokens.bg : customPalette.bg;
-              const finalTextColor = useSectionTheme ? sectionThemeTokens.element : (customPalette.fg ?? customPalette.text ?? sectionThemeTokens.element);
+              const finalTextColor = useSectionTheme ? sectionThemeTokens.element : (customPalette.fg ?? sectionThemeTokens.element);
 
               return (
                 <div key={section.id} className={styles.previewSectionFull} style={{

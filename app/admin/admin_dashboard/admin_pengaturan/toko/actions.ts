@@ -3,7 +3,30 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { HomepageSectionType, NavbarPosition } from "@prisma/client";
+// import { HomepageSectionType, NavbarPosition } from "@prisma/client";
+// Manually defining Enums due to build import issues
+export enum HomepageSectionType {
+  HERO = "HERO",
+  TEXT_SECTION = "TEXT_SECTION",
+  CATEGORY_GRID = "CATEGORY_GRID",
+  CATEGORY_GRID_COMMERCE = "CATEGORY_GRID_COMMERCE",
+  PRODUCT_CAROUSEL = "PRODUCT_CAROUSEL",
+  PRODUCT_LISTING = "PRODUCT_LISTING",
+  HIGHLIGHT_COLLECTION = "HIGHLIGHT_COLLECTION",
+  ROOM_CATEGORY = "ROOM_CATEGORY",
+  GALLERY = "GALLERY",
+  BRANCHES = "BRANCHES",
+  CONTACT = "CONTACT",
+  SOCIAL = "SOCIAL",
+  CUSTOM_PROMO = "CUSTOM_PROMO",
+  FOOTER = "FOOTER",
+}
+
+export enum NavbarPosition {
+  MAIN = "MAIN",
+  FOOTER = "FOOTER",
+  BOTTOM = "BOTTOM",
+}
 
 // ===============================
 // Helper

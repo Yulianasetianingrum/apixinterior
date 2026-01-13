@@ -2,7 +2,7 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { SocialIcon } from "./social-icons";
-import SwipeCarousel from "./SwipeCarousel";
+import SwipeCarousel from "../SwipeCarousel";
 import CategoryCommerceColumns from "./CategoryCommerceColumns.client";
 
 function formatRupiah(value: number | null | undefined) {

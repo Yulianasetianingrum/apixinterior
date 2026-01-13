@@ -11,7 +11,8 @@ type Props = {
 
 // 1. Generate Metadata for SEO
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-    const { slug } = await params;
+    const resolvedParams = await params;
+    const slug = resolvedParams.slug;
 
     const page = await prisma.dynamicPage.findUnique({
         where: { slug },
@@ -31,7 +32,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 // 2. Main Page Component
 export default async function DynamicPageComponent({ params }: Props) {
-    const { slug } = await params;
+    const resolvedParams = await params;
+    const slug = resolvedParams.slug;
 
     const page = await prisma.dynamicPage.findUnique({
         where: { slug },

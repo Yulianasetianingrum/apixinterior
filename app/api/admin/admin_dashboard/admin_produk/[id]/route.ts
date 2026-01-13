@@ -852,7 +852,7 @@ export async function PUT(
 
     // update media kalau ada perubahan yang dihitung
     if (nextMainImageId !== undefined || nextGalleryIds !== undefined) {
-      await prisma.$transaction(async (tx) => {
+      await prisma.$transaction(async (tx: any) => {
         if (nextMainImageId !== undefined) {
           await tx.produk.update({
             where: { id },
@@ -917,8 +917,8 @@ export async function PUT(
       const gallerySet =
         nextGalleryIds !== undefined
           ? new Set(nextGalleryIds)
-          : new Set(existingGaleri.map((g) => g.gambarId));
-      gallerySet.forEach((id) => exists.add(id));
+          : new Set(existingGaleri.map((g: any) => g.gambarId));
+      gallerySet.forEach((id: any) => exists.add(Number(id)));
 
       const toInsert = [...varImageIds].filter((id) => !exists.has(id));
       if (toInsert.length) {

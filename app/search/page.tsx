@@ -32,7 +32,7 @@ export default async function SearchPage({ searchParams }: Props) {
 
         if (categoryData) {
             categoryName = categoryData.nama;
-            categoryProductIds = categoryData.items.map(item => item.produkId);
+            categoryProductIds = categoryData.items.map((item: any) => item.produkId);
         }
     }
 
@@ -59,12 +59,12 @@ export default async function SearchPage({ searchParams }: Props) {
         });
 
         const searchResults = fuse.search(query);
-        let matchedIds = searchResults.map(r => r.item.id);
+        let matchedIds = searchResults.map((r: any) => r.item.id);
 
         // Apply Category Filter if active
         if (categoryProductIds !== null) {
             const allowedIds = new Set(categoryProductIds);
-            matchedIds = matchedIds.filter(id => allowedIds.has(id));
+            matchedIds = matchedIds.filter((id: number) => allowedIds.has(id));
         }
 
         if (matchedIds.length > 0) {
@@ -75,7 +75,7 @@ export default async function SearchPage({ searchParams }: Props) {
 
             // Maintain Sort Order
             products = matchedIds
-                .map(id => dbProducts.find(p => p.id === id))
+                .map((id: number) => dbProducts.find((p: any) => p.id === id))
                 .filter(Boolean);
         }
 
@@ -130,7 +130,7 @@ export default async function SearchPage({ searchParams }: Props) {
                         gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
                         gap: "24px"
                     }}>
-                        {products.map((product, index) => (
+                        {products.map((product: any, index: number) => (
                             <ProductCard key={product.id} product={product} index={index} />
                         ))}
                     </div>

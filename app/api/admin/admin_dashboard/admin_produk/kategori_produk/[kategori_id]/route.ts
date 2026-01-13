@@ -36,7 +36,7 @@ export async function DELETE(req: NextRequest) {
       );
     }
 
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: any) => {
       // hapus semua item dulu (jaga-jaga kalau FK di DB belum cascade)
       await tx.kategoriProdukItem.deleteMany({
         where: { kategoriId },

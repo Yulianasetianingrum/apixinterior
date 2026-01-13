@@ -876,7 +876,7 @@ export default async function TokoPreviewDraftPage({
                     const useSectionTheme = sectionBg === "FOLLOW_NAVBAR";
                     // Use section theme tokens if standard theme is rendering (i.e. not using a custom bg override)
                     const finalBg = useSectionTheme ? themeTokens.bg : customPalette.bg;
-                    const finalTextColor = useSectionTheme ? themeTokens.element : (customPalette.fg ?? customPalette.text ?? themeTokens.element);
+                    const finalTextColor = useSectionTheme ? themeTokens.element : (customPalette.fg ?? themeTokens.element);
 
                     return (
                       <div
@@ -1284,7 +1284,7 @@ export default async function TokoPreviewDraftPage({
 
                                     <div className={ui.pcCtaWrap}>
                                       {showCta ? (
-                                        <a className={ui.pcCta} href={href} style={{ background: themeTokens.ctaBg, color: themeTokens.ctaFg, border: `1px solid ${themeTokens.ctaBorder ?? themeTokens.ctaBg}` }}>
+                                        <a className={ui.pcCta} href={href} style={{ background: themeTokens.ctaBg, color: themeTokens.ctaFg, border: `1px solid ${themeTokens.ctaBg}` }}>
                                           Lihat Produk
                                         </a>
                                       ) : (
@@ -1409,7 +1409,7 @@ export default async function TokoPreviewDraftPage({
 
                         {showMore ? (
                           <div className={ui.productListingFooter}>
-                            <a className={ui.productListingMore} href="/produk" style={{ background: themeTokens.ctaBg, color: themeTokens.ctaFg, border: `1px solid ${themeTokens.ctaBorder ?? themeTokens.ctaBg}` }}>
+                            <a className={ui.productListingMore} href="/produk" style={{ background: themeTokens.ctaBg, color: themeTokens.ctaFg, border: `1px solid ${themeTokens.ctaBg}` }}>
                               Tampilkan Semua
                             </a>
                           </div>

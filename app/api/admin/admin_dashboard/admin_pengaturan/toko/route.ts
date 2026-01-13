@@ -146,8 +146,8 @@ async function validateRefs(type: HomepageSectionType, rawConfig: unknown) {
         where: { iconKey: { in: keys } },
         select: { iconKey: true },
       });
-      const exists = new Set(rows.map((r) => String(r.iconKey).toLowerCase()));
-      const missing = keys.filter((k) => !exists.has(k));
+      const exists = new Set(rows.map((r: any) => String(r.iconKey).toLowerCase()));
+      const missing = keys.filter((k: any) => !exists.has(k));
       if (missing.length) {
         return { ok: false, error: `SOCIAL.selected ada iconKey yang tidak ditemukan di media_sosial: ${missing.join(", ")}` };
       }
@@ -159,35 +159,35 @@ async function validateRefs(type: HomepageSectionType, rawConfig: unknown) {
 
   if (imageIds.length) {
     const rows = await prisma.gambarUpload.findMany({ where: { id: { in: imageIds } }, select: { id: true } });
-    const exists = new Set(rows.map((r) => r.id));
+    const exists = new Set(rows.map((r: any) => r.id));
     const missing = imageIds.filter((id) => !exists.has(id));
     if (missing.length) errors.push(`Gambar (gambar_upload) tidak ditemukan: ${missing.join(", ")}`);
   }
 
   if (productIds.length) {
     const rows = await prisma.produk.findMany({ where: { id: { in: productIds } }, select: { id: true } });
-    const exists = new Set(rows.map((r) => r.id));
+    const exists = new Set(rows.map((r: any) => r.id));
     const missing = productIds.filter((id) => !exists.has(id));
     if (missing.length) errors.push(`Produk tidak ditemukan: ${missing.join(", ")}`);
   }
 
   if (kategoriIds.length) {
     const rows = await prisma.kategoriProduk.findMany({ where: { id: { in: kategoriIds } }, select: { id: true } });
-    const exists = new Set(rows.map((r) => r.id));
+    const exists = new Set(rows.map((r: any) => r.id));
     const missing = kategoriIds.filter((id) => !exists.has(id));
     if (missing.length) errors.push(`Kategori tidak ditemukan: ${missing.join(", ")}`);
   }
 
   if (hubungiIds.length) {
     const rows = await prisma.hubungi.findMany({ where: { id: { in: hubungiIds } }, select: { id: true } });
-    const exists = new Set(rows.map((r) => r.id));
+    const exists = new Set(rows.map((r: any) => r.id));
     const missing = hubungiIds.filter((id) => !exists.has(id));
     if (missing.length) errors.push(`Hubungi tidak ditemukan: ${missing.join(", ")}`);
   }
 
   if (branchIds.length) {
     const rows = await prisma.cabangToko.findMany({ where: { id: { in: branchIds } }, select: { id: true } });
-    const exists = new Set(rows.map((r) => r.id));
+    const exists = new Set(rows.map((r: any) => r.id));
     const missing = branchIds.filter((id) => !exists.has(id));
     if (missing.length) errors.push(`Cabang toko tidak ditemukan: ${missing.join(", ")}`);
   }
@@ -241,12 +241,12 @@ export async function GET() {
       prisma.gambarUpload.findMany({ select: { id: true, url: true, title: true }, orderBy: { id: "desc" }, take: 200 }),
       prisma.produk.findMany({ select: { id: true, nama: true, slug: true, harga: true, promoAktif: true, promoTipe: true, promoValue: true }, orderBy: { id: "desc" }, take: 300 }),
       prisma.kategoriProduk.findMany({ select: { id: true, nama: true }, orderBy: { id: "desc" }, take: 300 }),
-      prisma.hubungi.findMany({ select: { id: true, label: true, value: true }, orderBy: { id: "desc" }, take: 200 }),
-      prisma.cabangToko.findMany({ select: { id: true, nama: true, alamat: true }, orderBy: { id: "desc" }, take: 200 }),
+      prisma.hubungi.findMany({ select: { id: true, nomor: true, prioritas: true }, orderBy: { id: "desc" }, take: 200 }),
+      prisma.cabangToko.findMany({ select: { id: true, namaCabang: true, mapsUrl: true }, orderBy: { id: "desc" }, take: 200 }),
       prisma.mediaSosial.findMany({ select: { id: true, nama: true, iconKey: true, url: true }, orderBy: { id: "desc" }, take: 200 }),
     ]);
 
-    
+
     // ---- hitung harga final promo utk master produk (biar UI toko/detail bisa pakai harga terbaru) ----
     const produkWithPromo = produk.map((p: any) => {
       const hargaAsli = Math.round(Number(p.harga ?? 0) || 0);
@@ -277,7 +277,7 @@ export async function GET() {
       return { ...p, hargaAsli, hargaFinal, isPromo: true, promoLabel };
     });
 
-return json({
+    return json({
       ok: true,
       draft,
       master: { images, produk: produkWithPromo, kategori, hubungi, cabang, medsos },

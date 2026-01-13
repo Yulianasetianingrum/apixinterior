@@ -515,7 +515,7 @@ export default async function TokoPengaturanPage({
 
   // Fetch products (latest 200 + used ones)
   const latestProducts = await prisma.produk.findMany({ orderBy: { id: "desc" }, take: 200 });
-  const fetchedIds = new Set(latestProducts.map((p) => p.id));
+  const fetchedIds = new Set(latestProducts.map((p: any) => p.id));
 
   const missingIds = Array.from(usedProductIds).filter((id) => !fetchedIds.has(id));
   let extraProducts: any[] = [];

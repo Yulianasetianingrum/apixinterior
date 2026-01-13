@@ -29,8 +29,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     });
 
     const productPages: MetadataRoute.Sitemap = products
-        .filter((p) => p.slug && p.slug.trim() !== '')
-        .map((product) => ({
+        .filter((p: any) => p.slug && p.slug.trim() !== '')
+        .map((product: any) => ({
             url: `${baseUrl}/produk/${product.slug}`,
             lastModified: product.createdAt || new Date(),
             changeFrequency: 'weekly' as const,
@@ -46,8 +46,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     });
 
     const categoryPages: MetadataRoute.Sitemap = categories
-        .filter((c) => c.slug && c.slug.trim() !== '')
-        .map((category) => ({
+        .filter((c: any) => c.slug && c.slug.trim() !== '')
+        .map((category: any) => ({
             url: `${baseUrl}/kategori/${category.slug}`,
             lastModified: category.createdAt || new Date(),
             changeFrequency: 'weekly' as const,

@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: any) => {
       // hapus semua item lama di kategori ini
       await tx.kategoriProdukItem.deleteMany({
         where: { kategoriId },
@@ -91,10 +91,7 @@ export async function POST(req: NextRequest) {
   } catch (error: any) {
     console.error("POST /kategori_produk/:id/items error:", error);
 
-    if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
-      error.code === "P2003"
-    ) {
+    if (error?.code === "P2003") {
       return NextResponse.json(
         {
           error:

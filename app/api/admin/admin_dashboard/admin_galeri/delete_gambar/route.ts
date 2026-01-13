@@ -72,7 +72,7 @@ async function handleDeleteImage(
   // simpan URL untuk hapus file fisik setelah transaksi DB sukses
   let gambarUrlToDelete = "";
 
-  const result = await prisma.$transaction(async (tx) => {
+  const result = await prisma.$transaction(async (tx: any) => {
     const gambar = await tx.gambarUpload.findUnique({ where: { id } });
     if (!gambar) {
       return { status: 404 as const, json: { error: "Data gambar tidak ditemukan" } };
