@@ -26,8 +26,8 @@ export type SectionRow = {
 export type SectionScope = "draft" | "published" | "legacy";
 
 const TABLE_BY_SCOPE: Record<Exclude<SectionScope, "legacy">, string> = {
-  draft: "HomepageSectionDraft",
-  published: "HomepageSectionPublished",
+  draft: "homepagesectiondraft",
+  published: "homepagesectionpublished",
 };
 
 function safeParseJson(v: any): any {
@@ -105,7 +105,7 @@ export async function getSections(scope: SectionScope): Promise<SectionRow[]> {
     // Legacy fallback table: `homepagesection`
     // If your legacy table name differs, adjust here.
     const rows = (await prisma.$queryRawUnsafe(
-      `SELECT id,type,title,slug,enabled,sortOrder,config FROM HomepageSection ORDER BY sortOrder ASC`
+      `SELECT id,type,title,slug,enabled,sortOrder,config FROM homepagesection ORDER BY sortOrder ASC`
     )) as any[];
     return rows.map(normalizeSectionRow);
   }

@@ -14,6 +14,8 @@ model Admin {
   role         String? // optional: "superadmin", "editor", dll
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+
+  @@map("admin")
 }
 
 //
@@ -25,6 +27,8 @@ model Category {
   name          String         @unique // contoh: "Furniture Rumah"
   subcategories Subcategory[]
   gambar        GambarUpload[]
+
+  @@map("category")
 }
 
 //
@@ -39,6 +43,7 @@ model Subcategory {
   gambar     GambarUpload[]
 
   @@unique([categoryId, name])
+  @@map("subcategory")
 }
 
 //
@@ -387,6 +392,8 @@ model HomepageSection {
   updatedAt DateTime @updatedAt
 
   items HomepageSectionItem[]
+
+  @@map("homepagesection")
 }
 
 enum NavbarPosition {
@@ -410,6 +417,8 @@ model NavbarItem {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@map("navbaritem")
 }
 
 model AdminMenuItem {
@@ -427,6 +436,8 @@ model AdminMenuItem {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@map("adminmenuitem")
 }
 
 enum ThemeColor {
@@ -445,6 +456,8 @@ model ThemeSettings {
   primaryColor   ThemeColor @default(GOLD)
   secondaryColor ThemeColor @default(BLACK)
   updatedAt      DateTime   @updatedAt
+
+  @@map("themesettings")
 }
 
 enum NavbarTheme {
@@ -462,6 +475,8 @@ model NavbarSetting {
   backgroundTheme String? @default("NAVY_GOLD")
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
+
+  @@map("navbarsetting")
 }
 
 model BannerPromo {
@@ -495,6 +510,8 @@ model HomepageSectionDraft {
   heroContent     Json?
   createdAt   DateTime            @default(now())
   updatedAt   DateTime            @updatedAt
+
+  @@map("homepagesectiondraft")
 }
 
 model HomepageSectionPublished {
@@ -513,6 +530,8 @@ model HomepageSectionPublished {
   heroContent     Json?
   createdAt   DateTime            @default(now())
   updatedAt   DateTime            @updatedAt
+
+  @@map("homepagesectionpublished")
 }
 
 model HomepageSectionItem {
@@ -535,6 +554,8 @@ model HomepageSectionItem {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@map("homepagesectionitem")
 }
 
 //
