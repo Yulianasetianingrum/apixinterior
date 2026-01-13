@@ -100,7 +100,7 @@ export async function createNavbarItem(input: {
   href: string;
   position: NavbarPosition;
   isExternal?: boolean;
-  iconKey?: string;
+  iconKey?: string | null;
   showSearch?: boolean;
 }) {
   const last = await prisma.navbarItem.findFirst({
@@ -132,7 +132,7 @@ export async function updateNavbarItem(input: {
   position?: NavbarPosition;
   enabled?: boolean;
   isExternal?: boolean;
-  iconKey?: string;
+  iconKey?: string | null;
   showSearch?: boolean;
 }) {
   const { id, ...rest } = input;
@@ -175,7 +175,7 @@ export async function reorderNavbarItems(
 export async function createAdminMenuItem(input: {
   label: string;
   path: string;
-  iconKey?: string;
+  iconKey?: string | null;
   parentId?: number | null;
 }) {
   const last = await prisma.adminMenuItem.findFirst({
@@ -202,7 +202,7 @@ export async function updateAdminMenuItem(input: {
   id: number;
   label?: string;
   path?: string;
-  iconKey?: string;
+  iconKey?: string | null;
   parentId?: number | null;
   enabled?: boolean;
 }) {

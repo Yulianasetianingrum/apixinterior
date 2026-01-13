@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { NavbarTheme } from "@/app/navbar/Navbar";
 // Removed individual editors imports in favor of Wrapper
 import FooterEditorWrapper from "./FooterEditorWrapper";
 
@@ -49,6 +50,12 @@ import {
   ADMIN_TOKO_PATH,
   THEME_META_SLUG_PREFIX,
   DEFAULT_THEME_KEY,
+  defaultThemeName,
+  normalizeRoomCards,
+  legacyToNewConfig,
+  parseNum,
+  parseNumArray,
+  SECTION_ICON,
 } from "./toko-utils";
 import { SectionTypeId, ThemeKey } from "./types";
 import {
@@ -56,8 +63,8 @@ import {
   unpublishWebsite,
   updateBackgroundTheme,
   updateNavbarTheme,
-  toggleDraftSection as toggleDraft,
-  deleteDraftSection as deleteDraft,
+  toggleDraft,
+  deleteDraft,
   addRoomCategoryCard,
   duplicateDraft,
   createTheme,
@@ -678,7 +685,7 @@ export default async function TokoPengaturanPage({
       if (produkIds.length) {
         const prods = await prisma.produk.findMany({
           where: { id: { in: produkIds } },
-          select: { id: true, mainImageId: true, galleryImageIds: true },
+          select: { id: true, mainImageId: true, galeri: { select: { gambarId: true }, orderBy: { urutan: 'asc' } } },
         });
 
         const prodById = new Map<number, any>(prods.map((p: any) => [Number(p.id), p]));
@@ -689,8 +696,8 @@ export default async function TokoPengaturanPage({
           let imageId: number | null = Number.isFinite(mainId) && mainId > 0 ? mainId : null;
 
           if (!imageId) {
-            const gal = Array.isArray((p as any)?.galleryImageIds) ? ((p as any).galleryImageIds as any[]) : [];
-            const firstGal = Number(gal[0]);
+            const gal = (p as any)?.galeri ?? [];
+            const firstGal = Number(gal[0]?.gambarId);
             if (Number.isFinite(firstGal) && firstGal > 0) imageId = firstGal;
           }
 

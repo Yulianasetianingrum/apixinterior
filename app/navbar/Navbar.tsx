@@ -17,7 +17,7 @@ import searchWhite from "../uploads/search_white.png";
 
 export const dynamic = "force-dynamic";
 
-type NavbarTheme =
+export type NavbarTheme =
     | "NAVY_GOLD"
     | "WHITE_GOLD"
     | "NAVY_WHITE"
