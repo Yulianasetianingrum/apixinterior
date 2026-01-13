@@ -2,6 +2,7 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import type { Metadata } from "next";
+import Navbar from "@/app/navbar/Navbar";
 
 // Force dynamic rendering to ensure fresh data
 export const dynamic = "force-dynamic";
@@ -54,11 +55,24 @@ export default async function ArticlePage({ params }: Props) {
     }
 
     // Styles
+    const mainWrapperStyle = {
+        minHeight: "100vh",
+        backgroundColor: "#f8fafc", // Subtle gray background
+        paddingBottom: "80px",
+    };
+
     const containerStyle = {
-        maxWidth: "800px",
+        maxWidth: "900px",
         margin: "0 auto",
-        padding: "40px 24px",
-        fontFamily: "'Inter', sans-serif",
+        padding: "40px 16px",
+        fontFamily: "'Outfit', 'Inter', sans-serif",
+    };
+
+    const articleCardStyle = {
+        backgroundColor: "#ffffff",
+        borderRadius: "24px",
+        padding: "clamp(24px, 5vw, 60px)",
+        boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 10px 15px -3px rgba(0, 0, 0, 0.1)",
     };
 
     const headerStyle = {
@@ -66,30 +80,45 @@ export default async function ArticlePage({ params }: Props) {
         marginBottom: "40px",
     };
 
+    const badgeStyle = {
+        marginBottom: "16px",
+        display: "inline-block",
+        padding: "6px 16px",
+        borderRadius: "99px",
+        background: "linear-gradient(135deg, #fef3c7 0%, #ffedd5 100%)",
+        color: "#d97706",
+        fontSize: "13px",
+        fontWeight: "700",
+        textTransform: "uppercase" as const,
+        letterSpacing: "0.5px",
+    };
+
     const titleStyle = {
-        fontSize: "clamp(32px, 5vw, 48px)",
+        fontSize: "clamp(28px, 6vw, 44px)",
         fontWeight: "800",
         color: "#0f172a",
         lineHeight: "1.2",
-        marginBottom: "16px",
+        marginBottom: "20px",
+        letterSpacing: "-0.02em",
     };
 
     const metaStyle = {
-        fontSize: "14px",
+        fontSize: "15px",
         color: "#64748b",
         display: "flex",
         justifyContent: "center",
-        gap: "16px",
+        flexWrap: "wrap" as const,
+        gap: "12px",
         alignItems: "center",
-        marginBottom: "32px",
+        marginBottom: "40px",
     };
 
     const imageWrapperStyle = {
         width: "100%",
-        borderRadius: "16px",
+        borderRadius: "20px",
         overflow: "hidden",
-        boxShadow: "0 10px 30px -10px rgba(0,0,0,0.15)",
-        marginBottom: "40px",
+        boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+        marginBottom: "50px",
         aspectRatio: "16/9",
         backgroundColor: "#f1f5f9",
     };
@@ -104,11 +133,19 @@ export default async function ArticlePage({ params }: Props) {
         fontSize: "18px",
         lineHeight: "1.8",
         color: "#334155",
+        textAlign: "left" as const,
+    };
+
+    const footerStyle = {
+        marginTop: "60px",
+        paddingTop: "40px",
+        borderTop: "2px solid #f1f5f9",
+        textAlign: "center" as const,
     };
 
     // Helper to format date
-    const formatDate = (dateString: Date) => {
-        return new Date(dateString).toLocaleDateString("id-ID", {
+    const formatDate = (date: Date) => {
+        return new Date(date).toLocaleDateString("id-ID", {
             day: "numeric",
             month: "long",
             year: "numeric",
@@ -116,63 +153,71 @@ export default async function ArticlePage({ params }: Props) {
     };
 
     return (
-        <main style={{ minHeight: "100vh", background: "#ffffff" }}>
-            <article style={containerStyle}>
+        <main style={mainWrapperStyle}>
+            <Navbar />
 
-                {/* Header Section */}
-                <header style={headerStyle}>
-                    <div style={{ marginBottom: 12, display: "inline-block", padding: "4px 12px", borderRadius: 99, background: "#fef3c7", color: "#d97706", fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px" }}>
-                        Artikel & Blog
+            <div style={containerStyle}>
+                <article style={articleCardStyle}>
+
+                    {/* Header Section */}
+                    <header style={headerStyle}>
+                        <div style={badgeStyle}>
+                            Artikel & Blog
+                        </div>
+                        <h1 style={titleStyle}>{post.title}</h1>
+                        <div style={metaStyle}>
+                            <span>Ditulis oleh <strong style={{ color: "#0f172a" }}>{post.author || "Admin"}</strong></span>
+                            <span style={{ width: 4, height: 4, background: "#cbd5e1", borderRadius: "50%" }} />
+                            <span>{formatDate(post.updatedAt)}</span>
+                        </div>
+                    </header>
+
+                    {/* Hero Image */}
+                    {post.coverImage && (
+                        <figure style={imageWrapperStyle}>
+                            <img
+                                src={post.coverImage}
+                                alt={post.title}
+                                style={imageStyle}
+                            />
+                        </figure>
+                    )}
+
+                    {/* Article Content */}
+                    <div
+                        className="prose prose-lg prose-slate"
+                        style={contentStyle}
+                        dangerouslySetInnerHTML={{ __html: post.content }}
+                    />
+
+                    {/* Share Section */}
+                    <div style={footerStyle}>
+                        <p style={{ fontSize: "15px", fontWeight: "600", color: "#64748b", marginBottom: "20px" }}>
+                            Bagikan artikel ini kepada teman Anda:
+                        </p>
+                        <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
+                            <a
+                                href={`https://wa.me/?text=Baca artikel menarik ini: ${post.title} - ${typeof window !== 'undefined' ? window.location.href : ""}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{
+                                    padding: "12px 24px",
+                                    borderRadius: "12px",
+                                    background: "#25D366",
+                                    color: "white",
+                                    textDecoration: "none",
+                                    fontWeight: "700",
+                                    fontSize: "14px",
+                                    transition: "transform 0.2s ease"
+                                }}
+                            >
+                                Share di WhatsApp
+                            </a>
+                        </div>
                     </div>
-                    <h1 style={titleStyle}>{post.title}</h1>
-                    <div style={metaStyle}>
-                        <span>Ditulis oleh <strong>{post.author || "Admin"}</strong></span>
-                        <span style={{ width: 4, height: 4, background: "#cbd5e1", borderRadius: "50%" }} />
-                        <span>{formatDate(post.updatedAt)}</span>
-                    </div>
-                </header>
 
-                {/* Hero Image */}
-                {post.coverImage && (
-                    <figure style={imageWrapperStyle}>
-                        <img
-                            src={post.coverImage}
-                            alt={post.title}
-                            style={imageStyle}
-                        />
-                    </figure>
-                )}
-
-                {/* Article Content */}
-                <div
-                    className="prose prose-lg prose-slate"
-                    style={contentStyle}
-                    dangerouslySetInnerHTML={{ __html: post.content }}
-                />
-
-                {/* Footer / Share (Simple) */}
-                <div style={{ marginTop: 60, paddingTop: 30, borderTop: "1px solid #e2e8f0", textAlign: "center" }}>
-                    <p style={{ fontSize: 14, color: "#64748b", marginBottom: 16 }}>Bagikan artikel ini:</p>
-                    <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
-                        <a
-                            href={`https://wa.me/?text=Baca artikel menarik ini: ${post.title}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            style={{ padding: "10px 20px", borderRadius: 8, background: "#25D366", color: "white", textDecoration: "none", fontWeight: 600, fontSize: 14 }}
-                        >
-                            WhatsApp
-                        </a>
-                        <button
-                            // onClick={() => navigator.clipboard.writeText(window.location.href)} // Requires 'use client' or hydration friendly way
-                            style={{ padding: "10px 20px", borderRadius: 8, background: "#f1f5f9", color: "#334155", border: "none", fontWeight: 600, fontSize: 14, cursor: "not-allowed" }}
-                            title="Copy Link (Coming Soon)"
-                        >
-                            Copy Link
-                        </button>
-                    </div>
-                </div>
-
-            </article>
+                </article>
+            </div>
 
             {/* RECOMMENDATION SECTION */}
             <RecommendedPosts currentSlug={slug} />
