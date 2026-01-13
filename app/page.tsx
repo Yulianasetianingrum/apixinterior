@@ -578,7 +578,7 @@ export default async function HomePage({
                   }}>
                     <div style={{ maxWidth: 1400, margin: "0 auto", padding: "0 24px" }}>
                       {commerceGridData.title ? <h2 style={{ fontSize: 22, fontWeight: 600, margin: "0 0 16px", color: "var(--t-element)" }}>{commerceGridData.title}</h2> : null}
-                      {commerceGridData.items.length >= 2 ? (
+                      {commerceGridData.items.length >= 1 ? (
                         <CategoryCommerceColumns items={commerceGridData.items.map((it) => ({ id: it.categoryId, name: it.name, href: it.href, imageUrl: it.imageUrl, tabId: it.tabId }))} fallbackUrl={FALLBACK_CATEGORY_IMAGE_URL} mode={commerceGridData.mode} tabs={commerceGridData.tabs} viewAllHref={commerceGridData.mode === "reverse" ? "/kategori" : null} />
                       ) : null}
                     </div>
@@ -596,7 +596,7 @@ export default async function HomePage({
               }}>
                 <div style={{ maxWidth: 1400, margin: "0 auto", padding: "0 24px" }}>
                   {commerceGridData.title ? <h2 style={{ fontSize: 22, fontWeight: 600, margin: "0 0 16px", color: "var(--t-element)" }}>{commerceGridData.title}</h2> : null}
-                  {commerceGridData.items.length >= 2 ? ( // Adjusted threshold to 2 for visibility
+                  {commerceGridData.items.length >= 1 ? ( // Adjusted threshold to 1 for visibility
                     <CategoryCommerceColumns items={commerceGridData.items.map((it) => ({ id: it.categoryId, name: it.name, href: it.href, imageUrl: it.imageUrl, tabId: it.tabId }))} fallbackUrl={FALLBACK_CATEGORY_IMAGE_URL} mode={commerceGridData.mode} tabs={commerceGridData.tabs} viewAllHref={commerceGridData.mode === "reverse" ? "/kategori" : null} />
                   ) : null}
                 </div>

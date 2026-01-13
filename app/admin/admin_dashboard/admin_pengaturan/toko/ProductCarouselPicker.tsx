@@ -32,6 +32,7 @@ type Props = {
   /** Default: "productIds" */
   inputName?: string;
   showPrice?: boolean;
+  showCta?: boolean;
   buttonLabel?: string;
 };
 
@@ -90,6 +91,7 @@ export default function ProductCarouselPicker({
   defaultSelectedIds,
   inputName = "productIds",
   showPrice = true,
+  showCta = true,
   buttonLabel = "Pick Produk",
 }: Props) {
   const [open, setOpen] = useState(false);

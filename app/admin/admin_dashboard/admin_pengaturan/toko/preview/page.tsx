@@ -10,7 +10,7 @@ import ui from "./preview.module.css";
 import { CategoryGridPreview } from "./CategoryGridPreview";
 import CategoryCommerceColumns from "@/app/components/homepage/CategoryCommerceColumns.client";
 import { SocialIcon } from "@/app/components/homepage/social-icons";
-import { themeMetaSlug, getThemeKeyFromRow, isThemeMetaRow, getThemeKeyFromConfig, normalizeThemeKey, readSp, upperType } from "../toko-utils";
+import { themeMetaSlug, getThemeKeyFromRow, isThemeMetaRow, getThemeKeyFromConfig, normalizeThemeKey, readSp, upperType, normalizeVoucherImageIds } from "../toko-utils";
 import {
   normalizeConfig,
   getHeroThemeTokens,
@@ -810,7 +810,7 @@ export default async function TokoPreviewDraftPage({
                         className={ui.previewSectionFull}
                         style={{
                           background: customPalette.bg,
-                          color: customPalette.text,
+                          color: customPalette.fg,
                         }}
                       >
                         <div
@@ -819,7 +819,7 @@ export default async function TokoPreviewDraftPage({
                             ["--cg-card-bg" as any]: vars.cardBg,
                             ["--cg-card-fg" as any]: vars.insideText,
                             ["--cg-element" as any]: vars.outsideText,
-                            ["--cg-title-color" as any]: titleTextColor ?? customPalette.text,
+                            ["--cg-title-color" as any]: titleTextColor ?? customPalette.fg,
                             ["--cg-card-border" as any]: vars.border,
                           }}
                         >
@@ -910,7 +910,7 @@ export default async function TokoPreviewDraftPage({
                                 {commerceGridData.title}
                               </h2>
                             ) : null}
-                            {commerceGridData.items.length >= 2 ? (
+                            {commerceGridData.items.length >= 1 ? (
                               <CategoryCommerceColumns {...commerceGridData} viewAllHref={commerceGridData.mode === "reverse" ? "/kategori" : null} />
                             ) : null}
                           </div>
@@ -947,7 +947,7 @@ export default async function TokoPreviewDraftPage({
                             {commerceGridData.title}
                           </h2>
                         ) : null}
-                        {commerceGridData.items.length >= 2 ? (
+                        {commerceGridData.items.length >= 1 ? (
                           <CategoryCommerceColumns
                             {...commerceGridData}
                             viewAllHref={commerceGridData.mode === "reverse" ? "/kategori" : null}

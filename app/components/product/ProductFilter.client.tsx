@@ -8,22 +8,37 @@ import { FaMagnifyingGlass, FaFilter } from "react-icons/fa6";
 interface ProductFilterProps {
     categories: string[];
     tags: string[];
+    selectedCategory?: string;
+    selectedTag?: string;
+    initialSearch?: string;
+    initialMinPrice?: string;
+    initialMaxPrice?: string;
+    initialSort?: string;
 }
 
-export default function ProductFilter({ categories, tags }: ProductFilterProps) {
+export default function ProductFilter({
+    categories,
+    tags,
+    selectedCategory,
+    selectedTag,
+    initialSearch,
+    initialMinPrice,
+    initialMaxPrice,
+    initialSort,
+}: ProductFilterProps) {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [isPending, startTransition] = useTransition();
 
     // Local state for deferred updates (debounce search, etc)
-    const [search, setSearch] = useState(searchParams.get("q") ?? "");
-    const [minPrice, setMinPrice] = useState(searchParams.get("min") ?? "");
-    const [maxPrice, setMaxPrice] = useState(searchParams.get("max") ?? "");
-    const [sort, setSort] = useState(searchParams.get("sort") ?? "latest");
+    const [search, setSearch] = useState(initialSearch ?? searchParams.get("q") ?? "");
+    const [minPrice, setMinPrice] = useState(initialMinPrice ?? searchParams.get("min") ?? "");
+    const [maxPrice, setMaxPrice] = useState(initialMaxPrice ?? searchParams.get("max") ?? "");
+    const [sort, setSort] = useState(initialSort ?? searchParams.get("sort") ?? "latest");
     const [isOpen, setIsOpen] = useState(false);
 
-    const selectedCatName = searchParams.get("cat") ?? "";
-    const selectedTagName = searchParams.get("tag") ?? "";
+    const selectedCatName = searchParams.get("cat") ?? selectedCategory ?? "";
+    const selectedTagName = searchParams.get("tag") ?? selectedTag ?? "";
 
     // Close drawer when URL changes (filter applied) and syncing state
     useEffect(() => {

@@ -1,15 +1,14 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import "./theme.css";
 import { CartProvider } from "./context/CartContext";
 import { WishlistProvider } from "./context/WishlistContext";
 
-const inter = Inter({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-inter",
-});
+// Use system font stack to avoid Google Font download issues during Docker build
+const inter = {
+  className: "",
+  variable: "",
+};
 
 export const metadata: Metadata = {
   title: {

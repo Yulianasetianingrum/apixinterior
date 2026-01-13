@@ -193,6 +193,12 @@ export default async function ProductListingPage(props: {
                         <ProductFilter
                             categories={uniqueCategories}
                             tags={uniqueTags}
+                            selectedCategory={catName}
+                            selectedTag={tagName}
+                            initialSearch={q}
+                            initialMinPrice={minRaw}
+                            initialMaxPrice={maxRaw}
+                            initialSort={sort}
                         />
                     </aside>
 

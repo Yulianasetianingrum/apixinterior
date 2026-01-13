@@ -328,12 +328,9 @@ function SortRow({
             placeholder="Nama tampil"
           />
           {item.type === "category" ? (
-            <input
-              className={ui.select}
-              value={item.slug ?? ""}
-              onChange={(e) => onUpdate(item.key, { slug: e.target.value })}
-              placeholder={`Slug (default: ${catSlug || "-"})`}
-            />
+            <div style={{ fontSize: 11, opacity: 0.6, padding: "4px 8px" }}>
+              Slug: {item.slug || catSlug || "default"} (auto)
+            </div>
           ) : (
             <input
               className={ui.select}
@@ -619,7 +616,6 @@ export default function CategoryCommerceGridEditor({
           .replace("{base}", base)
           .replace("{scope}", scopeWord);
         const nextLabel = limitWords(ensureScopeLabel(templated.trim(), scopeWord), 6);
-        const desiredSlug = makeUnique(buildSeoSlug(nextLabel));
         const currentImg = it.imageId ? imageById.get(Number(it.imageId)) : null;
         const currentScore =
           currentImg && isPngUrl(currentImg.url) ? scoreImageMatch(baseRaw, currentImg) : 0;
@@ -627,7 +623,7 @@ export default function CategoryCommerceGridEditor({
         const finalImageId = currentScore >= 12 ? it.imageId : pickedId ?? null;
         if (finalImageId) usedImageIds.add(Number(finalImageId));
 
-        return { ...it, label: nextLabel || "", slug: desiredSlug || it.slug, imageId: finalImageId };
+        return { ...it, label: nextLabel || "", imageId: finalImageId };
       });
     });
   }
@@ -674,7 +670,7 @@ export default function CategoryCommerceGridEditor({
             key: `cat-${kategoriId}`,
             kategoriId,
             slug: fallbackSlug || String(kategoriId),
-            label: "",
+            label: cat?.nama || "",
             imageId: null,
             tabId: tabs[0]?.id,
           },

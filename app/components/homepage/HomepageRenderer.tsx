@@ -193,27 +193,27 @@ export default async function HomepageRenderer({ scope }: RendererProps) {
     getImageMap(refs.imageIds),
     refs.productIds.length
       ? prisma.produk.findMany({
-          where: { id: { in: refs.productIds } },
-          select: { id: true, nama: true, harga: true, mainImageId: true },
-        })
+        where: { id: { in: refs.productIds } },
+        select: { id: true, nama: true, harga: true, mainImageId: true },
+      })
       : Promise.resolve([]),
     refs.kategoriIds.length
       ? prisma.kategoriProduk.findMany({
-          where: { id: { in: refs.kategoriIds } },
-          select: { id: true, nama: true, slug: true },
-        })
+        where: { id: { in: refs.kategoriIds } },
+        select: { id: true, nama: true, slug: true },
+      })
       : Promise.resolve([]),
     refs.hubungiIds.length
       ? prisma.hubungi.findMany({
-          where: { id: { in: refs.hubungiIds } },
-          select: { id: true, label: true, value: true },
-        })
+        where: { id: { in: refs.hubungiIds } },
+        select: { id: true, label: true, value: true },
+      })
       : Promise.resolve([]),
     refs.branchIds.length
       ? prisma.cabangToko.findMany({
-          where: { id: { in: refs.branchIds } },
-          select: { id: true, nama: true, alamat: true },
-        })
+        where: { id: { in: refs.branchIds } },
+        select: { id: true, nama: true, alamat: true },
+      })
       : Promise.resolve([]),
     prisma.mediaSosial.findMany({
       select: { id: true, nama: true, iconKey: true, url: true },
@@ -329,7 +329,7 @@ export default async function HomepageRenderer({ scope }: RendererProps) {
             .filter(Boolean)
             .slice(0, maxItems);
 
-          if (items.length < 8) return null;
+          if (items.length < 1) return null;
 
           return (
             <CategoryCommerceGridSection
@@ -351,12 +351,12 @@ export default async function HomepageRenderer({ scope }: RendererProps) {
             typeof (cfg as any)?.description === "string"
               ? (cfg as any).description
               : typeof rawCfg.description === "string"
-              ? rawCfg.description
-              : typeof rawCfg.deskripsi === "string"
-              ? rawCfg.deskripsi
-              : typeof rawCfg.subtitle === "string"
-              ? rawCfg.subtitle
-              : null;
+                ? rawCfg.description
+                : typeof rawCfg.deskripsi === "string"
+                  ? rawCfg.deskripsi
+                  : typeof rawCfg.subtitle === "string"
+                    ? rawCfg.subtitle
+                    : null;
           const description =
             typeof descriptionCandidate === "string" && descriptionCandidate.trim() ? descriptionCandidate.trim() : null;
           const showPrice = cfg?.showPrice !== false;
@@ -495,17 +495,17 @@ export default async function HomepageRenderer({ scope }: RendererProps) {
           const items =
             mode === "products"
               ? (Array.isArray(cfg?.productIds) ? cfg.productIds : [])
-                  .filter((x: any) => typeof x === "number")
-                  .map((id: number) => {
-                    const p = produkMap.get(id);
-                    return { id, name: p?.nama ?? `Produk #${id}`, href: `/produk/${id}` };
-                  })
+                .filter((x: any) => typeof x === "number")
+                .map((id: number) => {
+                  const p = produkMap.get(id);
+                  return { id, name: p?.nama ?? `Produk #${id}`, href: `/produk/${id}` };
+                })
               : (Array.isArray(cfg?.categoryIds) ? cfg.categoryIds : [])
-                  .filter((x: any) => typeof x === "number")
-                  .map((id: number) => {
-                    const k = kategoriMap.get(id);
-                    return { id, name: k?.nama ?? `Kategori #${id}`, href: "/kategori" };
-                  });
+                .filter((x: any) => typeof x === "number")
+                .map((id: number) => {
+                  const k = kategoriMap.get(id);
+                  return { id, name: k?.nama ?? `Kategori #${id}`, href: "/kategori" };
+                });
 
           return (
             <HighlightCollectionSection

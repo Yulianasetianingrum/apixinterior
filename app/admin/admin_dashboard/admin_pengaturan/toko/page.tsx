@@ -52,12 +52,15 @@ import {
   DEFAULT_THEME_KEY,
   defaultThemeName,
   normalizeRoomCards,
+  normalizeVoucherImageIds,
   legacyToNewConfig,
+  slugify,
   parseNum,
   parseNumArray,
   SECTION_ICON,
 } from "./toko-utils";
 import { SectionTypeId, ThemeKey } from "./types";
+import { normalizePublicUrl } from "@/lib/product-utils";
 import {
   publishDraftToWebsite,
   unpublishWebsite,
@@ -86,6 +89,7 @@ import {
   saveCategoryGridCommerceConfig,
   saveProductCarouselConfig,
   pickAllProductListingProducts,
+  autoGenerateHighlightCollection,
   clearProductCarouselProducts,
   clearProductListingProducts,
   removeCustomPromoVoucher,
@@ -493,6 +497,7 @@ export default async function TokoPengaturanPage({
   const hubungiItems = (hubungiItemsRaw ?? []) as any[];
   const cabangItems = (cabangItemsRaw ?? []) as any[];
   const gambarItems = (gambarItemsRaw ?? []) as any[];
+  const bannerPromoItems = (bannerPromoItemsRaw ?? []) as any[];
 
   // Collect used product IDs to ensure they are fetched
   const usedProductIds = new Set<number>();
@@ -2442,7 +2447,7 @@ export default async function TokoPengaturanPage({
                                               const categoryId = isCategory ? Number(linkRaw.split(":")[1]) : null;
                                               const manualLink = !isCategory && typeof linkRaw === "string" ? linkRaw : "";
                                               const mode =
-                                                Number.isFinite(categoryId) && categoryId > 0
+                                                typeof categoryId === "number" && Number.isFinite(categoryId) && categoryId > 0
                                                   ? "category"
                                                   : manualLink
                                                     ? "manual"
@@ -3653,7 +3658,7 @@ export default async function TokoPengaturanPage({
                   {section.type === "CUSTOM_PROMO" && legacyBannerPromoId ? (
                     <div className={styles.helperText} style={{ marginTop: 8 }}>
                       Info legacy: <code>banner_promo</code> #{String(legacyBannerPromoId)}{" "}
-                      {bannerPromoItems.find((b) => Number(b.id) === Number(legacyBannerPromoId))
+                      {bannerPromoItems.find((b: any) => Number(b.id) === Number(legacyBannerPromoId))
                         ? "(ditemukan)"
                         : "(tidak ditemukan)"}
                     </div>

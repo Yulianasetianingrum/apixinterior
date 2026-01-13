@@ -672,7 +672,7 @@ export function buildCategoryCommerceGridProps(args: {
         const k = args.kategoriMap.get(Number(it.kategoriId));
         const labelOverride = String(it.label ?? "").trim();
         const title = labelOverride || String(k?.nama ?? "Kategori");
-        const slug = String(it.slug ?? k?.slug ?? "").trim();
+        const slug = String(k?.slug ?? it.slug ?? "").trim();
         const href = slug ? `/kategori/${slug}` : "#";
 
         let imageUrl = args.fallbackUrl;
