@@ -273,8 +273,26 @@ export default function KategoriProdukPage() {
         throw new Error(msg);
       }
 
+      const data = await res.json();
+
       setNewCategoryName("");
       await fetchCategories();
+
+      // Auto-open modal for the new category to add products immediately
+      const created = data?.kategori || data?.created;
+      if (created) {
+        // Construct a Category object with empty items (since it's new)
+        const newCatObj: Category = {
+          id: created.id,
+          nama: created.nama,
+          urutan: created.urutan,
+          isPromo: created.isPromo,
+          items: []
+        };
+        openModal(newCatObj);
+        showToast("success", "Sukses", `Kategori "${created.nama}" dibuat. Silakan pilih produk.`);
+      }
+
     } catch (err: any) {
       showToast("info", "Info", String(err?.message ?? "Gagal membuat kategori."));
     } finally {
@@ -1164,6 +1182,12 @@ export default function KategoriProdukPage() {
               disabled={creatingCategory || droppingAllCategories || genBusy}
               value={newCategoryName}
               onChange={(e) => setNewCategoryName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !creatingCategory) {
+                  e.preventDefault();
+                  handleCreateCategory();
+                }
+              }}
             />
             <button
               type="button"

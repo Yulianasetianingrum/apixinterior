@@ -129,9 +129,10 @@ export async function POST(req: NextRequest) {
       urutan = Math.max(0, Math.floor(body.urutan));
     } else {
       const agg = await prisma.kategoriProduk.aggregate({
-        _max: { urutan: true },
+        _min: { urutan: true },
       });
-      urutan = (agg._max.urutan ?? 0) + 1;
+      // Place at the top (smaller than current min)
+      urutan = (agg._min.urutan ?? 0) - 1;
     }
 
     const created = await prisma.kategoriProduk.create({
