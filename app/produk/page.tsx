@@ -3,7 +3,9 @@ import { prisma } from "@/lib/prisma";
 import ProductCard from "@/app/components/product/ProductCard.client";
 import ProductFilter from "@/app/components/product/ProductFilter.client";
 import styles from "./page.module.css";
-import { Prisma } from "@prisma/client";
+import Navbar from "@/app/navbar/Navbar";
+import GlobalFooter from "@/app/components/GlobalFooter";
+import { prisma } from "@/lib/prisma";
 import { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -226,7 +228,9 @@ export default async function ProductListingPage(props: {
                         )}
                     </div>
                 </div>
-            </main>
         </div>
+            </main >
+        <GlobalFooter />
+        </div >
     );
 }
