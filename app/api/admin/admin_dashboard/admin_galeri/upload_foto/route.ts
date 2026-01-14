@@ -34,36 +34,46 @@ export async function POST(req: Request) {
     const categoryName = formData.get('category') as string | null;
     const subcategoryName = formData.get('subcategory') as string | null;
 
-    // ========= OPTIMASI GAMBAR (SHARP) =========
-    // 1. Convert to Buffer
+    // ========= OPTIMASI GAMBAR (SHARP) & SAVE =========
     const originalBuffer = Buffer.from(await file.arrayBuffer());
-
-    // 2. Prepare sharp pipeline
-    const sharp = require('sharp');
-    let sharpInstance = sharp(originalBuffer)
-      .resize({ width: 1920, withoutEnlargement: true }) // Max HD width
-      .webp({ quality: 65, effort: 6 }); // WebP quality 65 (usually enough for <70kb)
-
-    // 3. Process
-    const processedBuffer = await sharpInstance.toBuffer();
-
     const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
     await fs.mkdir(uploadsDir, { recursive: true });
 
-    // 4. Filename .webp
-    const originalName = file.name || 'upload';
-    const safeName = originalName
-      .replace(/\s+/g, '-')
-      .replace(/[^a-zA-Z0-9.\-]/g, '');
-    // remove existing ext, add .webp
-    const baseName = safeName.substring(0, safeName.lastIndexOf('.')) || safeName;
-    const fileName = `${Date.now()}-${baseName}.webp`;
+    let finalBuffer = originalBuffer;
+    let finalFileName = "";
 
-    const filePath = path.join(uploadsDir, fileName);
-    await fs.writeFile(filePath, processedBuffer);
+    // Attempt Sharp
+    try {
+      const sharp = require('sharp');
+      const processing = sharp(originalBuffer)
+        .resize({ width: 1920, withoutEnlargement: true })
+        .webp({ quality: 65, effort: 4 }); // lowered effort for speed/compatibility
+
+      finalBuffer = await processing.toBuffer();
+
+      // Use webp extension
+      const originalName = file.name || 'upload';
+      const safeName = originalName.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9.\-]/g, '');
+      const baseName = safeName.substring(0, safeName.lastIndexOf('.')) || safeName;
+      finalFileName = `${Date.now()}-${baseName}.webp`;
+
+      console.log("Upload: Image optimized with Sharp.");
+    } catch (sharpError) {
+      console.error("Upload Warning: Sharp failed, saving original.", sharpError);
+
+      // Fallback to original
+      finalBuffer = originalBuffer;
+      const originalName = file.name || 'upload';
+      const safeName = originalName.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9.\-]/g, '');
+      finalFileName = `${Date.now()}-${safeName}`;
+    }
+
+    // Write file
+    const filePath = path.join(uploadsDir, finalFileName);
+    await fs.writeFile(filePath, finalBuffer);
 
     // URL yang bisa diakses visitor
-    const url = `/uploads/${fileName}`;
+    const url = `/uploads/${finalFileName}`;
 
     // ========= TITLE & TAGS =========
     const autoTitle =
