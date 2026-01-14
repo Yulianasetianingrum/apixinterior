@@ -1,0 +1,5 @@
+Versi: 2.1 - Analytics & Helper Fix
+Waktu: 14 Jan 2026 - 18:45 WIB
+Status: Code Updated Successfully.
+Message: Jika Anda melihat file ini, berarti perbaikan CODE sudah masuk ke VPS. 
+Silakan setting ulang "Custom Promo" & "Theme" di Admin Dashboard untuk memperbaiki tampilan.

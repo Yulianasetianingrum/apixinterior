@@ -5,7 +5,7 @@ export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
         const { path } = body;
-        const ip = req.headers.get("x-forwarded-for") || req.ip || "unknown";
+        const ip = req.headers.get("x-forwarded-for") || (req as any).ip || "unknown";
         const userAgent = req.headers.get("user-agent") || "unknown";
 
         if (!path) {
