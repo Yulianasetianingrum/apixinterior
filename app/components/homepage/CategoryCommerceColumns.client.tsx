@@ -113,7 +113,7 @@ export default function CategoryCommerceColumns({
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
                           src={iconUrl}
-                          alt={c.name}
+                          alt={`Kategori Interior ${c.name}`}
                           className={isCommerce ? `${ui.iconImg} ${ui.iconImgCommerce}` : ui.iconImg}
                           onError={(e) => {
                             e.currentTarget.style.opacity = "0";

@@ -486,8 +486,13 @@ export default async function HomePage({
       <WebSiteSchema />
       <LocalBusinessSchema
         name="Apix Interior"
-        description="Furniture, Mebel, dan Jasa Desain Interior Profesional"
+        description="Kontraktor Interior & Workshop Mebel Custom Terbaik. Spesialis Kitchen Set, Wardrobe, Furnitur Kantor, Hotel, Cafe & Home Decor. Melayani Jasa Desain & Build Interior Jabodetabek."
         priceRange="$$"
+        address={{
+          addressLocality: "Jakarta",
+          addressRegion: "DKI Jakarta",
+          addressCountry: "ID"
+        }}
       />
 
       <Navbar themeOverride={navbarTheme} />
