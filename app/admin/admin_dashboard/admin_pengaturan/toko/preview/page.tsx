@@ -1889,7 +1889,7 @@ export default async function TokoPreviewDraftPage({
                           const catId = Number(raw.split(":")[1]);
                           const k = kategoriMap.get(catId);
                           if (k && k.slug) {
-                            href = `/promo?kategori=${k.slug}`;
+                            href = `/kategori/${k.slug}`;
                           } else if (Number.isFinite(catId) && catId > 0) {
                             href = `/cari?kategori=${catId}`;
                           }

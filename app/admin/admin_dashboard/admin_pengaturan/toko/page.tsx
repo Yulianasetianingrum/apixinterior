@@ -2369,6 +2369,25 @@ export default async function TokoPengaturanPage({
 
                         </div>
 
+                        <div className={styles.sectionEditGrid}>
+                          <div className={styles.fieldGroup}>
+                            <label className={styles.label}>Tema Background (Baru)</label>
+                            <select
+                              name="sectionBgTheme"
+                              defaultValue={String((cfg as any).sectionBgTheme ?? "FOLLOW_NAVBAR")}
+                              className={styles.select}
+                            >
+                              <option value="FOLLOW_NAVBAR">Ikuti tema Navbar (Default)</option>
+                              <option value="WHITE">WHITE (Putih)</option>
+                              <option value="NAVY">NAVY (Biru Gelap)</option>
+                              <option value="GOLD">GOLD (Emas)</option>
+                            </select>
+                            <p className={styles.helperText}>
+                              Mengganti warna background blok ini supaya kontras dengan gambar promo.
+                            </p>
+                          </div>
+                        </div>
+
                         <div className={styles.fieldGroup}>
                           <label className={styles.label}>Voucher (gambar)</label>
                           <p className={styles.helperText}>

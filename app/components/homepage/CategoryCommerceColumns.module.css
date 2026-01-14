@@ -167,9 +167,9 @@
 }
 
 .iconCommerce {
-  width: 54px;
-  height: 54px;
-  flex: 0 0 54px;
+  width: 80px;
+  height: 80px;
+  flex: 0 0 80px;
   border-radius: 999px;
   background: transparent;
   border: none;
@@ -184,8 +184,8 @@
 }
 
 .iconImgCommerce {
-  width: 70%;
-  height: 70%;
+  width: 90%;
+  height: 90%;
 }
 
 .textCommerce {
@@ -282,9 +282,9 @@
   }
 
   .iconCommerce {
-    width: 42px;
-    height: 42px;
-    flex-basis: 42px;
+    width: 64px;
+    height: 64px;
+    flex-basis: 64px;
   }
 
   .textCommerce {

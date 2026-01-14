@@ -968,8 +968,8 @@ export default async function HomePage({
                   // console.log(`DEBUG_VOUCHER_CAT: CatID=${catId}, Found=${!!k}, Slug=${k?.slug}`);
 
                   if (k && k.slug) {
-                    // Redirect to search/product page instead of /promo
-                    href = `/cari?kategori=${k.slug}`;
+                    // Use dedicated Category route
+                    href = `/kategori/${k.slug}`;
                   } else if (Number.isFinite(catId) && catId > 0) {
                     const fallbackPath = `/cari?kategori=${catId}`;
                     href = fallbackPath;
