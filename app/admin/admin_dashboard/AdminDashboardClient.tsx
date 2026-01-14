@@ -283,6 +283,15 @@ export default function AdminDashboardClient() {
                   Menu FAQ & DLL
                 </button>
               </li>
+              <li style={{ borderTop: '1px solid #eee', paddingTop: '5px', marginTop: '5px' }}>
+                <button
+                  className={styles.cardLink}
+                  onClick={() => goToSubPage("/admin/admin_dashboard/system_check")}
+                  style={{ color: '#e11d48', fontWeight: 'bold' }}
+                >
+                  🛠️ Cek Server Health
+                </button>
+              </li>
             </ul>
           </article>
 

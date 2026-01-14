@@ -37,12 +37,27 @@ export default function SystemCheckPage() {
 
                     {/* FILESYSTEM */}
                     <div style={{ padding: '20px', border: '1px solid #ddd', borderRadius: '8px', background: report.filesystem?.status === 'ok' ? '#f0fdf4' : '#fef2f2' }}>
-                        <h2 style={{ fontWeight: 'bold', marginBottom: '10px' }}>2. Storage Permission (public/uploads)</h2>
+                        <h2 style={{ fontWeight: 'bold', marginBottom: '10px' }}>2. Storage (public/uploads)</h2>
                         <div style={{ fontSize: '18px', fontWeight: 'bold', color: report.filesystem?.status === 'ok' ? '#16a34a' : '#dc2626' }}>
                             {report.filesystem?.status?.toUpperCase()}
                         </div>
-                        <p style={{ marginTop: '5px' }}>Path: {report.filesystem?.path}</p>
+                        <p style={{ marginTop: '5px', fontFamily: 'monospace', background: '#eee', padding: '5px' }}>CWD: {report.cwd}</p>
+                        <p style={{ marginTop: '5px', fontFamily: 'monospace', background: '#eee', padding: '5px' }}>Path: {report.filesystem?.path}</p>
                         <p style={{ marginTop: '5px' }}>{report.filesystem?.message}</p>
+
+                        {report.filesystem?.files && report.filesystem.files.length > 0 && (
+                            <div style={{ marginTop: '15px' }}>
+                                <b>Recent Files Found in Server Folder:</b>
+                                <ul style={{ fontSize: '12px', marginTop: '5px', fontFamily: 'monospace' }}>
+                                    {report.filesystem.files.map((f: any) => (
+                                        <li key={f.name}>{f.name} ({new Date(f.time).toLocaleString()})</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+                        {report.filesystem?.files && report.filesystem.files.length === 0 && (
+                            <p style={{ color: 'orange' }}>Folder exists but EMPTY (No files found).</p>
+                        )}
                     </div>
 
                     <div style={{ marginTop: '20px', padding: '15px', background: '#f8fafc', borderRadius: '8px' }}>
