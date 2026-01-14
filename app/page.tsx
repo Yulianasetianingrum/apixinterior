@@ -793,17 +793,17 @@ export default async function HomePage({
                     const pr = computeHargaSetelahPromo(p);
                     return (
                       <article key={Number(p.id)} className={styles.productListingItem}>
-                        <a href={href} className={styles.pcCard} style={{ background: "pink", border: `2px solid red`, color: "black", textDecoration: "none", width: "100%", height: "100%" }}>
+                        <a href={href} className={styles.pcCard} style={{ background: themeTokens.card, border: `1px solid ${themeTokens.cardBorder}`, color: themeTokens.cardFg, textDecoration: "none", width: "100%", height: "100%" }}>
                           {imgUrl ? <div className={styles.pcMedia}><div className={styles.pcMediaBlur} style={{ backgroundImage: `url(${imgUrl})` }} /><img className={styles.pcMediaImg} src={imgUrl} alt={String(p.nama)} /></div> : <div className={styles.pcMediaPlaceholder} />}
                           <div className={styles.pcBody}>
-                            <div className={styles.pcTitle} style={{ color: "black", fontWeight: "bold" }}>DEBUG: {String(p.nama || "Kosong")}</div>
-                            <div className={styles.pcPrice} style={{ color: "black" }}>
+                            <div className={styles.pcTitle} style={{ color: themeTokens.cardFg }}>{String(p.nama || "Nama Produk")}</div>
+                            <div className={styles.pcPrice} style={{ color: themeTokens.cardFg }}>
                               {pr.isPromo ? (
                                 <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                                   <span style={{ fontWeight: 800 }}>{formatRupiah(pr.hargaFinal)}</span>
                                   <div style={{ display: "flex", gap: 8 }}>
                                     <span style={{ textDecoration: "line-through", opacity: 0.6 }}>{formatRupiah(pr.hargaAsli)}</span>
-                                    <span style={{ fontWeight: 800, color: "red" }}>{pr.promoLabel}</span>
+                                    <span style={{ fontWeight: 800, color: themeTokens.element }}>{pr.promoLabel}</span>
                                   </div>
                                 </div>
                               ) : (

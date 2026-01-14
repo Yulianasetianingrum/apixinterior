@@ -1388,7 +1388,7 @@ export default async function TokoPreviewDraftPage({
                                   )}
 
                                   <div className={ui.pcBody}>
-                                    <div className={ui.pcTitle} style={{ color: themeTokens.cardFg }}>{String(p.nama ?? "Produk")}</div>
+                                    <div className={ui.pcTitle} style={{ color: themeTokens.cardFg }}>{String(p.nama || "Nama Produk")}</div>
 
                                     <div className={ui.pcPrice} style={{ color: themeTokens.cardFg }}>
                                       {pr.isPromo ? (
