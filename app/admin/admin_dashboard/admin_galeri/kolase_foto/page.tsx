@@ -497,54 +497,30 @@ export default function KolaseFotoPage() {
                   <div
                     key={g.id}
                     className={`${styles.galleryCard} ${darkMode
-                        ? styles.galleryCardNight
-                        : styles.galleryCardDay
+                      ? styles.galleryCardNight
+                      : styles.galleryCardDay
                       }`}
                   >
-                    <div className={styles.galleryCheckbox}>
+                    <div className={`${styles.galleryCheckbox} ${isSelected(g.id) ? 'selected' : ''}`}>
                       <input
                         type="checkbox"
                         checked={isSelected(g.id)}
                         onChange={() => toggleSelect(g.id)}
+                        style={{ cursor: 'pointer', width: '16px', height: '16px' }}
                       />
                     </div>
                     <div className={styles.imageWrapper}>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={g.url}
                         alt={g.title ?? ''}
                         className={styles.galleryImage}
                         onClick={() => openPreview(g)}
-                        style={{ cursor: 'zoom-in' }}
                         onError={(e) => {
                           e.currentTarget.src = "https://placehold.co/400x300?text=No+Image";
-                          e.currentTarget.onerror = null; // prevent infinite loop
+                          e.currentTarget.onerror = null;
                         }}
                       />
-                    </div>
-                    <div className={styles.galleryMeta}>
-                      {g.category && (
-                        <div className={styles.categoryText}>
-                          {g.category.name}
-                          {g.subcategory
-                            ? ` › ${g.subcategory.name}`
-                            : ''}
-                        </div>
-                      )}
-                      {g.title && (
-                        <div className={styles.titleText}>{g.title}</div>
-                      )}
-                      <div className={styles.tagText}>Tags: {g.tags}</div>
-                      <button
-                        type="button"
-                        className={`${styles.deleteBtn} ${darkMode
-                            ? styles.deleteBtnDark
-                            : styles.deleteBtnLight
-                          }`}
-                        onClick={() => requestDeleteOne(g.id)}
-                      >
-                        Hapus
-                      </button>
+                      {/* Metadata removed from grid for iPhone look */}
                     </div>
                   </div>
                 ))}

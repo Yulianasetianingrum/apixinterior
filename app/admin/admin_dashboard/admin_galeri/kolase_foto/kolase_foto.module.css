@@ -184,39 +184,47 @@
    MASONRY GALLERY (Pinterest-like)
    =========================== */
 
+/* MASONRY PIN BOARD STYLE (OLD) -> SQUARE GRID STYLE (NEW, iPHONE LAYOUT) */
 .galleryGrid {
-  column-count: 4;
-  column-gap: 18px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 2px;
+  /* Tight gap like iPhone albums */
   padding-bottom: 40px;
-}
-
-@media (max-width: 1200px) {
-  .galleryGrid {
-    column-count: 3;
-  }
-}
-
-@media (max-width: 900px) {
-  .galleryGrid {
-    column-count: 2;
-  }
 }
 
 @media (max-width: 600px) {
   .galleryGrid {
-    column-count: 1;
+    grid-template-columns: repeat(3, 1fr);
+    /* 3 columns on mobile */
+    gap: 1px;
   }
 }
 
 .galleryCard {
-  break-inside: avoid;
-  margin-bottom: 18px;
-  border-radius: 18px;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  border: 1px solid rgba(15, 23, 42, 0.16);
   position: relative;
+  aspect-ratio: 1 / 1;
+  /* Square */
+  overflow: hidden;
+  border-radius: 0;
+  /* No radius in tight grid, or maybe very small */
+  cursor: pointer;
+  background: #eee;
+}
+
+/* Hover overlay effect */
+.galleryCard::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+
+.galleryCard:hover::after {
+  opacity: 1;
 }
 
 /* siang: kartu foto kecil putih */
@@ -231,31 +239,50 @@
 }
 
 /* gambar fleksibel tinggi bebas */
+/* gambar full square cover */
 .imageWrapper {
   width: 100%;
-  overflow: hidden;
-  min-height: 120px;
-  /* Ensure space even if image breaks */
-  background: #f1f5f9;
-  /* Placeholder color */
-  position: relative;
+  height: 100%;
 }
 
 .galleryImage {
   width: 100%;
-  height: auto;
-  display: block;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s;
+}
+
+.galleryCard:hover .galleryImage {
+  transform: scale(1.05);
+  /* Zoom effect on hover */
 }
 
 .galleryCheckbox {
   position: absolute;
-  top: 8px;
-  left: 8px;
-  z-index: 2;
-  background: rgba(255, 255, 255, 0.85);
-  border-radius: 8px;
-  padding: 4px 6px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  top: 6px;
+  right: 6px;
+  left: auto;
+  z-index: 5;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  padding: 4px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  /* Hide checkbox by default */
+  transform: scale(0.8);
+  transition: all 0.2s;
+}
+
+/* Show checkbox if selected OR hovered */
+.galleryCard:hover .galleryCheckbox,
+.galleryCheckbox.selected {
+  opacity: 1;
+  transform: scale(1);
 }
 
 .deleteBtn {
