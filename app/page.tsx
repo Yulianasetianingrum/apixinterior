@@ -795,8 +795,22 @@ export default async function HomePage({
                       <article key={Number(p.id)} className={styles.productListingItem}>
                         <a href={href} className={styles.pcCard} style={{ background: themeTokens.card, border: `1px solid ${themeTokens.cardBorder}`, color: themeTokens.cardFg, textDecoration: "none", width: "100%", height: "100%" }}>
                           {imgUrl ? <div className={styles.pcMedia}><div className={styles.pcMediaBlur} style={{ backgroundImage: `url(${imgUrl})` }} /><img className={styles.pcMediaImg} src={imgUrl} alt={String(p.nama)} /></div> : <div className={styles.pcMediaPlaceholder} />}
-                          <div className={styles.pcBody}><div className={styles.pcTitle} style={{ color: themeTokens.cardFg }}>{String(p.nama)}</div>
-                            <div className={styles.pcPrice} style={{ color: themeTokens.cardFg }}>{pr.isPromo ? <div style={{ display: "flex", flexDirection: "column", gap: 4 }}><span style={{ fontWeight: 800 }}>{formatRupiah(pr.hargaFinal)}</span><div style={{ display: "flex", gap: 8 }}><span style={{ textDecoration: "line-through", opacity: 0.6 }}>{formatRupiah(pr.hargaAsli)}</span><span style={{ fontWeight: 800, color: themeTokens.element }}>{pr.promoLabel}</span></div></div> : <>{formatRupiah(p.harga)}</>}</div></div>
+                          <div className={styles.pcBody}>
+                            <div className={styles.pcTitle} style={{ color: themeTokens.cardFg }}>{String(p.nama || "Nama Produk")}</div>
+                            <div className={styles.pcPrice} style={{ color: themeTokens.cardFg }}>
+                              {pr.isPromo ? (
+                                <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                                  <span style={{ fontWeight: 800 }}>{formatRupiah(pr.hargaFinal)}</span>
+                                  <div style={{ display: "flex", gap: 8 }}>
+                                    <span style={{ textDecoration: "line-through", opacity: 0.6 }}>{formatRupiah(pr.hargaAsli)}</span>
+                                    <span style={{ fontWeight: 800, color: themeTokens.element }}>{pr.promoLabel}</span>
+                                  </div>
+                                </div>
+                              ) : (
+                                <>{formatRupiah(p.harga)}</>
+                              )}
+                            </div>
+                          </div>
                         </a>
                       </article>
                     );
