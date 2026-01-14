@@ -213,6 +213,41 @@ export default function TotalPengunjungPage() {
                     </article>
                 </section>
 
+                <div style={{ marginTop: "40px", textAlign: "center", borderTop: "1px solid #e2e8f0", paddingTop: "20px" }}>
+                    <p style={{ marginBottom: "10px", color: "#ef4444", fontSize: "14px" }}>
+                        Danger Zone
+                    </p>
+                    <button
+                        onClick={async () => {
+                            if (confirm("Yakin ingin menghapus SEMUA data statistik menjadi 0? Data tidak bisa dikembalikan.")) {
+                                try {
+                                    const res = await fetch("/api/admin/admin_dashboard/admin_statistik/reset", { method: "POST" });
+                                    if (res.ok) {
+                                        alert("Data berhasil di-reset jadi 0.");
+                                        window.location.reload();
+                                    }
+                                } catch (e) {
+                                    alert("Gagal reset data");
+                                }
+                            }
+                        }}
+                        style={{
+                            background: "#fee2e2",
+                            color: "#ef4444",
+                            border: "1px solid #ef4444",
+                            padding: "8px 16px",
+                            borderRadius: "6px",
+                            cursor: "pointer",
+                            fontWeight: "600"
+                        }}
+                    >
+                        🗑️ Reset Semua Statistik ke 0
+                    </button>
+                    <p style={{ marginTop: "8px", fontSize: "12px", color: "#64748b" }}>
+                        Gunakan ini jika Anda ingin memulai tracking dari awal bersih.
+                    </p>
+                </div>
+
 
             </main>
         </div>

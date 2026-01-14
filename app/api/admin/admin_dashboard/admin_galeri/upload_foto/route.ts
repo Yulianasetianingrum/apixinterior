@@ -43,17 +43,18 @@ export async function POST(req: Request) {
     let finalFileName = "";
 
     // Attempt Sharp
+    const originalName = file.name || 'upload';
+    let safeName = originalName.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9.\-]/g, '');
+
     try {
       const sharp = require('sharp');
       const processing = sharp(originalBuffer)
         .resize({ width: 1920, withoutEnlargement: true })
-        .webp({ quality: 65, effort: 4 }); // lowered effort for speed/compatibility
+        .webp({ quality: 65, effort: 4 });
 
       finalBuffer = await processing.toBuffer();
 
       // Use webp extension
-      const originalName = file.name || 'upload';
-      const safeName = originalName.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9.\-]/g, '');
       const baseName = safeName.substring(0, safeName.lastIndexOf('.')) || safeName;
       finalFileName = `${Date.now()}-${baseName}.webp`;
 
@@ -63,8 +64,6 @@ export async function POST(req: Request) {
 
       // Fallback to original
       finalBuffer = originalBuffer;
-      const originalName = file.name || 'upload';
-      const safeName = originalName.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9.\-]/g, '');
       finalFileName = `${Date.now()}-${safeName}`;
     }
 
