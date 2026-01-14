@@ -35,25 +35,70 @@ export default function UploadFotoPage() {
   const [title, setTitle] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
+  // ... inside component ...
   function handleAutoGenerate() {
     if (!selectedFile) {
       alert("Silakan pilih file gambar terlebih dahulu.");
       return;
     }
-    // Remove extension
-    let name = selectedFile.name.replace(/\.[^/.]+$/, "");
-    // Replace separators with spaces
-    name = name.replace(/[-_]/g, " ");
-    // Capitalize first letter of each word
+    // 1. Clean Filename -> Title
+    let name = selectedFile.name.replace(/\.[^/.]+$/, ""); // remove extension
+    name = name.replace(/[-_]/g, " "); // replace separators
+    // Capitalize each word
     name = name.replace(/\b\w/g, (l) => l.toUpperCase());
-
     setTitle(name);
+
+    // 2. Smart Categorization
+    const lowerName = name.toLowerCase();
+
+    // Find matching category
+    const matchedCategory = categories.find(c =>
+      lowerName.includes(c.name.toLowerCase()) ||
+      c.name.toLowerCase().includes(lowerName)
+    );
+
+    if (matchedCategory) {
+      setCategoryInput(matchedCategory.name);
+    }
+    // Fallback Heuristics for common terms if no direct match
+    else if (lowerName.includes("kitchen")) setCategoryInput("Kitchen");
+    else if (lowerName.includes("kamar") || lowerName.includes("bed")) setCategoryInput("Kamar Tidur");
+    else if (lowerName.includes("ruang tamu") || lowerName.includes("living")) setCategoryInput("Ruang Tamu");
+    else if (lowerName.includes("kantor") || lowerName.includes("office")) setCategoryInput("Kantor");
+
+    // 3. Smart Subcategory (Heuristic)
+    if (lowerName.includes("lemari")) setSubcategoryInput("Lemari Pakaian");
+    else if (lowerName.includes("meja")) setSubcategoryInput("Meja Kerja");
+    else if (lowerName.includes("kabinet")) setSubcategoryInput("Kabinet");
+    else if (lowerName.includes("backdrop")) setSubcategoryInput("Backdrop TV");
+    else setSubcategoryInput(""); // Reset if unknown
+
+    // 4. Smart Tags
+    // Split by space, filter short words/stopwords
+    const stopWords = ["dan", "yang", "di", "ke", "dari", "ini", "itu", "untuk", "with", "and"];
+    const potentialTags = lowerName
+      .split(" ")
+      .map(w => w.trim())
+      .filter(w => w && w.length > 2 && !stopWords.includes(w));
+
+    // Take max 5 tags
+    setTags(potentialTags.slice(0, 7));
   }
 
+  // Fetch Categories on Mount
   useEffect(() => {
-    // TODO: kalau nanti ada API kategori/subkategori, isi disini
+    fetch('/api/admin/admin_dashboard/admin_produk/kategori_produk')
+      .then((res) => res.json())
+      .then((data) => {
+        // API returns array of objects with { id, nama, ... }
+        // We map to { id, name } for our local state
+        if (Array.isArray(data)) {
+          const mapped = data.map((d: any) => ({ id: d.id, name: d.nama }));
+          setCategories(mapped);
+        }
+      })
+      .catch((err) => console.error("Failed to fetch categories:", err));
   }, []);
-
   const availableSubcategories = useMemo(() => {
     const cat = categories.find(
       (c) => c.name.toLowerCase() === categoryInput.toLowerCase()
