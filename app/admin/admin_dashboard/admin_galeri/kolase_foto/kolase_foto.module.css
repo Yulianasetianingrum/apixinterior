@@ -225,315 +225,308 @@
 }
 
 /* malam: kartu foto kecil biru dongker */
+/* malam: kartu foto kecil biru dongker */
 .galleryCardNight {
+  background: #020617;
+}
 
-  /* siang: kartu foto kecil putih */
-  .galleryCardDay {
-    background: #ffffff;
-  }
+/* gambar fleksibel tinggi bebas */
+.imageWrapper {
+  width: 100%;
+  overflow: hidden;
+  min-height: 120px;
+  /* Ensure space even if image breaks */
+  background: #f1f5f9;
+  /* Placeholder color */
+  position: relative;
+}
 
-  /* malam: kartu foto kecil biru dongker */
-  .galleryCardNight {
-    background: #020617;
-  }
+.galleryImage {
+  width: 100%;
+  height: auto;
+  display: block;
+}
 
-  /* gambar fleksibel tinggi bebas */
-  .imageWrapper {
-    width: 100%;
-    overflow: hidden;
-    min-height: 120px;
-    /* Ensure space even if image breaks */
-    background: #f1f5f9;
-    /* Placeholder color */
-    position: relative;
-  }
+.galleryCheckbox {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 2;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 8px;
+  padding: 4px 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
 
-  .galleryImage {
-    width: 100%;
-    height: auto;
-    display: block;
-  }
+.deleteBtn {
+  margin-top: 8px;
+  align-self: flex-start;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease,
+    transform 0.08s ease;
+}
 
-  .galleryCheckbox {
-    position: absolute;
-    top: 8px;
-    left: 8px;
-    z-index: 2;
-    background: rgba(255, 255, 255, 0.85);
-    border-radius: 8px;
-    padding: 4px 6px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-  }
+/* siang: merah lembut */
+.deleteBtnLight {
+  background: #fee2e2;
+  color: #b91c1c;
+  border-color: #fecaca;
+}
 
-  .deleteBtn {
-    margin-top: 8px;
-    align-self: flex-start;
-    padding: 6px 14px;
-    border-radius: 999px;
-    border: 1px solid transparent;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease,
-      transform 0.08s ease;
-  }
+.deleteBtnLight:hover {
+  background: #fecaca;
+  transform: translateY(-1px);
+}
 
-  /* siang: merah lembut */
-  .deleteBtnLight {
-    background: #fee2e2;
-    color: #b91c1c;
-    border-color: #fecaca;
-  }
+/* malam: merah + golden */
+.deleteBtnDark {
+  background: #7f1d1d;
+  color: #fef2f2;
+  border-color: #b91c1c;
+}
 
-  .deleteBtnLight:hover {
-    background: #fecaca;
-    transform: translateY(-1px);
-  }
+.deleteBtnDark:hover {
+  background: #b91c1c;
+  transform: translateY(-1px);
+}
 
-  /* malam: merah + golden */
-  .deleteBtnDark {
-    background: #7f1d1d;
-    color: #fef2f2;
-    border-color: #b91c1c;
-  }
-
-  .deleteBtnDark:hover {
-    background: #b91c1c;
-    transform: translateY(-1px);
-  }
-
-  /* ===========================
+/* ===========================
    SIDEBAR
    =========================== */
 
+.closeSidebarButton {
+  border: none;
+  background: transparent;
+  color: #f5c542;
+  font-size: 22px;
+  margin-left: auto;
+  cursor: pointer;
+}
+
+@media (min-width: 1024px) {
   .closeSidebarButton {
-    border: none;
-    background: transparent;
-    color: #f5c542;
-    font-size: 22px;
-    margin-left: auto;
-    cursor: pointer;
+    display: none;
   }
+}
 
-  @media (min-width: 1024px) {
-    .closeSidebarButton {
-      display: none;
-    }
-  }
+.sidebarBackWrapper {
+  padding: 12px 16px 20px;
+}
 
-  .sidebarBackWrapper {
-    padding: 12px 16px 20px;
-  }
+.sidebarBackButton {
+  width: 100%;
+  border-radius: 999px;
+  border: 1px solid #f5c542;
+  background: transparent;
+  color: #f5c542;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 8px 0;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease;
+}
 
-  .sidebarBackButton {
-    width: 100%;
-    border-radius: 999px;
-    border: 1px solid #f5c542;
-    background: transparent;
-    color: #f5c542;
-    font-size: 14px;
-    font-weight: 600;
-    padding: 8px 0;
-    cursor: pointer;
-    transition: background 0.18s ease, color 0.18s ease;
-  }
-
-  .sidebarBackButton:hover {
-    background: #f5c542;
-    color: #0b1531;
-  }
+.sidebarBackButton:hover {
+  background: #f5c542;
+  color: #0b1531;
+}
 
 
-  /* ===========================
+/* ===========================
    CONFIRM MODAL (CUSTOM)
    NOTE: confirm()/alert() bawaan browser TIDAK bisa di-style via CSS.
    =========================== */
 
-  .modalOverlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(2, 6, 23, 0.72);
-    backdrop-filter: blur(2px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 18px;
-    z-index: 9999;
-  }
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.72);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  z-index: 9999;
+}
 
+.modalCard {
+  width: min(520px, 92vw);
+  max-height: 92vh;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.32);
+  border: 1px solid rgba(15, 23, 42, 0.22);
+}
+
+.modalCardDay {
+  background: linear-gradient(150deg, #ffffff 0%, #f8fafc 100%);
+  color: #0b1531;
+}
+
+.modalCardNight {
+  background: linear-gradient(150deg, #0f172a 0%, #020617 100%);
+  color: #f5c542;
+  border-color: rgba(245, 197, 66, 0.35);
+}
+
+.modalHeader {
+  padding: 16px 16px 8px;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.modalBody {
+  padding: 0 16px 14px;
+  font-size: 13px;
+  line-height: 1.45;
+  opacity: 0.95;
+  white-space: pre-line;
+  /* biar \n kebaca */
+}
+
+.modalActions {
+  display: flex;
+  gap: 10px;
+  padding: 12px 16px 16px;
+  justify-content: flex-end;
+}
+
+.modalBtn {
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease,
+    transform 0.08s ease;
+}
+
+.modalBtn:active {
+  transform: translateY(1px);
+}
+
+.modalBtnDisabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Cancel button */
+.modalBtnSecondaryDay {
+  background: #f3f4f6;
+  color: #0b1531;
+  border-color: #e5e7eb;
+}
+
+.modalBtnSecondaryDay:hover {
+  background: #e5e7eb;
+}
+
+.modalBtnSecondaryNight {
+  background: rgba(245, 197, 66, 0.08);
+  color: #f5c542;
+  border-color: rgba(245, 197, 66, 0.35);
+}
+
+.modalBtnSecondaryNight:hover {
+  background: rgba(245, 197, 66, 0.14);
+}
+
+/* OK (danger) button */
+.modalBtnDangerDay {
+  background: #fee2e2;
+  color: #b91c1c;
+  border-color: #fecaca;
+}
+
+.modalBtnDangerDay:hover {
+  background: #fecaca;
+}
+
+.modalBtnDangerNight {
+  background: #7f1d1d;
+  color: #fef2f2;
+  border-color: #b91c1c;
+}
+
+.modalBtnDangerNight:hover {
+  background: #b91c1c;
+}
+
+/* Preview modal layout */
+.previewLayout {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.previewImageBox {
+  border-radius: 14px;
+  overflow: hidden;
+  background: radial-gradient(circle at 30% 30%, rgba(15, 23, 42, 0.12), rgba(15, 23, 42, 0.4));
+  padding: 8px;
+}
+
+.previewImage {
+  width: 100%;
+  height: auto;
+  display: block;
+  max-height: 70vh;
+  object-fit: contain;
+  border-radius: 10px;
+  background: #0b1531;
+}
+
+.previewInfo {
+  display: grid;
+  gap: 6px;
+  font-size: 14px;
+  line-height: 1.5;
+  background: rgba(15, 23, 42, 0.04);
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
+.previewInfo b {
+  color: #0b1531;
+}
+
+.modalCardNight .previewInfo {
+  background: rgba(245, 197, 66, 0.08);
+}
+
+.modalCardNight .previewInfo b {
+  color: #f5c542;
+}
+
+@media (max-width: 1024px) {
   .modalCard {
-    width: min(520px, 92vw);
-    max-height: 92vh;
-    border-radius: 18px;
-    overflow: hidden;
-    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.32);
-    border: 1px solid rgba(15, 23, 42, 0.22);
-  }
-
-  .modalCardDay {
-    background: linear-gradient(150deg, #ffffff 0%, #f8fafc 100%);
-    color: #0b1531;
-  }
-
-  .modalCardNight {
-    background: linear-gradient(150deg, #0f172a 0%, #020617 100%);
-    color: #f5c542;
-    border-color: rgba(245, 197, 66, 0.35);
-  }
-
-  .modalHeader {
-    padding: 16px 16px 8px;
-    font-size: 16px;
-    font-weight: 700;
-  }
-
-  .modalBody {
-    padding: 0 16px 14px;
-    font-size: 13px;
-    line-height: 1.45;
-    opacity: 0.95;
-    white-space: pre-line;
-    /* biar \n kebaca */
-  }
-
-  .modalActions {
-    display: flex;
-    gap: 10px;
-    padding: 12px 16px 16px;
-    justify-content: flex-end;
-  }
-
-  .modalBtn {
-    border-radius: 999px;
-    padding: 8px 14px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    border: 1px solid transparent;
-    transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease,
-      transform 0.08s ease;
-  }
-
-  .modalBtn:active {
-    transform: translateY(1px);
-  }
-
-  .modalBtnDisabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none !important;
-  }
-
-  /* Cancel button */
-  .modalBtnSecondaryDay {
-    background: #f3f4f6;
-    color: #0b1531;
-    border-color: #e5e7eb;
-  }
-
-  .modalBtnSecondaryDay:hover {
-    background: #e5e7eb;
-  }
-
-  .modalBtnSecondaryNight {
-    background: rgba(245, 197, 66, 0.08);
-    color: #f5c542;
-    border-color: rgba(245, 197, 66, 0.35);
-  }
-
-  .modalBtnSecondaryNight:hover {
-    background: rgba(245, 197, 66, 0.14);
-  }
-
-  /* OK (danger) button */
-  .modalBtnDangerDay {
-    background: #fee2e2;
-    color: #b91c1c;
-    border-color: #fecaca;
-  }
-
-  .modalBtnDangerDay:hover {
-    background: #fecaca;
-  }
-
-  .modalBtnDangerNight {
-    background: #7f1d1d;
-    color: #fef2f2;
-    border-color: #b91c1c;
-  }
-
-  .modalBtnDangerNight:hover {
-    background: #b91c1c;
-  }
-
-  /* Preview modal layout */
-  .previewLayout {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .previewImageBox {
-    border-radius: 14px;
-    overflow: hidden;
-    background: radial-gradient(circle at 30% 30%, rgba(15, 23, 42, 0.12), rgba(15, 23, 42, 0.4));
-    padding: 8px;
+    width: min(640px, 94vw);
+    max-height: 90vh;
   }
 
   .previewImage {
-    width: 100%;
-    height: auto;
-    display: block;
-    max-height: 70vh;
-    object-fit: contain;
-    border-radius: 10px;
-    background: #0b1531;
+    max-height: 60vh;
+  }
+}
+
+@media (max-width: 640px) {
+  .modalCard {
+    width: 94vw;
+    max-height: 88vh;
+  }
+
+  .previewImage {
+    max-height: 52vh;
   }
 
   .previewInfo {
-    display: grid;
-    gap: 6px;
-    font-size: 14px;
-    line-height: 1.5;
-    background: rgba(15, 23, 42, 0.04);
-    border-radius: 12px;
-    padding: 10px 12px;
+    font-size: 13px;
   }
-
-  .previewInfo b {
-    color: #0b1531;
-  }
-
-  .modalCardNight .previewInfo {
-    background: rgba(245, 197, 66, 0.08);
-  }
-
-  .modalCardNight .previewInfo b {
-    color: #f5c542;
-  }
-
-  @media (max-width: 1024px) {
-    .modalCard {
-      width: min(640px, 94vw);
-      max-height: 90vh;
-    }
-
-    .previewImage {
-      max-height: 60vh;
-    }
-  }
-
-  @media (max-width: 640px) {
-    .modalCard {
-      width: 94vw;
-      max-height: 88vh;
-    }
-
-    .previewImage {
-      max-height: 52vh;
-    }
-
-    .previewInfo {
-      font-size: 13px;
-    }
-  }
+}
