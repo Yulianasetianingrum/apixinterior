@@ -467,30 +467,41 @@
 }
 
 .previewImageBox {
-  border-radius: 14px;
+  border-radius: 12px;
   overflow: hidden;
-  background: radial-gradient(circle at 30% 30%, rgba(15, 23, 42, 0.12), rgba(15, 23, 42, 0.4));
-  padding: 8px;
+  background: rgba(0, 0, 0, 0.03);
+  /* subtle gray */
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
 }
 
 .previewImage {
-  width: 100%;
+  width: auto;
   height: auto;
-  display: block;
-  max-height: 70vh;
+  max-width: 100%;
+  max-height: 65vh;
   object-fit: contain;
-  border-radius: 10px;
-  background: #0b1531;
+  border-radius: 4px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.modalCardNight .previewImageBox {
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .previewInfo {
   display: grid;
-  gap: 6px;
-  font-size: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  font-size: 13px;
   line-height: 1.5;
-  background: rgba(15, 23, 42, 0.04);
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
   border-radius: 12px;
-  padding: 10px 12px;
+  padding: 16px;
 }
 
 .previewInfo b {
