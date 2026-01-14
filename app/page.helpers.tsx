@@ -607,12 +607,30 @@ export function heroThemeClassFromConfig(heroThemeRaw: string, navbarThemeRaw: s
     const resolved = heroTheme === "FOLLOW_NAVBAR" || !heroTheme ? navbarTheme : heroTheme;
 
     switch (resolved) {
-        case "WHITE_GOLD": return styles.heroThemeWhiteGold;
-        case "NAVY_WHITE": return styles.heroThemeNavyWhite;
-        case "WHITE_NAVY": return styles.heroThemeWhiteNavy;
-        case "GOLD_NAVY": return styles.heroThemeGoldNavy;
-        case "GOLD_WHITE": return styles.heroThemeGoldWhite;
-        case "NAVY_GOLD": default: return styles.heroThemeNavyGold;
+        case "WHITE_GOLD":
+        case "theme_2":
+            return styles.heroThemeWhiteGold;
+        case "NAVY_WHITE":
+        case "theme_3":
+            return styles.heroThemeNavyWhite;
+        case "WHITE_NAVY":
+        case "WHITE":
+        case "LIGHT":
+        case "theme_6":
+            return styles.heroThemeWhiteNavy;
+        case "GOLD_NAVY":
+        case "GOLD":
+        case "theme_4":
+            return styles.heroThemeGoldNavy;
+        case "GOLD_WHITE":
+        case "theme_5":
+            return styles.heroThemeGoldWhite;
+        case "NAVY_GOLD":
+        case "NAVY":
+        case "DARK":
+        case "theme_1":
+        default:
+            return styles.heroThemeNavyGold;
     }
 }
 
