@@ -127,8 +127,8 @@ export default async function SearchPage({ searchParams }: Props) {
                 {products.length > 0 && (
                     <div style={{
                         display: "grid",
-                        gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-                        gap: "24px"
+                        gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
+                        gap: "16px"
                     }}>
                         {products.map((product: any, index: number) => (
                             <ProductCard key={product.id} product={product} index={index} />

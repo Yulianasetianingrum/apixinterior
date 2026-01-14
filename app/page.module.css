@@ -946,17 +946,17 @@
 :global(.theme-theme-2) .pcCard,
 :global(.theme-white_gold) .pcCard,
 :global(.theme-white-gold) .pcCard {
-  --t-card: #ffffff !important;
+  --t-card: #ffffff;
   --t-card-border: rgba(11, 29, 58, 0.08);
-  --t-text: #d4af37;
-  --t-sub: rgba(212, 175, 55, 0.85);
+  --t-text: #0b1d3a;
+  --t-sub: rgba(11, 29, 58, 0.85);
   --t-cta-bg: #d4af37;
   --t-cta-fg: #0b1d3a;
   --t-cta-hover-bg: #0b1d3a;
   --t-cta-hover-fg: #d4af37;
   --t-cta-border: rgba(212, 175, 55, 0.55);
-  background: var(--t-card) !important;
-  color: var(--t-text) !important;
+  background: var(--t-card);
+  color: var(--t-text);
 }
 
 .previewSectionTheme[data-theme="theme_3"],
@@ -4211,5 +4211,20 @@ article[data-hc-nohero="1"] .hcCta {
   .footerMenuContactGrid {
     grid-template-columns: 1fr;
     gap: 30px;
+  }
+}
+
+/* Added for Product Listing Grid responsiveness */
+.productListingGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 20px;
+  width: 100%;
+}
+
+@media (max-width: 640px) {
+  .productListingGrid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
   }
 }

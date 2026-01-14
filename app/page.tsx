@@ -660,7 +660,9 @@ export default async function HomePage({
 
             const hasHeadline = hasText(cfg.headline);
             const hasSubheadline = hasText(cfg.subheadline);
-            const hasEyebrow = hasText(cfg.eyebrow);
+            // Hide eyebrow if it looks like a generic theme name (e.g. "Theme 1", "THEME_1")
+            const isGenericEyebrow = /^(theme[\s_-]*\d+|untitled|draft)/i.test(cfg.eyebrow || "");
+            const hasEyebrow = hasText(cfg.eyebrow) && !isGenericEyebrow;
             const hasFloat1 = hasText(cfg.floatLookbookTitle) || hasText(cfg.floatLookbookSubtitle);
             const hasFloat2 = hasText(cfg.floatPromoTitle) || hasText(cfg.floatPromoText);
 
@@ -966,7 +968,8 @@ export default async function HomePage({
                   // console.log(`DEBUG_VOUCHER_CAT: CatID=${catId}, Found=${!!k}, Slug=${k?.slug}`);
 
                   if (k && k.slug) {
-                    href = `/promo?kategori=${k.slug}`;
+                    // Redirect to search/product page instead of /promo
+                    href = `/cari?kategori=${k.slug}`;
                   } else if (Number.isFinite(catId) && catId > 0) {
                     const fallbackPath = `/cari?kategori=${catId}`;
                     href = fallbackPath;

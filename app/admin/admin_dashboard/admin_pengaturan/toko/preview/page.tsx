@@ -1051,6 +1051,12 @@ export default async function TokoPreviewDraftPage({
                   }
 
                   if (!eyebrow) eyebrow = "";
+
+                  // Hide eyebrow if it looks like a generic theme name
+                  if (/^(theme[\s_-]*\d+|untitled|draft)/i.test(eyebrow)) {
+                    eyebrow = "";
+                  }
+
                   if (!headline) headline = "";
                   if (!subheadline) subheadline = "";
 

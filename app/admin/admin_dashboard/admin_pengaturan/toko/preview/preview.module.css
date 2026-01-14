@@ -4062,3 +4062,18 @@ article[data-hc-nohero="1"] .hcCta {
     gap: 30px;
   }
 }
+
+/* Added for Product Listing Grid responsiveness */
+.productListingGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 20px;
+  width: 100%;
+}
+
+@media (max-width: 640px) {
+  .productListingGrid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+  }
+}
