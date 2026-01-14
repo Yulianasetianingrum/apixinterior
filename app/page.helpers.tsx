@@ -91,7 +91,8 @@ export function getHeroThemeTokens(theme: string) {
             return { bg: navy, element: gold, card: navy, cardFg: gold, cardBorder: "rgba(255,255,255,0.22)", ctaBg: gold, ctaFg: navy, ctaHoverBg: navy, ctaHoverFg: gold, divider: "rgba(255,255,255,0.16)" };
         case "WHITE_GOLD":
         case "theme_2":
-            return { bg: white, element: gold, card: white, cardFg: gold, cardBorder: "rgba(11,29,58,0.12)", ctaBg: gold, ctaFg: navy, ctaHoverBg: navy, ctaHoverFg: gold, divider: "rgba(2,6,23,0.08)" };
+            // IMPROVED CONTRAST: Use Navy text on White card instead of Gold text
+            return { bg: white, element: gold, card: white, cardFg: navy, cardBorder: "rgba(11,29,58,0.12)", ctaBg: gold, ctaFg: navy, ctaHoverBg: navy, ctaHoverFg: gold, divider: "rgba(2,6,23,0.08)" };
         case "NAVY_WHITE":
         case "theme_3":
             return { bg: navy, element: white, card: navy, cardFg: white, cardBorder: "rgba(255,255,255,0.22)", ctaBg: white, ctaFg: navy, ctaHoverBg: navy, ctaHoverFg: white, divider: "rgba(255,255,255,0.16)" };
