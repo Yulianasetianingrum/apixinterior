@@ -34,19 +34,33 @@ export async function POST(req: Request) {
     const categoryName = formData.get('category') as string | null;
     const subcategoryName = formData.get('subcategory') as string | null;
 
-    // ========= SIMPAN FILE KE /public/uploads =========
-    const buffer = Buffer.from(await file.arrayBuffer());
+    // ========= OPTIMASI GAMBAR (SHARP) =========
+    // 1. Convert to Buffer
+    const originalBuffer = Buffer.from(await file.arrayBuffer());
+
+    // 2. Prepare sharp pipeline
+    const sharp = require('sharp');
+    let sharpInstance = sharp(originalBuffer)
+      .resize({ width: 1920, withoutEnlargement: true }) // Max HD width
+      .webp({ quality: 65, effort: 6 }); // WebP quality 65 (usually enough for <70kb)
+
+    // 3. Process
+    const processedBuffer = await sharpInstance.toBuffer();
+
     const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
     await fs.mkdir(uploadsDir, { recursive: true });
 
+    // 4. Filename .webp
     const originalName = file.name || 'upload';
     const safeName = originalName
       .replace(/\s+/g, '-')
       .replace(/[^a-zA-Z0-9.\-]/g, '');
-    const fileName = `${Date.now()}-${safeName || 'file'}`;
+    // remove existing ext, add .webp
+    const baseName = safeName.substring(0, safeName.lastIndexOf('.')) || safeName;
+    const fileName = `${Date.now()}-${baseName}.webp`;
 
     const filePath = path.join(uploadsDir, fileName);
-    await fs.writeFile(filePath, buffer);
+    await fs.writeFile(filePath, processedBuffer);
 
     // URL yang bisa diakses visitor
     const url = `/uploads/${fileName}`;
@@ -59,9 +73,9 @@ export async function POST(req: Request) {
 
     const tagList = tagsRaw
       ? tagsRaw
-          .split(',')
-          .map((t) => t.trim())
-          .filter(Boolean)
+        .split(',')
+        .map((t) => t.trim())
+        .filter(Boolean)
       : [];
 
     // ========= CATEGORY / SUBCATEGORY HANDLING =========
