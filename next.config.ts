@@ -21,7 +21,6 @@ const nextConfig: NextConfig = {
   },
   // Enable compression
   compress: true,
-  output: 'standalone',
 };
 
 export default nextConfig;
