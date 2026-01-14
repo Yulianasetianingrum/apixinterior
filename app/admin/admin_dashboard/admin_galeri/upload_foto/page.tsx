@@ -283,7 +283,7 @@ export default function UploadFotoPage() {
                         backgroundColor: '#e2e8f0',
                         border: 'none',
                         borderRadius: '4px',
-                        color: '#475569'
+                        color: '#475569',
                         fontWeight: 600
                       }}
                       title="Isi judul otomatis sesuai nama file"
