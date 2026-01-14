@@ -32,6 +32,24 @@ export default function UploadFotoPage() {
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
 
+  const [title, setTitle] = useState('');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  function handleAutoGenerate() {
+    if (!selectedFile) {
+      alert("Silakan pilih file gambar terlebih dahulu.");
+      return;
+    }
+    // Remove extension
+    let name = selectedFile.name.replace(/\.[^/.]+$/, "");
+    // Replace separators with spaces
+    name = name.replace(/[-_]/g, " ");
+    // Capitalize first letter of each word
+    name = name.replace(/\b\w/g, (l) => l.toUpperCase());
+
+    setTitle(name);
+  }
+
   useEffect(() => {
     // TODO: kalau nanti ada API kategori/subkategori, isi disini
   }, []);
@@ -75,6 +93,7 @@ export default function UploadFotoPage() {
     formData.set('category', categoryInput);
     formData.set('subcategory', subcategoryInput);
     formData.set('tags', tags.join(', '));
+    formData.set('title', title); // Ensure title is sent
 
     const res = await fetch(
       '/api/admin/admin_dashboard/admin_galeri/upload_foto',
@@ -114,9 +133,8 @@ export default function UploadFotoPage() {
         {/* kosong supaya tidak double judul */}
         <div className={layoutStyles.mobileTitle}></div>
         <div
-          className={`${styles.topRightBrand} ${
-            darkMode ? styles.topRightBrandNight : ''
-          }`}
+          className={`${styles.topRightBrand} ${darkMode ? styles.topRightBrandNight : ''
+            }`}
         >
           APIX INTERIOR
         </div>
@@ -132,9 +150,8 @@ export default function UploadFotoPage() {
 
       {/* SIDEBAR */}
       <aside
-        className={`${layoutStyles.sidebar} ${
-          sidebarOpen ? layoutStyles.sidebarOpen : ''
-        }`}
+        className={`${layoutStyles.sidebar} ${sidebarOpen ? layoutStyles.sidebarOpen : ''
+          }`}
       >
         <div className={layoutStyles.sidebarHeader}>
           <div className={layoutStyles.brand}>
@@ -186,9 +203,8 @@ export default function UploadFotoPage() {
           </span>
           <button
             type="button"
-            className={`${layoutStyles.themeSwitch} ${
-              darkMode ? layoutStyles.themeSwitchOn : ''
-            }`}
+            className={`${layoutStyles.themeSwitch} ${darkMode ? layoutStyles.themeSwitchOn : ''
+              }`}
             onClick={() => setDarkMode((prev) => !prev)}
           >
             <div className={layoutStyles.themeThumb} />
@@ -211,16 +227,14 @@ export default function UploadFotoPage() {
 
       {/* MAIN CONTENT */}
       <main
-        className={`${layoutStyles.main} ${
-          darkMode ? styles.mainNight : styles.mainDay
-        }`}
+        className={`${layoutStyles.main} ${darkMode ? styles.mainNight : styles.mainDay
+          }`}
       >
         {/* Brand kanan atas desktop */}
         <div className={styles.desktopTopBar}>
           <span
-            className={`${styles.desktopBrand} ${
-              darkMode ? styles.desktopBrandNight : ''
-            }`}
+            className={`${styles.desktopBrand} ${darkMode ? styles.desktopBrandNight : ''
+              }`}
           >
             APIX INTERIOR
           </span>
@@ -241,32 +255,50 @@ export default function UploadFotoPage() {
 
         {/* AREA CARD – BEDAKAN BACKGROUND DAY/NIGHT */}
         <div
-          className={`${styles.cardArea} ${
-            darkMode ? styles.cardAreaNight : styles.cardAreaDay
-          }`}
+          className={`${styles.cardArea} ${darkMode ? styles.cardAreaNight : styles.cardAreaDay
+            }`}
         >
           <div className={styles.cardWrapper}>
             <div
-              className={`${layoutStyles.card} ${styles.card} ${
-                darkMode ? styles.cardNight : styles.cardDay
-              } ${styles.noCardHover}`}
+              className={`${layoutStyles.card} ${styles.card} ${darkMode ? styles.cardNight : styles.cardDay
+                } ${styles.noCardHover}`}
             >
               <form
                 onSubmit={handleSubmit}
-                className={`${styles.form} ${
-                  darkMode ? styles.formNight : styles.formDay
-                }`}
+                className={`${styles.form} ${darkMode ? styles.formNight : styles.formDay
+                  }`}
               >
                 <div className={styles.field}>
-                  <label className={styles.label}>
-                    Judul (opsional)
-                    <input
-                      type="text"
-                      name="title"
-                      className={styles.input}
-                      placeholder="Contoh: Kitchen set minimalis klien Surabaya"
-                    />
-                  </label>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                    <label className={styles.label} style={{ marginBottom: 0 }}>
+                      Judul (opsional)
+                    </label>
+                    <button
+                      type="button"
+                      onClick={handleAutoGenerate}
+                      style={{
+                        fontSize: '12px',
+                        padding: '4px 8px',
+                        cursor: 'pointer',
+                        backgroundColor: '#e2e8f0',
+                        border: 'none',
+                        borderRadius: '4px',
+                        color: '#475569'
+                        fontWeight: 600
+                      }}
+                      title="Isi judul otomatis sesuai nama file"
+                    >
+                      ✨ Auto Generate
+                    </button>
+                  </div>
+                  <input
+                    type="text"
+                    name="title"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    className={styles.input}
+                    placeholder="Contoh: Kitchen set minimalis klien Surabaya"
+                  />
                 </div>
 
                 <div className={styles.field}>
@@ -278,6 +310,11 @@ export default function UploadFotoPage() {
                       accept="image/*"
                       required
                       className={styles.inputFile}
+                      onChange={(e) => {
+                        if (e.target.files && e.target.files[0]) {
+                          setSelectedFile(e.target.files[0]);
+                        }
+                      }}
                     />
                   </label>
                 </div>
@@ -356,9 +393,8 @@ export default function UploadFotoPage() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className={`${styles.submitBtn} ${
-                      darkMode ? styles.submitBtnDark : styles.submitBtnLight
-                    }`}
+                    className={`${styles.submitBtn} ${darkMode ? styles.submitBtnDark : styles.submitBtnLight
+                      }`}
                   >
                     {loading ? 'Mengupload...' : 'Upload'}
                   </button>
