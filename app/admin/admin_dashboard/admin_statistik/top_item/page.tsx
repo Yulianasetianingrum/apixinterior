@@ -31,9 +31,21 @@ export default function TopItemEnhancedPage() {
     const [dateFilter, setDateFilter] = useState<DateFilter>("all");
 
     useEffect(() => {
-        // Data akan muncul setelah deploy dan implement tracking
-        setTopItems([]);
-        setLoading(false);
+        setLoading(true);
+        fetch(`/api/admin/admin_dashboard/admin_statistik/top_item?filter=${dateFilter}`)
+            .then(res => res.json())
+            .then(data => {
+                if (Array.isArray(data)) {
+                    setTopItems(data);
+                } else {
+                    console.error("Invalid data format", data);
+                    setTopItems([]);
+                }
+            })
+            .catch(err => {
+                console.error("Failed to fetch top items:", err);
+            })
+            .finally(() => setLoading(false));
     }, [dateFilter]);
 
     const goHome = () => {
