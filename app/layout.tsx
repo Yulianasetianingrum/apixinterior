@@ -13,25 +13,18 @@ const inter = {
 
 export const metadata: Metadata = {
   title: {
-    default: "Apix Interior - Furniture, Mebel, & Desain Interior Terbaik",
-    template: "%s | Apix Interior"
+    default: "Apix Interior - Jasa Interior, Furniture, Mebel & Dekorasi Rumah Terbaik",
+    template: "%s | Apix Interior - Ahlinya Mebel & Dekorasi"
   },
   description: "Apix Interior menyediakan furniture berkualitas, mebel custom, dan jasa desain interior profesional untuk rumah, kantor, hotel, dan bangunan komersial. Melayani area Jabodetabek dengan harga terjangkau dan kualitas terbaik.",
   keywords: [
-    // Primary keywords (High Priority)
-    "interior", "mebel", "furniture", "dekorasi ruang", "desain rumah", "tukang",
+    // Priority Keywords (User Request)
+    "interior", "furniture", "mebel", "dekorasi rumah", "tukang", "tukang furniture",
+    "jasa interior", "jasa mebel", "jasa tukang", "dekorasi rumah mewah",
     // Secondary & Long-tail
-    "furniture kantor", "furniture rumah", "mebel minimalis", "mebel modern",
-    "kitchen set", "lemari custom", "lemari pakaian", "meja kantor", "kursi kantor",
-    "sofa", "tempat tidur", "rak buku", "meja makan", "lemari dapur",
-    // Services
-    "jasa interior", "jasa desain interior", "interior design jakarta",
-    "renovasi interior", "desain interior rumah", "desain interior kantor",
-    "jasa tukang furniture", "pembuatan furniture custom",
-    // Location-based
-    "furniture jakarta", "mebel jakarta", "interior jakarta", "furniture jabodetabek",
-    // Brand
-    "apix interior", "apix furniture", "apix mebel"
+    "furniture jakarta", "mebel jakarta", "furniture custom", "kitchen set custom",
+    "lemari custom", "meja makan", "sofa minimalis", "design interior",
+    "kontraktor interior", "tukang kayu profesional", "apix interior", "apix furniture"
   ],
   authors: [{ name: "Apix Interior", url: "https://apixinterior.com" }],
   creator: "Apix Interior",
