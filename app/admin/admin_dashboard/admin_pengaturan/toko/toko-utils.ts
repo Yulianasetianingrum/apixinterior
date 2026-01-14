@@ -494,6 +494,49 @@ export async function validateExistence(args: {
     }
 }
 
+export async function sanitizeExistence(args: {
+    productIds?: number[];
+    kategoriIds?: number[];
+    imageIds?: number[];
+    branchIds?: number[];
+    hubungiIds?: number[];
+    mediaIconKeys?: string[];
+}) {
+    const out = { ...args };
+
+    if (args.productIds?.length) {
+        const found = await prisma.produk.findMany({ where: { id: { in: args.productIds } }, select: { id: true } });
+        const validSet = new Set(found.map((x) => x.id));
+        out.productIds = args.productIds.filter((id) => validSet.has(id));
+    }
+    if (args.kategoriIds?.length) {
+        const found = await prisma.kategoriProduk.findMany({ where: { id: { in: args.kategoriIds } }, select: { id: true } });
+        const validSet = new Set(found.map((x) => x.id));
+        out.kategoriIds = args.kategoriIds.filter((id) => validSet.has(id));
+    }
+    if (args.imageIds?.length) {
+        const found = await prisma.gambarUpload.findMany({ where: { id: { in: args.imageIds } }, select: { id: true } });
+        const validSet = new Set(found.map((x) => x.id));
+        out.imageIds = args.imageIds.filter((id) => validSet.has(id));
+    }
+    if (args.branchIds?.length) {
+        const found = await prisma.cabangToko.findMany({ where: { id: { in: args.branchIds } }, select: { id: true } });
+        const validSet = new Set(found.map((x) => x.id));
+        out.branchIds = args.branchIds.filter((id) => validSet.has(id));
+    }
+    if (args.hubungiIds?.length) {
+        const found = await prisma.hubungi.findMany({ where: { id: { in: args.hubungiIds } }, select: { id: true } });
+        const validSet = new Set(found.map((x) => x.id));
+        out.hubungiIds = args.hubungiIds.filter((id) => validSet.has(id));
+    }
+    if (args.mediaIconKeys?.length) {
+        const found = await prisma.mediaSosial.findMany({ where: { iconKey: { in: args.mediaIconKeys } }, select: { iconKey: true } });
+        const validSet = new Set(found.map((x) => x.iconKey));
+        out.mediaIconKeys = args.mediaIconKeys.filter((k) => validSet.has(k));
+    }
+    return out;
+}
+
 export function legacyToNewConfig(type: string, cfg: any) {
     if (!isObject(cfg)) return cfg;
 

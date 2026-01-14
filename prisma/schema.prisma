@@ -661,3 +661,20 @@ model PageView {
   @@index([createdAt])
   @@map("page_views")
 }
+
+//
+// ============ PROMO PAGE CONFIG ============
+//
+
+model PromoPageConfig {
+  id             Int      @id @default(1)
+  heroTitle      String   @default("Luxury Flash Sale")
+  heroSubtitle   String?  @db.Text
+  flashSaleEnd   DateTime?
+  vouchers       Json?    @default("[]") // Array of { code, value, label, min }
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("promo_page_config")
+}

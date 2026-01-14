@@ -404,6 +404,14 @@ async function fetchPreviewTheme(themeKey: string) {
         const n = Number(id);
         if (Number.isFinite(n) && n > 0) imageIds.push(n);
       }
+      if (cfg.voucherLinks) {
+        Object.values(cfg.voucherLinks).forEach((val: any) => {
+          if (typeof val === "string" && val.startsWith("category:")) {
+            const cid = Number(val.split(":")[1]);
+            if (Number.isFinite(cid) && cid > 0) kategoriIds.push(cid);
+          }
+        });
+      }
     }
 
     if (s.type === "FOOTER") {
@@ -1873,7 +1881,12 @@ export default async function TokoPreviewDraftPage({
                       if (typeof raw === "string") {
                         if (raw.startsWith("category:")) {
                           const catId = Number(raw.split(":")[1]);
-                          if (Number.isFinite(catId) && catId > 0) href = `/cari?kategori=${catId}`;
+                          const k = kategoriMap.get(catId);
+                          if (k && k.slug) {
+                            href = `/promo?kategori=${k.slug}`;
+                          } else if (Number.isFinite(catId) && catId > 0) {
+                            href = `/cari?kategori=${catId}`;
+                          }
                         } else {
                           href = raw.trim();
                         }

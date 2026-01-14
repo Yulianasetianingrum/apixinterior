@@ -17,20 +17,18 @@ export const metadata: Metadata = {
   },
   description: "Apix Interior menyediakan furniture berkualitas, mebel custom, dan jasa desain interior profesional untuk rumah, kantor, hotel, dan bangunan komersial. Melayani area Jabodetabek dengan harga terjangkau dan kualitas terbaik.",
   keywords: [
-    // Primary keywords
-    "furniture", "mebel", "furnitur", "interior design", "desain interior",
-    // Product categories
+    // Primary keywords (High Priority)
+    "interior", "mebel", "furniture", "dekorasi ruang", "desain rumah", "tukang",
+    // Secondary & Long-tail
     "furniture kantor", "furniture rumah", "mebel minimalis", "mebel modern",
     "kitchen set", "lemari custom", "lemari pakaian", "meja kantor", "kursi kantor",
     "sofa", "tempat tidur", "rak buku", "meja makan", "lemari dapur",
     // Services
     "jasa interior", "jasa desain interior", "interior design jakarta",
     "renovasi interior", "desain interior rumah", "desain interior kantor",
+    "jasa tukang furniture", "pembuatan furniture custom",
     // Location-based
     "furniture jakarta", "mebel jakarta", "interior jakarta", "furniture jabodetabek",
-    // Long-tail
-    "furniture kantor minimalis", "mebel rumah modern", "desain interior minimalis",
-    "kitchen set custom", "lemari sliding", "furniture custom jakarta",
     // Brand
     "apix interior", "apix furniture", "apix mebel"
   ],

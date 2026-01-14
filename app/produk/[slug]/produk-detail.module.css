@@ -222,7 +222,7 @@
   /* Slightly wider */
   margin: 0 auto;
   /* Center the text block */
-  text-align: left;
+  text-align: justify;
   /* Keep text readable */
   overflow-wrap: break-word;
 }

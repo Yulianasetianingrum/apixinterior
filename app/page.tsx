@@ -154,6 +154,14 @@ async function fetchThemeData(themeKey: string, isPublished: boolean) {
     if (s.type === "CUSTOM_PROMO") {
       const cfg = s.config as any;
       if (Array.isArray(cfg.voucherImageIds)) cfg.voucherImageIds.forEach((id: any) => imageIds.push(Number(id)));
+      if (cfg.voucherLinks) {
+        Object.values(cfg.voucherLinks).forEach((val: any) => {
+          if (typeof val === "string" && val.startsWith("category:")) {
+            const cid = Number(val.split(":")[1]);
+            if (Number.isFinite(cid) && cid > 0) kategoriIds.push(cid);
+          }
+        });
+      }
     }
     if (s.type === "ROOM_CATEGORY") {
       const cfg = s.config as any;
@@ -899,7 +907,20 @@ export default async function HomePage({
               <div key={section.id} style={{ position: "fixed", right: 18, bottom: 18, zIndex: 60, display: "flex", flexDirection: "column", gap: 10 }}>
                 {items.map(({ k, row }: any) => {
                   const url = normalizeExternalUrl(row?.url);
-                  return <a key={k} href={url} target="_blank" rel="noopener noreferrer" style={{ width: 46, height: 46, borderRadius: 999, display: "grid", placeItems: "center", textDecoration: "none", background: btnBg, border: "1px solid rgba(255,255,255,0.2)", boxShadow: "0 12px 28px rgba(0,0,0,0.35)", backdropFilter: "blur(10px)" }}><span style={{ display: "grid", placeItems: "center", color: iconColor }}><SocialIcon iconKey={String(row?.iconKey ?? k)} /></span></a>
+                  return (
+                    <a
+                      key={k}
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`Kunjungi ${row?.nama || k}`}
+                      style={{ width: 46, height: 46, borderRadius: 999, display: "grid", placeItems: "center", textDecoration: "none", background: btnBg, border: "1px solid rgba(255,255,255,0.2)", boxShadow: "0 12px 28px rgba(0,0,0,0.35)", backdropFilter: "blur(10px)" }}
+                    >
+                      <span style={{ display: "grid", placeItems: "center", color: iconColor }}>
+                        <SocialIcon iconKey={String(row?.iconKey ?? k)} />
+                      </span>
+                    </a>
+                  )
                 })}
               </div>
             );
@@ -919,14 +940,28 @@ export default async function HomePage({
 
               let href = "";
               const rawLink = voucherLinks[nId];
+
+              // DEBUG: Trace link generation
+              // console.log(`DEBUG_VOUCHER: ID=${nId}, RawLink=${rawLink}`);
+
               if (typeof rawLink === "string") {
                 if (rawLink.startsWith("category:")) {
                   const catId = Number(rawLink.split(":")[1]);
-                  if (Number.isFinite(catId) && catId > 0) href = `/cari?kategori=${catId}`;
+                  const k = kategoriMap.get(catId);
+
+                  // console.log(`DEBUG_VOUCHER_CAT: CatID=${catId}, Found=${!!k}, Slug=${k?.slug}`);
+
+                  if (k && k.slug) {
+                    href = `/promo?kategori=${k.slug}`;
+                  } else if (Number.isFinite(catId) && catId > 0) {
+                    const fallbackPath = `/cari?kategori=${catId}`;
+                    href = fallbackPath;
+                  }
                 } else {
                   href = rawLink.trim();
                 }
               }
+              // console.log(`DEBUG_VOUCHER_FINAL: Href=${href}`);
               return { id: nId, url, href };
             }).filter(Boolean);
 

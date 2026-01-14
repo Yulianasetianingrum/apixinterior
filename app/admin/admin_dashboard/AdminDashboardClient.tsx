@@ -315,6 +315,19 @@ export default function AdminDashboardClient() {
                   Atur Toko
                 </button>
               </li>
+              {/* MENU PROMO PAGE */}
+              <li>
+                <button
+                  className={styles.cardLink}
+                  onClick={() =>
+                    goToSubPage(
+                      "/admin/admin_dashboard/admin_pengaturan/promo"
+                    )
+                  }
+                >
+                  Pengaturan Promo
+                </button>
+              </li>
               <li>
                 <button
                   className={styles.cardLink}

@@ -46,6 +46,7 @@ import {
     pickBestImage,
     THEME_META_SLUG_PREFIX,
     SECTION_DEFS,
+    sanitizeExistence,
 } from "./toko-utils";
 import { SectionTypeId, ThemeKey } from "./types";
 
@@ -187,11 +188,8 @@ export async function saveHeroConfig(formData: FormData) {
 
     const finalImageId = clearHero ? null : (incomingImageId ?? existingImageId);
 
-    try {
-        await validateExistence({ imageIds: finalImageId ? [finalImageId] : [] });
-    } catch (e: any) {
-        return redirectBack({ error: encodeURIComponent(e?.message ?? "Validasi gagal.") });
-    }
+    const { imageIds: validImageIds } = await sanitizeExistence({ imageIds: finalImageId ? [finalImageId] : [] });
+    const validatedImageId = validImageIds && validImageIds.length > 0 ? validImageIds[0] : null;
 
     const heroContent = {
         eyebrow,
@@ -212,8 +210,8 @@ export async function saveHeroConfig(formData: FormData) {
         subheadline,
         ctaLabel,
         ctaHref,
-        imageId: finalImageId,
-        heroImageId: finalImageId,
+        imageId: validatedImageId,
+        heroImageId: validatedImageId,
         badges,
         highlights,
         trustChips,
@@ -295,12 +293,10 @@ export async function saveProductListingConfig(formData: FormData) {
     const clearProducts = ((formData.get("clearProducts") as string | null) ?? "").trim() === "1";
     const productIds = clearProducts ? [] : parseNumArray((formData.getAll("productIds") as string[]) ?? []);
 
+    let validProductIds: number[] = [];
     if (productIds.length > 0) {
-        try {
-            await validateExistence({ productIds });
-        } catch (e: any) {
-            return redirectBack({ error: encodeURIComponent(e?.message ?? "Validasi gagal."), anchor, sectionId: id });
-        }
+        const sanitized = await sanitizeExistence({ productIds });
+        validProductIds = sanitized.productIds ?? [];
     }
 
     const sectionBgTheme = parseCustomPromoBgTheme(formData.get("sectionBgTheme") as string | null);
@@ -309,7 +305,7 @@ export async function saveProductListingConfig(formData: FormData) {
         sectionTheme: sectionThemeValue,
         sectionBgTheme,
         title: titleRaw,
-        productIds,
+        productIds: validProductIds,
     }, { title: titleRaw, slug });
 
     revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko");
@@ -331,20 +327,50 @@ export async function saveCustomPromoConfig(formData: FormData) {
 
     const voucherImageIds = parseNumArray(formData.getAll("voucherImageIds") as string[]);
     const voucherLinks: Record<number, string> = {};
+
+    // DEBUG: Print all form keys to see what's coming in
+    const debugKeys: string[] = [];
+    formData.forEach((_, k) => debugKeys.push(k));
+    console.log("DEBUG_TOK0_ACTIONS: Incoming Form Keys:", debugKeys);
+
     for (const vid of voucherImageIds) {
-        const link = (formData.get(`link_${vid}`) as string | null)?.trim() ?? "";
-        if (link) voucherLinks[vid] = link;
+        // Parse mode and fields from VoucherLinkEditor
+        const modeKey = `voucherLinkMode_${vid}`;
+        const catKey = `voucherCategory_${vid}`;
+        const manualKey = `voucherLink_${vid}`;
+
+        const mode = (formData.get(modeKey) as string | null)?.trim();
+        const catIdRaw = formData.get(catKey);
+        const manualLinkRaw = formData.get(manualKey);
+
+        console.log(`DEBUG_TOK0_ACTIONS: Processing VID=${vid}, Mode=${mode}`, { catIdRaw, manualLinkRaw });
+
+        if (mode === "category") {
+            const catId = (catIdRaw as string | null)?.trim();
+            if (catId) {
+                voucherLinks[vid] = `category:${catId}`;
+                console.log(`DEBUG_TOK0_ACTIONS: Set VID=${vid} to Category=${catId}`);
+            } else {
+                console.log(`DEBUG_TOK0_ACTIONS: VID=${vid} Mode=Category but ID is empty!`);
+            }
+        } else if (mode === "manual") {
+            const manualLink = (manualLinkRaw as string | null)?.trim();
+            if (manualLink) {
+                voucherLinks[vid] = manualLink;
+                console.log(`DEBUG_TOK0_ACTIONS: Set VID=${vid} to Manual=${manualLink}`);
+            }
+        } else {
+            // Fallback for legacy or direct inputs if any
+            const simpleLink = (formData.get(`link_${vid}`) as string | null)?.trim();
+            if (simpleLink) voucherLinks[vid] = simpleLink;
+        }
     }
 
-    try {
-        await validateExistence({ imageIds: voucherImageIds });
-    } catch (e: any) {
-        return redirectBack({ error: encodeURIComponent(e?.message ?? "Validasi gagal.") });
-    }
+    const { imageIds: validVoucherIds } = await sanitizeExistence({ imageIds: voucherImageIds });
 
     await updateDraftConfigPreserveTheme(
         id,
-        { layout, sectionBgTheme, voucherImageIds, voucherLinks },
+        { layout, sectionBgTheme, voucherImageIds: validVoucherIds ?? [], voucherLinks },
         { title, slug },
     );
 
@@ -426,13 +452,9 @@ export async function saveBranchesConfig(formData: FormData) {
     const branchIds = parseNumArray((formData.getAll("branchIds") as string[]) ?? []);
     const layout = String(formData.get("layout") ?? "carousel") === "grid" ? "grid" : "carousel";
 
-    try {
-        await validateExistence({ branchIds });
-    } catch (e: any) {
-        return redirectBack({ error: encodeURIComponent(e?.message ?? "Validasi gagal.") });
-    }
+    const { branchIds: validBranchIds } = await sanitizeExistence({ branchIds });
 
-    await updateDraftConfigPreserveTheme(id, { branchIds, layout }, { title, slug });
+    await updateDraftConfigPreserveTheme(id, { branchIds: validBranchIds ?? [], layout }, { title, slug });
     revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko");
     return redirectBack({ notice: encodeURIComponent("Config BRANCHES tersimpan.") });
 }
@@ -459,15 +481,12 @@ export async function saveContactConfig(formData: FormData) {
         if (label) buttonLabels[hid] = label;
     }
 
-    try {
-        await validateExistence({ hubungiIds, imageIds: imageId ? [imageId] : [] });
-    } catch (e: any) {
-        return redirectBack({ error: encodeURIComponent(e?.message ?? "Validasi gagal.") });
-    }
+    const { hubungiIds: validHubungiIds, imageIds: validImageIds } = await sanitizeExistence({ hubungiIds, imageIds: imageId ? [imageId] : [] });
+    const validatedImageId = validImageIds && validImageIds.length > 0 ? validImageIds[0] : null;
 
     await updateDraftConfigPreserveTheme(
         id,
-        { hubungiIds, buttonLabels, mode, showImage, imageId, headerText, bodyText },
+        { hubungiIds: validHubungiIds ?? [], buttonLabels, mode, showImage, imageId: validatedImageId, headerText, bodyText },
         { title, slug },
     );
 
@@ -738,18 +757,21 @@ export async function saveCategoryGridConfig(formData: FormData) {
         .map((it) => it.coverImageId)
         .filter((v): v is number => typeof v === "number" && v > 0);
 
-    try {
-        await validateExistence({ kategoriIds: finalKategoriIds, imageIds: coverIds });
-    } catch (e: any) {
-        return redirectBack({ error: encodeURIComponent(e?.message ?? "Validasi gagal.") });
-    }
+    const { kategoriIds: validKategoriIds, imageIds: validCoverIds } = await sanitizeExistence({ kategoriIds: finalKategoriIds, imageIds: coverIds });
+    const validCoverSet = new Set(validCoverIds ?? []);
+    const validKategoriSet = new Set(validKategoriIds ?? []);
+
+    const sanitizedItems = finalItems.filter(it => validKategoriSet.has(it.kategoriId)).map(it => ({
+        ...it,
+        coverImageId: (it.coverImageId && validCoverSet.has(it.coverImageId)) ? it.coverImageId : null
+    }));
 
     await updateDraftConfigPreserveTheme(
         id,
         {
             ...(sectionTheme ? { sectionTheme } : {}),
             layout: { columns, ...(maxItems ? { maxItems } : {}) },
-            items: finalItems,
+            items: sanitizedItems,
         },
         { title, slug },
     );
@@ -1095,17 +1117,14 @@ export async function saveHighlightCollectionConfig(formData: FormData) {
 
     // Validasi
     const imageIdsToValidate = nextHeroImageId ? [nextHeroImageId] : [];
-    try {
-        await validateExistence({ productIds, imageIds: imageIdsToValidate });
-    } catch (e: any) {
-        return redirectBack({ error: encodeURIComponent(e?.message ?? "Validasi gagal.") });
-    }
+    const { productIds: validProductIds, imageIds: validImageIds } = await sanitizeExistence({ productIds, imageIds: imageIdsToValidate });
+    const validatedHeroImageId = validImageIds && validImageIds.length > 0 ? validImageIds[0] : null;
 
     // items
     const existingItems = Array.isArray((existingConfigForMerge as any)?.items) ? (existingConfigForMerge as any).items : null;
     const shouldRegenerateItems = clearProducts || hasProductIdsField || !existingItems;
     const items = shouldRegenerateItems
-        ? productIds.map((pid) => ({ type: "product", refId: pid, enabled: true }))
+        ? (validProductIds ?? []).map((pid) => ({ type: "product", refId: pid, enabled: true }))
         : existingItems;
 
     const slugRaw = (formData.get("slug") as string | null)?.trim() ?? "";
@@ -1117,11 +1136,11 @@ export async function saveHighlightCollectionConfig(formData: FormData) {
             // Backward compatible keys
             mode: "products",
             title,
-            productIds,
+            productIds: validProductIds,
 
             // New keys
             layout,
-            heroImageId: nextHeroImageId,
+            heroImageId: validatedHeroImageId,
 
             badgeText: "",
             headline,
@@ -1566,10 +1585,19 @@ export async function uploadImageToGalleryAndAttach(formData: FormData): Promise
 
         // Validate basic references so config tetap aman
         const ref = collectExistenceArgs(type, cfg);
-        await validateExistence(ref);
+        const { imageIds: validImageIds = [], ...rest } = await sanitizeExistence(ref);
 
         if (!imageIdToUse || !Number.isFinite(imageIdToUse)) {
             return { ok: false, error: "ImageId tidak valid setelah proses upload/pilih." };
+        }
+
+        // If the new imageId is not in the sanitized list (meaning it doesn't exist in DB), fail gracefully or warn.
+        // However, we just added it or picked it, so it should exist. 
+        // If it was pruned by sanitizeExistence, then it's invalid.
+        // We only check if our specific imageIdToUse is valid if it's an image attachment.
+        if (ref.imageIds?.includes(imageIdToUse)) {
+            const found = (validImageIds ?? []).includes(imageIdToUse);
+            if (!found) return { ok: false, error: "Gambar yang dipilih tidak ditemukan di database." };
         }
 
         // CRITICAL FIX: Save the updated config to database!
@@ -1641,15 +1669,20 @@ export async function saveRoomCategoryConfig(formData: FormData) {
     const kategoriIds = cards.map((c) => c.kategoriId).filter((v): v is number => typeof v === "number");
     const imageIds = cards.map((c) => c.imageId).filter((v): v is number => typeof v === "number");
 
-    try {
-        await validateExistence({ kategoriIds, imageIds });
-    } catch (e: any) {
-        return redirectBack({ error: encodeURIComponent(e?.message ?? "Validasi gagal.") });
-    }
+    const { kategoriIds: validKategoriIds, imageIds: validImageIds } = await sanitizeExistence({ kategoriIds, imageIds });
+
+    const validKategoriSet = new Set(validKategoriIds ?? []);
+    const validImageSet = new Set(validImageIds ?? []);
+
+    const sanitizedCards = cards.map(c => ({
+        ...c,
+        kategoriId: (c.kategoriId && validKategoriSet.has(c.kategoriId)) ? c.kategoriId : null,
+        imageId: (c.imageId && validImageSet.has(c.imageId)) ? c.imageId : null
+    }));
 
     await updateDraftConfigPreserveTheme(
         id,
-        { ...(sectionTheme ? { sectionTheme } : {}), cards },
+        { ...(sectionTheme ? { sectionTheme } : {}), cards: sanitizedCards },
         { title, slug },
     );
 

@@ -217,7 +217,7 @@ function ImagePickerModal({
 
 
 // === Variasi & Kombinasi (port dari variasi.html, scoped) ===
-const VariasiKombinasiWidget = function VariasiKombinasiWidget({
+const VariasiKombinasiWidget = memo(function VariasiKombinasiWidget({
   notify,
   storageKey,
 }: {
@@ -253,216 +253,216 @@ const VariasiKombinasiWidget = function VariasiKombinasiWidget({
 
     let onVarKolasePicked: any = null;
 
+    try {
+      const d: any = document;
 
-    const d: any = document;
+      const LS_KEY = storageKey;
+      const toastEl = d.getElementById("toast");
+      let lastAutoFocusKey = null;
+      const uid = () => "id_" + Math.random().toString(16).slice(2) + "_" + Date.now().toString(16);
 
-    const LS_KEY = storageKey;
-    const toastEl = d.getElementById("toast");
-    let lastAutoFocusKey: any = null;
-    const uid = () => "id_" + Math.random().toString(16).slice(2) + "_" + Date.now().toString(16);
+      // === Foto variasi (upload / kolase) ===
+      const uploadUrlByVar: Record<string, string> = {};
+      const kolaseCache: any = { loaded: false, loading: false, items: [], byId: {}, promise: null as any };
 
-    // === Foto variasi (upload / kolase) ===
-    const uploadUrlByVar: Record<string, string> = {};
-    const kolaseCache: any = { loaded: false, loading: false, items: [], byId: {}, promise: null as any };
+      const VAR_UPLOAD_ENDPOINT = "/api/admin/admin_dashboard/admin_produk/tambah_produk/upload_variasi";
 
-    const VAR_UPLOAD_ENDPOINT = "/api/admin/admin_dashboard/admin_produk/tambah_produk/upload_variasi";
+      async function uploadVarImageToGambarUpload(file: File, meta?: { title?: string; tags?: string }) {
+        const fd = new FormData();
+        fd.append("file", file);
+        if (meta?.title) fd.append("title", meta.title);
+        if (meta?.tags) fd.append("tags", meta.tags);
 
-    async function uploadVarImageToGambarUpload(file: File, meta?: { title?: string; tags?: string }) {
-      const fd = new FormData();
-      fd.append("file", file);
-      if (meta?.title) fd.append("title", meta.title);
-      if (meta?.tags) fd.append("tags", meta.tags);
-
-      const res = await fetch(VAR_UPLOAD_ENDPOINT, { method: "POST", body: fd } as any);
-      if (!res.ok) {
-        throw new Error("Upload variasi gagal");
-      }
-      const json = await res.json();
-      const data = (json && (json.data ?? json)) as any;
-      if (!data || data.id == null || !data.url) {
-        throw new Error("Response upload variasi tidak valid");
-      }
-      return { id: Number(data.id), url: String(data.url) };
-    }
-
-    function vaultEl() {
-      return d.getElementById("vcomboVault");
-    }
-
-    function ensureVarUploadInput(varId: string) {
-      const v = vaultEl();
-      if (!v) return null as any;
-
-      const name = `variasiFotoUpload__${varId}`;
-      let inp = v.querySelector(`input[data-var-upload="${varId}"]`) as HTMLInputElement | null;
-      if (inp) return inp;
-
-      inp = d.createElement("input") as HTMLInputElement;
-      inp.type = "file";
-      inp.accept = "image/*";
-      inp.name = name;
-      inp.setAttribute("data-var-upload", varId);
-
-      inp.onchange = () => {
-        const file = (inp && inp.files && inp.files[0]) ? inp.files[0] : null;
-        const vv: any = state.variations.find((x: any) => x.id === varId);
-        if (!vv) return;
-
-        if (!vv.image) vv.image = { mode: "", kolaseId: null, kolaseUrl: "", uploadField: "" };
-        vv.image.uploadField = name;
-
-        if (!file) {
-          // batal pilih file
-          vv.image.mode = "";
-          vv.image.kolaseId = null;
-          vv.image.kolaseUrl = "";
-          vv.image.uploadStatus = "";
-          vv.image.uploadName = "";
-          vv.image.uploadToken = "";
-
-          try { if (uploadUrlByVar[varId]) URL.revokeObjectURL(uploadUrlByVar[varId]); } catch { }
-          delete uploadUrlByVar[varId];
-
-          save(); render();
-          return;
+        const res = await fetch(VAR_UPLOAD_ENDPOINT, { method: "POST", body: fd } as any);
+        if (!res.ok) {
+          throw new Error("Upload variasi gagal");
         }
+        const json = await res.json();
+        const data = (json && (json.data ?? json)) as any;
+        if (!data || data.id == null || !data.url) {
+          throw new Error("Response upload variasi tidak valid");
+        }
+        return { id: Number(data.id), url: String(data.url) };
+      }
 
-        // Upload langsung ke DB (tabel gambar_upload) via endpoint upload_variasi
-        vv.image.mode = "upload";
-        vv.image.kolaseId = null;
-        vv.image.kolaseUrl = "";
-        vv.image.uploadStatus = "uploading";
-        vv.image.uploadName = file.name;
-        const token = uid();
-        vv.image.uploadToken = token;
+      function vaultEl() {
+        return d.getElementById("vcomboVault");
+      }
 
-        // preview cepat via objectURL
-        try { if (uploadUrlByVar[varId]) URL.revokeObjectURL(uploadUrlByVar[varId]); } catch { }
-        try { uploadUrlByVar[varId] = URL.createObjectURL(file); } catch { }
+      function ensureVarUploadInput(varId: string) {
+        const v = vaultEl();
+        if (!v) return null as any;
 
-        save(); render();
+        const name = `variasiFotoUpload__${varId}`;
+        let inp = v.querySelector(`input[data-var-upload="${varId}"]`) as HTMLInputElement | null;
+        if (inp) return inp;
 
-        (async () => {
-          try {
-            const up = await uploadVarImageToGambarUpload(file, { title: vv.label ? `Variasi: ${vv.label}` : "Foto Variasi" });
+        inp = d.createElement("input");
+        inp.type = "file";
+        inp.accept = "image/*";
+        inp.name = name;
+        inp.setAttribute("data-var-upload", varId);
 
-            const cur: any = state.variations.find((x: any) => x.id === varId);
-            if (!cur || !cur.image || cur.image.uploadToken !== token) return;
+        inp.onchange = () => {
+          const file = (inp && inp.files && inp.files[0]) ? inp.files[0] : null;
+          const vv: any = state.variations.find((x: any) => x.id === varId);
+          if (!vv) return;
 
-            cur.image.kolaseId = up.id;
-            cur.image.kolaseUrl = up.url;
-            cur.image.uploadStatus = "done";
+          if (!vv.image) vv.image = { mode: "", kolaseId: null, kolaseUrl: "", uploadField: "" };
+          vv.image.uploadField = name;
 
-            // file tidak perlu disimpan lagi
-            try { inp.value = ""; } catch { }
+          if (!file) {
+            // batal pilih file
+            vv.image.mode = "";
+            vv.image.kolaseId = null;
+            vv.image.kolaseUrl = "";
+            vv.image.uploadStatus = "";
+            vv.image.uploadName = "";
+            vv.image.uploadToken = "";
+
             try { if (uploadUrlByVar[varId]) URL.revokeObjectURL(uploadUrlByVar[varId]); } catch { }
             delete uploadUrlByVar[varId];
 
             save(); render();
-          } catch (err: any) {
-            const cur: any = state.variations.find((x: any) => x.id === varId);
-            if (!cur || !cur.image || cur.image.uploadToken !== token) return;
-
-            cur.image.uploadStatus = "error";
-            save(); render();
-            try { toast(String(err?.message || "Upload variasi gagal")); } catch { }
+            return;
           }
-        })();
-      };
 
-      v.appendChild(inp);
-      return inp;
-    }
+          // Upload langsung ke DB (tabel gambar_upload) via endpoint upload_variasi
+          vv.image.mode = "upload";
+          vv.image.kolaseId = null;
+          vv.image.kolaseUrl = "";
+          vv.image.uploadStatus = "uploading";
+          vv.image.uploadName = file.name;
+          const token = uid();
+          vv.image.uploadToken = token;
 
-    function getUploadUrl(varId: string) {
-      const inp = ensureVarUploadInput(varId);
-      const file = (inp && inp.files && inp.files[0]) ? inp.files[0] : null;
-      if (!file) return "";
-      if (uploadUrlByVar[varId]) return uploadUrlByVar[varId];
-      try {
-        uploadUrlByVar[varId] = URL.createObjectURL(file);
-        return uploadUrlByVar[varId];
-      } catch {
+          // preview cepat via objectURL
+          try { if (uploadUrlByVar[varId]) URL.revokeObjectURL(uploadUrlByVar[varId]); } catch { }
+          try { uploadUrlByVar[varId] = URL.createObjectURL(file); } catch { }
+
+          save(); render();
+
+          (async () => {
+            try {
+              const up = await uploadVarImageToGambarUpload(file, { title: vv.label ? `Variasi: ${vv.label}` : "Foto Variasi" });
+
+              const cur: any = state.variations.find((x: any) => x.id === varId);
+              if (!cur || !cur.image || cur.image.uploadToken !== token) return;
+
+              cur.image.kolaseId = up.id;
+              cur.image.kolaseUrl = up.url;
+              cur.image.uploadStatus = "done";
+
+              // file tidak perlu disimpan lagi
+              try { inp.value = ""; } catch { }
+              try { if (uploadUrlByVar[varId]) URL.revokeObjectURL(uploadUrlByVar[varId]); } catch { }
+              delete uploadUrlByVar[varId];
+
+              save(); render();
+            } catch (err: any) {
+              const cur: any = state.variations.find((x: any) => x.id === varId);
+              if (!cur || !cur.image || cur.image.uploadToken !== token) return;
+
+              cur.image.uploadStatus = "error";
+              save(); render();
+              try { toast(String(err?.message || "Upload variasi gagal")); } catch { }
+            }
+          })();
+        };
+
+        v.appendChild(inp);
+        return inp;
+      }
+
+      function getUploadUrl(varId: string) {
+        const inp = ensureVarUploadInput(varId);
+        const file = (inp && inp.files && inp.files[0]) ? inp.files[0] : null;
+        if (!file) return "";
+        if (uploadUrlByVar[varId]) return uploadUrlByVar[varId];
+        try {
+          uploadUrlByVar[varId] = URL.createObjectURL(file);
+          return uploadUrlByVar[varId];
+        } catch {
+          return "";
+        }
+      }
+
+      function getVarImageUrl(v: any) {
+        if (!v || !v.image) return "";
+        if (v.image.mode === "kolase" && v.image.kolaseUrl) return v.image.kolaseUrl;
+        if (v.image.mode === "upload") {
+          // setelah upload sukses, server mengembalikan url dan kita simpan di kolaseUrl
+          if (v.image.kolaseUrl) return v.image.kolaseUrl;
+          return getUploadUrl(v.id);
+        }
         return "";
       }
-    }
 
-    function getVarImageUrl(v: any) {
-      if (!v || !v.image) return "";
-      if (v.image.mode === "kolase" && v.image.kolaseUrl) return v.image.kolaseUrl;
-      if (v.image.mode === "upload") {
-        // setelah upload sukses, server mengembalikan url dan kita simpan di kolaseUrl
-        if (v.image.kolaseUrl) return v.image.kolaseUrl;
-        return getUploadUrl(v.id);
+      function clearVarImage(v: any) {
+        if (!v) return;
+        if (!v.image) v.image = { mode: "", kolaseId: null, kolaseUrl: "", uploadField: "" };
+        v.image.mode = "";
+        v.image.kolaseId = null;
+        v.image.kolaseUrl = "";
+        v.image.uploadField = `variasiFotoUpload__${v.id}`;
+        v.image.uploadStatus = "";
+        v.image.uploadName = "";
+        v.image.uploadToken = "";
+
+        const inp = vaultEl()?.querySelector(`input[data-var-upload="${v.id}"]`) as HTMLInputElement | null;
+        if (inp) inp.value = "";
+
+        try { if (uploadUrlByVar[v.id]) URL.revokeObjectURL(uploadUrlByVar[v.id]); } catch { }
+        delete uploadUrlByVar[v.id];
       }
-      return "";
-    }
 
-    function clearVarImage(v: any) {
-      if (!v) return;
-      if (!v.image) v.image = { mode: "", kolaseId: null, kolaseUrl: "", uploadField: "" };
-      v.image.mode = "";
-      v.image.kolaseId = null;
-      v.image.kolaseUrl = "";
-      v.image.uploadField = `variasiFotoUpload__${v.id}`;
-      v.image.uploadStatus = "";
-      v.image.uploadName = "";
-      v.image.uploadToken = "";
+      function ensureKolaseCacheLoaded() {
+        if (kolaseCache.loaded) return Promise.resolve();
+        if (kolaseCache.promise) return kolaseCache.promise;
 
-      const inp = vaultEl()?.querySelector(`input[data-var-upload="${v.id}"]`) as HTMLInputElement | null;
-      if (inp) inp.value = "";
+        kolaseCache.loading = true;
 
-      try { if (uploadUrlByVar[v.id]) URL.revokeObjectURL(uploadUrlByVar[v.id]); } catch { }
-      delete uploadUrlByVar[v.id];
-    }
-
-    function ensureKolaseCacheLoaded() {
-      if (kolaseCache.loaded) return Promise.resolve();
-      if (kolaseCache.promise) return kolaseCache.promise;
-
-      kolaseCache.loading = true;
-
-      kolaseCache.promise = fetch("/api/admin/admin_dashboard/admin_galeri/list_gambar", { cache: "no-store" } as any)
-        .then(async (r: any) => {
-          if (r.ok) return r.json();
-          // coba ambil pesan error dari JSON kalau ada
-          let j: any = null;
-          try { j = await r.json(); } catch { }
-          throw new Error(j?.error || j?.message || "Gagal load kolase");
-        })
-        .then((data: any) => {
-          const imgs = (data?.data ?? data?.images ?? data?.gambar ?? data?.items ?? data) || [];
-          kolaseCache.items = Array.isArray(imgs) ? imgs : [];
-          kolaseCache.byId = {};
-          kolaseCache.items.forEach((it: any) => {
-            if (it && it.id != null) kolaseCache.byId[it.id] = it;
+        kolaseCache.promise = fetch("/api/admin/admin_dashboard/admin_galeri/list_gambar", { cache: "no-store" } as any)
+          .then(async (r: any) => {
+            if (r.ok) return r.json();
+            // coba ambil pesan error dari JSON kalau ada
+            let j: any = null;
+            try { j = await r.json(); } catch { }
+            throw new Error(j?.error || j?.message || "Gagal load kolase");
+          })
+          .then((data: any) => {
+            const imgs = (data?.data ?? data?.images ?? data?.gambar ?? data?.items ?? data) || [];
+            kolaseCache.items = Array.isArray(imgs) ? imgs : [];
+            kolaseCache.byId = {};
+            kolaseCache.items.forEach((it: any) => {
+              if (it && it.id != null) kolaseCache.byId[it.id] = it;
+            });
+            kolaseCache.loaded = true;
+            return kolaseCache.items;
+          })
+          .catch((err: any) => {
+            console.error("Gagal load kolase foto (variasi)", err);
+            kolaseCache.items = [];
+            kolaseCache.byId = {};
+            kolaseCache.loaded = false;
+            return [];
+          })
+          .finally(() => {
+            kolaseCache.loading = false;
+            kolaseCache.promise = null;
           });
-          kolaseCache.loaded = true;
-          return kolaseCache.items;
-        })
-        .catch((err: any) => {
-          console.error("Gagal load kolase foto (variasi)", err);
-          kolaseCache.items = [];
-          kolaseCache.byId = {};
-          kolaseCache.loaded = false;
-          return [];
-        })
-        .finally(() => {
-          kolaseCache.loading = false;
-          kolaseCache.promise = null;
-        });
 
-      return kolaseCache.promise;
-    }
+        return kolaseCache.promise;
+      }
 
-    function ensureVarKolaseModal() {
-      let overlay = d.getElementById("vImgModalOverlay") as any;
-      if (overlay) return overlay;
+      function ensureVarKolaseModal() {
+        let overlay = d.getElementById("vImgModalOverlay") as any;
+        if (overlay) return overlay;
 
-      overlay = d.createElement("div");
-      overlay.id = "vImgModalOverlay";
-      overlay.className = "vImgModalOverlay";
-      overlay.innerHTML = `
+        overlay = d.createElement("div");
+        overlay.id = "vImgModalOverlay";
+        overlay.className = "vImgModalOverlay";
+        overlay.innerHTML = `
         <div class="vImgModal" role="dialog" aria-modal="true">
           <div class="vImgModalHead">
             <b>Pilih Foto dari Kolase (Variasi)</b>
@@ -481,727 +481,728 @@ const VariasiKombinasiWidget = function VariasiKombinasiWidget({
         </div>
       `;
 
-      const close = () => { overlay.style.display = "none"; overlay.__pickForVarId = null; overlay.__selId = null; };
+        const close = () => { overlay.style.display = "none"; overlay.__pickForVarId = null; overlay.__selId = null; };
 
-      overlay.addEventListener("click", (e: any) => {
-        if (e.target === overlay) close();
-      });
-      overlay.querySelector("[data-x]").onclick = close;
-      overlay.querySelector("[data-cancel]").onclick = close;
+        overlay.addEventListener("click", (e: any) => {
+          if (e.target === overlay) close();
+        });
+        overlay.querySelector("[data-x]").onclick = close;
+        overlay.querySelector("[data-cancel]").onclick = close;
 
-      d.body.appendChild(overlay);
-      return overlay;
-    }
-
-    function openVarKolasePicker(v: any) {
-      try {
-        const selId = (v?.image?.mode === "kolase" && v.image.kolaseId) ? v.image.kolaseId : null;
-        const initialSelectedIds = selId ? [selId] : [];
-        window.dispatchEvent(new CustomEvent("apix:openVarKolase", {
-          detail: { varId: v?.id, initialSelectedIds }
-        }));
-      } catch (err) {
-        console.error("Gagal buka picker kolase variasi", err);
-        try { toast("Gagal buka kolase variasi"); } catch { }
+        d.body.appendChild(overlay);
+        return overlay;
       }
-    }
-    const TITLE_PH = "contoh: Ukuran / Warna / Model / Material / Finishing / Tekstur / Motif / Paket / Jasa Pasang / Desain";
 
-    const UNIT_OPTIONS = [
-      { v: "M2", label: "M2 (per m²)" },
-      { v: "M", label: "M (per meter)" },
-      { v: "POINT", label: "POINT (per titik)" },
-      { v: "PCS", label: "PCS (per unit)" },
-      { v: "SERVICE", label: "SERVICE (borongan/paket)" },
-    ];
-    function unitLabel(u: any) {
-      const found = UNIT_OPTIONS.find(x => x.v === u);
-      return found ? found.label : u;
-    }
-
-    function toast(msg: any) {
-      toastEl.textContent = msg;
-      toastEl.classList.add("show");
-      setTimeout(() => toastEl.classList.remove("show"), 1200);
-    }
-    function collectVarMedia() {
-      if (!state || !state.enabled) return [];
-      const vars = Array.isArray(state.variations) ? state.variations : [];
-      return vars
-        .map((v: any) => {
-          const url = getVarImageUrl(v);
-          return {
-            varId: v?.id ?? "",
-            label: v?.label || "",
-            url: url || "",
-            mode: v?.image?.mode || "",
-            kolaseId: v?.image?.kolaseId ?? null,
-          };
-        })
-        .filter((m: any) => !!m.url);
-    }
-    function broadcastVarMedia() {
-      try {
-        const media = collectVarMedia();
-        window.dispatchEvent(new CustomEvent("apix:varMediaUpdate", { detail: { enabled: !!state?.enabled, media } }));
-      } catch { }
-    }
-    function syncHidden() {
-      const fEnabled = d.getElementById("vcombo_hidden_enabled");
-      const fJson = d.getElementById("vcombo_hidden_json");
-      const fClear = d.getElementById("vcombo_hidden_clear");
-      try {
-        if (fEnabled) fEnabled.value = state.enabled ? "1" : "0";
-        if (fClear) fClear.value = state.enabled ? "0" : "1";
-        if (fJson) fJson.value = state.enabled ? JSON.stringify(state) : "";
-
-        // jika variasi dimatikan, file upload variasi jangan ikut tersubmit
-        const v = vaultEl();
-        if (v) {
-          [...v.querySelectorAll('input[type="file"][data-var-upload]')].forEach((inp: any) => {
-            inp.disabled = !state.enabled;
-          });
+      function openVarKolasePicker(v: any) {
+        try {
+          const selId = (v?.image?.mode === "kolase" && v.image.kolaseId) ? v.image.kolaseId : null;
+          const initialSelectedIds = selId ? [selId] : [];
+          window.dispatchEvent(new CustomEvent("apix:openVarKolase", {
+            detail: { varId: v?.id, initialSelectedIds }
+          }));
+        } catch (err) {
+          console.error("Gagal buka picker kolase variasi", err);
+          try { toast("Gagal buka kolase variasi"); } catch { }
         }
-
-        broadcastVarMedia();
-      } catch { }
-    }
-    function save() {
-      try {
-        if (LS_KEY) localStorage.setItem(LS_KEY, JSON.stringify(state));
-      } catch { }
-      syncHidden();
-    }
-    function load() {
-      if (!LS_KEY) return null;
-      try {
-        const raw = localStorage.getItem(LS_KEY);
-        return raw ? JSON.parse(raw) : null;
-      } catch { return null; }
-    }
-
-    // input nyaman: state update pas input, render pas blur
-    function bindTitleInput(el: any, getter: any, setter: any) {
-      el.value = getter() || "";
-      el.addEventListener("input", () => {
-        setter(el.value);
-        save();
-      });
-      el.addEventListener("blur", () => {
-        // Judul kombinasi boleh kosong. Jangan paksa rerender/fokus saat blur.
-        // Label default akan mengikuti state pada render berikutnya (mis. saat pindah tab / klik tombol).
-      });
-    }
-
-    // === ENTER navigation (tanpa perlu arahkan kursor) ===
-    // Rule: tekan Enter -> fokus ke input/select berikutnya yang "wajar" & belum diisi dulu,
-    // kalau tidak ada yang kosong -> fokus ke next normal.
-    function isField(el: any) {
-      if (!el) return false;
-      if (el.disabled) return false;
-      const tag = (el.tagName || "").toLowerCase();
-      if (tag === "textarea") return true;
-      if (tag === "input") {
-        const t = (el.type || "text").toLowerCase();
-        if (t === "hidden" || t === "button" || t === "submit" || t === "reset" || t === "file") return false;
-        return true;
       }
-      if (tag === "select") return true;
-      return false;
-    }
-    function isVisible(el: any) {
-      if (!el) return false;
-      const r = el.getBoundingClientRect();
-      return r.width > 0 && r.height > 0;
-    }
-    function fieldValue(el: any) {
-      const tag = (el.tagName || "").toLowerCase();
-      if (tag === "select") return (el.value || "").trim();
-      if (tag === "input" || tag === "textarea") return (el.value || "").trim();
-      return "";
-    }
-    function isEmptyField(el: any) {
-      // Field kosong yang "wajib" diisi untuk alur Enter.
-      // Judul Kombinasi (Lv1/Lv2/Lv3) & field opsional lain jangan dianggap wajib.
-      try {
-        if (el.classList && el.classList.contains("titleInput")) return false;
+      const TITLE_PH = "contoh: Ukuran / Warna / Model / Material / Finishing / Tekstur / Motif / Paket / Jasa Pasang / Desain";
 
-        // Harga add-on (opsional), harga variasi (opsional), unit override (opsional), judul produk (opsional)
-        if (el.matches && el.matches('input[data-price], input[data-newprice], input[name="variation_price"], input[name="variation_unit"], input[name="product_title"]')) {
-          return false;
-        }
-        if (el.getAttribute && el.getAttribute("data-optional") === "1") return false;
-      } catch (_) { }
+      const UNIT_OPTIONS = [
+        { v: "M2", label: "M2 (per m²)" },
+        { v: "M", label: "M (per meter)" },
+        { v: "POINT", label: "POINT (per titik)" },
+        { v: "PCS", label: "PCS (per unit)" },
+        { v: "SERVICE", label: "SERVICE (borongan/paket)" },
+      ];
+      function unitLabel(u) {
+        const found = UNIT_OPTIONS.find(x => x.v === u);
+        return found ? found.label : u;
+      }
 
-      // "kosong" = value empty string OR placeholder mode (like follow product)
-      return fieldValue(el) === "";
-    }
-    function nextFocusableFrom(root: any, current: any) {
-      const list = Array.from(root.querySelectorAll("input, select, textarea, button")).filter(el => isField(el) && isVisible(el));
-      const i = list.indexOf(current);
-      if (i < 0) return null;
-      return list[i + 1] || null;
-    }
-    function focusFirstEmptyAfter(root: any, current: any) {
-      const list = Array.from(root.querySelectorAll("input, select, textarea")).filter(el => isField(el) && isVisible(el));
-      const i = list.indexOf(current);
-      if (i < 0) return false;
+      function toast(msg) {
+        toastEl.textContent = msg;
+        toastEl.classList.add("show");
+        setTimeout(() => toastEl.classList.remove("show"), 1200);
+      }
+      function collectVarMedia() {
+        if (!state || !state.enabled) return [];
+        const vars = Array.isArray(state.variations) ? state.variations : [];
+        return vars
+          .map((v: any) => {
+            const url = getVarImageUrl(v);
+            return {
+              varId: v?.id ?? "",
+              label: v?.label || "",
+              url: url || "",
+              mode: v?.image?.mode || "",
+              kolaseId: v?.image?.kolaseId ?? null,
+            };
+          })
+          .filter((m: any) => !!m.url);
+      }
+      function broadcastVarMedia() {
+        try {
+          const media = collectVarMedia();
+          window.dispatchEvent(new CustomEvent("apix:varMediaUpdate", { detail: { enabled: !!state?.enabled, media } }));
+        } catch { }
+      }
+      function syncHidden() {
+        const fEnabled = d.getElementById("vcombo_hidden_enabled");
+        const fJson = d.getElementById("vcombo_hidden_json");
+        const fClear = d.getElementById("vcombo_hidden_clear");
+        try {
+          if (fEnabled) fEnabled.value = state.enabled ? "1" : "0";
+          if (fClear) fClear.value = state.enabled ? "0" : "1";
+          if (fJson) fJson.value = state.enabled ? JSON.stringify(state) : "";
 
-      // 1) cari yang kosong dulu (sesudah current)
-      for (let k = i + 1; k < list.length; k++) {
-        if (isEmptyField(list[k])) {
-          (list[k] as any).focus();
-          (list[k] as any).select?.();
+          // jika variasi dimatikan, file upload variasi jangan ikut tersubmit
+          const v = vaultEl();
+          if (v) {
+            [...v.querySelectorAll('input[type="file"][data-var-upload]')].forEach((inp: any) => {
+              inp.disabled = !state.enabled;
+            });
+          }
+
+          broadcastVarMedia();
+        } catch { }
+      }
+      function save() {
+        try {
+          if (LS_KEY) localStorage.setItem(LS_KEY, JSON.stringify(state));
+        } catch { }
+        syncHidden();
+      }
+      function load() {
+        if (!LS_KEY) return null;
+        try {
+          const raw = localStorage.getItem(LS_KEY);
+          return raw ? JSON.parse(raw) : null;
+        } catch { return null; }
+      }
+
+      // input nyaman: state update pas input, render pas blur
+      function bindTitleInput(el, getter, setter) {
+        el.value = getter() || "";
+        el.addEventListener("input", () => {
+          setter(el.value);
+          save();
+        });
+        el.addEventListener("blur", () => {
+          // Judul kombinasi boleh kosong. Jangan paksa rerender/fokus saat blur.
+          // Label default akan mengikuti state pada render berikutnya (mis. saat pindah tab / klik tombol).
+        });
+      }
+
+      // === ENTER navigation (tanpa perlu arahkan kursor) ===
+      // Rule: tekan Enter -> fokus ke input/select berikutnya yang "wajar" & belum diisi dulu,
+      // kalau tidak ada yang kosong -> fokus ke next normal.
+      function isField(el) {
+        if (!el) return false;
+        if (el.disabled) return false;
+        const tag = (el.tagName || "").toLowerCase();
+        if (tag === "textarea") return true;
+        if (tag === "input") {
+          const t = (el.type || "text").toLowerCase();
+          if (t === "hidden" || t === "button" || t === "submit" || t === "reset" || t === "file") return false;
           return true;
         }
+        if (tag === "select") return true;
+        return false;
       }
-      // 2) kalau ga ada yang kosong, next biasa
-      const nxt = list[i + 1] || null;
-      if (nxt) {
-        (nxt as any).focus();
-        (nxt as any).select?.();
-        return true;
+      function isVisible(el) {
+        if (!el) return false;
+        const r = el.getBoundingClientRect();
+        return r.width > 0 && r.height > 0;
       }
-      return false;
-    }
-    // global handler: Enter -> fokus next
-    const ROOT = d.getElementById("vcomboRoot");
-    d.addEventListener("keydown", (e: any) => {
-      if (ROOT && e.target && !ROOT.contains(e.target)) return;
-      if (e.key !== "Enter") return;
-      const t = e.target;
-      if (!isField(t)) return;
+      function fieldValue(el) {
+        const tag = (el.tagName || "").toLowerCase();
+        if (tag === "select") return (el.value || "").trim();
+        if (tag === "input" || tag === "textarea") return (el.value || "").trim();
+        return "";
+      }
+      function isEmptyField(el) {
+        // Field kosong yang "wajib" diisi untuk alur Enter.
+        // Judul Kombinasi (Lv1/Lv2/Lv3) & field opsional lain jangan dianggap wajib.
+        try {
+          if (el.classList && el.classList.contains("titleInput")) return false;
 
-      // jangan ganggu Enter di button
-      if ((t.tagName || "").toLowerCase() === "button") return;
+          // Harga add-on (opsional), harga variasi (opsional), unit override (opsional), judul produk (opsional)
+          if (el.matches && el.matches('input[data-price], input[data-newprice], input[name="variation_price"], input[name="variation_unit"], input[name="product_title"]')) {
+            return false;
+          }
+          if (el.getAttribute && el.getAttribute("data-optional") === "1") return false;
+        } catch (_) { }
 
-      // prevent submit / newline
-      e.preventDefault();
+        // "kosong" = value empty string OR placeholder mode (like follow product)
+        return fieldValue(el) === "";
+      }
+      function nextFocusableFrom(root, current) {
+        const list = Array.from(root.querySelectorAll("input, select, textarea, button")).filter(el => isField(el) && isVisible(el));
+        const i = list.indexOf(current);
+        if (i < 0) return null;
+        return list[i + 1] || null;
+      }
+      function focusFirstEmptyAfter(root, current) {
+        const list = Array.from(root.querySelectorAll("input, select, textarea")).filter(el => isField(el) && isVisible(el)) as any[];
+        const i = list.indexOf(current);
+        if (i < 0) return false;
 
-      const stepRoot = d.getElementById("page");
-      if (!stepRoot) return;
-
-      // Jika sedang di input "Tambah" (vName/vPrice/vUnit etc) dan Enter,
-      // fokus pindah dulu; kalau posisi sudah di field terakhir row tambah,
-      // otomatis trigger tombol tambah.
-      const id = t.id || "";
-      if (id === "vUnit") {
-        // last field of add-variation row -> trigger Tambah
-        const btn = d.getElementById("vAdd");
-        if (btn && !btn.disabled) {
-          btn.click();
-          return;
+        // 1) cari yang kosong dulu (sesudah current)
+        for (let k = i + 1; k < list.length; k++) {
+          if (isEmptyField(list[k])) {
+            list[k].focus();
+            list[k].select?.();
+            return true;
+          }
         }
-      }
-      if (id === "pBase") {
-        // terakhir di produk -> lanjut
-        const btn = d.getElementById("toVar");
-        if (btn && !btn.disabled) {
-          btn.click();
-          return;
+        // 2) kalau ga ada yang kosong, next biasa
+        const nxt = list[i + 1] || null;
+        if (nxt) {
+          nxt.focus();
+          nxt.select?.();
+          return true;
         }
+        return false;
       }
+      // global handler: Enter -> fokus next
+      const ROOT = d.getElementById("vcomboRoot");
+      d.addEventListener("keydown", (e) => {
+        if (ROOT && e.target && !ROOT.contains(e.target)) return;
+        if (e.key !== "Enter") return;
+        const t = e.target;
+        if (!isField(t)) return;
 
-      // normal: fokus ke field kosong berikutnya atau next biasa
-      const ok = focusFirstEmptyAfter(stepRoot, t);
-      if (!ok) {
-        // kalau buntu, coba klik tombol primary paling relevan di halaman (Lanjut/Simpan)
-        const primaries = stepRoot.querySelectorAll(".btn.primary");
-        const primary = primaries[primaries.length - 1];
-        if (primary) primary.click();
-      }
-    }, true);
+        // jangan ganggu Enter di button
+        if ((t.tagName || "").toLowerCase() === "button") return;
 
-    // === state ===
-    let state = load() || null;
-    if (!state) {
-      state = {
-        enabled: false,
-        step: 0,
-        comboTab: 1,
-        combo: { lv2Enabled: false, lv3Enabled: false },
-        titles: { varTitle: "", lv1Title: "", lv2Title: "", lv3Title: "" },
-        product: { title: "", unit: "M2", basePrice: "", status: "" },
-        variations: [],
-        preview: { varId: null, lv1Id: null, lv2Id: null, lv3Id: null, qty: 1 },
-        ui: { selLv1ByVar: {}, selLv2ByVarLv1: {} },
-        optClip: null
-      };
-      save();
-    } else {
-      if (!state.combo) state.combo = { lv2Enabled: false, lv3Enabled: false };
-      if (!("enabled" in state)) state.enabled = (state.variations && state.variations.length) ? true : false;
-      // Default tampilan selalu mulai dari tab Produk (biar tidak langsung munculin form variasi).
-      state.step = 0;
-      if (!state.titles) state.titles = { varTitle: "", lv1Title: "", lv2Title: "", lv3Title: "" };
-      if (!state.product) state.product = { title: "", unit: "M2", basePrice: "", status: "" };
-      if (state.product.status === undefined) state.product.status = "";
-      if (!state.variations) state.variations = [];
-      if (!state.preview) state.preview = { varId: null, lv1Id: null, lv2Id: null, lv3Id: null, qty: 1 };
-      if (!state.ui) state.ui = { selLv1ByVar: {}, selLv2ByVarLv1: {} };
-      if (!("optClip" in state)) state.optClip = null;
+        // prevent submit / newline
+        e.preventDefault();
 
-      state.variations.forEach((v: any) => {
-        if ("enabled" in v) delete (v as any).enabled;
-        if (v.price === undefined) v.price = "";
-        if (v.unitOverride === undefined) v.unitOverride = "";
-        if (!v.image) v.image = { mode: "", kolaseId: null, kolaseUrl: "", uploadField: `variasiFotoUpload__${v.id}` };
-        if (v.image.mode === undefined) v.image.mode = "";
-        if (v.image.kolaseId === undefined) v.image.kolaseId = null;
-        if (v.image.kolaseUrl === undefined) v.image.kolaseUrl = "";
-        if (v.image.uploadField === undefined) v.image.uploadField = `variasiFotoUpload__${v.id}`;
-        // normalize harga lama: pastikan hanya angka
-        v.price = String(v.price || "").replace(/[^\d]/g, "");
-        (v as any).promo = normalizePromo((v as any).promo);
+        const stepRoot = d.getElementById("page");
+        if (!stepRoot) return;
 
-        if (!v.combos) v.combos = { lv1: [] };
-        if (!Array.isArray(v.combos.lv1)) v.combos.lv1 = [];
-        v.combos.lv1.forEach((l1: any) => {
-          l1.addPrice = String(l1.addPrice || "").replace(/[^\d]/g, "");
-          (l1 as any).promo = normalizePromo((l1 as any).promo);
-          if (!Array.isArray(l1.lv2)) l1.lv2 = [];
-          l1.lv2.forEach((l2: any) => {
-            l2.addPrice = String(l2.addPrice || "").replace(/[^\d]/g, "");
-            (l2 as any).promo = normalizePromo((l2 as any).promo);
-            if (!Array.isArray(l2.lv3)) l2.lv3 = [];
-            l2.lv3.forEach((l3: any) => {
-              l3.addPrice = String(l3.addPrice || "").replace(/[^\d]/g, "");
-              (l3 as any).promo = normalizePromo((l3 as any).promo);
+        // Jika sedang di input "Tambah" (vName/vPrice/vUnit etc) dan Enter,
+        // fokus pindah dulu; kalau posisi sudah di field terakhir row tambah,
+        // otomatis trigger tombol tambah.
+        const id = t.id || "";
+        if (id === "vUnit") {
+          // last field of add-variation row -> trigger Tambah
+          const btn = d.getElementById("vAdd");
+          if (btn && !btn.disabled) {
+            btn.click();
+            return;
+          }
+        }
+        if (id === "pBase") {
+          // terakhir di produk -> lanjut
+          const btn = d.getElementById("toVar");
+          if (btn && !btn.disabled) {
+            btn.click();
+            return;
+          }
+        }
+
+        // normal: fokus ke field kosong berikutnya atau next biasa
+        const ok = focusFirstEmptyAfter(stepRoot, t);
+        if (!ok) {
+          // kalau buntu, coba klik tombol primary paling relevan di halaman (Lanjut/Simpan)
+          const primaries = stepRoot.querySelectorAll(".btn.primary");
+          const primary = primaries[primaries.length - 1];
+          if (primary) primary.click();
+        }
+      }, true);
+
+      // === state ===
+      let state = load() || null;
+      if (!state) {
+        state = {
+          enabled: false,
+          step: 0,
+          comboTab: 1,
+          combo: { lv2Enabled: false, lv3Enabled: false },
+          titles: { varTitle: "", lv1Title: "", lv2Title: "", lv3Title: "" },
+          product: { title: "", unit: "M2", basePrice: "", status: "" },
+          variations: [],
+          preview: { varId: null, lv1Id: null, lv2Id: null, lv3Id: null, qty: 1 },
+          ui: { selLv1ByVar: {}, selLv2ByVarLv1: {} },
+          optClip: null
+        };
+        save();
+      } else {
+        if (!state.combo) state.combo = { lv2Enabled: false, lv3Enabled: false };
+        if (!("enabled" in state)) state.enabled = (state.variations && state.variations.length) ? true : false;
+        // Default tampilan selalu mulai dari tab Produk (biar tidak langsung munculin form variasi).
+        state.step = 0;
+        if (!state.titles) state.titles = { varTitle: "", lv1Title: "", lv2Title: "", lv3Title: "" };
+        if (!state.product) state.product = { title: "", unit: "M2", basePrice: "", status: "" };
+        if (state.product.status === undefined) state.product.status = "";
+        if (!state.variations) state.variations = [];
+        if (!state.preview) state.preview = { varId: null, lv1Id: null, lv2Id: null, lv3Id: null, qty: 1 };
+        if (!state.ui) state.ui = { selLv1ByVar: {}, selLv2ByVarLv1: {} };
+        if (!("optClip" in state)) state.optClip = null;
+
+        state.variations.forEach(v => {
+          if ("enabled" in v) delete (v as any).enabled;
+          if (v.price === undefined) v.price = "";
+          if (v.unitOverride === undefined) v.unitOverride = "";
+          if (!v.image) v.image = { mode: "", kolaseId: null, kolaseUrl: "", uploadField: `variasiFotoUpload__${v.id}` };
+          if (v.image.mode === undefined) v.image.mode = "";
+          if (v.image.kolaseId === undefined) v.image.kolaseId = null;
+          if (v.image.kolaseUrl === undefined) v.image.kolaseUrl = "";
+          if (v.image.uploadField === undefined) v.image.uploadField = `variasiFotoUpload__${v.id}`;
+          // normalize harga lama: pastikan hanya angka
+          v.price = String(v.price || "").replace(/[^\d]/g, "");
+          (v as any).promo = normalizePromo((v as any).promo);
+
+          if (!v.combos) v.combos = { lv1: [] };
+          if (!Array.isArray(v.combos.lv1)) v.combos.lv1 = [];
+          v.combos.lv1.forEach(l1 => {
+            l1.addPrice = String(l1.addPrice || "").replace(/[^\d]/g, "");
+            (l1 as any).promo = normalizePromo((l1 as any).promo);
+            if (!Array.isArray(l1.lv2)) l1.lv2 = [];
+            l1.lv2.forEach(l2 => {
+              l2.addPrice = String(l2.addPrice || "").replace(/[^\d]/g, "");
+              (l2 as any).promo = normalizePromo((l2 as any).promo);
+              if (!Array.isArray(l2.lv3)) l2.lv3 = [];
+              l2.lv3.forEach(l3 => {
+                l3.addPrice = String(l3.addPrice || "").replace(/[^\d]/g, "");
+                (l3 as any).promo = normalizePromo((l3 as any).promo);
+              });
             });
           });
         });
+      }
+
+
+      // === Sync: ikuti Nama Produk & Harga dari form utama (Informasi Utama & Harga & Status) ===
+      // Tujuan: admin tidak perlu input ulang judul & harga di widget variasi.
+      let mainFormSyncCleanup: null | (() => void) = null;
+
+      function bindMainFormSync() {
+        const SELS = 'input[name="nama"], input[name="harga"], select[name="status"], input[name="status"]';
+
+        const readMain = () => {
+          const namaEl = d.querySelector('input[name="nama"]') as HTMLInputElement | null;
+          const hargaEl = d.querySelector('input[name="harga"]') as HTMLInputElement | null;
+
+          // status di form utama umumnya <select name="status">
+          const statusEl =
+            (d.querySelector('select[name="status"]') as HTMLSelectElement | null) ||
+            (d.querySelector('input[name="status"]') as HTMLInputElement | null);
+
+          const title = String(namaEl?.value || "");
+          const base = normalizePriceString(String(hargaEl?.value || ""));
+          const status = String(statusEl?.value || "");
+
+          return { title, base, status };
+        };
+
+        const syncOnce = () => {
+          const { title, base, status } = readMain();
+          let changed = false;
+
+          if (state.product.title !== title) {
+            state.product.title = title;
+            changed = true;
+          }
+          if (state.product.basePrice !== base) {
+            state.product.basePrice = base;
+            changed = true;
+          }
+          if ((state.product.status || "") !== status) {
+            state.product.status = status;
+            changed = true;
+          }
+
+          if (changed) {
+            save();
+            try { render(); } catch { }
+          }
+        };
+
+        const handler = (e?: any) => {
+          const t = e?.target;
+          if (t && t.matches && !t.matches(SELS)) return;
+          syncOnce();
+        };
+
+        // initial + catch async prefill/edit mode lebih lama
+        handler();
+        const itv = window.setInterval(() => syncOnce(), 400);
+        const tmo = window.setTimeout(() => window.clearInterval(itv), 12000);
+
+        // event delegation (aman kalau React replace node input)
+        d.addEventListener("input", handler, true);
+        d.addEventListener("change", handler, true);
+
+        return () => {
+          try { window.clearInterval(itv); } catch { }
+          try { window.clearTimeout(tmo); } catch { }
+          try { d.removeEventListener("input", handler, true); } catch { }
+          try { d.removeEventListener("change", handler, true); } catch { }
+        };
+      }
+
+      // bind sekarang (sekali) — state.product akan selalu mengikuti form utama
+      mainFormSyncCleanup = bindMainFormSync();
+
+
+      // === Bridge: hasil pilih kolase dari React ImagePickerModal (biar modalnya sama persis) ===
+      onVarKolasePicked = (ev: any) => {
+        try {
+          const det = ev?.detail || {};
+          const varId = det.varId;
+          const selId = det.imageId ?? det.selId ?? det.id;
+          const url = det.url || det.kolaseUrl || "";
+          if (!varId || !selId) return;
+
+          const vv: any = state.variations.find((x: any) => x.id === String(varId));
+          if (!vv) return;
+
+          if (!vv.image) vv.image = { mode: "", kolaseId: null, kolaseUrl: "", uploadField: "" };
+          vv.image.mode = "kolase";
+          vv.image.uploadStatus = "";
+          vv.image.uploadName = "";
+          vv.image.uploadToken = "";
+          vv.image.kolaseId = Number(selId);
+          vv.image.kolaseUrl = String(url || "");
+          vv.image.uploadField = `variasiFotoUpload__${vv.id}`;
+
+          // clear upload file if any
+          const up = ensureVarUploadInput(vv.id);
+          if (up) up.value = "";
+          try { if (uploadUrlByVar[vv.id]) URL.revokeObjectURL(uploadUrlByVar[vv.id]); } catch { }
+          delete uploadUrlByVar[vv.id];
+
+          save(); render();
+        } catch (err) {
+          console.error("apply var kolase picked error", err);
+        }
+      };
+
+      varKolasePickedRef.current = onVarKolasePicked;
+      broadcastVarMediaRef.current = broadcastVarMedia;
+      window.addEventListener("apix:varKolasePicked", onVarKolasePicked as any);
+      window.addEventListener("apix:requestVarMedia", broadcastVarMedia as any);
+
+
+
+      // === COPY/PASTE Opsi (Lv1/Lv2/Lv3) ===
+      function normKey(s) { return (s || "").trim().toLowerCase(); }
+      function setOptClip(payload) {
+        state.optClip = payload;
+        save();
+      }
+      function getOptClip() { return state.optClip || null; }
+
+      function stripLv3(o) {
+        return {
+          label: (o?.label || "").trim(),
+          addPrice: normalizePriceString(o?.addPrice || ""),
+          promo: o?.promo ? { ...o.promo } : defaultPromo(),
+        };
+      }
+      function stripLv2(o) {
+        return {
+          label: (o?.label || "").trim(),
+          addPrice: normalizePriceString(o?.addPrice || ""),
+          promo: o?.promo ? { ...o.promo } : defaultPromo(),
+          lv3: Array.isArray(o?.lv3) ? o.lv3.map(stripLv3) : []
+        };
+      }
+      function stripLv1(o) {
+        return {
+          label: (o?.label || "").trim(),
+          addPrice: normalizePriceString(o?.addPrice || ""),
+          promo: o?.promo ? { ...o.promo } : defaultPromo(),
+          lv2: Array.isArray(o?.lv2) ? o.lv2.map(stripLv2) : []
+        };
+      }
+
+      function cloneLv3(o) {
+        return {
+          id: uid(),
+          label: (o?.label || "").trim(),
+          addPrice: normalizePriceString(o?.addPrice || ""),
+          promo: o?.promo ? { ...o.promo } : defaultPromo(),
+        };
+      }
+      function cloneLv2(o) {
+        return {
+          id: uid(),
+          label: (o?.label || "").trim(),
+          addPrice: normalizePriceString(o?.addPrice || ""),
+          promo: o?.promo ? { ...o.promo } : defaultPromo(),
+          lv3: Array.isArray(o?.lv3) ? o.lv3.map(cloneLv3) : []
+        };
+      }
+      function cloneLv1(o) {
+        return {
+          id: uid(),
+          label: (o?.label || "").trim(),
+          addPrice: normalizePriceString(o?.addPrice || ""),
+          promo: o?.promo ? { ...o.promo } : defaultPromo(),
+          lv2: Array.isArray(o?.lv2) ? o.lv2.map(cloneLv2) : []
+        };
+      }
+
+      function pasteInto(targetArr, items, levelLabel) {
+        targetArr = targetArr || [];
+        const existing = new Set(targetArr.map(x => normKey(x.label)));
+        let added = 0, skipped = 0;
+        items.forEach(it => {
+          const k = normKey(it.label);
+          if (!k) { skipped++; return; }
+          if (existing.has(k)) { skipped++; return; }
+          existing.add(k);
+          targetArr.push(it);
+          added++;
+        });
+        toast(`${added} opsi ${levelLabel} ditambahkan` + (skipped ? ` • ${skipped} dilewati` : ``));
+        return { added, skipped };
+      }
+
+      const stepsEl = d.getElementById("steps");
+      const pageEl = d.getElementById("page");
+
+      function esc(s) {
+        return String(s || "")
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+      function toInt(v) {
+        const s = String(v ?? "");
+        const digits = s.replace(/[^\d]/g, "");
+        if (!digits) return 0;
+        const n = Number(digits);
+        return Number.isFinite(n) ? Math.max(0, n) : 0;
+      }
+      function normalizePriceString(v) {
+        const s = String(v ?? "");
+        return s.replace(/[^\d]/g, "");
+      }
+      function parseMoney(str) {
+        if (str === "" || str == null) return 0;
+        return toInt(str);
+      }
+      function formatIDR(n) {
+        try { return new Intl.NumberFormat("id-ID").format(toInt(n)); }
+        catch { return String(toInt(n)); }
+      }
+
+
+      // === Promo/Diskon (opsional) untuk Variasi & Kombinasi Lv1/Lv2/Lv3 ===
+      function defaultPromo() {
+        return { active: false, type: "percent", value: "" };
+      }
+      function normalizePromo(p) {
+        if (!p) return defaultPromo();
+        return {
+          active: !!(p as any).active,
+          type: ((p as any).type === "nominal") ? "nominal" : "percent",
+          value: normalizePriceString(((p as any).value || "") as any)
+        };
+      }
+      function applyPromo(before, promo) {
+        const p = normalizePromo(promo);
+        const b = toInt(before);
+        if (!p.active) return { before: b, after: b, badge: "" };
+
+        if (p.type === "percent") {
+          let pct = toInt(p.value);
+          if (pct > 100) pct = 100;
+          const after = Math.max(0, Math.round(b * (100 - pct) / 100));
+          return { before: b, after, badge: pct ? `-${pct}%` : "" };
+        } else {
+          const cut = toInt(p.value);
+          const after = Math.max(0, b - cut);
+          return { before: b, after, badge: cut ? `-Rp ${formatIDR(cut)}` : "" };
+        }
+      }
+      function priceHtml(before, after, badge) {
+        const b = toInt(before);
+        const a = toInt(after);
+        if (a < b) {
+          return `<span class="oldPrice">Rp ${formatIDR(b)}</span><span class="newPrice">Rp ${formatIDR(a)}</span>${badge ? `<span class="promoBadge">${esc(badge)}</span>` : ""}`;
+        }
+        return `<span class="newPrice">Rp ${formatIDR(a)}</span>`;
+      }
+
+      // Paksa input harga tetap angka (hapus huruf/simbol saat diketik)
+      d.addEventListener("input", (e) => {
+        const el = e.target;
+        if (!(el instanceof HTMLInputElement)) return;
+        if (el.matches('input[data-price], input[data-newprice], input[name$="_price"], input[name="variation_price"]')) {
+          const before = el.value;
+          const after = normalizePriceString(before);
+          if (before !== after) {
+            const pos = el.selectionStart ?? after.length;
+            el.value = after;
+            try {
+              const newPos = Math.min(after.length, Math.max(0, pos - (before.length - after.length)));
+              el.setSelectionRange(newPos, newPos);
+            } catch { }
+          }
+        }
       });
-    }
 
-
-    // === Sync: ikuti Nama Produk & Harga dari form utama (Informasi Utama & Harga & Status) ===
-    // Tujuan: admin tidak perlu input ulang judul & harga di widget variasi.
-    let mainFormSyncCleanup: null | (() => void) = null;
-    function bindMainFormSync() {
-      const SELS = 'input[name="nama"], input[name="harga"], select[name="status"], input[name="status"]';
-
-      const readMain = () => {
-        const namaEl = d.querySelector('input[name="nama"]') as HTMLInputElement | null;
-        const hargaEl = d.querySelector('input[name="harga"]') as HTMLInputElement | null;
-
-        // status di form utama umumnya <select name="status">
-        const statusEl =
-          (d.querySelector('select[name="status"]') as HTMLSelectElement | null) ||
-          (d.querySelector('input[name="status"]') as HTMLInputElement | null);
-
-        const title = String(namaEl?.value || "");
-        const base = normalizePriceString(String(hargaEl?.value || ""));
-        const status = String(statusEl?.value || "");
-
-        return { title, base, status };
-      };
-
-      const syncOnce = () => {
-        const { title, base, status } = readMain();
-        let changed = false;
-
-        if (state.product.title !== title) {
-          state.product.title = title;
-          changed = true;
-        }
-        if (state.product.basePrice !== base) {
-          state.product.basePrice = base;
-          changed = true;
-        }
-        if ((state.product.status || "") !== status) {
-          state.product.status = status;
-          changed = true;
-        }
-
-        if (changed) {
-          save();
-          try { render(); } catch { }
-        }
-      };
-
-      const handler = (e?: any) => {
-        const t = e?.target;
-        if (t && t.matches && !t.matches(SELS)) return;
-        syncOnce();
-      };
-
-      // initial + catch async prefill/edit mode lebih lama
-      handler();
-      const itv = window.setInterval(() => syncOnce(), 400);
-      const tmo = window.setTimeout(() => window.clearInterval(itv), 12000);
-
-      // event delegation (aman kalau React replace node input)
-      d.addEventListener("input", handler, true);
-      d.addEventListener("change", handler, true);
-
-      return () => {
-        try { window.clearInterval(itv); } catch { }
-        try { window.clearTimeout(tmo); } catch { }
-        try { d.removeEventListener("input", handler, true); } catch { }
-        try { d.removeEventListener("change", handler, true); } catch { }
-      };
-    }
-
-    // bind sekarang (sekali) — state.product akan selalu mengikuti form utama
-    mainFormSyncCleanup = bindMainFormSync();
-
-
-    // === Bridge: hasil pilih kolase dari React ImagePickerModal (biar modalnya sama persis) ===
-    onVarKolasePicked = (ev: any) => {
-      try {
-        const det = ev?.detail || {};
-        const varId = det.varId;
-        const selId = det.imageId ?? det.selId ?? det.id;
-        const url = det.url || det.kolaseUrl || "";
-        if (!varId || !selId) return;
-
-        const vv: any = state.variations.find((x: any) => x.id === String(varId));
-        if (!vv) return;
-
-        if (!vv.image) vv.image = { mode: "", kolaseId: null, kolaseUrl: "", uploadField: "" };
-        vv.image.mode = "kolase";
-        vv.image.uploadStatus = "";
-        vv.image.uploadName = "";
-        vv.image.uploadToken = "";
-        vv.image.kolaseId = Number(selId);
-        vv.image.kolaseUrl = String(url || "");
-        vv.image.uploadField = `variasiFotoUpload__${vv.id}`;
-
-        // clear upload file if any
-        const up = ensureVarUploadInput(vv.id);
-        if (up) up.value = "";
-        try { if (uploadUrlByVar[vv.id]) URL.revokeObjectURL(uploadUrlByVar[vv.id]); } catch { }
-        delete uploadUrlByVar[vv.id];
-
-        save(); render();
-      } catch (err) {
-        console.error("apply var kolase picked error", err);
+      // Event promo (diskon) - delegation (lebih ringan, tidak perlu bind per-row)
+      let promoRenderT = 0 as any;
+      function scheduleRender() {
+        try { clearTimeout(promoRenderT); } catch { }
+        promoRenderT = setTimeout(() => { try { render(); } catch { } }, 120);
       }
-    };
+      function getTargetByDataset(el: any) {
+        const scope = el?.dataset?.scope;
+        const varId = el?.dataset?.var;
+        const vv: any = (state.variations || []).find((x: any) => x.id === String(varId));
+        if (!vv) return null;
 
-    varKolasePickedRef.current = onVarKolasePicked;
-    broadcastVarMediaRef.current = broadcastVarMedia;
-    window.addEventListener("apix:varKolasePicked", onVarKolasePicked as any);
-    window.addEventListener("apix:requestVarMedia", broadcastVarMedia as any);
+        if (scope === "var") return vv;
 
+        const lv1 = (vv.combos?.lv1 || []).find((x: any) => x.id === String(el.dataset.lv1));
+        if (scope === "lv1") return lv1 || null;
 
+        const lv2 = (lv1?.lv2 || []).find((x: any) => x.id === String(el.dataset.lv2));
+        if (scope === "lv2") return lv2 || null;
 
-    // === COPY/PASTE Opsi (Lv1/Lv2/Lv3) ===
-    function normKey(s: any) { return (s || "").trim().toLowerCase(); }
-    function setOptClip(payload: any) {
-      state.optClip = payload;
-      save();
-    }
-    function getOptClip() { return state.optClip || null; }
+        const lv3 = (lv2?.lv3 || []).find((x: any) => x.id === String(el.dataset.lv3));
+        if (scope === "lv3") return lv3 || null;
 
-    function stripLv3(o: any) {
-      return {
-        label: (o?.label || "").trim(),
-        addPrice: normalizePriceString(o?.addPrice || ""),
-        promo: o?.promo ? { ...o.promo } : defaultPromo(),
-      };
-    }
-    function stripLv2(o: any) {
-      return {
-        label: (o?.label || "").trim(),
-        addPrice: normalizePriceString(o?.addPrice || ""),
-        promo: o?.promo ? { ...o.promo } : defaultPromo(),
-        lv3: Array.isArray(o?.lv3) ? o.lv3.map(stripLv3) : []
-      };
-    }
-    function stripLv1(o: any) {
-      return {
-        label: (o?.label || "").trim(),
-        addPrice: normalizePriceString(o?.addPrice || ""),
-        promo: o?.promo ? { ...o.promo } : defaultPromo(),
-        lv2: Array.isArray(o?.lv2) ? o.lv2.map(stripLv2) : []
-      };
-    }
+        return null;
+      }
 
-    function cloneLv3(o: any) {
-      return {
-        id: uid(),
-        label: (o?.label || "").trim(),
-        addPrice: normalizePriceString(o?.addPrice || ""),
-        promo: o?.promo ? { ...o.promo } : defaultPromo(),
-      };
-    }
-    function cloneLv2(o: any) {
-      return {
-        id: uid(),
-        label: (o?.label || "").trim(),
-        addPrice: normalizePriceString(o?.addPrice || ""),
-        promo: o?.promo ? { ...o.promo } : defaultPromo(),
-        lv3: Array.isArray(o?.lv3) ? o.lv3.map(cloneLv3) : []
-      };
-    }
-    function cloneLv1(o: any) {
-      return {
-        id: uid(),
-        label: (o?.label || "").trim(),
-        addPrice: normalizePriceString(o?.addPrice || ""),
-        promo: o?.promo ? { ...o.promo } : defaultPromo(),
-        lv2: Array.isArray(o?.lv2) ? o.lv2.map(cloneLv2) : []
-      };
-    }
+      d.addEventListener("change", (e) => {
+        const el = (e as any).target;
+        if (!(el instanceof HTMLInputElement)) return;
 
-    function pasteInto(targetArr: any, items: any, levelLabel: any) {
-      targetArr = targetArr || [];
-      const existing = new Set(targetArr.map((x: any) => normKey(x.label)));
-      let added = 0, skipped = 0;
-      items.forEach((it: any) => {
-        const k = normKey(it.label);
-        if (!k) { skipped++; return; }
-        if (existing.has(k)) { skipped++; return; }
-        existing.add(k);
-        targetArr.push(it);
-        added++;
+        if (el.matches("[data-promo-on]")) {
+          const tgt: any = getTargetByDataset(el);
+          if (!tgt) return;
+          tgt.promo = normalizePromo(tgt.promo);
+          tgt.promo.active = !!el.checked;
+          save(); scheduleRender();
+        }
+
+        if (el.matches("[data-promo-type]")) {
+          const tgt: any = getTargetByDataset(el);
+          if (!tgt) return;
+          tgt.promo = normalizePromo(tgt.promo);
+          tgt.promo.type = (el.getAttribute("data-promo-type") === "nominal") ? "nominal" : "percent";
+          save(); scheduleRender();
+        }
       });
-      toast(`${added} opsi ${levelLabel} ditambahkan` + (skipped ? ` • ${skipped} dilewati` : ``));
-      return { added, skipped };
-    }
 
-    const stepsEl = d.getElementById("steps");
-    const pageEl = d.getElementById("page");
+      d.addEventListener("input", (e) => {
+        const el = (e as any).target;
+        if (!(el instanceof HTMLInputElement)) return;
+        if (!el.matches("[data-promo-val]")) return;
 
-    function esc(s: any) {
-      return String(s || "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-    }
-    function toInt(v: any) {
-      const s = String(v ?? "");
-      const digits = s.replace(/[^\d]/g, "");
-      if (!digits) return 0;
-      const n = Number(digits);
-      return Number.isFinite(n) ? Math.max(0, n) : 0;
-    }
-    function normalizePriceString(v: any) {
-      const s = String(v ?? "");
-      return s.replace(/[^\d]/g, "");
-    }
-    function parseMoney(str: any) {
-      if (str === "" || str == null) return 0;
-      return toInt(str);
-    }
-    function formatIDR(n: any) {
-      try { return new Intl.NumberFormat("id-ID").format(toInt(n)); }
-      catch { return String(toInt(n)); }
-    }
-
-
-    // === Promo/Diskon (opsional) untuk Variasi & Kombinasi Lv1/Lv2/Lv3 ===
-    function defaultPromo() {
-      return { active: false, type: "percent", value: "" };
-    }
-    function normalizePromo(p: any) {
-      if (!p) return defaultPromo();
-      return {
-        active: !!(p as any).active,
-        type: ((p as any).type === "nominal") ? "nominal" : "percent",
-        value: normalizePriceString(((p as any).value || "") as any)
-      };
-    }
-    function applyPromo(before: any, promo: any) {
-      const p = normalizePromo(promo);
-      const b = toInt(before);
-      if (!p.active) return { before: b, after: b, badge: "" };
-
-      if (p.type === "percent") {
-        let pct = toInt(p.value);
-        if (pct > 100) pct = 100;
-        const after = Math.max(0, Math.round(b * (100 - pct) / 100));
-        return { before: b, after, badge: pct ? `-${pct}%` : "" };
-      } else {
-        const cut = toInt(p.value);
-        const after = Math.max(0, b - cut);
-        return { before: b, after, badge: cut ? `-Rp ${formatIDR(cut)}` : "" };
-      }
-    }
-    function priceHtml(before: any, after: any, badge: any) {
-      const b = toInt(before);
-      const a = toInt(after);
-      if (a < b) {
-        return `<span class="oldPrice">Rp ${formatIDR(b)}</span><span class="newPrice">Rp ${formatIDR(a)}</span>${badge ? `<span class="promoBadge">${esc(badge)}</span>` : ""}`;
-      }
-      return `<span class="newPrice">Rp ${formatIDR(a)}</span>`;
-    }
-
-    // Paksa input harga tetap angka (hapus huruf/simbol saat diketik)
-    d.addEventListener("input", (e: any) => {
-      const el = e.target;
-      if (!(el instanceof HTMLInputElement)) return;
-      if (el.matches('input[data-price], input[data-newprice], input[name$="_price"], input[name="variation_price"]')) {
-        const before = el.value;
-        const after = normalizePriceString(before);
-        if (before !== after) {
-          const pos = el.selectionStart ?? after.length;
-          el.value = after;
-          try {
-            const newPos = Math.min(after.length, Math.max(0, pos - (before.length - after.length)));
-            el.setSelectionRange(newPos, newPos);
-          } catch { }
-        }
-      }
-    });
-
-    // Event promo (diskon) - delegation (lebih ringan, tidak perlu bind per-row)
-    let promoRenderT = 0 as any;
-    function scheduleRender() {
-      try { clearTimeout(promoRenderT); } catch { }
-      promoRenderT = setTimeout(() => { try { render(); } catch { } }, 120);
-    }
-    function getTargetByDataset(el: any) {
-      const scope = el?.dataset?.scope;
-      const varId = el?.dataset?.var;
-      const vv: any = (state.variations || []).find((x: any) => x.id === String(varId));
-      if (!vv) return null;
-
-      if (scope === "var") return vv;
-
-      const lv1 = (vv.combos?.lv1 || []).find((x: any) => x.id === String(el.dataset.lv1));
-      if (scope === "lv1") return lv1 || null;
-
-      const lv2 = (lv1?.lv2 || []).find((x: any) => x.id === String(el.dataset.lv2));
-      if (scope === "lv2") return lv2 || null;
-
-      const lv3 = (lv2?.lv3 || []).find((x: any) => x.id === String(el.dataset.lv3));
-      if (scope === "lv3") return lv3 || null;
-
-      return null;
-    }
-
-    d.addEventListener("change", (e: any) => {
-      const el = (e as any).target;
-      if (!(el instanceof HTMLInputElement)) return;
-
-      if (el.matches("[data-promo-on]")) {
         const tgt: any = getTargetByDataset(el);
         if (!tgt) return;
         tgt.promo = normalizePromo(tgt.promo);
-        tgt.promo.active = !!el.checked;
+        tgt.promo.value = normalizePriceString(el.value);
+        el.value = tgt.promo.value;
         save(); scheduleRender();
+      });
+
+      function baseReady() { return parseMoney(state.product.basePrice) > 0; }
+
+      function tVar() { return (state.titles.varTitle || "").trim() || "Variasi"; }
+      function tLv1() { return (state.titles.lv1Title || "").trim() || "Pilihan"; }
+      function tLv2() { return (state.titles.lv2Title || "").trim() || "Kombinasi"; }
+      function tLv3() { return (state.titles.lv3Title || "").trim() || "Opsi"; }
+
+      function effectiveUnitForVar(v) {
+        return (v && v.unitOverride) ? v.unitOverride : state.product.unit;
+      }
+      function unitSymbolShort(u) {
+        const s = String(u || "").trim();
+        if (!s) return "";
+        const up = s.toUpperCase();
+        if (up === "M2") return "m²";
+        if (up === "M3") return "m³";
+        if (up === "CM2") return "cm²";
+        if (up === "CM3") return "cm³";
+        if (up === "MM2") return "mm²";
+        if (up === "MM3") return "mm³";
+        // default: lowercase for nicer display (PCS -> pcs)
+        return up.toLowerCase();
+      }
+      function effectiveBasePriceForVar(v) {
+        return parseMoney((v && v.price) ? v.price : "") || parseMoney(state.product.basePrice);
       }
 
-      if (el.matches("[data-promo-type]")) {
-        const tgt: any = getTargetByDataset(el);
-        if (!tgt) return;
-        tgt.promo = normalizePromo(tgt.promo);
-        tgt.promo.type = (el.getAttribute("data-promo-type") === "nominal") ? "nominal" : "percent";
-        save(); scheduleRender();
+      function renderSteps() {
+        stepsEl.innerHTML = "";
+        stepsEl.appendChild(makeStep(0, "Produk"));
+        stepsEl.appendChild(makeStep(1, "Variasi"));
+        stepsEl.appendChild(makeStep(2, "Kombinasi"));
       }
-    });
-
-    d.addEventListener("input", (e: any) => {
-      const el = (e as any).target;
-      if (!(el instanceof HTMLInputElement)) return;
-      if (!el.matches("[data-promo-val]")) return;
-
-      const tgt: any = getTargetByDataset(el);
-      if (!tgt) return;
-      tgt.promo = normalizePromo(tgt.promo);
-      tgt.promo.value = normalizePriceString(el.value);
-      el.value = tgt.promo.value;
-      save(); scheduleRender();
-    });
-
-    function baseReady() { return parseMoney(state.product.basePrice) > 0; }
-
-    function tVar() { return (state.titles.varTitle || "").trim() || "Variasi"; }
-    function tLv1() { return (state.titles.lv1Title || "").trim() || "Pilihan"; }
-    function tLv2() { return (state.titles.lv2Title || "").trim() || "Kombinasi"; }
-    function tLv3() { return (state.titles.lv3Title || "").trim() || "Opsi"; }
-
-    function effectiveUnitForVar(v: any) {
-      return (v && v.unitOverride) ? v.unitOverride : state.product.unit;
-    }
-    function unitSymbolShort(u: any) {
-      const s = String(u || "").trim();
-      if (!s) return "";
-      const up = s.toUpperCase();
-      if (up === "M2") return "m²";
-      if (up === "M3") return "m³";
-      if (up === "CM2") return "cm²";
-      if (up === "CM3") return "cm³";
-      if (up === "MM2") return "mm²";
-      if (up === "MM3") return "mm³";
-      // default: lowercase for nicer display (PCS -> pcs)
-      return up.toLowerCase();
-    }
-    function effectiveBasePriceForVar(v: any) {
-      return parseMoney((v && v.price) ? v.price : "") || parseMoney(state.product.basePrice);
-    }
-
-    function renderSteps() {
-      stepsEl.innerHTML = "";
-      stepsEl.appendChild(makeStep(0, "Produk"));
-      stepsEl.appendChild(makeStep(1, "Variasi"));
-      stepsEl.appendChild(makeStep(2, "Kombinasi"));
-    }
-    function makeStep(i: any, label: any) {
-      const el = d.createElement("div");
-      el.className = "step" + (state.step === i ? " active" : "");
-      el.innerHTML = `<div class="dot">${i + 1}</div><div class="lbl">${esc(label)}</div>`;
-      el.onclick = () => {
-        if (i > 0 && !baseReady()) { toast("Harga produk wajib diisi"); state.step = 0; }
-        else state.step = i;
-        save(); render();
-      };
-      return el;
-    }
-
-    function ensurePreviewDefaults() {
-      const activeVars = (state.variations || []).filter((x: any) => x.enabled !== false);
-      if (!state.preview.varId && activeVars[0]) state.preview.varId = activeVars[0].id;
-      let v = activeVars.find((x: any) => x.id === state.preview.varId);
-      if (!v) {
-        state.preview.varId = activeVars[0]?.id || null;
-        state.preview.lv1Id = null; state.preview.lv2Id = null; state.preview.lv3Id = null;
-        v = activeVars.find((x: any) => x.id === state.preview.varId);
-        if (!v) return;
+      function makeStep(i, label) {
+        const el = d.createElement("div");
+        el.className = "step" + (state.step === i ? " active" : "");
+        el.innerHTML = `<div class="dot">${i + 1}</div><div class="lbl">${esc(label)}</div>`;
+        el.onclick = () => {
+          if (i > 0 && !baseReady()) { toast("Harga produk wajib diisi"); state.step = 0; }
+          else state.step = i;
+          save(); render();
+        };
+        return el;
       }
 
-      const lv1Arr = v.combos.lv1 || [];
-      if (!lv1Arr.length) { state.preview.lv1Id = null; state.preview.lv2Id = null; state.preview.lv3Id = null; return; }
+      function ensurePreviewDefaults() {
+        const activeVars = (state.variations || []).filter(x => x.enabled !== false);
+        if (!state.preview.varId && activeVars[0]) state.preview.varId = activeVars[0].id;
+        let v = activeVars.find(x => x.id === state.preview.varId);
+        if (!v) {
+          state.preview.varId = activeVars[0]?.id || null;
+          state.preview.lv1Id = null; state.preview.lv2Id = null; state.preview.lv3Id = null;
+          v = activeVars.find(x => x.id === state.preview.varId);
+          if (!v) return;
+        }
 
-      if (!state.preview.lv1Id || !lv1Arr.some((o: any) => o.id === state.preview.lv1Id)) {
-        state.preview.lv1Id = lv1Arr[0].id;
-        state.preview.lv2Id = null;
-        state.preview.lv3Id = null;
+        const lv1Arr = v.combos.lv1 || [];
+        if (!lv1Arr.length) { state.preview.lv1Id = null; state.preview.lv2Id = null; state.preview.lv3Id = null; return; }
+
+        if (!state.preview.lv1Id || !lv1Arr.some(o => o.id === state.preview.lv1Id)) {
+          state.preview.lv1Id = lv1Arr[0].id;
+          state.preview.lv2Id = null;
+          state.preview.lv3Id = null;
+        }
+
+        const lv1 = lv1Arr.find(o => o.id === state.preview.lv1Id);
+        const lv2Arr = (lv1 && lv1.lv2) ? lv1.lv2 : [];
+        if (!state.combo.lv2Enabled || !lv2Arr.length) {
+          state.preview.lv2Id = null;
+          state.preview.lv3Id = null;
+          return;
+        }
+        if (!state.preview.lv2Id || !lv2Arr.some(o => o.id === state.preview.lv2Id)) {
+          state.preview.lv2Id = lv2Arr[0].id;
+          state.preview.lv3Id = null;
+        }
+
+        const lv2 = lv2Arr.find(o => o.id === state.preview.lv2Id);
+        const lv3Arr = (lv2 && lv2.lv3) ? lv2.lv3 : [];
+        if (!state.combo.lv3Enabled || !lv3Arr.length) {
+          state.preview.lv3Id = null;
+          return;
+        }
+        if (!state.preview.lv3Id || !lv3Arr.some(o => o.id === state.preview.lv3Id)) {
+          state.preview.lv3Id = lv3Arr[0].id;
+        }
       }
 
-      const lv1 = lv1Arr.find((o: any) => o.id === state.preview.lv1Id);
-      const lv2Arr = (lv1 && lv1.lv2) ? lv1.lv2 : [];
-      if (!state.combo.lv2Enabled || !lv2Arr.length) {
-        state.preview.lv2Id = null;
-        state.preview.lv3Id = null;
-        return;
-      }
-      if (!state.preview.lv2Id || !lv2Arr.some((o: any) => o.id === state.preview.lv2Id)) {
-        state.preview.lv2Id = lv2Arr[0].id;
-        state.preview.lv3Id = null;
-      }
-
-      const lv2 = lv2Arr.find((o: any) => o.id === state.preview.lv2Id);
-      const lv3Arr = (lv2 && lv2.lv3) ? lv2.lv3 : [];
-      if (!state.combo.lv3Enabled || !lv3Arr.length) {
-        state.preview.lv3Id = null;
-        return;
-      }
-      if (!state.preview.lv3Id || !lv3Arr.some((o: any) => o.id === state.preview.lv3Id)) {
-        state.preview.lv3Id = lv3Arr[0].id;
-      }
-    }
-
-    function render() {
-      // Jika variasi OFF: jangan munculin form/tab variasi sama sekali.
-      // Preview e-commerce tetap selalu tampil (sesuai requirement).
-      if (!state.enabled) {
-        stepsEl.style.display = "none";
-        pageEl.innerHTML = `
+      function render() {
+        // Jika variasi OFF: jangan munculin form/tab variasi sama sekali.
+        // Preview e-commerce tetap selalu tampil (sesuai requirement).
+        if (!state.enabled) {
+          stepsEl.style.display = "none";
+          pageEl.innerHTML = `
           <div class="disabledBox">
             <div class="disabledTitle">Variasi belum aktif</div>
             <div class="disabledSub">
@@ -1212,40 +1213,40 @@ const VariasiKombinasiWidget = function VariasiKombinasiWidget({
           <div style="height:12px;"></div>
           <div id="previewMount"></div>
         `;
-        const pm = d.getElementById("previewMount");
-        pm.innerHTML = "";
-        pm.appendChild(renderPreviewEcommerce());
-        return;
-      }
+          const pm = d.getElementById("previewMount");
+          pm.innerHTML = "";
+          pm.appendChild(renderPreviewEcommerce());
+          return;
+        }
 
-      stepsEl.style.display = "";
-      renderSteps();
+        stepsEl.style.display = "";
+        renderSteps();
 
-      // Layout: form/tab dulu, preview selalu di bawah
-      pageEl.innerHTML = `
+        // Layout: form/tab dulu, preview selalu di bawah
+        pageEl.innerHTML = `
         <div id="formMount"></div>
         <div style="height:12px;"></div>
         <div id="previewMount"></div>
       `;
 
-      // Render konten form sesuai step/tab
-      const fm = d.getElementById("formMount");
-      if (state.step === 0) renderProduk(fm);
-      else if (state.step === 1) renderVariasi(fm);
-      else renderKombinasi(fm);
+        // Render konten form sesuai step/tab
+        const fm = d.getElementById("formMount");
+        if (state.step === 0) renderProduk(fm);
+        else if (state.step === 1) renderVariasi(fm);
+        else renderKombinasi(fm);
 
-      // Render preview (selalu tampil di bawah)
-      const pm = d.getElementById("previewMount");
-      pm.innerHTML = "";
-      pm.appendChild(renderPreviewEcommerce());
-    }
+        // Render preview (selalu tampil di bawah)
+        const pm = d.getElementById("previewMount");
+        pm.innerHTML = "";
+        pm.appendChild(renderPreviewEcommerce());
+      }
 
-    function renderProduk(mount: any) {
-      const titleVal = state.product.title || "";
-      const baseVal = state.product.basePrice || "";
-      const statusVal = state.product.status || "";
+      function renderProduk(mount) {
+        const titleVal = state.product.title || "";
+        const baseVal = state.product.basePrice || "";
+        const statusVal = state.product.status || "";
 
-      mount.innerHTML = `
+        mount.innerHTML = `
     <div class="box" style="margin-bottom:10px;">
       <div class="boxHead">
         <b>Ikuti Produk Utama</b>
@@ -1268,7 +1269,7 @@ const VariasiKombinasiWidget = function VariasiKombinasiWidget({
       <div>
         <label>Dijual per</label>
         <select id="pUnit" name="product_unit" autocomplete="on">
-          ${UNIT_OPTIONS.map((u: any) => `<option value="${u.v}">${esc(u.label)}</option>`).join("")}
+          ${UNIT_OPTIONS.map(u => `<option value="${u.v}">${esc(u.label)}</option>`).join("")}
         </select>
       </div>
     </div>
@@ -1303,23 +1304,23 @@ const VariasiKombinasiWidget = function VariasiKombinasiWidget({
       <button class="btn primary" id="toVar" type="button">Lanjut</button>
     </div>
   `;
-      const pUnit = d.getElementById("pUnit");
-      pUnit.value = state.product.unit;
+        const pUnit = d.getElementById("pUnit");
+        pUnit.value = state.product.unit;
 
-      pUnit.onchange = () => { state.product.unit = pUnit.value; save(); render(); };
+        pUnit.onchange = () => { state.product.unit = pUnit.value; save(); render(); };
 
-      d.getElementById("toVar").onclick = () => {
-        if (!baseReady()) { toast("Harga produk wajib diisi"); return; }
-        state.step = 1; save(); render();
-        // fokus ke input pertama di variasi
-        setTimeout(() => d.querySelector("#vName")?.focus(), 0);
-      };
-    }
+        d.getElementById("toVar").onclick = () => {
+          if (!baseReady()) { toast("Harga produk wajib diisi"); return; }
+          state.step = 1; save(); render();
+          // fokus ke input pertama di variasi
+          setTimeout(() => d.querySelector("#vName")?.focus(), 0);
+        };
+      }
 
-    function renderVariasi(mount: any) {
-      const has = state.variations.length > 0;
+      function renderVariasi(mount) {
+        const has = state.variations.length > 0;
 
-      mount.innerHTML = `
+        mount.innerHTML = `
         <div class="box globalBox">
           <div class="boxHead">
             <b>Judul Global (untuk admin)</b>
@@ -1367,7 +1368,7 @@ const VariasiKombinasiWidget = function VariasiKombinasiWidget({
                 <label>Unit ${esc(tVar())} (opsional)</label>
                 <select id="vUnit" name="variation_unit" autocomplete="on">
                   <option value="">Ikuti produk (${esc(state.product.unit)})</option>
-                  ${UNIT_OPTIONS.map((u: any) => `<option value="${u.v}">${esc(u.label)}</option>`).join("")}
+                  ${UNIT_OPTIONS.map(u => `<option value="${u.v}">${esc(u.label)}</option>`).join("")}
                 </select>
                 <small>kosong → ikut unit produk</small>
               </div>
@@ -1400,54 +1401,54 @@ const VariasiKombinasiWidget = function VariasiKombinasiWidget({
         </div>
       `;
 
-      bindTitleInput(
-        d.getElementById("titleVar"),
-        () => state.titles.varTitle,
-        (v: any) => { state.titles.varTitle = v; }
-      );
+        bindTitleInput(
+          d.getElementById("titleVar"),
+          () => state.titles.varTitle,
+          (v) => { state.titles.varTitle = v; }
+        );
 
-      const vName = d.getElementById("vName");
-      const vPrice = d.getElementById("vPrice");
-      const vUnit = d.getElementById("vUnit");
+        const vName = d.getElementById("vName");
+        const vPrice = d.getElementById("vPrice");
+        const vUnit = d.getElementById("vUnit");
 
-      function addVar() {
-        const nm = (vName.value || "").trim();
-        if (!nm) { toast(`Nama ${tVar().toLowerCase()} wajib`); vName.focus(); return; }
-        if (state.variations.length >= 10) { toast("Maks 10 variasi"); return; }
+        function addVar() {
+          const nm = (vName.value || "").trim();
+          if (!nm) { toast(`Nama ${tVar().toLowerCase()} wajib`); vName.focus(); return; }
+          if (state.variations.length >= 10) { toast("Maks 10 variasi"); return; }
 
-        const id = uid();
-        state.variations.push({
-          id,
-          enabled: true,
-          label: nm,
-          price: (vPrice.value || "").trim(),
-          unitOverride: (vUnit.value || "").trim(),
-          promo: defaultPromo(),
-          image: { mode: "", kolaseId: null, kolaseUrl: "", uploadField: `variasiFotoUpload__${id}` },
-          combos: { lv1: [] }
-        });
+          const id = uid();
+          state.variations.push({
+            id,
+            enabled: true,
+            label: nm,
+            price: (vPrice.value || "").trim(),
+            unitOverride: (vUnit.value || "").trim(),
+            promo: defaultPromo(),
+            image: { mode: "", kolaseId: null, kolaseUrl: "", uploadField: `variasiFotoUpload__${id}` },
+            combos: { lv1: [] }
+          });
 
-        if (!state.preview.varId) state.preview.varId = state.variations[0].id;
+          if (!state.preview.varId) state.preview.varId = state.variations[0].id;
 
-        vName.value = ""; vPrice.value = ""; vUnit.value = "";
-        save(); render();
-        // setelah tambah, fokus balik ke vName biar cepat input variasi berikutnya
-        setTimeout(() => d.getElementById("vName")?.focus(), 0);
-      }
+          vName.value = ""; vPrice.value = ""; vUnit.value = "";
+          save(); render();
+          // setelah tambah, fokus balik ke vName biar cepat input variasi berikutnya
+          setTimeout(() => d.getElementById("vName")?.focus(), 0);
+        }
 
-      d.getElementById("vAdd").onclick = addVar;
+        d.getElementById("vAdd").onclick = addVar;
 
-      if (has) {
-        const list = d.getElementById("vList");
-        list.innerHTML = "";
-        state.variations.forEach((v: any, idx: any) => {
-          const row = d.createElement("div");
+        if (has) {
+          const list = d.getElementById("vList");
+          list.innerHTML = "";
+          state.variations.forEach((v, idx) => {
+            const row = d.createElement("div");
 
 
-          row.className = "vCard";
-          const vp = normalizePromo((v as any).promo);
-          (v as any).promo = vp;
-          row.innerHTML = `
+            row.className = "vCard";
+            const vp = normalizePromo((v as any).promo);
+            (v as any).promo = vp;
+            row.innerHTML = `
             <div class="vTop">
               <div>
                 <label style="margin:0 0 6px;">${esc(tVar())} ${idx + 1}</label>
@@ -1468,7 +1469,7 @@ const VariasiKombinasiWidget = function VariasiKombinasiWidget({
                 <label style="margin:0 0 6px;">Unit ${esc(tVar())} (opsional)</label>
                 <select data-unit name="variation_unit" autocomplete="on">
                   <option value="">Ikuti produk (${esc(state.product.unit)})</option>
-                  ${UNIT_OPTIONS.map((u: any) => `
+                  ${UNIT_OPTIONS.map(u => `
                     <option value="${u.v}" ${v.unitOverride === u.v ? "selected" : ""}>${esc(u.label)}</option>
                   `).join("")}
                 </select>
@@ -1555,223 +1556,223 @@ const VariasiKombinasiWidget = function VariasiKombinasiWidget({
               </div>
             </div>
           `;
-          row.querySelector("[data-name]").oninput = (e: any) => { v.label = e.target.value; save(); };
-          row.querySelector("[data-price]").oninput = (e: any) => { v.price = normalizePriceString(e.target.value); save(); };
-          row.querySelector("[data-unit]").onchange = (e: any) => { v.unitOverride = e.target.value || ""; save(); render(); };
-          // Foto variasi (upload / kolase)
-          ensureVarUploadInput(v.id);
-          const th = row.querySelector("[data-vthumb]") as any;
-          const mt = row.querySelector("[data-vimg-meta]") as any;
-          const fn = row.querySelector("[data-vfile-name]") as any;
-          const uploadRow = row.querySelector("[data-vupload-row]") as any;
-          const pickRow = row.querySelector("[data-vpick-row]") as any;
-          const clearBtn = row.querySelector("[data-vimg-clear]") as any;
+            row.querySelector("[data-name]").oninput = (e) => { v.label = e.target.value; save(); };
+            row.querySelector("[data-price]").oninput = (e) => { v.price = normalizePriceString(e.target.value); save(); };
+            row.querySelector("[data-unit]").onchange = (e) => { v.unitOverride = e.target.value || ""; save(); render(); };
+            // Foto variasi (upload / kolase)
+            ensureVarUploadInput(v.id);
+            const th = row.querySelector("[data-vthumb]") as any;
+            const mt = row.querySelector("[data-vimg-meta]") as any;
+            const fn = row.querySelector("[data-vfile-name]") as any;
+            const uploadRow = row.querySelector("[data-vupload-row]") as any;
+            const pickRow = row.querySelector("[data-vpick-row]") as any;
+            const clearBtn = row.querySelector("[data-vimg-clear]") as any;
 
-          const paint = () => {
-            const mode = (v.image && v.image.mode) ? v.image.mode : "";
-            const url = getVarImageUrl(v);
-            if (th) th.style.backgroundImage = url ? `url("${url}")` : "";
+            const paint = () => {
+              const mode = (v.image && v.image.mode) ? v.image.mode : "";
+              const url = getVarImageUrl(v);
+              if (th) th.style.backgroundImage = url ? `url("${url}")` : "";
 
-            // radio checked
+              // radio checked
+              try {
+                [...row.querySelectorAll('input[data-vimg-mode]')].forEach((inp: any) => {
+                  inp.checked = String(inp.value || "") === String(mode || "");
+                });
+              } catch { }
+
+              // toggle rows
+              if (uploadRow) uploadRow.style.display = (mode === "upload") ? "flex" : "none";
+              if (pickRow) pickRow.style.display = (mode === "kolase") ? "block" : "none";
+              if (clearBtn) clearBtn.style.display = mode ? "inline-flex" : "none";
+
+              // file name (upload)
+              if (fn) {
+                if (mode === "upload") {
+                  const nm = (v.image && v.image.uploadName) ? String(v.image.uploadName) : "";
+                  fn.textContent = nm || "No file chosen";
+                } else {
+                  fn.textContent = "No file chosen";
+                }
+              }
+
+              let meta = "Belum ada foto";
+              if (mode === "kolase") {
+                meta = v.image?.kolaseId ? `Kolase • ID ${v.image.kolaseId}` : "Kolase • belum dipilih";
+              } else if (mode === "upload") {
+                const st = String(v.image?.uploadStatus || "");
+                if (st === "uploading") meta = "Upload • mengupload...";
+                else if (st === "error") meta = "Upload • gagal (pilih lagi)";
+                else if (v.image?.kolaseId) meta = `Upload • tersimpan • ID ${v.image.kolaseId}`;
+                else meta = "Upload • belum dipilih";
+              }
+              if (mt) mt.textContent = meta;
+            };
+
+            // radio change: none / upload / kolase
             try {
               [...row.querySelectorAll('input[data-vimg-mode]')].forEach((inp: any) => {
-                inp.checked = String(inp.value || "") === String(mode || "");
-              });
-            } catch { }
+                inp.onchange = () => {
+                  const val = String(inp.value || "");
+                  if (val === "") {
+                    clearVarImage(v);
+                    save(); render();
+                    return;
+                  }
 
-            // toggle rows
-            if (uploadRow) uploadRow.style.display = (mode === "upload") ? "flex" : "none";
-            if (pickRow) pickRow.style.display = (mode === "kolase") ? "block" : "none";
-            if (clearBtn) clearBtn.style.display = mode ? "inline-flex" : "none";
+                  if (!v.image) v.image = { mode: "", kolaseId: null, kolaseUrl: "", uploadField: "" };
+                  v.image.uploadField = `variasiFotoUpload__${v.id}`;
 
-            // file name (upload)
-            if (fn) {
-              if (mode === "upload") {
-                const nm = (v.image && v.image.uploadName) ? String(v.image.uploadName) : "";
-                fn.textContent = nm || "No file chosen";
-              } else {
-                fn.textContent = "No file chosen";
-              }
-            }
+                  if (val === "upload") {
+                    const keep = (v.image.mode === "upload" && v.image.kolaseId);
+                    v.image.mode = "upload";
+                    // jika sebelumnya bukan upload, kosongkan dulu agar user pilih file baru
+                    if (!keep) {
+                      v.image.kolaseId = null;
+                      v.image.kolaseUrl = "";
+                      v.image.uploadStatus = "";
+                      v.image.uploadName = "";
+                      v.image.uploadToken = "";
+                    }
+                    save(); render();
+                    return;
+                  }
 
-            let meta = "Belum ada foto";
-            if (mode === "kolase") {
-              meta = v.image?.kolaseId ? `Kolase • ID ${v.image.kolaseId}` : "Kolase • belum dipilih";
-            } else if (mode === "upload") {
-              const st = String(v.image?.uploadStatus || "");
-              if (st === "uploading") meta = "Upload • mengupload...";
-              else if (st === "error") meta = "Upload • gagal (pilih lagi)";
-              else if (v.image?.kolaseId) meta = `Upload • tersimpan • ID ${v.image.kolaseId}`;
-              else meta = "Upload • belum dipilih";
-            }
-            if (mt) mt.textContent = meta;
-          };
-
-          // radio change: none / upload / kolase
-          try {
-            [...row.querySelectorAll('input[data-vimg-mode]')].forEach((inp: any) => {
-              inp.onchange = () => {
-                const val = String(inp.value || "");
-                if (val === "") {
-                  clearVarImage(v);
-                  save(); render();
-                  return;
-                }
-
-                if (!v.image) v.image = { mode: "", kolaseId: null, kolaseUrl: "", uploadField: "" };
-                v.image.uploadField = `variasiFotoUpload__${v.id}`;
-
-                if (val === "upload") {
-                  const keep = (v.image.mode === "upload" && v.image.kolaseId);
-                  v.image.mode = "upload";
-                  // jika sebelumnya bukan upload, kosongkan dulu agar user pilih file baru
-                  if (!keep) {
-                    v.image.kolaseId = null;
-                    v.image.kolaseUrl = "";
+                  if (val === "kolase") {
+                    v.image.mode = "kolase";
                     v.image.uploadStatus = "";
                     v.image.uploadName = "";
                     v.image.uploadToken = "";
+                    // clear upload file if any (biar gak bingung)
+                    const up = ensureVarUploadInput(v.id);
+                    if (up) up.value = "";
+                    try { if (uploadUrlByVar[v.id]) URL.revokeObjectURL(uploadUrlByVar[v.id]); } catch { }
+                    delete uploadUrlByVar[v.id];
+
+                    save(); render();
+                    return;
                   }
-                  save(); render();
-                  return;
-                }
+                };
+              });
+            } catch { }
 
-                if (val === "kolase") {
-                  v.image.mode = "kolase";
-                  v.image.uploadStatus = "";
-                  v.image.uploadName = "";
-                  v.image.uploadToken = "";
-                  // clear upload file if any (biar gak bingung)
-                  const up = ensureVarUploadInput(v.id);
-                  if (up) up.value = "";
-                  try { if (uploadUrlByVar[v.id]) URL.revokeObjectURL(uploadUrlByVar[v.id]); } catch { }
-                  delete uploadUrlByVar[v.id];
+            (row.querySelector("[data-vimg-upload]") as any).onclick = () => {
+              // set mode ke upload dulu (UX)
+              if (!v.image) v.image = { mode: "", kolaseId: null, kolaseUrl: "", uploadField: "" };
+              const prev = v.image.mode;
+              v.image.mode = "upload";
+              v.image.uploadField = `variasiFotoUpload__${v.id}`;
+              if (prev !== "upload") {
+                v.image.kolaseId = null;
+                v.image.kolaseUrl = "";
+                v.image.uploadStatus = "";
+                v.image.uploadName = "";
+                v.image.uploadToken = "";
+              }
+              save();
+              (ensureVarUploadInput(v.id) as any)?.click();
+              paint();
+            };
 
-                  save(); render();
-                  return;
-                }
-              };
-            });
-          } catch { }
+            (row.querySelector("[data-vimg-pick]") as any).onclick = () => {
+              if (!v.image) v.image = { mode: "", kolaseId: null, kolaseUrl: "", uploadField: "" };
+              v.image.mode = "kolase";
+              v.image.uploadField = `variasiFotoUpload__${v.id}`;
+              save();
+              openVarKolasePicker(v);
+            };
 
-          (row.querySelector("[data-vimg-upload]") as any).onclick = () => {
-            // set mode ke upload dulu (UX)
-            if (!v.image) v.image = { mode: "", kolaseId: null, kolaseUrl: "", uploadField: "" };
-            const prev = v.image.mode;
-            v.image.mode = "upload";
-            v.image.uploadField = `variasiFotoUpload__${v.id}`;
-            if (prev !== "upload") {
-              v.image.kolaseId = null;
-              v.image.kolaseUrl = "";
-              v.image.uploadStatus = "";
-              v.image.uploadName = "";
-              v.image.uploadToken = "";
-            }
-            save();
-            (ensureVarUploadInput(v.id) as any)?.click();
+            (row.querySelector("[data-vimg-clear]") as any).onclick = () => {
+              clearVarImage(v);
+              save(); render();
+            };
+
             paint();
-          };
 
-          (row.querySelector("[data-vimg-pick]") as any).onclick = () => {
-            if (!v.image) v.image = { mode: "", kolaseId: null, kolaseUrl: "", uploadField: "" };
-            v.image.mode = "kolase";
-            v.image.uploadField = `variasiFotoUpload__${v.id}`;
-            save();
-            openVarKolasePicker(v);
-          };
+            row.querySelector("[data-del]").onclick = () => {
+              if (!confirm(`Hapus ${tVar().toLowerCase()} ini (beserta kombinasi anaknya)?`)) return;
+              state.variations = state.variations.filter(x => x.id !== v.id);
 
-          (row.querySelector("[data-vimg-clear]") as any).onclick = () => {
-            clearVarImage(v);
-            save(); render();
-          };
+              if (state.preview.varId === v.id) {
+                state.preview.varId = state.variations[0]?.id || null;
+                state.preview.lv1Id = null;
+                state.preview.lv2Id = null;
+                state.preview.lv3Id = null;
+              }
 
-          paint();
+              delete state.ui.selLv1ByVar[v.id];
+              Object.keys(state.ui.selLv2ByVarLv1 || {}).forEach(k => {
+                if (k.startsWith(v.id + "::")) delete state.ui.selLv2ByVarLv1[k];
+              });
 
-          row.querySelector("[data-del]").onclick = () => {
-            if (!confirm(`Hapus ${tVar().toLowerCase()} ini (beserta kombinasi anaknya)?`)) return;
-            state.variations = state.variations.filter((x: any) => x.id !== v.id);
+              // cleanup foto variasi (vault)
+              const up = vaultEl()?.querySelector(`input[data-var-upload="${v.id}"]`) as any;
+              if (up) up.remove();
+              try { if (uploadUrlByVar[v.id]) URL.revokeObjectURL(uploadUrlByVar[v.id]); } catch { }
+              delete uploadUrlByVar[v.id];
 
-            if (state.preview.varId === v.id) {
-              state.preview.varId = state.variations[0]?.id || null;
-              state.preview.lv1Id = null;
-              state.preview.lv2Id = null;
-              state.preview.lv3Id = null;
-            }
+              save(); render();
+            };
 
-            delete state.ui.selLv1ByVar[v.id];
-            Object.keys(state.ui.selLv2ByVarLv1 || {}).forEach(k => {
-              if (k.startsWith(v.id + "::")) delete state.ui.selLv2ByVarLv1[k];
-            });
+            list.appendChild(row);
+          });
+        }
 
-            // cleanup foto variasi (vault)
-            const up = vaultEl()?.querySelector(`input[data-var-upload="${v.id}"]`) as any;
-            if (up) up.remove();
-            try { if (uploadUrlByVar[v.id]) URL.revokeObjectURL(uploadUrlByVar[v.id]); } catch { }
-            delete uploadUrlByVar[v.id];
+        d.getElementById("backP").onclick = () => { state.step = 0; save(); render(); };
+        d.getElementById("toK").onclick = () => {
+          if (!baseReady()) { toast("Harga produk wajib diisi"); return; }
+          state.step = 2; save(); render();
+        };
 
-            save(); render();
-          };
-
-          list.appendChild(row);
-        });
+        // autofocus hanya saat masuk step Variasi (tidak setiap render)
+        const afKey = `v:${state.step}`;
+        if (lastAutoFocusKey !== afKey) {
+          lastAutoFocusKey = afKey;
+          setTimeout(() => d.getElementById("vName")?.focus(), 0);
+        }
       }
 
-      d.getElementById("backP").onclick = () => { state.step = 0; save(); render(); };
-      d.getElementById("toK").onclick = () => {
-        if (!baseReady()) { toast("Harga produk wajib diisi"); return; }
-        state.step = 2; save(); render();
-      };
-
-      // autofocus hanya saat masuk step Variasi (tidak setiap render)
-      const afKey = `v:${state.step}`;
-      if (lastAutoFocusKey !== afKey) {
-        lastAutoFocusKey = afKey;
-        setTimeout(() => d.getElementById("vName")?.focus(), 0);
+      function anyLv1Exists() {
+        return state.variations.some(v => (v.combos.lv1 || []).length > 0);
       }
-    }
 
-    function anyLv1Exists() {
-      return state.variations.some((v: any) => (v.combos.lv1 || []).length > 0);
-    }
+      function getSelLv1(varId, fallbackLv1Id) {
+        const v = state.variations.find(x => x.id === varId);
+        const arr = (v && v.combos.lv1) ? v.combos.lv1 : [];
+        if (!arr.length) return null;
+        let cur = state.ui.selLv1ByVar[varId];
+        if (!cur || !arr.some(o => o.id === cur)) cur = fallbackLv1Id || arr[0].id;
+        state.ui.selLv1ByVar[varId] = cur;
+        return cur;
+      }
+      function getSelLv2(varId, lv1Id) {
+        const key = `${varId}::${lv1Id}`;
+        const v = state.variations.find(x => x.id === varId);
+        const lv1 = v?.combos.lv1?.find(o => o.id === lv1Id);
+        const arr = lv1?.lv2 || [];
+        if (!arr.length) return null;
+        let cur = state.ui.selLv2ByVarLv1[key];
+        if (!cur || !arr.some(o => o.id === cur)) cur = arr[0].id;
+        state.ui.selLv2ByVarLv1[key] = cur;
+        return cur;
+      }
 
-    function getSelLv1(varId: any, fallbackLv1Id?: any) {
-      const v = state.variations.find((x: any) => x.id === varId);
-      const arr = (v && v.combos.lv1) ? v.combos.lv1 : [];
-      if (!arr.length) return null;
-      let cur = state.ui.selLv1ByVar[varId];
-      if (!cur || !arr.some((o: any) => o.id === cur)) cur = fallbackLv1Id || arr[0].id;
-      state.ui.selLv1ByVar[varId] = cur;
-      return cur;
-    }
-    function getSelLv2(varId: any, lv1Id: any) {
-      const key = `${varId}::${lv1Id}`;
-      const v = state.variations.find((x: any) => x.id === varId);
-      const lv1 = v?.combos.lv1?.find((o: any) => o.id === lv1Id);
-      const arr = lv1?.lv2 || [];
-      if (!arr.length) return null;
-      let cur = state.ui.selLv2ByVarLv1[key];
-      if (!cur || !arr.some((o: any) => o.id === cur)) cur = arr[0].id;
-      state.ui.selLv2ByVarLv1[key] = cur;
-      return cur;
-    }
+      // ==== Kombinasi + preview (sama seperti versi sebelumnya, dipersingkat) ====
+      // NOTE: fokus request kamu: Enter pindah ke input selanjutnya.
+      // Jadi bagian kombinasi tetap sama logicnya, tapi input harga dibuat text+inputmode agar autofill oke.
+      // (Aku keep full code biar 1 file runnable.)
 
-    // ==== Kombinasi + preview (sama seperti versi sebelumnya, dipersingkat) ====
-    // NOTE: fokus request kamu: Enter pindah ke input selanjutnya.
-    // Jadi bagian kombinasi tetap sama logicnya, tapi input harga dibuat text+inputmode agar autofill oke.
-    // (Aku keep full code biar 1 file runnable.)
-
-    function renderKombinasi(mount: any) {
-      if (state.variations.length === 0) {
-        mount.innerHTML = `
+      function renderKombinasi(mount) {
+        if (state.variations.length === 0) {
+          mount.innerHTML = `
           <div class="empty"><b>Belum ada ${esc(tVar())}.</b><br/>Tambah ${esc(tVar()).toLowerCase()} dulu.</div>
           <div class="divider"></div>
           <div class="btnRow"><button class="btn" id="backV" type="button">Kembali</button></div>
         `;
-        d.getElementById("backV").onclick = () => { state.step = 1; save(); render(); };
-        return;
-      }
+          d.getElementById("backV").onclick = () => { state.step = 1; save(); render(); };
+          return;
+        }
 
-      mount.innerHTML = `
+        mount.innerHTML = `
         <div class="subtabs">
           <div class="stabRow">
             <button type="button" class="stab ${state.comboTab === 1 ? "active" : ""}" data-tab="1">${esc(tLv1())} Lv1</button>
@@ -1795,44 +1796,44 @@ const VariasiKombinasiWidget = function VariasiKombinasiWidget({
         </div>
       `;
 
-      pageEl.querySelectorAll(".stab").forEach((el: any) => {
-        el.onclick = () => {
-          const t = Number(el.getAttribute("data-tab"));
-          state.comboTab = t;
-          save(); render();
-        };
-      });
+        pageEl.querySelectorAll(".stab").forEach(el => {
+          el.onclick = () => {
+            const t = Number(el.getAttribute("data-tab"));
+            state.comboTab = t;
+            save(); render();
+          };
+        });
 
-      d.getElementById("backV").onclick = () => { state.step = 1; save(); render(); };
-      d.getElementById("btnSave").onclick = () => { save(); toast("Tersimpan"); };
+        d.getElementById("backV").onclick = () => { state.step = 1; save(); render(); };
+        d.getElementById("btnSave").onclick = () => { save(); toast("Tersimpan"); };
 
-      const body = d.getElementById("comboBody");
-      if (state.comboTab === 1) body.appendChild(renderLv1());
-      if (state.comboTab === 2) body.appendChild(renderLv2());
-      if (state.comboTab === 3) body.appendChild(renderLv3());
+        const body = d.getElementById("comboBody");
+        if (state.comboTab === 1) body.appendChild(renderLv1());
+        if (state.comboTab === 2) body.appendChild(renderLv2());
+        if (state.comboTab === 3) body.appendChild(renderLv3());
 
-      // autofocus hanya saat pindah tab/step (biar tidak "maksa" fokus balik ke judul)
-      const afKey = `k:${state.step}:${state.comboTab}`;
-      if (lastAutoFocusKey !== afKey) {
-        lastAutoFocusKey = afKey;
-        setTimeout(() => {
-          const ae = d.activeElement;
-          if (ae && ae.closest && ae.closest("#page") && isField(ae)) return;
-          // fokus ke input pertama di area tab kombinasi aktif
-          const first = d.querySelector("#comboBody input:not([disabled]), #comboBody select:not([disabled])");
-          first?.focus();
-        }, 0);
+        // autofocus hanya saat pindah tab/step (biar tidak "maksa" fokus balik ke judul)
+        const afKey = `k:${state.step}:${state.comboTab}`;
+        if (lastAutoFocusKey !== afKey) {
+          lastAutoFocusKey = afKey;
+          setTimeout(() => {
+            const ae = d.activeElement;
+            if (ae && ae.closest && ae.closest("#page") && isField(ae)) return;
+            // fokus ke input pertama di area tab kombinasi aktif
+            const first = d.querySelector("#comboBody input:not([disabled]), #comboBody select:not([disabled])");
+            first?.focus();
+          }, 0);
+        }
       }
-    }
 
-    function renderLv1() {
-      const wrap = d.createElement("div");
-      wrap.style.display = "grid";
-      wrap.style.gap = "10px";
+      function renderLv1() {
+        const wrap = d.createElement("div");
+        wrap.style.display = "grid";
+        wrap.style.gap = "10px";
 
-      const top = d.createElement("div");
-      top.className = "box globalBox";
-      top.innerHTML = `
+        const top = d.createElement("div");
+        top.className = "box globalBox";
+        top.innerHTML = `
         <div class="boxHead">
           <b>Kombinasi Lv 1</b>
           <span class="badge">kosong = pakai default</span>
@@ -1849,42 +1850,42 @@ const VariasiKombinasiWidget = function VariasiKombinasiWidget({
           <div class="hint">Aktifkan Lv2 hanya kalau perlu level lanjutan. Kalau aktif → auto pindah tab Lv2.</div>
           <div class="btnRow" style="justify-content:flex-start;">
             ${state.combo.lv2Enabled
-          ? `<span class="badge">Kombinasi Lv2 aktif ✅</span>`
-          : `<button class="btn goldBlack" id="enableLv2" type="button">Aktifkan Kombinasi Lv2</button>`
-        }
+            ? `<span class="badge">Kombinasi Lv2 aktif ✅</span>`
+            : `<button class="btn goldBlack" id="enableLv2" type="button">Aktifkan Kombinasi Lv2</button>`
+          }
           </div>
         </div>
       `;
-      wrap.appendChild(top);
+        wrap.appendChild(top);
 
-      bindTitleInput(
-        top.querySelector("#titleLv1"),
-        () => state.titles.lv1Title,
-        (v: any) => { state.titles.lv1Title = v; }
-      );
+        bindTitleInput(
+          top.querySelector("#titleLv1"),
+          () => state.titles.lv1Title,
+          (v) => { state.titles.lv1Title = v; }
+        );
 
-      const enableLv2 = top.querySelector("#enableLv2");
-      if (enableLv2) {
-        enableLv2.onclick = () => {
-          if (!anyLv1Exists()) {
-            toast(`Buat ${tLv1()} minimal 1 dulu baru aktifkan Lv2`);
-            return;
-          }
-          const ok = confirm(`Aktifkan Kombinasi Lv2 untuk SEMUA ${tVar().toLowerCase()}?`);
-          if (ok) {
-            state.combo.lv2Enabled = true;
-            state.comboTab = 2;
-            save(); render();
-          }
-        };
-      }
+        const enableLv2 = top.querySelector("#enableLv2");
+        if (enableLv2) {
+          enableLv2.onclick = () => {
+            if (!anyLv1Exists()) {
+              toast(`Buat ${tLv1()} minimal 1 dulu baru aktifkan Lv2`);
+              return;
+            }
+            const ok = confirm(`Aktifkan Kombinasi Lv2 untuk SEMUA ${tVar().toLowerCase()}?`);
+            if (ok) {
+              state.combo.lv2Enabled = true;
+              state.comboTab = 2;
+              save(); render();
+            }
+          };
+        }
 
-      state.variations.forEach((v: any) => {
-        const box = d.createElement("div");
-        box.className = "box";
-        const lv1Count = v.combos.lv1.length;
+        state.variations.forEach(v => {
+          const box = d.createElement("div");
+          box.className = "box";
+          const lv1Count = v.combos.lv1.length;
 
-        box.innerHTML = `
+          box.innerHTML = `
           <div class="boxHead">
             <b>${esc(tVar())}: ${esc(v.label || "-")} → ${esc(tLv1())} (Lv1)</b>
             <span class="badge">${lv1Count} opsi</span>
@@ -1917,85 +1918,85 @@ const VariasiKombinasiWidget = function VariasiKombinasiWidget({
           </div>
         `;
 
-        const newName = box.querySelector("[data-newname]");
-        const newPrice = box.querySelector("[data-newprice]");
-        const btnAdd = box.querySelector("[data-add]");
-        const list = box.querySelector("[data-list]");
+          const newName = box.querySelector("[data-newname]");
+          const newPrice = box.querySelector("[data-newprice]");
+          const btnAdd = box.querySelector("[data-add]");
+          const list = box.querySelector("[data-list]");
 
-        const btnCopy = box.querySelector("[data-copy]");
-        const btnPaste = box.querySelector("[data-paste]");
-        const btnDropAll = box.querySelector("[data-dropall]");
-        if (btnDropAll) {
-          btnDropAll.onclick = () => {
-            const ok = confirm(`Drop ALL opsi ${tLv1()} untuk variasi "${v.label || "-"}"? (Lv2/Lv3 ikut hilang)`);
-            if (!ok) return;
-            v.combos = { lv1: [] };
-            // reset pilihan UI utk variasi ini
-            if (state.ui?.selLv1ByVar) delete state.ui.selLv1ByVar[v.id];
-            if (state.ui?.selLv2ByVarLv1) {
-              Object.keys(state.ui.selLv2ByVarLv1).forEach(k => {
-                if (k.startsWith(v.id + "::")) delete state.ui.selLv2ByVarLv1[k];
-              });
-            }
-            // reset preview kalau sedang lihat variasi ini
-            if (state.preview?.varId === v.id) {
-              state.preview.lv1Id = null;
-              state.preview.lv2Id = null;
-              state.preview.lv3Id = null;
-            }
-            save(); render();
-          };
-        }
-        const clipInfo = box.querySelector("[data-clipinfo]");
-        if (clipInfo) {
-          const c = getOptClip();
-          clipInfo.textContent = (c && c.level === 1) ? `Clipboard: ${c.label || "-"} (${(c.data || []).length} item)` : "";
-        }
-        if (btnCopy) {
-          btnCopy.onclick = () => {
-            const data = (v.combos.lv1 || []).map(stripLv1);
-            const payload = { level: 1, label: `Lv1 dari variasi "${v.label || "-"}"`, data, ts: Date.now() };
-            setOptClip(payload);
-            navigator.clipboard?.writeText(JSON.stringify(data, null, 2)).catch(() => { });
-            toast("Opsi Lv1 dicopy. Buka variasi lain lalu klik Paste.");
-            render();
-          };
-        }
-        if (btnPaste) {
-          btnPaste.onclick = () => {
+          const btnCopy = box.querySelector("[data-copy]");
+          const btnPaste = box.querySelector("[data-paste]");
+          const btnDropAll = box.querySelector("[data-dropall]");
+          if (btnDropAll) {
+            btnDropAll.onclick = () => {
+              const ok = confirm(`Drop ALL opsi ${tLv1()} untuk variasi "${v.label || "-"}"? (Lv2/Lv3 ikut hilang)`);
+              if (!ok) return;
+              v.combos = { lv1: [] };
+              // reset pilihan UI utk variasi ini
+              if (state.ui?.selLv1ByVar) delete state.ui.selLv1ByVar[v.id];
+              if (state.ui?.selLv2ByVarLv1) {
+                Object.keys(state.ui.selLv2ByVarLv1).forEach(k => {
+                  if (k.startsWith(v.id + "::")) delete state.ui.selLv2ByVarLv1[k];
+                });
+              }
+              // reset preview kalau sedang lihat variasi ini
+              if (state.preview?.varId === v.id) {
+                state.preview.lv1Id = null;
+                state.preview.lv2Id = null;
+                state.preview.lv3Id = null;
+              }
+              save(); render();
+            };
+          }
+          const clipInfo = box.querySelector("[data-clipinfo]");
+          if (clipInfo) {
             const c = getOptClip();
-            if (!c || c.level !== 1) { toast("Clipboard kosong / beda level"); return; }
-            v.combos.lv1 = v.combos.lv1 || [];
-            const items = (c.data || []).map(cloneLv1);
-            pasteInto(v.combos.lv1, items, tLv1());
-            if (state.preview.varId === v.id && !state.preview.lv1Id && v.combos.lv1[0]) state.preview.lv1Id = v.combos.lv1[0].id;
+            clipInfo.textContent = (c && c.level === 1) ? `Clipboard: ${c.label || "-"} (${(c.data || []).length} item)` : "";
+          }
+          if (btnCopy) {
+            btnCopy.onclick = () => {
+              const data = (v.combos.lv1 || []).map(stripLv1);
+              const payload = { level: 1, label: `Lv1 dari variasi "${v.label || "-"}"`, data, ts: Date.now() };
+              setOptClip(payload);
+              navigator.clipboard?.writeText(JSON.stringify(data, null, 2)).catch(() => { });
+              toast("Opsi Lv1 dicopy. Buka variasi lain lalu klik Paste.");
+              render();
+            };
+          }
+          if (btnPaste) {
+            btnPaste.onclick = () => {
+              const c = getOptClip();
+              if (!c || c.level !== 1) { toast("Clipboard kosong / beda level"); return; }
+              v.combos.lv1 = v.combos.lv1 || [];
+              const items = (c.data || []).map(cloneLv1);
+              pasteInto(v.combos.lv1, items, tLv1());
+              if (state.preview.varId === v.id && !state.preview.lv1Id && v.combos.lv1[0]) state.preview.lv1Id = v.combos.lv1[0].id;
+              save(); render();
+            };
+          }
+
+
+          btnAdd.onclick = () => {
+            const nm = (newName.value || "").trim();
+            if (!nm) { toast(`Nama ${tLv1()} wajib`); newName.focus(); return; }
+            v.combos.lv1.push({ id: uid(), label: nm, addPrice: normalizePriceString((newPrice.value || "").trim()), promo: defaultPromo(), lv2: [] });
+
+            if (state.preview.varId === v.id && !state.preview.lv1Id) state.preview.lv1Id = v.combos.lv1[0].id;
+
+            newName.value = ""; newPrice.value = "";
             save(); render();
           };
-        }
 
+          list.innerHTML = "";
+          if (!v.combos.lv1.length) {
+            list.innerHTML = `<div class="empty"><b>Belum ada ${esc(tLv1())}.</b><br/>Tambah opsi dulu.</div>`;
+          } else {
+            v.combos.lv1.forEach((o, idx) => {
+              const r = d.createElement("div");
 
-        btnAdd.onclick = () => {
-          const nm = (newName.value || "").trim();
-          if (!nm) { toast(`Nama ${tLv1()} wajib`); newName.focus(); return; }
-          v.combos.lv1.push({ id: uid(), label: nm, addPrice: normalizePriceString((newPrice.value || "").trim()), promo: defaultPromo(), lv2: [] });
-
-          if (state.preview.varId === v.id && !state.preview.lv1Id) state.preview.lv1Id = v.combos.lv1[0].id;
-
-          newName.value = ""; newPrice.value = "";
-          save(); render();
-        };
-
-        list.innerHTML = "";
-        if (!v.combos.lv1.length) {
-          list.innerHTML = `<div class="empty"><b>Belum ada ${esc(tLv1())}.</b><br/>Tambah opsi dulu.</div>`;
-        } else {
-          v.combos.lv1.forEach((o: any, idx: any) => {
-            const r = d.createElement("div");
-
-            r.className = "cCard";
-            const op = normalizePromo((o as any).promo);
-            (o as any).promo = op;
-            r.innerHTML = `
+              r.className = "cCard";
+              const op = normalizePromo((o as any).promo);
+              (o as any).promo = op;
+              r.innerHTML = `
               <div class="cNameCol">
                 <label style="margin:0 0 6px;">${esc(tLv1())} Opsi ${idx + 1}</label>
                 <input data-name name="lv1_name" autocomplete="on" value="${esc(o.label || "")}" />
@@ -2045,39 +2046,39 @@ const VariasiKombinasiWidget = function VariasiKombinasiWidget({
                 </div>
               </div>
             `;
-            r.querySelector("[data-name]").oninput = (e: any) => { o.label = e.target.value; save(); };
-            r.querySelector("[data-price]").oninput = (e: any) => { o.addPrice = normalizePriceString(e.target.value); save(); };
-            r.querySelector("[data-del]").onclick = () => {
-              if (!confirm(`Hapus opsi ${tLv1()} ini beserta anaknya?`)) return;
-              v.combos.lv1 = v.combos.lv1.filter((x: any) => x.id !== o.id);
-              delete state.ui.selLv2ByVarLv1[`${v.id}::${o.id}`];
+              r.querySelector("[data-name]").oninput = (e) => { o.label = e.target.value; save(); };
+              r.querySelector("[data-price]").oninput = (e) => { o.addPrice = normalizePriceString(e.target.value); save(); };
+              r.querySelector("[data-del]").onclick = () => {
+                if (!confirm(`Hapus opsi ${tLv1()} ini beserta anaknya?`)) return;
+                v.combos.lv1 = v.combos.lv1.filter(x => x.id !== o.id);
+                delete state.ui.selLv2ByVarLv1[`${v.id}::${o.id}`];
 
-              if (state.preview.varId === v.id && state.preview.lv1Id === o.id) {
-                state.preview.lv1Id = null;
-                state.preview.lv2Id = null;
-                state.preview.lv3Id = null;
-              }
+                if (state.preview.varId === v.id && state.preview.lv1Id === o.id) {
+                  state.preview.lv1Id = null;
+                  state.preview.lv2Id = null;
+                  state.preview.lv3Id = null;
+                }
 
-              save(); render();
-            };
-            list.appendChild(r);
-          });
-        }
+                save(); render();
+              };
+              list.appendChild(r);
+            });
+          }
 
-        wrap.appendChild(box);
-      });
+          wrap.appendChild(box);
+        });
 
-      return wrap;
-    }
+        return wrap;
+      }
 
-    function renderLv2() {
-      const wrap = d.createElement("div");
-      wrap.style.display = "grid";
-      wrap.style.gap = "10px";
+      function renderLv2() {
+        const wrap = d.createElement("div");
+        wrap.style.display = "grid";
+        wrap.style.gap = "10px";
 
-      const top = d.createElement("div");
-      top.className = "box globalBox";
-      top.innerHTML = `
+        const top = d.createElement("div");
+        top.className = "box globalBox";
+        top.innerHTML = `
         <div class="boxHead">
           <b>Kombinasi Lv 2</b>
           <span class="badge">${state.combo.lv2Enabled ? "Lv2 aktif" : "Lv2 belum aktif"}</span>
@@ -2103,64 +2104,64 @@ const VariasiKombinasiWidget = function VariasiKombinasiWidget({
               <div class="hint">Aktifkan Lv3 hanya kalau perlu. Kalau aktif → auto pindah tab Lv3.</div>
               <div class="btnRow" style="justify-content:flex-start;">
                 ${state.combo.lv3Enabled
-          ? `<span class="badge">Kombinasi Lv3 aktif ✅</span>`
-          : `<button class="btn goldBlack" id="enableLv3" type="button">Aktifkan Kombinasi Lv3</button>`
-        }
+            ? `<span class="badge">Kombinasi Lv3 aktif ✅</span>`
+            : `<button class="btn goldBlack" id="enableLv3" type="button">Aktifkan Kombinasi Lv3</button>`
+          }
               </div>
             `
-        }
+          }
         </div>
       `;
-      wrap.appendChild(top);
+        wrap.appendChild(top);
 
-      // enable Lv2 juga bisa dari tab Lv2
-      const enableLv2 = top.querySelector("#enableLv2");
-      if (enableLv2) {
-        enableLv2.onclick = () => {
-          if (!anyLv1Exists()) {
-            toast(`Buat ${tLv1()} minimal 1 dulu baru aktifkan Lv2`);
-            return;
-          }
-          const ok = confirm(`Aktifkan Kombinasi Lv2 untuk SEMUA ${tVar().toLowerCase()}?`);
-          if (ok) {
-            state.combo.lv2Enabled = true;
-            // tetap di tab Lv2 (biar admin langsung lanjut)
-            state.comboTab = 2;
-            save(); render();
-          }
-        };
-      }
+        // enable Lv2 juga bisa dari tab Lv2
+        const enableLv2 = top.querySelector("#enableLv2");
+        if (enableLv2) {
+          enableLv2.onclick = () => {
+            if (!anyLv1Exists()) {
+              toast(`Buat ${tLv1()} minimal 1 dulu baru aktifkan Lv2`);
+              return;
+            }
+            const ok = confirm(`Aktifkan Kombinasi Lv2 untuk SEMUA ${tVar().toLowerCase()}?`);
+            if (ok) {
+              state.combo.lv2Enabled = true;
+              // tetap di tab Lv2 (biar admin langsung lanjut)
+              state.comboTab = 2;
+              save(); render();
+            }
+          };
+        }
 
-      if (!state.combo.lv2Enabled) return wrap;
+        if (!state.combo.lv2Enabled) return wrap;
 
-      bindTitleInput(
-        top.querySelector("#titleLv2"),
-        () => state.titles.lv2Title,
-        (v: any) => { state.titles.lv2Title = v; }
-      );
+        bindTitleInput(
+          top.querySelector("#titleLv2"),
+          () => state.titles.lv2Title,
+          (v) => { state.titles.lv2Title = v; }
+        );
 
-      const enableLv3 = top.querySelector("#enableLv3");
-      if (enableLv3) {
-        enableLv3.onclick = () => {
-          const ok = confirm(`Aktifkan Kombinasi Lv3 untuk SEMUA ${tVar().toLowerCase()}?`);
-          if (ok) {
-            state.combo.lv3Enabled = true;
-            state.comboTab = 3;
-            save(); render();
-          }
-        };
-      }
+        const enableLv3 = top.querySelector("#enableLv3");
+        if (enableLv3) {
+          enableLv3.onclick = () => {
+            const ok = confirm(`Aktifkan Kombinasi Lv3 untuk SEMUA ${tVar().toLowerCase()}?`);
+            if (ok) {
+              state.combo.lv3Enabled = true;
+              state.comboTab = 3;
+              save(); render();
+            }
+          };
+        }
 
-      state.variations.forEach((v: any) => {
-        const box = d.createElement("div");
-        box.className = "box";
+        state.variations.forEach(v => {
+          const box = d.createElement("div");
+          box.className = "box";
 
-        const lv1Arr = v.combos.lv1 || [];
-        const selLv1Id = getSelLv1(v.id);
-        const lv1 = lv1Arr.find((o: any) => o.id === selLv1Id);
-        const lv2Arr = (lv1 && lv1.lv2) ? lv1.lv2 : [];
+          const lv1Arr = v.combos.lv1 || [];
+          const selLv1Id = getSelLv1(v.id, null);
+          const lv1 = lv1Arr.find(o => o.id === selLv1Id);
+          const lv2Arr = (lv1 && lv1.lv2) ? lv1.lv2 : [];
 
-        box.innerHTML = `
+          box.innerHTML = `
           <div class="boxHead">
             <b>${esc(tVar())}: ${esc(v.label || "-")} → ${esc(tLv2())} (Lv2)</b>
             <span class="badge">${lv2Arr.length} opsi</span>
@@ -2173,7 +2174,7 @@ const VariasiKombinasiWidget = function VariasiKombinasiWidget({
                 <div>
                   <label>Pilih Opsi Lv1</label>
                   <select data-sel-lv1>
-                    ${lv1Arr.map((o: any) => `<option value="${o.id}" ${o.id === selLv1Id ? "selected" : ""}>${esc(o.label || "-")}</option>`).join("")}
+                    ${lv1Arr.map(o => `<option value="${o.id}" ${o.id === selLv1Id ? "selected" : ""}>${esc(o.label || "-")}</option>`).join("")}
                   </select>
                   <div class="hint">Lv2 masuk di bawah Lv1 ini.</div>
                 </div>
@@ -2205,99 +2206,99 @@ const VariasiKombinasiWidget = function VariasiKombinasiWidget({
           </div>
         `;
 
-        if (!lv1Arr.length) {
-          wrap.appendChild(box);
-          return;
-        }
+          if (!lv1Arr.length) {
+            wrap.appendChild(box);
+            return;
+          }
 
-        const selLv1El = box.querySelector("[data-sel-lv1]");
-        selLv1El.onchange = () => {
-          state.ui.selLv1ByVar[v.id] = selLv1El.value;
-          save(); render();
-        };
-
-        const newName = box.querySelector("[data-newname]");
-        const newPrice = box.querySelector("[data-newprice]");
-        const btnAdd = box.querySelector("[data-add]");
-        const list = box.querySelector("[data-list]");
-
-        const btnCopy = box.querySelector("[data-copy]");
-        const btnPaste = box.querySelector("[data-paste]");
-        const btnDropAll = box.querySelector("[data-dropall]");
-        if (btnDropAll) {
-          btnDropAll.onclick = () => {
-            if (!lv1) { toast("Pilih Opsi Lv1 dulu"); return; }
-            const ok = confirm(`Drop ALL opsi ${tLv2()} di bawah Lv1 "${lv1.label || "-"}" untuk variasi "${v.label || "-"}"?`);
-            if (!ok) return;
-            lv1.lv2 = [];
-            const key = `${v.id}::${lv1.id}`;
-            if (state.ui?.selLv2ByVarLv1) delete state.ui.selLv2ByVarLv1[key];
-            if (state.preview?.varId === v.id && state.preview?.lv1Id === lv1.id) {
-              state.preview.lv2Id = null;
-              state.preview.lv3Id = null;
-            }
+          const selLv1El = box.querySelector("[data-sel-lv1]");
+          selLv1El.onchange = () => {
+            state.ui.selLv1ByVar[v.id] = selLv1El.value;
             save(); render();
           };
-        }
-        const clipInfo = box.querySelector("[data-clipinfo]");
-        if (clipInfo) {
-          const c = getOptClip();
-          clipInfo.textContent = (c && c.level === 2) ? `Clipboard: ${c.label || "-"} (${(c.data || []).length} item)` : "";
-        }
-        if (btnCopy) {
-          btnCopy.onclick = () => {
-            const lv1Id = state.ui.selLv1ByVar[v.id];
-            const lv1Obj = v.combos.lv1.find((o: any) => o.id === lv1Id);
-            if (!lv1Obj) { toast("Pilih opsi Lv1 dulu"); return; }
-            const data = (lv1Obj.lv2 || []).map(stripLv2);
-            const payload = { level: 2, label: `Lv2 dari variasi "${v.label || "-"}" • Lv1 "${lv1Obj.label || "-"}"`, data, ts: Date.now() };
-            setOptClip(payload);
-            navigator.clipboard?.writeText(JSON.stringify(data, null, 2)).catch(() => { });
-            toast("Opsi Lv2 dicopy. Pilih target Lv1 lalu klik Paste.");
-            render();
-          };
-        }
-        if (btnPaste) {
-          btnPaste.onclick = () => {
+
+          const newName = box.querySelector("[data-newname]");
+          const newPrice = box.querySelector("[data-newprice]");
+          const btnAdd = box.querySelector("[data-add]");
+          const list = box.querySelector("[data-list]");
+
+          const btnCopy = box.querySelector("[data-copy]");
+          const btnPaste = box.querySelector("[data-paste]");
+          const btnDropAll = box.querySelector("[data-dropall]");
+          if (btnDropAll) {
+            btnDropAll.onclick = () => {
+              if (!lv1) { toast("Pilih Opsi Lv1 dulu"); return; }
+              const ok = confirm(`Drop ALL opsi ${tLv2()} di bawah Lv1 "${lv1.label || "-"}" untuk variasi "${v.label || "-"}"?`);
+              if (!ok) return;
+              lv1.lv2 = [];
+              const key = `${v.id}::${lv1.id}`;
+              if (state.ui?.selLv2ByVarLv1) delete state.ui.selLv2ByVarLv1[key];
+              if (state.preview?.varId === v.id && state.preview?.lv1Id === lv1.id) {
+                state.preview.lv2Id = null;
+                state.preview.lv3Id = null;
+              }
+              save(); render();
+            };
+          }
+          const clipInfo = box.querySelector("[data-clipinfo]");
+          if (clipInfo) {
             const c = getOptClip();
-            if (!c || c.level !== 2) { toast("Clipboard kosong / beda level"); return; }
+            clipInfo.textContent = (c && c.level === 2) ? `Clipboard: ${c.label || "-"} (${(c.data || []).length} item)` : "";
+          }
+          if (btnCopy) {
+            btnCopy.onclick = () => {
+              const lv1Id = state.ui.selLv1ByVar[v.id];
+              const lv1Obj = v.combos.lv1.find(o => o.id === lv1Id);
+              if (!lv1Obj) { toast("Pilih opsi Lv1 dulu"); return; }
+              const data = (lv1Obj.lv2 || []).map(stripLv2);
+              const payload = { level: 2, label: `Lv2 dari variasi "${v.label || "-"}" • Lv1 "${lv1Obj.label || "-"}"`, data, ts: Date.now() };
+              setOptClip(payload);
+              navigator.clipboard?.writeText(JSON.stringify(data, null, 2)).catch(() => { });
+              toast("Opsi Lv2 dicopy. Pilih target Lv1 lalu klik Paste.");
+              render();
+            };
+          }
+          if (btnPaste) {
+            btnPaste.onclick = () => {
+              const c = getOptClip();
+              if (!c || c.level !== 2) { toast("Clipboard kosong / beda level"); return; }
+              const lv1Id = state.ui.selLv1ByVar[v.id];
+              const lv1Obj = v.combos.lv1.find(o => o.id === lv1Id);
+              if (!lv1Obj) { toast("Pilih opsi Lv1 dulu"); return; }
+              lv1Obj.lv2 = lv1Obj.lv2 || [];
+              const items = (c.data || []).map(cloneLv2);
+              pasteInto(lv1Obj.lv2, items, tLv2());
+              save(); render();
+            };
+          }
+
+
+          btnAdd.onclick = () => {
             const lv1Id = state.ui.selLv1ByVar[v.id];
-            const lv1Obj = v.combos.lv1.find((o: any) => o.id === lv1Id);
+            const lv1Obj = v.combos.lv1.find(o => o.id === lv1Id);
             if (!lv1Obj) { toast("Pilih opsi Lv1 dulu"); return; }
+            const nm = (newName.value || "").trim();
+            if (!nm) { toast(`Nama ${tLv2()} wajib`); newName.focus(); return; }
             lv1Obj.lv2 = lv1Obj.lv2 || [];
-            const items = (c.data || []).map(cloneLv2);
-            pasteInto(lv1Obj.lv2, items, tLv2());
+            lv1Obj.lv2.push({ id: uid(), label: nm, addPrice: normalizePriceString((newPrice.value || "").trim()), promo: defaultPromo(), lv3: [] });
+
+            state.ui.selLv2ByVarLv1[`${v.id}::${lv1Id}`] = lv1Obj.lv2[0].id;
+
+            newName.value = ""; newPrice.value = "";
             save(); render();
           };
-        }
 
+          list.innerHTML = "";
+          if (!lv2Arr.length) {
+            list.innerHTML = `<div class="empty"><b>Belum ada ${esc(tLv2())} untuk Lv1 ini.</b><br/>Tambah di atas.</div>`;
+          } else {
+            lv2Arr.forEach((o, idx) => {
+              const r = d.createElement("div");
 
-        btnAdd.onclick = () => {
-          const lv1Id = state.ui.selLv1ByVar[v.id];
-          const lv1Obj = v.combos.lv1.find((o: any) => o.id === lv1Id);
-          if (!lv1Obj) { toast("Pilih opsi Lv1 dulu"); return; }
-          const nm = (newName.value || "").trim();
-          if (!nm) { toast(`Nama ${tLv2()} wajib`); newName.focus(); return; }
-          lv1Obj.lv2 = lv1Obj.lv2 || [];
-          lv1Obj.lv2.push({ id: uid(), label: nm, addPrice: normalizePriceString((newPrice.value || "").trim()), promo: defaultPromo(), lv3: [] });
-
-          state.ui.selLv2ByVarLv1[`${v.id}::${lv1Id}`] = lv1Obj.lv2[0].id;
-
-          newName.value = ""; newPrice.value = "";
-          save(); render();
-        };
-
-        list.innerHTML = "";
-        if (!lv2Arr.length) {
-          list.innerHTML = `<div class="empty"><b>Belum ada ${esc(tLv2())} untuk Lv1 ini.</b><br/>Tambah di atas.</div>`;
-        } else {
-          lv2Arr.forEach((o: any, idx: any) => {
-            const r = d.createElement("div");
-
-            r.className = "cCard";
-            const op = normalizePromo((o as any).promo);
-            (o as any).promo = op;
-            r.innerHTML = `
+              r.className = "cCard";
+              const op = normalizePromo((o as any).promo);
+              (o as any).promo = op;
+              r.innerHTML = `
               <div class="cNameCol">
                 <label style="margin:0 0 6px;">${esc(tLv2())} Opsi ${idx + 1}</label>
                 <input data-name name="lv2_name" autocomplete="on" value="${esc(o.label || "")}" />
@@ -2347,34 +2348,34 @@ const VariasiKombinasiWidget = function VariasiKombinasiWidget({
                 </div>
               </div>
             `;
-            r.querySelector("[data-name]").oninput = (e: any) => { o.label = e.target.value; save(); };
-            r.querySelector("[data-price]").oninput = (e: any) => { o.addPrice = normalizePriceString(e.target.value); save(); };
-            r.querySelector("[data-del]").onclick = () => {
-              if (!confirm(`Hapus opsi ${tLv2()} ini beserta anaknya?`)) return;
-              lv1.lv2 = (lv1.lv2 || []).filter((x: any) => x.id !== o.id);
-              const key = `${v.id}::${lv1.id}`;
-              if (state.ui.selLv2ByVarLv1[key] === o.id) delete state.ui.selLv2ByVarLv1[key];
+              r.querySelector("[data-name]").oninput = (e) => { o.label = e.target.value; save(); };
+              r.querySelector("[data-price]").oninput = (e) => { o.addPrice = normalizePriceString(e.target.value); save(); };
+              r.querySelector("[data-del]").onclick = () => {
+                if (!confirm(`Hapus opsi ${tLv2()} ini beserta anaknya?`)) return;
+                lv1.lv2 = (lv1.lv2 || []).filter(x => x.id !== o.id);
+                const key = `${v.id}::${lv1.id}`;
+                if (state.ui.selLv2ByVarLv1[key] === o.id) delete state.ui.selLv2ByVarLv1[key];
 
-              save(); render();
-            };
-            list.appendChild(r);
-          });
-        }
+                save(); render();
+              };
+              list.appendChild(r);
+            });
+          }
 
-        wrap.appendChild(box);
-      });
+          wrap.appendChild(box);
+        });
 
-      return wrap;
-    }
+        return wrap;
+      }
 
-    function renderLv3() {
-      const wrap = d.createElement("div");
-      wrap.style.display = "grid";
-      wrap.style.gap = "10px";
+      function renderLv3() {
+        const wrap = d.createElement("div");
+        wrap.style.display = "grid";
+        wrap.style.gap = "10px";
 
-      const top = d.createElement("div");
-      top.className = "box globalBox";
-      top.innerHTML = `
+        const top = d.createElement("div");
+        top.className = "box globalBox";
+        top.innerHTML = `
         <div class="boxHead">
           <b>Kombinasi Lv 3</b>
           <span class="badge">${state.combo.lv3Enabled ? "Lv3 aktif" : "Lv3 belum aktif"}</span>
@@ -2401,44 +2402,44 @@ const VariasiKombinasiWidget = function VariasiKombinasiWidget({
             `)}
         </div>
       `;
-      wrap.appendChild(top);
+        wrap.appendChild(top);
 
-      // enable Lv3 juga bisa dari tab Lv3
-      const enableLv3 = top.querySelector("#enableLv3");
-      if (enableLv3) {
-        enableLv3.onclick = () => {
-          const ok = confirm(`Aktifkan Kombinasi Lv3 untuk SEMUA ${tVar().toLowerCase()}?`);
-          if (ok) {
-            state.combo.lv3Enabled = true;
-            state.comboTab = 3;
-            save(); render();
-          }
-        };
-      }
+        // enable Lv3 juga bisa dari tab Lv3
+        const enableLv3 = top.querySelector("#enableLv3");
+        if (enableLv3) {
+          enableLv3.onclick = () => {
+            const ok = confirm(`Aktifkan Kombinasi Lv3 untuk SEMUA ${tVar().toLowerCase()}?`);
+            if (ok) {
+              state.combo.lv3Enabled = true;
+              state.comboTab = 3;
+              save(); render();
+            }
+          };
+        }
 
-      if (!state.combo.lv2Enabled || !state.combo.lv3Enabled) return wrap;
+        if (!state.combo.lv2Enabled || !state.combo.lv3Enabled) return wrap;
 
-      bindTitleInput(
-        top.querySelector("#titleLv3"),
-        () => state.titles.lv3Title,
-        (v: any) => { state.titles.lv3Title = v; }
-      );
+        bindTitleInput(
+          top.querySelector("#titleLv3"),
+          () => state.titles.lv3Title,
+          (v) => { state.titles.lv3Title = v; }
+        );
 
-      state.variations.forEach((v: any) => {
-        const box = d.createElement("div");
-        box.className = "box";
+        state.variations.forEach(v => {
+          const box = d.createElement("div");
+          box.className = "box";
 
-        const lv1Arr = v.combos.lv1 || [];
-        const selLv1Id = getSelLv1(v.id);
-        const lv1 = lv1Arr.find((o: any) => o.id === selLv1Id);
+          const lv1Arr = v.combos.lv1 || [];
+          const selLv1Id = getSelLv1(v.id, null);
+          const lv1 = lv1Arr.find(o => o.id === selLv1Id);
 
-        const lv2Arr = lv1?.lv2 || [];
-        const selLv2Id = selLv1Id ? getSelLv2(v.id, selLv1Id) : null;
-        const lv2 = lv2Arr.find((o: any) => o.id === selLv2Id);
+          const lv2Arr = lv1?.lv2 || [];
+          const selLv2Id = selLv1Id ? getSelLv2(v.id, selLv1Id) : null;
+          const lv2 = lv2Arr.find(o => o.id === selLv2Id);
 
-        const lv3Arr = lv2?.lv3 || [];
+          const lv3Arr = lv2?.lv3 || [];
 
-        box.innerHTML = `
+          box.innerHTML = `
           <div class="boxHead">
             <b>${esc(tVar())}: ${esc(v.label || "-")} → ${esc(tLv3())} (Lv3)</b>
             <span class="badge">${lv3Arr.length} opsi</span>
@@ -2451,7 +2452,7 @@ const VariasiKombinasiWidget = function VariasiKombinasiWidget({
                 <div>
                   <label>Pilih Opsi Lv1</label>
                   <select data-sel-lv1>
-                    ${lv1Arr.map((o: any) => `<option value="${o.id}" ${o.id === selLv1Id ? "selected" : ""}>${esc(o.label || "-")}</option>`).join("")}
+                    ${lv1Arr.map(o => `<option value="${o.id}" ${o.id === selLv1Id ? "selected" : ""}>${esc(o.label || "-")}</option>`).join("")}
                   </select>
                   <div class="hint">Lv3 ada di bawah opsi Lv2.</div>
                 </div>
@@ -2459,9 +2460,9 @@ const VariasiKombinasiWidget = function VariasiKombinasiWidget({
                   <label>Pilih Opsi Lv2</label>
                   <select data-sel-lv2 ${lv2Arr.length ? "" : "disabled"}>
                     ${lv2Arr.length
-            ? lv2Arr.map((o: any) => `<option value="${o.id}" ${o.id === selLv2Id ? "selected" : ""}>${esc(o.label || "-")}</option>`).join("")
-            : `<option value="">Belum ada Lv2 untuk Lv1 ini</option>`
-          }
+              ? lv2Arr.map(o => `<option value="${o.id}" ${o.id === selLv2Id ? "selected" : ""}>${esc(o.label || "-")}</option>`).join("")
+              : `<option value="">Belum ada Lv2 untuk Lv1 ini</option>`
+            }
                   </select>
                   <div class="hint">${lv2Arr.length ? "Lv3 masuk di bawah Lv2 ini." : "Tambah Lv2 dulu di tab Lv2."}</div>
                 </div>
@@ -2495,120 +2496,120 @@ const VariasiKombinasiWidget = function VariasiKombinasiWidget({
           </div>
         `;
 
-        if (!lv1Arr.length) {
-          wrap.appendChild(box);
-          return;
-        }
+          if (!lv1Arr.length) {
+            wrap.appendChild(box);
+            return;
+          }
 
-        const selLv1El = box.querySelector("[data-sel-lv1]");
-        const selLv2El = box.querySelector("[data-sel-lv2]");
-        selLv1El.onchange = () => {
-          state.ui.selLv1ByVar[v.id] = selLv1El.value;
-          save(); render();
-        };
-        if (selLv2El) {
-          selLv2El.onchange = () => {
-            const key = `${v.id}::${state.ui.selLv1ByVar[v.id]}`;
-            state.ui.selLv2ByVarLv1[key] = selLv2El.value;
+          const selLv1El = box.querySelector("[data-sel-lv1]");
+          const selLv2El = box.querySelector("[data-sel-lv2]");
+          selLv1El.onchange = () => {
+            state.ui.selLv1ByVar[v.id] = selLv1El.value;
             save(); render();
           };
-        }
+          if (selLv2El) {
+            selLv2El.onchange = () => {
+              const key = `${v.id}::${state.ui.selLv1ByVar[v.id]}`;
+              state.ui.selLv2ByVarLv1[key] = selLv2El.value;
+              save(); render();
+            };
+          }
 
-        const newName = box.querySelector("[data-newname]");
-        const newPrice = box.querySelector("[data-newprice]");
-        const btnAdd = box.querySelector("[data-add]");
-        const list = box.querySelector("[data-list]");
+          const newName = box.querySelector("[data-newname]");
+          const newPrice = box.querySelector("[data-newprice]");
+          const btnAdd = box.querySelector("[data-add]");
+          const list = box.querySelector("[data-list]");
 
-        const btnCopy = box.querySelector("[data-copy]");
-        const btnPaste = box.querySelector("[data-paste]");
-        const btnDropAll = box.querySelector("[data-dropall]");
-        if (btnDropAll) {
-          btnDropAll.onclick = () => {
-            if (!lv1Arr.length) { toast(`Belum ada ${tLv1()}`); return; }
-            if (!lv2Arr.length) { toast(`Belum ada ${tLv2()} di Lv1 ini`); return; }
-            if (!lv2) { toast("Pilih Opsi Lv2 dulu"); return; }
-            const ok = confirm(`Drop ALL opsi ${tLv3()} di bawah Lv2 "${lv2.label || "-"}" untuk variasi "${v.label || "-"}"?`);
-            if (!ok) return;
-            lv2.lv3 = [];
-            if (state.preview?.varId === v.id && state.preview?.lv1Id === selLv1Id && state.preview?.lv2Id === lv2.id) {
-              state.preview.lv3Id = null;
-            }
-            save(); render();
-          };
-        }
-        const clipInfo = box.querySelector("[data-clipinfo]");
-        if (clipInfo) {
-          const c = getOptClip();
-          clipInfo.textContent = (c && c.level === 3) ? `Clipboard: ${c.label || "-"} (${(c.data || []).length} item)` : "";
-        }
-        if (btnCopy) {
-          btnCopy.onclick = () => {
-            const lv1Id = state.ui.selLv1ByVar[v.id];
-            const lv1Obj = v.combos.lv1.find((o: any) => o.id === lv1Id);
-            if (!lv1Obj) { toast("Pilih Lv1 dulu"); return; }
-            const key = `${v.id}::${lv1Id}`;
-            const lv2Id = state.ui.selLv2ByVarLv1[key];
-            const lv2Obj = (lv1Obj.lv2 || []).find((o: any) => o.id === lv2Id);
-            if (!lv2Obj) { toast("Pilih Lv2 dulu"); return; }
-            const data = (lv2Obj.lv3 || []).map(stripLv3);
-            const payload = { level: 3, label: `Lv3 dari variasi "${v.label || "-"}" • Lv1 "${lv1Obj.label || "-"}" • Lv2 "${lv2Obj.label || "-"}"`, data, ts: Date.now() };
-            setOptClip(payload);
-            navigator.clipboard?.writeText(JSON.stringify(data, null, 2)).catch(() => { });
-            toast("Opsi Lv3 dicopy. Pilih target Lv2 lalu klik Paste.");
-            render();
-          };
-        }
-        if (btnPaste) {
-          btnPaste.onclick = () => {
+          const btnCopy = box.querySelector("[data-copy]");
+          const btnPaste = box.querySelector("[data-paste]");
+          const btnDropAll = box.querySelector("[data-dropall]");
+          if (btnDropAll) {
+            btnDropAll.onclick = () => {
+              if (!lv1Arr.length) { toast(`Belum ada ${tLv1()}`); return; }
+              if (!lv2Arr.length) { toast(`Belum ada ${tLv2()} di Lv1 ini`); return; }
+              if (!lv2) { toast("Pilih Opsi Lv2 dulu"); return; }
+              const ok = confirm(`Drop ALL opsi ${tLv3()} di bawah Lv2 "${lv2.label || "-"}" untuk variasi "${v.label || "-"}"?`);
+              if (!ok) return;
+              lv2.lv3 = [];
+              if (state.preview?.varId === v.id && state.preview?.lv1Id === selLv1Id && state.preview?.lv2Id === lv2.id) {
+                state.preview.lv3Id = null;
+              }
+              save(); render();
+            };
+          }
+          const clipInfo = box.querySelector("[data-clipinfo]");
+          if (clipInfo) {
             const c = getOptClip();
-            if (!c || c.level !== 3) { toast("Clipboard kosong / beda level"); return; }
-            const lv1Id = state.ui.selLv1ByVar[v.id];
-            const lv1Obj = v.combos.lv1.find((o: any) => o.id === lv1Id);
-            if (!lv1Obj) { toast("Pilih Lv1 dulu"); return; }
-            const key = `${v.id}::${lv1Id}`;
-            const lv2Id = state.ui.selLv2ByVarLv1[key];
-            const lv2Obj = (lv1Obj.lv2 || []).find((o: any) => o.id === lv2Id);
-            if (!lv2Obj) { toast("Pilih Lv2 dulu"); return; }
-            lv2Obj.lv3 = lv2Obj.lv3 || [];
-            const items = (c.data || []).map(cloneLv3);
-            pasteInto(lv2Obj.lv3, items, tLv3());
-            save(); render();
-          };
-        }
+            clipInfo.textContent = (c && c.level === 3) ? `Clipboard: ${c.label || "-"} (${(c.data || []).length} item)` : "";
+          }
+          if (btnCopy) {
+            btnCopy.onclick = () => {
+              const lv1Id = state.ui.selLv1ByVar[v.id];
+              const lv1Obj = v.combos.lv1.find(o => o.id === lv1Id);
+              if (!lv1Obj) { toast("Pilih Lv1 dulu"); return; }
+              const key = `${v.id}::${lv1Id}`;
+              const lv2Id = state.ui.selLv2ByVarLv1[key];
+              const lv2Obj = (lv1Obj.lv2 || []).find(o => o.id === lv2Id);
+              if (!lv2Obj) { toast("Pilih Lv2 dulu"); return; }
+              const data = (lv2Obj.lv3 || []).map(stripLv3);
+              const payload = { level: 3, label: `Lv3 dari variasi "${v.label || "-"}" • Lv1 "${lv1Obj.label || "-"}" • Lv2 "${lv2Obj.label || "-"}"`, data, ts: Date.now() };
+              setOptClip(payload);
+              navigator.clipboard?.writeText(JSON.stringify(data, null, 2)).catch(() => { });
+              toast("Opsi Lv3 dicopy. Pilih target Lv2 lalu klik Paste.");
+              render();
+            };
+          }
+          if (btnPaste) {
+            btnPaste.onclick = () => {
+              const c = getOptClip();
+              if (!c || c.level !== 3) { toast("Clipboard kosong / beda level"); return; }
+              const lv1Id = state.ui.selLv1ByVar[v.id];
+              const lv1Obj = v.combos.lv1.find(o => o.id === lv1Id);
+              if (!lv1Obj) { toast("Pilih Lv1 dulu"); return; }
+              const key = `${v.id}::${lv1Id}`;
+              const lv2Id = state.ui.selLv2ByVarLv1[key];
+              const lv2Obj = (lv1Obj.lv2 || []).find(o => o.id === lv2Id);
+              if (!lv2Obj) { toast("Pilih Lv2 dulu"); return; }
+              lv2Obj.lv3 = lv2Obj.lv3 || [];
+              const items = (c.data || []).map(cloneLv3);
+              pasteInto(lv2Obj.lv3, items, tLv3());
+              save(); render();
+            };
+          }
 
 
-        if (btnAdd) {
-          btnAdd.onclick = () => {
-            const lv1Id = state.ui.selLv1ByVar[v.id];
-            const lv1Obj = v.combos.lv1.find((o: any) => o.id === lv1Id);
-            if (!lv1Obj) { toast("Pilih Lv1 dulu"); return; }
-            const key = `${v.id}::${lv1Id}`;
-            const lv2Id = state.ui.selLv2ByVarLv1[key];
-            const lv2Obj = (lv1Obj.lv2 || []).find((o: any) => o.id === lv2Id);
-            if (!lv2Obj) { toast("Pilih Lv2 dulu"); return; }
-            const nm = (newName.value || "").trim();
-            if (!nm) { toast(`Nama ${tLv3()} wajib`); newName.focus(); return; }
-            lv2Obj.lv3 = lv2Obj.lv3 || [];
-            lv2Obj.lv3.push({ id: uid(), label: nm, addPrice: normalizePriceString((newPrice.value || "").trim()), promo: defaultPromo() });
+          if (btnAdd) {
+            btnAdd.onclick = () => {
+              const lv1Id = state.ui.selLv1ByVar[v.id];
+              const lv1Obj = v.combos.lv1.find(o => o.id === lv1Id);
+              if (!lv1Obj) { toast("Pilih Lv1 dulu"); return; }
+              const key = `${v.id}::${lv1Id}`;
+              const lv2Id = state.ui.selLv2ByVarLv1[key];
+              const lv2Obj = (lv1Obj.lv2 || []).find(o => o.id === lv2Id);
+              if (!lv2Obj) { toast("Pilih Lv2 dulu"); return; }
+              const nm = (newName.value || "").trim();
+              if (!nm) { toast(`Nama ${tLv3()} wajib`); newName.focus(); return; }
+              lv2Obj.lv3 = lv2Obj.lv3 || [];
+              lv2Obj.lv3.push({ id: uid(), label: nm, addPrice: normalizePriceString((newPrice.value || "").trim()), promo: defaultPromo() });
 
-            newName.value = ""; newPrice.value = "";
-            save(); render();
-          };
-        }
+              newName.value = ""; newPrice.value = "";
+              save(); render();
+            };
+          }
 
-        list.innerHTML = "";
-        if (!lv2Arr.length) {
-          list.innerHTML = `<div class="empty"><b>Belum ada Lv2 untuk Lv1 ini.</b><br/>Tambah Lv2 dulu di tab Lv2.</div>`;
-        } else if (!lv3Arr.length) {
-          list.innerHTML = `<div class="empty"><b>Belum ada ${esc(tLv3())} untuk Lv2 ini.</b><br/>Tambah di atas.</div>`;
-        } else {
-          lv3Arr.forEach((o: any, idx: any) => {
-            const r = d.createElement("div");
+          list.innerHTML = "";
+          if (!lv2Arr.length) {
+            list.innerHTML = `<div class="empty"><b>Belum ada Lv2 untuk Lv1 ini.</b><br/>Tambah Lv2 dulu di tab Lv2.</div>`;
+          } else if (!lv3Arr.length) {
+            list.innerHTML = `<div class="empty"><b>Belum ada ${esc(tLv3())} untuk Lv2 ini.</b><br/>Tambah di atas.</div>`;
+          } else {
+            lv3Arr.forEach((o, idx) => {
+              const r = d.createElement("div");
 
-            r.className = "cCard";
-            const op = normalizePromo((o as any).promo);
-            (o as any).promo = op;
-            r.innerHTML = `
+              r.className = "cCard";
+              const op = normalizePromo((o as any).promo);
+              (o as any).promo = op;
+              r.innerHTML = `
               <div class="cNameCol">
                 <label style="margin:0 0 6px;">${esc(tLv3())} Opsi ${idx + 1}</label>
                 <input data-name name="lv3_name" autocomplete="on" value="${esc(o.label || "")}" />
@@ -2658,43 +2659,322 @@ const VariasiKombinasiWidget = function VariasiKombinasiWidget({
                 </div>
               </div>
             `;
-            r.querySelector("[data-name]").oninput = (e: any) => { o.label = e.target.value; save(); };
-            r.querySelector("[data-price]").oninput = (e: any) => { o.addPrice = normalizePriceString(e.target.value); save(); };
-            r.querySelector("[data-del]").onclick = () => {
-              if (!confirm(`Hapus opsi ${tLv3()} ini?`)) return;
-              lv2.lv3 = (lv2.lv3 || []).filter((x: any) => x.id !== o.id);
+              r.querySelector("[data-name]").oninput = (e) => { o.label = e.target.value; save(); };
+              r.querySelector("[data-price]").oninput = (e) => { o.addPrice = normalizePriceString(e.target.value); save(); };
+              r.querySelector("[data-del]").onclick = () => {
+                if (!confirm(`Hapus opsi ${tLv3()} ini?`)) return;
+                lv2.lv3 = (lv2.lv3 || []).filter(x => x.id !== o.id);
+                save(); render();
+              };
+              list.appendChild(r);
+            });
+          }
+
+          wrap.appendChild(box);
+        });
+
+        return wrap;
+      }
+
+      function renderPreviewEcommerce() {
+        ensurePreviewDefaults();
+
+        const box = d.createElement("div");
+        box.className = "box";
+        box.innerHTML = `
+        <div class="boxHead">
+          <b>Preview (tampilan e-commerce)</b>
+          <span class="badge">klik chip untuk pilih</span>
+        </div>
+        <div class="boxBody">
+          <div class="previewGrid">
+            <div>
+              <div class="pvMedia">
+                <div class="pvThumb" id="pvThumb"></div>
+                <div class="pvMediaText">
+                  <div class="pvTitle">${esc(state.product.title || "Produk")}</div>
+                  <div class="pvSub">Foto variasi (opsional)</div>
+                </div>
+              </div>
+
+              <label>${esc(tVar())}</label>
+              <div class="chips" id="pvVars"></div>
+
+              <div style="height:10px;"></div>
+
+              <label id="pvLv1Label">${esc(tLv1())}</label>
+              <div class="chips" id="pvLv1"></div>
+
+              <div style="height:10px;"></div>
+
+              <label id="pvLv2Label">${esc(tLv2())}</label>
+              <div id="pvLv2Mount"></div>
+
+              <div style="height:10px;"></div>
+
+              <label id="pvLv3Label">${esc(tLv3())}</label>
+              <div id="pvLv3Mount"></div>
+
+              <div style="height:12px;"></div>
+
+              <div class="priceLine" id="pvPrice"></div>
+            </div>
+          </div>
+        </div>
+      `;
+
+        const pvVars = box.querySelector("#pvVars");
+        const pvLv1 = box.querySelector("#pvLv1");
+        const pvLv2M = box.querySelector("#pvLv2Mount");
+        const pvLv3M = box.querySelector("#pvLv3Mount");
+        const pvThumb = box.querySelector("#pvThumb") as any;
+
+        const pvLv1Label = box.querySelector("#pvLv1Label");
+        const pvLv2Label = box.querySelector("#pvLv2Label");
+        const pvLv3Label = box.querySelector("#pvLv3Label");
+        const pvPrice = box.querySelector("#pvPrice");
+        pvVars.innerHTML = "";
+        const activeVars = (state.variations || []).filter(x => x.enabled !== false);
+        activeVars.forEach(v => {
+          const base = effectiveBasePriceForVar(v);
+          const unit = effectiveUnitForVar(v);
+          const label = v.label || "-";
+          const badge = (v.price && String(v.price).trim() !== "")
+            ? `Base ${formatIDR(base)}`
+            : `Base ikut produk`;
+
+          const c = d.createElement("div");
+          c.className = "chip" + (state.preview.varId === v.id ? " sel" : "");
+          c.innerHTML = `<span>${esc(label)}</span>`;
+          c.onclick = () => {
+            state.preview.varId = v.id;
+            state.preview.lv1Id = null;
+            state.preview.lv2Id = null;
+            state.preview.lv3Id = null;
+            save(); render();
+          };
+          pvVars.appendChild(c);
+        });
+
+        const v = state.variations.find(x => x.id === state.preview.varId);
+        const base = effectiveBasePriceForVar(v);
+        const unit = effectiveUnitForVar(v);
+
+        const lv1Arr = v?.combos?.lv1 || [];
+
+        // Sembunyikan label level jika kosong (tanpa pesan)
+        pvLv1Label.style.display = (lv1Arr.length ? "" : "none");
+
+        pvLv1.innerHTML = "";
+        if (!lv1Arr.length) {
+          // tidak tampilkan pesan kosong
+        } else {
+          lv1Arr.forEach(o => {
+            const add = parseMoney(o.addPrice || "");
+            const c = d.createElement("div");
+            c.className = "chip" + (state.preview.lv1Id === o.id ? " sel" : "");
+            c.innerHTML = `<span>${esc(o.label || "-")}</span>`;
+            c.onclick = () => {
+              state.preview.lv1Id = o.id;
+              state.preview.lv2Id = null;
+              state.preview.lv3Id = null;
               save(); render();
             };
-            list.appendChild(r);
+            pvLv1.appendChild(c);
           });
         }
 
-        wrap.appendChild(box);
-      });
+        const lv1 = lv1Arr.find(o => o.id === state.preview.lv1Id);
+        const lv2Arr = (lv1 && lv1.lv2) ? lv1.lv2 : [];
 
-      return wrap;
+        pvLv2M.innerHTML = "";
+        // Lv2: jangan tampilkan pesan kosong; sembunyikan jika tidak relevan
+        if (!state.combo.lv2Enabled) {
+          pvLv2Label.style.display = "none";
+        } else if (!lv1) {
+          pvLv2Label.style.display = "none";
+        } else if (!lv2Arr.length) {
+          pvLv2Label.style.display = "none";
+        } else {
+          pvLv2Label.style.display = "";
+
+          const chips = d.createElement("div");
+          chips.className = "chips";
+          lv2Arr.forEach(o => {
+            const add = parseMoney(o.addPrice || "");
+            const c = d.createElement("div");
+            c.className = "chip" + (state.preview.lv2Id === o.id ? " sel" : "");
+            c.innerHTML = `<span>${esc(o.label || "-")}</span>`;
+            c.onclick = () => {
+              state.preview.lv2Id = o.id;
+              state.preview.lv3Id = null;
+              save(); render();
+            };
+            chips.appendChild(c);
+          });
+          pvLv2M.appendChild(chips);
+        }
+
+        const lv2 = lv2Arr.find(o => o.id === state.preview.lv2Id);
+        const lv3Arr = (lv2 && lv2.lv3) ? lv2.lv3 : [];
+
+        pvLv3M.innerHTML = "";
+        // Lv3: jangan tampilkan pesan kosong; sembunyikan jika tidak relevan
+        if (!state.combo.lv2Enabled) {
+          pvLv3Label.style.display = "none";
+        } else if (!state.combo.lv3Enabled) {
+          pvLv3Label.style.display = "none";
+        } else if (!lv2) {
+          pvLv3Label.style.display = "none";
+        } else if (!lv3Arr.length) {
+          pvLv3Label.style.display = "none";
+        } else {
+          pvLv3Label.style.display = "";
+
+          const chips = d.createElement("div");
+          chips.className = "chips";
+          lv3Arr.forEach(o => {
+            const add = parseMoney(o.addPrice || "");
+            const c = d.createElement("div");
+            c.className = "chip" + (state.preview.lv3Id === o.id ? " sel" : "");
+            c.innerHTML = `<span>${esc(o.label || "-")}</span>`;
+            c.onclick = () => {
+              state.preview.lv3Id = o.id;
+              save(); render();
+            };
+            chips.appendChild(c);
+          });
+          pvLv3M.appendChild(chips);
+        }
+
+        const qty = Math.max(1, toInt(state.preview.qty || 1));
+        const lv3Sel = lv3Arr.find(o => o.id === state.preview.lv3Id);
+
+        // Preview sisi user: harga akhir = base (produk/variasi) + add-on Lv1/Lv2/Lv3 yang dipilih (level aktif saja)
+        const vPromo = normalizePromo((v as any)?.promo);
+        const baseCalc = applyPromo(toInt(base), vPromo);
+
+        const lv1Promo = lv1 ? normalizePromo((lv1 as any).promo) : defaultPromo();
+        const add1Before = lv1 ? parseMoney(lv1.addPrice || "") : 0;
+        const add1Calc = applyPromo(add1Before, lv1Promo);
+
+        const lv2Promo = (state.combo.lv2Enabled && lv2) ? normalizePromo((lv2 as any).promo) : defaultPromo();
+        const add2Before = (state.combo.lv2Enabled && lv2) ? parseMoney(lv2.addPrice || "") : 0;
+        const add2Calc = applyPromo(add2Before, lv2Promo);
+
+        const lv3Promo = (state.combo.lv2Enabled && state.combo.lv3Enabled && lv3Sel) ? normalizePromo((lv3Sel as any).promo) : defaultPromo();
+        const add3Before = (state.combo.lv2Enabled && state.combo.lv3Enabled && lv3Sel) ? parseMoney(lv3Sel.addPrice || "") : 0;
+        const add3Calc = applyPromo(add3Before, lv3Promo);
+
+        const beforeUnit = toInt(baseCalc.before) + toInt(add1Calc.before) + toInt(add2Calc.before) + toInt(add3Calc.before);
+        const afterUnit = toInt(baseCalc.after) + toInt(add1Calc.after) + toInt(add2Calc.after) + toInt(add3Calc.after);
+
+        const totalBefore = beforeUnit * qty;
+        const totalAfter = afterUnit * qty;
+
+        // badge persen total (mirip contoh -10%)
+        let totalBadge = "";
+        if (totalAfter < totalBefore && totalBefore > 0) {
+          const pct = Math.round((1 - (totalAfter / totalBefore)) * 100);
+          if (pct > 0) totalBadge = `-${pct}%`;
+        }
+
+        const unitSym = unitSymbolShort(unit);
+
+        pvPrice.innerHTML = `
+        <div class="bigPrice">${priceHtml(totalBefore, totalAfter, totalBadge)}${unitSym ? "/" + esc(unitSym) : ""}</div>
+      `;
+
+        // Foto variasi (opsional) di preview
+        try {
+          const vv: any = state.variations.find((x: any) => x.id === state.preview.varId);
+          const url = vv ? getVarImageUrl(vv) : "";
+          if (pvThumb) pvThumb.style.backgroundImage = url ? `url("${url}")` : "";
+        } catch { }
+
+        return box;
+      }
+
+      d.getElementById("btnReset").onclick = () => {
+        if (!confirm("Reset semua?")) return;
+        localStorage.removeItem(LS_KEY);
+        location.reload();
+      };
+      d.getElementById("btnExport").onclick = () => {
+        const payload = JSON.stringify(state, null, 2);
+        navigator.clipboard?.writeText(payload).catch(() => { });
+        alert(payload);
+      };
+      d.getElementById("btnImport").onclick = () => {
+        const raw = prompt("Paste JSON state:");
+        if (!raw) return;
+        try {
+          const obj = JSON.parse(raw);
+          if (!obj.product || !obj.variations) throw new Error("Format invalid");
+          state = obj;
+          if (!state.combo) state.combo = { lv2Enabled: false, lv3Enabled: false };
+          if (!("enabled" in state)) state.enabled = (state.variations && state.variations.length) ? true : false;
+          if (!state.preview) state.preview = { varId: null, lv1Id: null, lv2Id: null, lv3Id: null, qty: 1 };
+          if (!state.titles) state.titles = { varTitle: "", lv1Title: "", lv2Title: "", lv3Title: "" };
+          if (!state.ui) state.ui = { selLv1ByVar: {}, selLv2ByVarLv1: {} };
+          if (!("optClip" in state)) state.optClip = null;
+          state.variations.forEach(v => {
+            if ("enabled" in v) delete (v as any).enabled;
+            if (v.unitOverride === undefined) v.unitOverride = "";
+            if (v.price === undefined) v.price = "";
+            v.price = String(v.price || "").replace(/[^\d]/g, "");
+            (v as any).promo = normalizePromo((v as any).promo);
+            if (!v.combos) v.combos = { lv1: [] };
+            if (!Array.isArray(v.combos.lv1)) v.combos.lv1 = [];
+            v.combos.lv1.forEach(l1 => {
+              l1.addPrice = String(l1.addPrice || "").replace(/[^\d]/g, "");
+              (l1 as any).promo = normalizePromo((l1 as any).promo);
+              if (!Array.isArray(l1.lv2)) l1.lv2 = [];
+              l1.lv2.forEach(l2 => {
+                l2.addPrice = String(l2.addPrice || "").replace(/[^\d]/g, "");
+                (l2 as any).promo = normalizePromo((l2 as any).promo);
+                if (!Array.isArray(l2.lv3)) l2.lv3 = [];
+                l2.lv3.forEach(l3 => {
+                  l3.addPrice = String(l3.addPrice || "").replace(/[^\d]/g, "");
+                  (l3 as any).promo = normalizePromo((l3 as any).promo);
+                });
+              });
+            });
+          });
+          if (!("optClip" in state)) state.optClip = null;
+          save(); render(); toast("Import sukses");
+        } catch (e) {
+          alert("Import gagal: " + (e.message || e));
+        }
+      };
+
+      // === Toggle global aktifkan variasi ===
+      const enabledToggle = d.getElementById("vcomboEnabled");
+      if (enabledToggle) {
+        enabledToggle.checked = !!state.enabled;
+        enabledToggle.onchange = () => {
+          const next = !!enabledToggle.checked;
+          if (next && !state.enabled) { state.step = 0; }
+          state.enabled = next;
+          save();
+          render();
+        };
+      }
+      syncHidden();
+
+
+      render();
+
+    } catch (e) {
+      console.error("VCombo init error", e);
+      notify("Gagal inisialisasi Variasi & Kombinasi.");
     }
 
-    function renderPreviewEcommerce() {
-      const box = document.createElement("div");
-      box.innerHTML = "Preview placeholder";
-      return box;
-    }
-
-
-
-
-
-
-
-
-
-    render();
 
     return () => {
       try { if (onVarKolasePicked) window.removeEventListener("apix:varKolasePicked", onVarKolasePicked as any); } catch { }
-      try { window.removeEventListener("apix:requestVarMedia", broadcastVarMediaRef.current as any); } catch { }
-      try { if (mainFormSyncCleanup) mainFormSyncCleanup(); } catch { }
+      // try { window.removeEventListener("apix:requestVarMedia", broadcastVarMedia as any); } catch { }
+      // try { if (mainFormSyncCleanup) mainFormSyncCleanup(); } catch { }
     };
 
   }, [notify]);
@@ -3335,7 +3615,7 @@ const VariasiKombinasiWidget = function VariasiKombinasiWidget({
       <div className="toast" id="toast"></div>
     </div>
   );
-};
+});
 
 
 export default function TambahProdukPage() {
@@ -3490,7 +3770,7 @@ export default function TambahProdukPage() {
           label: m?.label ?? "",
           mode: m?.mode ?? "",
         }))
-        .filter((m: any) => !!m.url);
+        .filter((m) => !!m.url);
 
       setVarMediaPreview(normalized);
     };
@@ -5297,13 +5577,7 @@ export default function TambahProdukPage() {
       ? "Finishing HPL Premium: Permukaan halus, tahan goresan ringan, serta sangat mudah dibersihkan dari debu atau noda."
       : "Finishing Halus & Rapi: Lapisan akhir yang memikat mata dan melindungi material dasar dari kelembapan.";
 
-    const whyLoveIt = `
-✨ Keunggulan Utama:
-✅ ${benefit1}
-✅ ${benefit2}
-✅ ${benefit3}
-✅ Estetika Modern: Desain minimalis yang timeless, mudah dipadukan dengan berbagai tema interior mulai dari scandinavian hingga industrial.
-    `.trim();
+    const whyLoveIt = `<strong>Keunggulan Utama:</strong><ul><li>${benefit1}</li><li>${benefit2}</li><li>${benefit3}</li><li>Estetika Modern: Desain minimalis yang timeless, mudah dipadukan dengan berbagai tema interior mulai dari scandinavian hingga industrial.</li></ul>`;
 
     const dimStr = (panjang > 0 && lebar > 0 && tinggi > 0)
       ? `P ${panjang} cm x L ${lebar} cm x T ${tinggi} cm`
@@ -5313,32 +5587,19 @@ export default function TambahProdukPage() {
       ? "Bisa custom ukuran & layout dalam"
       : "Siap pakai, perakitan mudah";
 
-    const specs = `
-📋 Spesifikasi Detail:
-- Dimensi: ${dimStr}
-- Material Utama: ${materialClean} (Tahan terhadap rayap & jamur)
-- Finishing: ${finishingClean}
-- Warna: ${warna}
-- Fitur Unggulan: ${featureStr}
-    `.trim();
+    const specs = `<strong>Spesifikasi Detail:</strong><ul><li>Dimensi: ${dimStr}</li><li>Material Utama: ${materialClean} (Tahan terhadap rayap & jamur)</li><li>Finishing: ${finishingClean}</li><li>Warna: ${warna}</li><li>Fitur Unggulan: ${featureStr}</li></ul>`;
 
-    const care = `
-💡 Perawatan Mudah:
-Cukup lap dengan kain microfiber sedikit lembap untuk membersihkan debu sehari-hari. Hindari penggunaan cairan kimia keras atau sikat kasar agar kualitas finishing tetap terjaga sempurna.
-    `.trim();
+    const care = `<strong>Perawatan Mudah:</strong><p>Cukup lap dengan kain microfiber sedikit lembap untuk membersihkan debu sehari-hari. Hindari penggunaan cairan kimia keras atau sikat kasar agar kualitas finishing tetap terjaga sempurna.</p>`;
 
     const installNote = getValue("jasaPasang") === "ya"
       ? "Kami menyediakan opsi pengiriman aman dan tim ahli siap membantu instalasi rapi di lokasi Anda."
       : "Produk dikirim dalam kondisi aman. Instruksi perakitan disertakan (jika produk knock-down).";
 
-    const shipping = `
-🚚 Pengiriman & Instalasi:
-${installNote} Estimasi pengerjaan ${estimasi} (tergantung antrian produksi).
-    `.trim();
+    const shipping = `<strong>Pengiriman & Instalasi:</strong><p>${installNote} Estimasi pengerjaan ${estimasi} (tergantung antrian produksi).</p>`;
 
     const cta = isCustom
-      ? "Wujudkan interior impian Anda sekarang! Hubungi kami untuk konsultasi desain dan penawaran spesial. 🛠️✨"
-      : "Stok terbatas! Segera amankan produk ini untuk mempercantik ruangan Anda. Klik tombol beli sekarang! 🛒✨";
+      ? "Wujudkan interior impian Anda sekarang! Hubungi kami untuk konsultasi desain dan penawaran spesial."
+      : "Stok terbatas! Segera amankan produk ini untuk mempercantik ruangan Anda. Klik tombol beli sekarang!";
 
     const fullDesc = [intro, whyLoveIt, specs, care, shipping, cta]
       .join("\n\n");

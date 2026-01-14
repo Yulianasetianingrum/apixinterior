@@ -729,13 +729,19 @@ export default async function TokoPengaturanPage({
    * LOGIC UPDATE: Read Navbar Theme from DRAFT META first.
    * If draft has no specific navbar theme, fallback to global setting or default.
    */
-  const activeMetaRow = draftSections.find((r) => isThemeMetaRow(r) && getThemeKeyFromRow(r) === activeThemeKey);
+  // More robust finding: Check config key OR slug match
+  const activeMetaRow = draftSections.find((r) => {
+    if (isThemeMetaRow(r) && getThemeKeyFromRow(r) === activeThemeKey) return true;
+    if (String(r.slug) === themeMetaSlug(activeThemeKey)) return true;
+    return false;
+  });
   const activeMetaConfig = (activeMetaRow?.config ?? {}) as any;
   const draftNavbarTheme = activeMetaConfig.navbarTheme; // "NAVY_GOLD", "WHITE_GOLD", etc.
 
   // Prioritize draft setting -> default (NAVY_GOLD).
   // REMOVE global setting fallback to prevent crosstalk (theme lain "ikut-ikutan").
   const currentTheme: NavbarTheme = (draftNavbarTheme as NavbarTheme) ?? "NAVY_GOLD";
+
 
   return (
     <main className={styles.page}>
@@ -1007,7 +1013,7 @@ export default async function TokoPengaturanPage({
           </span>
         </div>
 
-        <form action={updateNavbarTheme} className={styles.fieldGroup}>
+        <form id="navbarThemeForm" data-section-form="1" action={updateNavbarTheme} className={styles.fieldGroup}>
           <label htmlFor="navbarTheme" className={styles.label}>
             Pilih tema warna navbar
           </label>
@@ -1038,14 +1044,14 @@ export default async function TokoPengaturanPage({
         </p>
 
 
-        <form action={updateBackgroundTheme} className={styles.newSectionForm}>
+        <form id="backgroundThemeForm" data-section-form="1" action={updateBackgroundTheme} className={styles.newSectionForm}>
           <input type="hidden" name="themeKey" value={activeThemeKey ?? ""} />
           <div className={styles.newSectionGrid}>
             <div className={styles.fieldGroup}>
               <label className={styles.label}>Tema Background Utama</label>
               <select
                 name="backgroundTheme"
-                defaultValue={String((((draftSections as any[]).find((r) => isThemeMetaRow(r) && getThemeKeyFromRow(r) === activeThemeKey)?.config as any) ?? {})?.backgroundTheme ?? "FOLLOW_NAVBAR")}
+                defaultValue={String(activeMetaConfig?.backgroundTheme ?? "FOLLOW_NAVBAR")}
                 className={styles.select}
               >
                 <option value="FOLLOW_NAVBAR">Ikuti tema Navbar (default)</option>
