@@ -62,6 +62,7 @@ export function normalizeThemeAttr(v: any): string {
 const ALLOWED_THEME_COMBOS = new Set([
     "theme_1", "theme_2", "theme_3", "theme_4", "theme_5", "theme_6",
     "NAVY_GOLD", "WHITE_GOLD", "NAVY_WHITE", "GOLD_NAVY", "GOLD_WHITE", "WHITE_NAVY",
+    "GOLD", "NAVY", "WHITE", "LIGHT", "DARK",
 ]);
 
 export function parseSectionTheme(raw: any): string | null {
@@ -84,6 +85,8 @@ export function getHeroThemeTokens(theme: string) {
 
     switch (theme) {
         case "NAVY_GOLD":
+        case "NAVY":
+        case "DARK":
         case "theme_1":
             return { bg: navy, element: gold, card: navy, cardFg: gold, cardBorder: "rgba(255,255,255,0.22)", ctaBg: gold, ctaFg: navy, ctaHoverBg: navy, ctaHoverFg: gold, divider: "rgba(255,255,255,0.16)" };
         case "WHITE_GOLD":
@@ -93,12 +96,15 @@ export function getHeroThemeTokens(theme: string) {
         case "theme_3":
             return { bg: navy, element: white, card: navy, cardFg: white, cardBorder: "rgba(255,255,255,0.22)", ctaBg: white, ctaFg: navy, ctaHoverBg: navy, ctaHoverFg: white, divider: "rgba(255,255,255,0.16)" };
         case "GOLD_NAVY":
+        case "GOLD":
         case "theme_4":
             return { bg: gold, element: navy, card: gold, cardFg: navy, cardBorder: "rgba(11,29,58,0.20)", ctaBg: navy, ctaFg: white, ctaHoverBg: white, ctaHoverFg: navy, divider: "rgba(11,29,58,0.14)" };
         case "GOLD_WHITE":
         case "theme_5":
             return { bg: gold, element: white, card: gold, cardFg: white, cardBorder: "rgba(255,255,255,0.22)", ctaBg: white, ctaFg: ink, ctaHoverBg: ink, ctaHoverFg: white, divider: "rgba(255,255,255,0.18)" };
         case "WHITE_NAVY":
+        case "WHITE":
+        case "LIGHT":
         case "theme_6":
         default:
             return { bg: white, element: navy, card: white, cardFg: navy, cardBorder: "rgba(11,29,58,0.12)", ctaBg: navy, ctaFg: white, ctaHoverBg: white, ctaHoverFg: navy, divider: "rgba(2,6,23,0.08)" };
