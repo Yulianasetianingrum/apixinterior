@@ -71,8 +71,8 @@ export async function POST(req: Request) {
     const filePath = path.join(uploadsDir, finalFileName);
     await fs.writeFile(filePath, finalBuffer);
 
-    // URL yang bisa diakses visitor
-    const url = `/uploads/${finalFileName}`;
+    // URL yang bisa diakses visitor (Lewat API Dynamic biar langsung muncul tanpa restart)
+    const url = `/api/img?f=${finalFileName}`;
 
     // ========= TITLE & TAGS =========
     const autoTitle =
