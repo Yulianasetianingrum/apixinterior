@@ -228,9 +228,8 @@ export default async function ProductListingPage(props: {
                         )}
                     </div>
                 </div>
+            </main>
+            <GlobalFooter />
         </div>
-            </main >
-        <GlobalFooter />
-        </div >
     );
 }
