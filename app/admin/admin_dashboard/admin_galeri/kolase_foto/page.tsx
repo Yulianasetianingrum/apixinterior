@@ -315,9 +315,8 @@ export default function KolaseFotoPage() {
         </button>
         <div className={layoutStyles.mobileTitle}></div>
         <div
-          className={`${styles.topRightBrand} ${
-            darkMode ? styles.topRightBrandNight : ''
-          }`}
+          className={`${styles.topRightBrand} ${darkMode ? styles.topRightBrandNight : ''
+            }`}
         >
           APIX INTERIOR
         </div>
@@ -333,9 +332,8 @@ export default function KolaseFotoPage() {
 
       {/* SIDEBAR */}
       <aside
-        className={`${layoutStyles.sidebar} ${
-          sidebarOpen ? layoutStyles.sidebarOpen : ''
-        }`}
+        className={`${layoutStyles.sidebar} ${sidebarOpen ? layoutStyles.sidebarOpen : ''
+          }`}
       >
         <div className={layoutStyles.sidebarHeader}>
           <div className={layoutStyles.brand}>
@@ -387,9 +385,8 @@ export default function KolaseFotoPage() {
           </span>
           <button
             type="button"
-            className={`${layoutStyles.themeSwitch} ${
-              darkMode ? layoutStyles.themeSwitchOn : ''
-            }`}
+            className={`${layoutStyles.themeSwitch} ${darkMode ? layoutStyles.themeSwitchOn : ''
+              }`}
             onClick={() => setDarkMode((prev) => !prev)}
           >
             <div className={layoutStyles.themeThumb} />
@@ -412,16 +409,14 @@ export default function KolaseFotoPage() {
 
       {/* MAIN CONTENT */}
       <main
-        className={`${layoutStyles.main} ${
-          darkMode ? styles.mainNight : styles.mainDay
-        }`}
+        className={`${layoutStyles.main} ${darkMode ? styles.mainNight : styles.mainDay
+          }`}
       >
         {/* Brand kanan atas desktop */}
         <div className={styles.desktopTopBar}>
           <span
-            className={`${styles.desktopBrand} ${
-              darkMode ? styles.desktopBrandNight : ''
-            }`}
+            className={`${styles.desktopBrand} ${darkMode ? styles.desktopBrandNight : ''
+              }`}
           >
             APIX INTERIOR
           </span>
@@ -442,15 +437,13 @@ export default function KolaseFotoPage() {
 
         {/* AREA CARD + GRID */}
         <div
-          className={`${styles.cardArea} ${
-            darkMode ? styles.cardAreaNight : styles.cardAreaDay
-          }`}
+          className={`${styles.cardArea} ${darkMode ? styles.cardAreaNight : styles.cardAreaDay
+            }`}
         >
           <div className={styles.cardWrapper}>
             <div
-              className={`${layoutStyles.card} ${styles.card} ${
-                darkMode ? styles.cardNight : styles.cardDay
-              } ${styles.noCardHover}`}
+              className={`${layoutStyles.card} ${styles.card} ${darkMode ? styles.cardNight : styles.cardDay
+                } ${styles.noCardHover}`}
             >
               {/* Search bar */}
               <div className={styles.toolbar}>
@@ -459,14 +452,13 @@ export default function KolaseFotoPage() {
                   placeholder="Cari berdasarkan judul, tag, kategori..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-              className={styles.searchInput}
-            />
+                  className={styles.searchInput}
+                />
                 <div className={styles.toolbarActions}>
                   <button
                     type="button"
-                    className={`${styles.deleteBtn} ${
-                      darkMode ? styles.deleteBtnDark : styles.deleteBtnLight
-                    }`}
+                    className={`${styles.deleteBtn} ${darkMode ? styles.deleteBtnDark : styles.deleteBtnLight
+                      }`}
                     onClick={requestDeleteSelected}
                     disabled={
                       loading || deletingSelected || selectedIds.length === 0
@@ -480,9 +472,8 @@ export default function KolaseFotoPage() {
 
                   <button
                     type="button"
-                    className={`${styles.deleteBtn} ${
-                      darkMode ? styles.deleteBtnDark : styles.deleteBtnLight
-                    }`}
+                    className={`${styles.deleteBtn} ${darkMode ? styles.deleteBtnDark : styles.deleteBtnLight
+                      }`}
                     onClick={requestDropAll}
                     disabled={loading || droppingAll || data.length === 0}
                     title="Hapus semua gambar"
@@ -505,11 +496,10 @@ export default function KolaseFotoPage() {
                 {filtered.map((g) => (
                   <div
                     key={g.id}
-                    className={`${styles.galleryCard} ${
-                      darkMode
+                    className={`${styles.galleryCard} ${darkMode
                         ? styles.galleryCardNight
                         : styles.galleryCardDay
-                    }`}
+                      }`}
                   >
                     <div className={styles.galleryCheckbox}>
                       <input
@@ -526,6 +516,10 @@ export default function KolaseFotoPage() {
                         className={styles.galleryImage}
                         onClick={() => openPreview(g)}
                         style={{ cursor: 'zoom-in' }}
+                        onError={(e) => {
+                          e.currentTarget.src = "https://placehold.co/400x300?text=No+Image";
+                          e.currentTarget.onerror = null; // prevent infinite loop
+                        }}
                       />
                     </div>
                     <div className={styles.galleryMeta}>
@@ -543,11 +537,10 @@ export default function KolaseFotoPage() {
                       <div className={styles.tagText}>Tags: {g.tags}</div>
                       <button
                         type="button"
-                        className={`${styles.deleteBtn} ${
-                          darkMode
+                        className={`${styles.deleteBtn} ${darkMode
                             ? styles.deleteBtnDark
                             : styles.deleteBtnLight
-                        }`}
+                          }`}
                         onClick={() => requestDeleteOne(g.id)}
                       >
                         Hapus
@@ -559,117 +552,112 @@ export default function KolaseFotoPage() {
             </div>
           </div>
         </div>
-      
-      {/* CONFIRM MODAL (custom - bisa di-style) */}
-      {confirmOpen && (
-        <div className={styles.modalOverlay} onClick={closeConfirm}>
-          <div
-            className={`${styles.modalCard} ${
-              darkMode ? styles.modalCardNight : styles.modalCardDay
-            }`}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className={styles.modalHeader}>{confirmTitle}</div>
-            <div className={styles.modalBody}>{confirmMessage}</div>
-            <div className={styles.modalActions}>
-              <button
-                type="button"
-                className={`${styles.modalBtn} ${
-                  darkMode ? styles.modalBtnSecondaryNight : styles.modalBtnSecondaryDay
-                } ${droppingAll || deletingOne ? styles.modalBtnDisabled : ''}`}
-                onClick={closeConfirm}
-                disabled={droppingAll || deletingOne}
-              >
-                Cancel
-              </button>
 
-              <button
-                type="button"
-                className={`${styles.modalBtn} ${
-                  darkMode ? styles.modalBtnDangerNight : styles.modalBtnDangerDay
-                } ${droppingAll || deletingOne || deletingSelected ? styles.modalBtnDisabled : ''}`}
-                onClick={onConfirm}
-                disabled={droppingAll || deletingOne || deletingSelected}
-              >
-                {droppingAll || deletingOne || deletingSelected ? 'Menghapus...' : 'OK'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {previewItem && (
-        <div className={styles.modalOverlay} onClick={closePreview}>
-          <div
-            className={`${styles.modalCard} ${
-              darkMode ? styles.modalCardNight : styles.modalCardDay
-            }`}
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              maxWidth: 'min(820px, 96vw)',
-              width: '100%',
-              maxHeight: '92vh',
-              overflowY: 'auto',
-            }}
-          >
-            <div className={styles.modalHeader}>
-              {previewItem.title || 'Preview Gambar'}
-            </div>
-            <div className={styles.previewLayout}>
-              <div className={styles.previewImageBox}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={previewItem.url}
-                  alt={previewItem.title ?? ''}
-                  className={styles.previewImage}
-                />
-              </div>
-              <div className={styles.previewInfo}>
-                <div><b>ID:</b> {previewItem.id}</div>
-                <div><b>Tags:</b> {previewItem.tags || '-'}</div>
-                {previewItem.category && (
-                  <div>
-                    <b>Kategori:</b> {previewItem.category.name}
-                    {previewItem.subcategory
-                      ? ` / ${previewItem.subcategory.name}`
-                      : ''}
-                  </div>
-                )}
-                {previewMeta.loading ? (
-                  <div>Memuat info...</div>
-                ) : previewMeta.error ? (
-                  <div style={{ color: '#e11d48' }}>{previewMeta.error}</div>
-                ) : (
-                  <>
-                    <div>
-                      <b>Dimensi:</b>{' '}
-                      {previewMeta.width && previewMeta.height
-                        ? `${previewMeta.width} x ${previewMeta.height}px`
-                        : '-'}
-                    </div>
-                    <div>
-                      <b>Ukuran file:</b> {formatBytes(previewMeta.bytes)}
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
-            <div className={styles.modalActions}>
-              <button
-                type="button"
-                className={`${styles.modalBtn} ${
-                  darkMode ? styles.modalBtnSecondaryNight : styles.modalBtnSecondaryDay
+        {/* CONFIRM MODAL (custom - bisa di-style) */}
+        {confirmOpen && (
+          <div className={styles.modalOverlay} onClick={closeConfirm}>
+            <div
+              className={`${styles.modalCard} ${darkMode ? styles.modalCardNight : styles.modalCardDay
                 }`}
-                onClick={closePreview}
-              >
-                Tutup
-              </button>
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className={styles.modalHeader}>{confirmTitle}</div>
+              <div className={styles.modalBody}>{confirmMessage}</div>
+              <div className={styles.modalActions}>
+                <button
+                  type="button"
+                  className={`${styles.modalBtn} ${darkMode ? styles.modalBtnSecondaryNight : styles.modalBtnSecondaryDay
+                    } ${droppingAll || deletingOne ? styles.modalBtnDisabled : ''}`}
+                  onClick={closeConfirm}
+                  disabled={droppingAll || deletingOne}
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="button"
+                  className={`${styles.modalBtn} ${darkMode ? styles.modalBtnDangerNight : styles.modalBtnDangerDay
+                    } ${droppingAll || deletingOne || deletingSelected ? styles.modalBtnDisabled : ''}`}
+                  onClick={onConfirm}
+                  disabled={droppingAll || deletingOne || deletingSelected}
+                >
+                  {droppingAll || deletingOne || deletingSelected ? 'Menghapus...' : 'OK'}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-</main>
+        {previewItem && (
+          <div className={styles.modalOverlay} onClick={closePreview}>
+            <div
+              className={`${styles.modalCard} ${darkMode ? styles.modalCardNight : styles.modalCardDay
+                }`}
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                maxWidth: 'min(820px, 96vw)',
+                width: '100%',
+                maxHeight: '92vh',
+                overflowY: 'auto',
+              }}
+            >
+              <div className={styles.modalHeader}>
+                {previewItem.title || 'Preview Gambar'}
+              </div>
+              <div className={styles.previewLayout}>
+                <div className={styles.previewImageBox}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={previewItem.url}
+                    alt={previewItem.title ?? ''}
+                    className={styles.previewImage}
+                  />
+                </div>
+                <div className={styles.previewInfo}>
+                  <div><b>ID:</b> {previewItem.id}</div>
+                  <div><b>Tags:</b> {previewItem.tags || '-'}</div>
+                  {previewItem.category && (
+                    <div>
+                      <b>Kategori:</b> {previewItem.category.name}
+                      {previewItem.subcategory
+                        ? ` / ${previewItem.subcategory.name}`
+                        : ''}
+                    </div>
+                  )}
+                  {previewMeta.loading ? (
+                    <div>Memuat info...</div>
+                  ) : previewMeta.error ? (
+                    <div style={{ color: '#e11d48' }}>{previewMeta.error}</div>
+                  ) : (
+                    <>
+                      <div>
+                        <b>Dimensi:</b>{' '}
+                        {previewMeta.width && previewMeta.height
+                          ? `${previewMeta.width} x ${previewMeta.height}px`
+                          : '-'}
+                      </div>
+                      <div>
+                        <b>Ukuran file:</b> {formatBytes(previewMeta.bytes)}
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+              <div className={styles.modalActions}>
+                <button
+                  type="button"
+                  className={`${styles.modalBtn} ${darkMode ? styles.modalBtnSecondaryNight : styles.modalBtnSecondaryDay
+                    }`}
+                  onClick={closePreview}
+                >
+                  Tutup
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+      </main>
     </div>
   );
 }
