@@ -3,6 +3,7 @@ import "./globals.css";
 import "./theme.css";
 import { CartProvider } from "./context/CartContext";
 import { WishlistProvider } from "./context/WishlistContext";
+import PageViewTracker from "./components/analytics/PageViewTracker.client";
 
 // Use system font stack to avoid Google Font download issues during Docker build
 const inter = {
@@ -99,7 +100,10 @@ export default function RootLayout({
     <html lang="id" className={inter.variable}>
       <body className={`bg-white ${inter.className}`}>
         <CartProvider>
-          <WishlistProvider>{children}</WishlistProvider>
+          <WishlistProvider>
+            <PageViewTracker />
+            {children}
+          </WishlistProvider>
         </CartProvider>
       </body>
     </html>

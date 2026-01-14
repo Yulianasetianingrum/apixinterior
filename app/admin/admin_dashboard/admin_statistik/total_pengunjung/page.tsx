@@ -22,16 +22,18 @@ export default function TotalPengunjungPage() {
     });
 
     useEffect(() => {
-        // Data akan muncul setelah:
-        // 1. Deploy ke VPS
-        // 2. Setup Google Analytics atau tracking lainnya
-        // Untuk sekarang, semua 0 karena belum publish
-        setStats({
-            today: 0,
-            thisWeek: 0,
-            thisMonth: 0,
-            total: 0,
-        });
+        async function fetchStats() {
+            try {
+                const res = await fetch("/api/admin/admin_dashboard/admin_statistik");
+                if (res.ok) {
+                    const data = await res.json();
+                    setStats(data);
+                }
+            } catch (error) {
+                console.error("Failed to fetch stats:", error);
+            }
+        }
+        fetchStats();
     }, []);
 
     const goHome = () => {
