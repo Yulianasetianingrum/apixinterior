@@ -723,7 +723,10 @@
   --t-cta-fg: #0b1d3a;
   --t-cta-hover-bg: #0b1d3a;
   --t-cta-hover-fg: #f5c042;
+  --t-cta-hover-fg: #f5c042;
   --t-cta-border: rgba(245, 192, 66, 0.70);
+  background: var(--t-card);
+  color: var(--t-text);
 }
 
 .previewSectionTheme[data-theme="theme_2"],
@@ -753,8 +756,9 @@
   --t-cta-hover-bg: #0b1d3a;
   --t-cta-hover-fg: #d4af37;
   --t-cta-border: rgba(212, 175, 55, 0.55);
-  background: var(--t-card) !important;
-  color: var(--t-text) !important;
+  /* Removed !important to allow inline overrides */
+  /* background: var(--t-card); */
+  /* color: var(--t-text); */
 }
 
 .previewSectionTheme[data-theme="theme_3"],
