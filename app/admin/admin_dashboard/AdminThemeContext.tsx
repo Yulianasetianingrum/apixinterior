@@ -31,10 +31,7 @@ export function AdminThemeProvider({ children }: { children: ReactNode }) {
         });
     };
 
-    if (!mounted) {
-        // Prevent hydration mismatch by rendering nothing or a shell until client side
-        return <>{children}</>;
-    }
+
 
     return (
         <AdminThemeContext.Provider value={{ isDarkMode, toggleTheme }}>
