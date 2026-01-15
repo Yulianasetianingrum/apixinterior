@@ -2722,7 +2722,16 @@ export default async function TokoPengaturanPage({
                       </div>
 
                       <div className={styles.fieldGroup}>
-                        <label className={styles.label}>Tema Section</label>
+                        <label className={styles.label}>Background Section</label>
+                        <select name="sectionBgTheme" defaultValue={String((cfg as any).sectionBgTheme ?? "NAVY")} className={styles.select}>
+                          <option value="NAVY">NAVY</option>
+                          <option value="GOLD">GOLD</option>
+                          <option value="WHITE">WHITE</option>
+                        </select>
+                      </div>
+
+                      <div className={styles.fieldGroup}>
+                        <label className={styles.label}>Tema Card</label>
                         <select name="sectionTheme" defaultValue={String((cfg as any).sectionTheme ?? "FOLLOW_NAVBAR")} className={styles.select}>
                           <option value="FOLLOW_NAVBAR">Ikuti tema Navbar (default)</option>
                           <option value="NAVY_GOLD">NAVY + GOLD</option>

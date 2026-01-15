@@ -472,12 +472,16 @@ export async function saveBranchesConfig(formData: FormData) {
             ? sectionTheme
             : "FOLLOW_NAVBAR";
 
+    const rawBg = (formData.get("sectionBgTheme") as string | null) ?? "";
+    const sectionBgTheme = (rawBg === "GOLD" || rawBg === "WHITE") ? rawBg : "NAVY";
+
     const { branchIds: validBranchIds } = await sanitizeExistence({ branchIds });
 
     await updateDraftConfigPreserveTheme(id, {
         branchIds: validBranchIds ?? [],
         layout,
         sectionTheme: sectionThemeValue,
+        sectionBgTheme,
     }, { title, slug });
     revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko");
     return redirectBack({ notice: encodeURIComponent("Config BRANCHES tersimpan.") });

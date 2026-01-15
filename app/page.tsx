@@ -922,6 +922,15 @@ export default async function HomePage({
             const sectionThemeResolved = resolveEffectiveTheme(cfg.sectionTheme ?? "FOLLOW_NAVBAR", navbarTheme);
             const cardThemeClass = sectionThemeResolved ? `theme-${String(sectionThemeResolved).toLowerCase()}` : "";
             const colors = getHeroThemeTokens(sectionThemeResolved);
+
+            // Independent Background Logic
+            const pair = parseThemePair(sectionThemeResolved);
+            const savedBg = (cfg as any).sectionBgTheme;
+            const effectiveBgToken = savedBg && ["NAVY", "GOLD", "WHITE"].includes(savedBg) ? savedBg : pair.a;
+
+            const sectionBgColor = effectiveBgToken === "WHITE" ? "#FFFFFF" : effectiveBgToken === "GOLD" ? "#D4AF37" : "#0B1D3A";
+            const sectionTextColor = effectiveBgToken === "WHITE" || effectiveBgToken === "GOLD" ? "#0B1D3A" : "#FFFFFF";
+
             const selectedIds: number[] = Array.isArray(cfg.branchIds) ? cfg.branchIds : [];
             const branches = selectedIds.map((id: any) => cabangMap.get(Number(id))).filter(Boolean);
             const layoutEffective = (cfg.layout === "carousel" && branches.length > 0 && branches.length <= 5) ? "grid" : cfg.layout;
@@ -951,7 +960,7 @@ export default async function HomePage({
             if (!branches.length) return null;
 
             return (
-              <section key={section.id} className={`${styles.previewSection} ${styles.previewSectionTheme}`} data-theme={sectionThemeResolved} style={{ backgroundColor: colors.bg, color: colors.element }}>
+              <section key={section.id} className={`${styles.previewSection} ${styles.previewSectionTheme}`} data-theme={sectionThemeResolved} style={{ backgroundColor: sectionBgColor, color: sectionTextColor }}>
                 {section.title ? <h2 className={styles.sectionTitle}>{section.title}</h2> : null}
                 {layoutEffective === "carousel" ? <div className={styles.pcRow}>{branches.map(renderCard)}</div> : <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", width: "100%" }}>{branches.map(renderCard)}</div>}
               </section>
