@@ -13,12 +13,36 @@ export async function GET() {
 
         const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 
+        const excludeConditions = {
+            NOT: [
+                { path: { startsWith: "/admin" } },
+                { path: { startsWith: "/api" } },
+            ]
+        };
+
         // 1. Visitor Stats
         const [todayCount, thisWeekCount, thisMonthCount, totalCount] = await Promise.all([
-            prisma.pageView.count({ where: { createdAt: { gte: today } } }),
-            prisma.pageView.count({ where: { createdAt: { gte: startOfWeek } } }),
-            prisma.pageView.count({ where: { createdAt: { gte: startOfMonth } } }),
-            prisma.pageView.count(),
+            prisma.pageView.count({
+                where: {
+                    createdAt: { gte: today },
+                    ...excludeConditions
+                }
+            }),
+            prisma.pageView.count({
+                where: {
+                    createdAt: { gte: startOfWeek },
+                    ...excludeConditions
+                }
+            }),
+            prisma.pageView.count({
+                where: {
+                    createdAt: { gte: startOfMonth },
+                    ...excludeConditions
+                }
+            }),
+            prisma.pageView.count({
+                where: excludeConditions
+            }),
         ]);
 
         // 2. Top Product (Detail Views)

@@ -10,163 +10,139 @@ export async function POST(req: Request) {
   try {
     const formData = await req.formData();
 
-    // Bisa terima "foto" (versi lama) atau "file" (versi baru)
-    const file =
-      (formData.get('foto') as File | null) ||
-      (formData.get('file') as File | null);
+    // Support multiple files
+    const files = formData.getAll('foto') as File[];
 
-    if (!file) {
+    if (!files || files.length === 0) {
       return NextResponse.json(
         { success: false, error: 'File foto tidak ditemukan' },
         { status: 400 },
       );
     }
 
-    // Field tambahan (optional)
-    const titleFromForm = formData.get('title') as string | null;
-    const tagsRaw = formData.get('tags') as string | null;
+    // Common fields for all files (if shared)
+    const formTitle = formData.get('title') as string | null;
+    const formTags = formData.get('tags') as string | null;
 
-    // Bisa pakai ID langsung
-    const categoryIdRaw = formData.get('categoryId') as string | null;
-    const subcategoryIdRaw = formData.get('subcategoryId') as string | null;
+    // Category handling
+    const formCategoryId = formData.get('categoryId') as string | null;
+    const formSubcategoryId = formData.get('subcategoryId') as string | null;
+    const formCategoryName = formData.get('category') as string | null;
+    const formSubcategoryName = formData.get('subcategory') as string | null;
 
-    // Atau pakai nama (kalau mau auto-bikin kategori/subkategori)
-    const categoryName = formData.get('category') as string | null;
-    const subcategoryName = formData.get('subcategory') as string | null;
+    // --- PREPARE CATEGORY (Once for all files if shared) ---
+    // If user selects specific category, we resolve it now
+    let finalCategoryId: number | null = null;
+    let finalSubcategoryId: number | null = null;
 
-    // ========= OPTIMASI GAMBAR (SHARP) & SAVE =========
-    const originalBuffer = Buffer.from(await file.arrayBuffer());
+    // 1. Resolve Category
+    if (formCategoryId && !Number.isNaN(Number(formCategoryId))) {
+      finalCategoryId = Number(formCategoryId);
+    } else if (formCategoryName && formCategoryName.trim() !== '') {
+      const name = formCategoryName.trim();
+      let cat = await prisma.category.findUnique({ where: { name } });
+      if (!cat) {
+        cat = await prisma.category.create({ data: { name } });
+      }
+      finalCategoryId = cat.id;
+    }
+
+    // 2. Resolve Subcategory
+    if (finalCategoryId) {
+      if (formSubcategoryId && !Number.isNaN(Number(formSubcategoryId))) {
+        finalSubcategoryId = Number(formSubcategoryId);
+      } else if (formSubcategoryName && formSubcategoryName.trim() !== '') {
+        const subName = formSubcategoryName.trim();
+        let sub = await prisma.subcategory.findFirst({
+          where: { name: subName, categoryId: finalCategoryId }
+        });
+        if (!sub) {
+          sub = await prisma.subcategory.create({
+            data: { name: subName, categoryId: finalCategoryId }
+          });
+        }
+        finalSubcategoryId = sub.id;
+      }
+    }
+
+    // --- PROCESS FILES ---
+    const results = [];
     const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
     await fs.mkdir(uploadsDir, { recursive: true });
 
-    let finalBuffer = originalBuffer;
-    let finalFileName = "";
-
-    // Attempt Sharp
-    const originalName = file.name || 'upload';
-    let safeName = originalName.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9.\-]/g, '');
-
-    try {
-      const sharp = require('sharp');
-      const processing = sharp(originalBuffer)
-        .resize({ width: 1920, withoutEnlargement: true })
-        .webp({ quality: 65, effort: 4 });
-
-      finalBuffer = await processing.toBuffer();
-
-      // Use webp extension
-      const baseName = safeName.substring(0, safeName.lastIndexOf('.')) || safeName;
-      finalFileName = `${Date.now()}-${baseName}.webp`;
-
-      console.log("Upload: Image optimized with Sharp.");
-    } catch (sharpError) {
-      console.error("Upload Warning: Sharp failed, saving original.", sharpError);
-
-      // Fallback to original
-      finalBuffer = originalBuffer;
-      finalFileName = `${Date.now()}-${safeName}`;
-    }
-
-    // Write file
-    const filePath = path.join(uploadsDir, finalFileName);
-    await fs.writeFile(filePath, finalBuffer);
-
-    // URL yang bisa diakses visitor (Lewat API Dynamic biar langsung muncul tanpa restart)
-    const url = `/api/img?f=${finalFileName}`;
-
-    // ========= TITLE & TAGS =========
-    const autoTitle =
-      titleFromForm && titleFromForm.trim() !== ''
-        ? titleFromForm.trim()
-        : originalName;
-
-    const tagList = tagsRaw
-      ? tagsRaw
-        .split(',')
-        .map((t) => t.trim())
-        .filter(Boolean)
+    // Tags processing
+    const tagList = formTags
+      ? formTags.split(',').map((t) => t.trim()).filter(Boolean)
       : [];
+    const tagsString = tagList.join(', ');
 
-    // ========= CATEGORY / SUBCATEGORY HANDLING =========
-    let categoryId: number | null = null;
-    let subcategoryId: number | null = null;
+    for (const file of files) {
+      if (!file.name) continue;
 
-    // 1. Kalau ada categoryId & subcategoryId numeric → pakai itu dulu
-    if (categoryIdRaw && !Number.isNaN(Number(categoryIdRaw))) {
-      categoryId = Number(categoryIdRaw);
-    }
-    if (subcategoryIdRaw && !Number.isNaN(Number(subcategoryIdRaw))) {
-      subcategoryId = Number(subcategoryIdRaw);
-    }
+      const originalBuffer = Buffer.from(await file.arrayBuffer());
+      let finalBuffer = originalBuffer;
+      let finalFileName = "";
 
-    // 2. Kalau belum ada categoryId, tapi ada nama kategori → findOrCreate
-    if (!categoryId && categoryName && categoryName.trim() !== '') {
-      const name = categoryName.trim();
+      // Auto-generate title if not provided or if multiple files (append index/name?)
+      // If multiple files, we probably shouldn't use the exact same title for all unless intended.
+      // Logic: If title is provided, use it. If multiple files, properly just use filename or append?
+      // Let's stick to: If 1 file, use formTitle provided. If >1 file, use filename as title fallback usually safer,
+      // UNLESS formTitle is generic like "Project A". Let's use FormTitle if exists.
 
-      let category = await prisma.category.findUnique({
-        where: { name },
-      });
+      // Sharp Optimization
+      const originalName = file.name;
+      let safeName = originalName.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9.\-]/g, '');
 
-      if (!category) {
-        category = await prisma.category.create({
-          data: { name },
-        });
+      try {
+        const sharp = require('sharp');
+        const processing = sharp(originalBuffer)
+          .resize({ width: 1920, withoutEnlargement: true })
+          .webp({ quality: 65, effort: 4 });
+
+        finalBuffer = await processing.toBuffer();
+        const baseName = safeName.substring(0, safeName.lastIndexOf('.')) || safeName;
+        finalFileName = `${Date.now()}-${baseName}-${Math.floor(Math.random() * 1000)}.webp`;
+
+      } catch (filesError) {
+        console.error(`Sharp failed for ${originalName}`, filesError);
+        finalBuffer = originalBuffer;
+        finalFileName = `${Date.now()}-${safeName}`;
       }
 
-      categoryId = category.id;
-    }
+      // Write
+      await fs.writeFile(path.join(uploadsDir, finalFileName), finalBuffer);
+      const url = `/api/img?f=${finalFileName}`;
 
-    // 3. Kalau belum ada subcategoryId, tapi ada nama subkategori & categoryId → findOrCreate
-    if (
-      categoryId &&
-      !subcategoryId &&
-      subcategoryName &&
-      subcategoryName.trim() !== ''
-    ) {
-      const subName = subcategoryName.trim();
-
-      let subcategory = await prisma.subcategory.findFirst({
-        where: {
-          name: subName,
-          categoryId,
-        },
-      });
-
-      if (!subcategory) {
-        subcategory = await prisma.subcategory.create({
-          data: {
-            name: subName,
-            categoryId,
-          },
-        });
+      // Determine Title
+      // If user gave a title, use it. If multiple, maybe append? 
+      // Current requirement: simple "Add" might imply batch upload. 
+      // Let's use regex to nice-ify filename if no title provided.
+      let thisTitle = formTitle;
+      if (!thisTitle || thisTitle.trim() === '') {
+        let name = originalName.replace(/\.[^/.]+$/, "");
+        name = name.replace(/[-_]/g, " ");
+        thisTitle = name.replace(/\b\w/g, (l) => l.toUpperCase());
       }
 
-      subcategoryId = subcategory.id;
+      // Save DB
+      const gambar = await prisma.gambarUpload.create({
+        data: {
+          url,
+          title: thisTitle,
+          tags: tagsString,
+          categoryId: finalCategoryId,
+          subcategoryId: finalSubcategoryId,
+        }
+      });
+      results.push(gambar);
     }
 
-    // ========= SIMPAN KE DATABASE (GambarUpload) =========
-    const gambar = await prisma.gambarUpload.create({
-      data: {
-        url,
-        title: autoTitle,
-        tags: tagList.join(', '),
-        categoryId,
-        subcategoryId,
-      },
-      include: {
-        category: true,
-        subcategory: true,
-      },
-    });
-
-    // ========= RESPONSE =========
     return NextResponse.json({
       success: true,
-      data: gambar,      // buat kode lama
-      id: gambar.id,     // buat kebutuhan baru
-      url: gambar.url,
-      title: gambar.title,
+      count: results.length,
+      data: results // Array of created items
     });
+
   } catch (err) {
     console.error('Upload error:', err);
     return NextResponse.json(

@@ -11,6 +11,9 @@ export default function PageViewTracker() {
         // Avoid double tracking in React Strict Mode or rapid updates, though usually safe in useEffect dependency array
         if (lastTracked.current === pathname) return;
 
+        // Ignored paths
+        if (pathname.startsWith("/admin") || pathname.startsWith("/api")) return;
+
         const track = async () => {
             try {
                 await fetch("/api/analytics/track", {

@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import ProductVariationSelector from "./ProductVariationSelector.client";
 
@@ -20,6 +20,22 @@ export default function ProductDetailClient({ product, waNumber }: WrapperProps)
     const galleryImageUrls = (product.galeri || [])
         .map((g: any) => normalizePublicUrl(g.gambar?.url || null))
         .filter((u: any): u is string => !!u);
+
+    // Track View on Mount
+    useEffect(() => {
+        const trackView = async () => {
+            try {
+                await fetch("/api/analytics/product/view", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ produkId: product.id }),
+                });
+            } catch (err) {
+                // ignore silent error
+            }
+        };
+        trackView();
+    }, [product.id]);
 
     // also add main image to list if not there?
     const allImages = [

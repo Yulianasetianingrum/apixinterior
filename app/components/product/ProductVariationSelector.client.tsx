@@ -189,6 +189,16 @@ export default function ProductVariationSelector({ product, onImageChange, baseW
     const handlePesan = () => {
         if (!baseWaNumber) return;
 
+        // Track Click (Non-blocking)
+        try {
+            fetch("/api/analytics/product/contact", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ produkId: product.id }),
+                keepalive: true
+            }).catch(() => { });
+        } catch { }
+
         // Construct Message
         let text = `Halo, saya mau pesan produk: *${product.nama}*\n`;
         text += `Slug: ${product.slug}\n`;

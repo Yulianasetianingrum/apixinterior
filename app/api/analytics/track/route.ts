@@ -12,6 +12,10 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Path required" }, { status: 400 });
         }
 
+        if (path.startsWith("/admin") || path.startsWith("/api")) {
+            return NextResponse.json({ success: true, ignored: true });
+        }
+
         await prisma.pageView.create({
             data: {
                 path,

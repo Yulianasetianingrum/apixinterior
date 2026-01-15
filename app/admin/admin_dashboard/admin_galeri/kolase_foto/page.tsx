@@ -1,6 +1,7 @@
+
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import layoutStyles from '../../admin_dashboard.module.css';
 import styles from './kolase_foto.module.css';
@@ -22,6 +23,7 @@ export default function KolaseFotoPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
 
+  // Delete / Drop States
   const [droppingAll, setDroppingAll] = useState(false);
   const [deletingOne, setDeletingOne] = useState(false);
   const [deletingSelected, setDeletingSelected] = useState(false);
@@ -32,6 +34,7 @@ export default function KolaseFotoPage() {
   const [confirmTargetId, setConfirmTargetId] = useState<number | null>(null);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
+  // Preview State
   const [previewItem, setPreviewItem] = useState<Gambar | null>(null);
   const [previewMeta, setPreviewMeta] = useState<{
     loading: boolean;
@@ -41,23 +44,170 @@ export default function KolaseFotoPage() {
     error?: string;
   }>({ loading: false });
 
+  // Add / Edit States
+  const [addOpen, setAddOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [editItem, setEditItem] = useState<Gambar | null>(null);
+
+  // Form State (Shared for Add/Edit)
+  const [formFiles, setFormFiles] = useState<FileList | null>(null); // For Add only
+  const [formTitle, setFormTitle] = useState('');
+  const [formCategory, setFormCategory] = useState('');
+  const [formSubcategory, setFormSubcategory] = useState('');
+  const [formTags, setFormTags] = useState<string[]>([]);
+  const [formTagInput, setFormTagInput] = useState('');
+  const [formSubmitting, setFormSubmitting] = useState(false);
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
 
+  // Load Data
   async function loadData() {
     setLoading(true);
-    const res = await fetch(
-      '/api/admin/admin_dashboard/admin_galeri/list_gambar'
-    );
-    const json = await res.json();
-    setData(json.data ?? []);
-    setLoading(false);
+    try {
+      const res = await fetch('/api/admin/admin_dashboard/admin_galeri/list_gambar');
+      const json = await res.json();
+      setData(json.data ?? []);
+    } catch {
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
   }
 
   useEffect(() => {
     loadData();
   }, []);
+
+  // --- ACTIONS ---
+
+  // Add Model Logic
+  function openAddModal() {
+    setFormFiles(null);
+    setFormTitle('');
+    setFormCategory('');
+    setFormSubcategory('');
+    setFormTags([]);
+    setFormTagInput('');
+    setAddOpen(true);
+  }
+
+  function handleAutoGenerate(file: File) {
+    if (!file) return;
+    let name = file.name.replace(/\.[^/.]+$/, "");
+    name = name.replace(/[-_]/g, " ");
+    name = name.replace(/\b\w/g, (l) => l.toUpperCase());
+    setFormTitle(name);
+
+    const lowerName = name.toLowerCase();
+
+    // Simple heuristics
+    if (lowerName.includes("kitchen")) setFormCategory("Kitchen");
+    else if (lowerName.includes("kamar") || lowerName.includes("bed")) setFormCategory("Kamar Tidur");
+    else if (lowerName.includes("ruang tamu") || lowerName.includes("living")) setFormCategory("Ruang Tamu");
+    else if (lowerName.includes("kantor") || lowerName.includes("office")) setFormCategory("Kantor");
+
+    if (lowerName.includes("lemari")) setFormSubcategory("Lemari Pakaian");
+    else if (lowerName.includes("meja")) setFormSubcategory("Meja Kerja");
+    else if (lowerName.includes("kabinet")) setFormSubcategory("Kabinet");
+
+    const stopWords = ["dan", "yang", "di", "ke", "dari", "ini", "itu", "untuk", "with", "and"];
+    const potentialTags = lowerName.split(" ").map(w => w.trim()).filter(w => w && w.length > 2 && !stopWords.includes(w));
+    setFormTags(potentialTags.slice(0, 7));
+  }
+
+  async function doAddSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!formFiles || formFiles.length === 0) {
+      alert("Pilih minimal satu foto.");
+      return;
+    }
+    setFormSubmitting(true);
+
+    const formData = new FormData();
+    for (let i = 0; i < formFiles.length; i++) {
+      formData.append('foto', formFiles[i]); // Use 'foto' to match existing API logic 
+    }
+    formData.set('title', formTitle);
+    formData.set('tags', formTags.join(', '));
+    formData.set('category', formCategory);
+    formData.set('subcategory', formSubcategory);
+
+    try {
+      const res = await fetch('/api/admin/admin_dashboard/admin_galeri/upload_foto', {
+        method: 'POST',
+        body: formData
+      });
+      if (!res.ok) throw new Error('Upload gagal');
+
+      setAddOpen(false);
+      loadData(); // Refresh
+    } catch (err) {
+      alert("Gagal upload gambar.");
+      console.error(err);
+    } finally {
+      setFormSubmitting(false);
+    }
+  }
+
+  // Edit Modal Logic
+  function openEditModal(g: Gambar) {
+    setEditItem(g);
+    setFormTitle(g.title || '');
+    setFormCategory(g.category?.name || '');
+    setFormSubcategory(g.subcategory?.name || '');
+    setFormTags(g.tags ? g.tags.split(',').map(t => t.trim()).filter(Boolean) : []);
+    setFormTagInput('');
+    setEditOpen(true);
+  }
+
+  async function doEditSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!editItem) return;
+    setFormSubmitting(true);
+
+    try {
+      const res = await fetch('/api/admin/admin_dashboard/admin_galeri/update_gambar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: editItem.id,
+          title: formTitle,
+          tags: formTags.join(', '),
+          categoryName: formCategory,
+          subcategoryName: formSubcategory
+        })
+      });
+      if (!res.ok) throw new Error('Update gagal');
+
+      setEditOpen(false);
+      setEditItem(null);
+      loadData();
+    } catch (err) {
+      alert("Gagal update gambar.");
+      console.error(err);
+    } finally {
+      setFormSubmitting(false);
+    }
+  }
+
+  // Tag helper
+  function addTag(e: React.KeyboardEvent) {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      const t = formTagInput.trim();
+      if (t && !formTags.includes(t)) {
+        setFormTags([...formTags, t]);
+      }
+      setFormTagInput('');
+    }
+  }
+  function removeTag(t: string) {
+    setFormTags(formTags.filter(x => x !== t));
+  }
+
+
+  // --- DELETE LOGIC (Existing) ---
 
   async function doDeleteOne(id: number) {
     const res = await fetch(
@@ -346,7 +496,6 @@ export default function KolaseFotoPage() {
             </div>
           </div>
 
-          {/* tombol X (HP/TABLET) */}
           <button
             type="button"
             className={styles.closeSidebarButton}
@@ -356,7 +505,6 @@ export default function KolaseFotoPage() {
           </button>
         </div>
 
-        {/* MENU */}
         <div className={layoutStyles.menu}>
           <button
             type="button"
@@ -378,7 +526,6 @@ export default function KolaseFotoPage() {
           </button>
         </div>
 
-        {/* SWITCH MODE */}
         <div className={layoutStyles.themeSwitchWrapper}>
           <span className={layoutStyles.themeLabel}>
             Mode tombol: {darkMode ? 'Malam' : 'Siang'}
@@ -393,7 +540,6 @@ export default function KolaseFotoPage() {
           </button>
         </div>
 
-        {/* TOMBOL KEMBALI */}
         <div className={styles.sidebarBackWrapper}>
           <button
             type="button"
@@ -412,7 +558,6 @@ export default function KolaseFotoPage() {
         className={`${layoutStyles.main} ${darkMode ? styles.mainNight : styles.mainDay
           }`}
       >
-        {/* Brand kanan atas desktop */}
         <div className={styles.desktopTopBar}>
           <span
             className={`${styles.desktopBrand} ${darkMode ? styles.desktopBrandNight : ''
@@ -431,7 +576,7 @@ export default function KolaseFotoPage() {
           <p
             className={`${layoutStyles.pageSubtitle} ${styles.pageSubtitleOutside}`}
           >
-            Lihat dan kelola semua foto yang sudah diupload ke galeri.
+            Lihat, kelola, tambah, dan edit foto galeri Anda.
           </p>
         </header>
 
@@ -445,7 +590,7 @@ export default function KolaseFotoPage() {
               className={`${layoutStyles.card} ${styles.card} ${darkMode ? styles.cardNight : styles.cardDay
                 } ${styles.noCardHover}`}
             >
-              {/* Search bar */}
+              {/* Search bar & Actions */}
               <div className={styles.toolbar}>
                 <input
                   type="text"
@@ -455,6 +600,18 @@ export default function KolaseFotoPage() {
                   className={styles.searchInput}
                 />
                 <div className={styles.toolbarActions}>
+
+                  {/* ADD BUTTON */}
+                  <button
+                    type="button"
+                    className={`${styles.deleteBtn} ${darkMode ? styles.actionBtnDark : styles.actionBtnLight}`} // reused styles
+                    onClick={openAddModal}
+                    title="Upload Foto Baru"
+                    style={{ backgroundColor: '#2563eb', color: 'white', borderColor: '#2563eb' }}
+                  >
+                    + Tambah Foto
+                  </button>
+
                   <button
                     type="button"
                     className={`${styles.deleteBtn} ${darkMode ? styles.deleteBtnDark : styles.deleteBtnLight
@@ -466,8 +623,8 @@ export default function KolaseFotoPage() {
                     title="Hapus gambar terpilih"
                   >
                     {deletingSelected
-                      ? 'Menghapus...'
-                      : `Hapus terpilih (${selectedIds.length || 0})`}
+                      ? '...'
+                      : `Hapus (${selectedIds.length})`}
                   </button>
 
                   <button
@@ -478,7 +635,7 @@ export default function KolaseFotoPage() {
                     disabled={loading || droppingAll || data.length === 0}
                     title="Hapus semua gambar"
                   >
-                    {droppingAll ? 'Menghapus...' : 'DROP ALL'}
+                    {droppingAll ? '...' : 'DROP ALL'}
                   </button>
                 </div>
               </div>
@@ -488,7 +645,7 @@ export default function KolaseFotoPage() {
                 <p className={styles.statusText}>Memuat data...</p>
               )}
               {!loading && filtered.length === 0 && (
-                <p className={styles.statusText}>Belum ada gambar.</p>
+                <p className={styles.statusText}>Belum ada gambar. Silakan upload foto.</p>
               )}
 
               {/* Grid */}
@@ -509,6 +666,21 @@ export default function KolaseFotoPage() {
                         style={{ cursor: 'pointer', width: '16px', height: '16px' }}
                       />
                     </div>
+
+                    {/* EDIT BUTTON (Overlay) */}
+                    <button
+                      onClick={(e) => { e.stopPropagation(); openEditModal(g); }}
+                      style={{
+                        position: 'absolute', top: 8, right: 8, zIndex: 10,
+                        background: 'rgba(255,255,255,0.9)',
+                        border: '1px solid #ccc', borderRadius: '4px',
+                        cursor: 'pointer', padding: '2px 6px', fontSize: '10px', fontWeight: 'bold'
+                      }}
+                      title="Edit Gambar"
+                    >
+                      EDIT
+                    </button>
+
                     <div className={styles.imageWrapper}>
                       <img
                         src={g.url}
@@ -519,8 +691,8 @@ export default function KolaseFotoPage() {
                           e.currentTarget.src = "https://placehold.co/400x300?text=No+Image";
                           e.currentTarget.onerror = null;
                         }}
+                        loading="lazy"
                       />
-                      {/* Metadata removed from grid for iPhone look */}
                     </div>
                   </div>
                 ))}
@@ -529,7 +701,170 @@ export default function KolaseFotoPage() {
           </div>
         </div>
 
-        {/* CONFIRM MODAL (custom - bisa di-style) */}
+        {/* --- ADD MODAL --- */}
+        {addOpen && (
+          <div className={styles.modalOverlay} onClick={() => setAddOpen(false)}>
+            <div
+              className={`${styles.modalCard} ${darkMode ? styles.modalCardNight : styles.modalCardDay}`}
+              onClick={(e) => e.stopPropagation()}
+              style={{ maxWidth: '500px' }}
+            >
+              <div className={styles.modalHeader}>Tambah Foto Baru</div>
+              <form onSubmit={doAddSubmit} className={styles.modalBody} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+
+                <label className={styles.label}>
+                  Pilih File (Bisa Banyak)
+                  <input
+                    type="file" multiple accept="image/*"
+                    onChange={(e) => {
+                      if (e.target.files) {
+                        setFormFiles(e.target.files);
+                        // Auto-generate helper if simple single upload, else user types manually
+                        if (e.target.files.length === 1) handleAutoGenerate(e.target.files[0]);
+                      }
+                    }}
+                    style={{ display: 'block', marginTop: 4 }}
+                    required
+                  />
+                </label>
+
+                <label className={styles.label}>
+                  Judul (Opsional)
+                  <input
+                    type="text" className={styles.input}
+                    value={formTitle} onChange={(e) => setFormTitle(e.target.value)}
+                    placeholder="Judul gambar..."
+                  />
+                </label>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                  <label className={styles.label}>
+                    Kategori
+                    <input
+                      type="text" className={styles.input}
+                      value={formCategory} onChange={(e) => setFormCategory(e.target.value)}
+                      placeholder="Contoh: Kitchen"
+                    />
+                  </label>
+                  <label className={styles.label}>
+                    Subkategori
+                    <input
+                      type="text" className={styles.input}
+                      value={formSubcategory} onChange={(e) => setFormSubcategory(e.target.value)}
+                      placeholder="Contoh: Kabinet"
+                    />
+                  </label>
+                </div>
+
+                <label className={styles.label}>
+                  Tags
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 4, padding: 4, border: '1px solid #ddd', borderRadius: 4 }}>
+                    {formTags.map(t => (
+                      <span key={t} style={{ background: '#eee', padding: '2px 6px', borderRadius: 4, fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}>
+                        #{t}
+                        <button type="button" onClick={() => removeTag(t)} style={{ border: 'none', background: 'none', cursor: 'pointer', fontWeight: 'bold' }}>×</button>
+                      </span>
+                    ))}
+                    <input
+                      type="text"
+                      value={formTagInput} onChange={(e) => setFormTagInput(e.target.value)}
+                      onKeyDown={addTag}
+                      placeholder={formTags.length === 0 ? "Ketik tag lalu Enter" : ""}
+                      style={{ border: 'none', outline: 'none', flex: 1, minWidth: 60 }}
+                    />
+                  </div>
+                </label>
+
+                <div className={styles.modalActions}>
+                  <button type="button" onClick={() => setAddOpen(false)}
+                    className={`${styles.modalBtn} ${darkMode ? styles.modalBtnSecondaryNight : styles.modalBtnSecondaryDay}`}>
+                    Batal
+                  </button>
+                  <button type="submit" disabled={formSubmitting}
+                    className={`${styles.modalBtn}`} style={{ background: '#2563eb', color: 'white' }}>
+                    {formSubmitting ? 'Mengupload...' : 'Upload'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* --- EDIT MODAL --- */}
+        {editOpen && editItem && (
+          <div className={styles.modalOverlay} onClick={() => setEditOpen(false)}>
+            <div
+              className={`${styles.modalCard} ${darkMode ? styles.modalCardNight : styles.modalCardDay}`}
+              onClick={(e) => e.stopPropagation()}
+              style={{ maxWidth: '500px' }}
+            >
+              <div className={styles.modalHeader}>Edit Foto</div>
+              <form onSubmit={doEditSubmit} className={styles.modalBody} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+
+                <div style={{ textAlign: 'center' }}>
+                  <img src={editItem.url} alt="Preview" style={{ maxHeight: 150, borderRadius: 8 }} />
+                </div>
+
+                <label className={styles.label}>
+                  Judul
+                  <input
+                    type="text" className={styles.input}
+                    value={formTitle} onChange={(e) => setFormTitle(e.target.value)}
+                  />
+                </label>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                  <label className={styles.label}>
+                    Kategori
+                    <input
+                      type="text" className={styles.input}
+                      value={formCategory} onChange={(e) => setFormCategory(e.target.value)}
+                    />
+                  </label>
+                  <label className={styles.label}>
+                    Subkategori
+                    <input
+                      type="text" className={styles.input}
+                      value={formSubcategory} onChange={(e) => setFormSubcategory(e.target.value)}
+                    />
+                  </label>
+                </div>
+
+                <label className={styles.label}>
+                  Tags
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 4, padding: 4, border: '1px solid #ddd', borderRadius: 4 }}>
+                    {formTags.map(t => (
+                      <span key={t} style={{ background: '#eee', padding: '2px 6px', borderRadius: 4, fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}>
+                        #{t}
+                        <button type="button" onClick={() => removeTag(t)} style={{ border: 'none', background: 'none', cursor: 'pointer', fontWeight: 'bold' }}>×</button>
+                      </span>
+                    ))}
+                    <input
+                      type="text"
+                      value={formTagInput} onChange={(e) => setFormTagInput(e.target.value)}
+                      onKeyDown={addTag}
+                      placeholder={formTags.length === 0 ? "Ketik tag lalu Enter" : ""}
+                      style={{ border: 'none', outline: 'none', flex: 1, minWidth: 60 }}
+                    />
+                  </div>
+                </label>
+
+                <div className={styles.modalActions}>
+                  <button type="button" onClick={() => setEditOpen(false)}
+                    className={`${styles.modalBtn} ${darkMode ? styles.modalBtnSecondaryNight : styles.modalBtnSecondaryDay}`}>
+                    Batal
+                  </button>
+                  <button type="submit" disabled={formSubmitting}
+                    className={`${styles.modalBtn}`} style={{ background: '#059669', color: 'white' }}>
+                    {formSubmitting ? 'Menyimpan...' : 'Simpan Perubahan'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* --- DELETE CONFIRM MODAL (Existing) --- */}
         {confirmOpen && (
           <div className={styles.modalOverlay} onClick={closeConfirm}>
             <div
@@ -564,6 +899,7 @@ export default function KolaseFotoPage() {
           </div>
         )}
 
+        {/* --- PREVIEW MODAL (Existing) --- */}
         {previewItem && (
           <div className={styles.modalOverlay} onClick={closePreview}>
             <div
@@ -590,6 +926,14 @@ export default function KolaseFotoPage() {
                   />
                 </div>
                 <div className={styles.previewInfo}>
+                  <div style={{ marginBottom: 12 }}>
+                    <button
+                      onClick={() => { closePreview(); openEditModal(previewItem); }}
+                      style={{ width: '100%', padding: '8px', background: '#e0f2fe', border: '1px solid #7dd3fc', borderRadius: 6, color: '#0369a1', fontWeight: 600, cursor: 'pointer' }}
+                    >
+                      ✏️ Edit Data Foto Ini
+                    </button>
+                  </div>
                   <div><b>ID:</b> {previewItem.id}</div>
                   <div><b>Tags:</b> {previewItem.tags || '-'}</div>
                   {previewItem.category && (

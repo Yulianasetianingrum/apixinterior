@@ -112,6 +112,17 @@ export default function ProductCard({ product: pRaw, index }: ProductCardProps) 
     const handleContact = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
+
+        // Track Click (Non-blocking)
+        try {
+            fetch("/api/analytics/product/contact", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ produkId: p.id }),
+                keepalive: true // Ensure request survives redirection
+            }).catch(() => { });
+        } catch { }
+
         const message = `Halo, saya tertarik dengan produk: ${p.nama}`;
         const waUrl = `https://wa.me/6281234567890?text=${encodeURIComponent(message)}`;
         window.open(waUrl, "_blank");
