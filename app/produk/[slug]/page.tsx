@@ -223,6 +223,10 @@ export default async function ProdukDetailPage({ params }: PageProps) {
 
           <div className={styles.specGrid}>
             <div className={styles.specItem}>
+              <strong>Satuan</strong>
+              <div>{resolveUnitLabel(produk.hargaTipe)}</div>
+            </div>
+            <div className={styles.specItem}>
               <strong>Material</strong>
               <div>{produk.material || "-"}</div>
             </div>
