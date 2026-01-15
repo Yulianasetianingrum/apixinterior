@@ -289,8 +289,8 @@
 /* di desktop, main geser karena ada sidebar kiri */
 @media (min-width: 1024px) {
   .main {
-    margin-left: 260px;
-    padding: 28px 32px 32px;
+    margin-left: 280px;
+    padding: 32px;
   }
 }
 
