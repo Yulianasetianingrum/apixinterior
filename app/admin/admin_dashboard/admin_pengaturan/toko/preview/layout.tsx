@@ -1,3 +1,13 @@
+import { AdminThemeProvider } from "../../../AdminThemeContext";
+
 export default function PreviewLayout({ children }: { children: React.ReactNode }) {
-    return <>{children}</>;
+    return (
+        <html lang="id">
+            <body>
+                <AdminThemeProvider>
+                    {children}
+                </AdminThemeProvider>
+            </body>
+        </html>
+    );
 }

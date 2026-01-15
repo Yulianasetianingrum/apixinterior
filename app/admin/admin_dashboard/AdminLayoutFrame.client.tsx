@@ -38,6 +38,11 @@ export default function AdminLayoutFrame({ children }: { children: ReactNode }) 
         }
     };
 
+    // Skip sidebar for preview routes
+    if (pathname.includes('/preview')) {
+        return <>{children}</>;
+    }
+
     return (
         <div className={`${styles.dashboard} ${isDarkMode ? styles.dashboardDark : ""}`}>
             {/* TOP BAR – MOBILE/TABLET */}
