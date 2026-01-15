@@ -83,7 +83,13 @@ export default function FloatingPreviewActions({
 
   return (
     <div className={styles.floatingActions}>
-      <a className={previewClassName} href={previewHref} style={{ textDecoration: "none" }}>
+      <a
+        className={previewClassName}
+        href={previewHref}
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{ textDecoration: "none" }}
+      >
         Preview
       </a>
 
