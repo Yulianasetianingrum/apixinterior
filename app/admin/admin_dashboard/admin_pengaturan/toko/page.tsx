@@ -2440,6 +2440,16 @@ export default async function TokoPengaturanPage({
                                               <img
                                                 src={url}
                                                 alt={`Voucher ${imgId}`}
+                                                onError={(e) => {
+                                                  // Fallback to proxy if static file fails
+                                                  const target = e.currentTarget;
+                                                  if (!target.src.includes("/api/img_proxy")) {
+                                                    const filename = url.split("/").pop();
+                                                    if (filename) {
+                                                      target.src = `/api/img_proxy?file=${filename}&t=${Date.now()}`;
+                                                    }
+                                                  }
+                                                }}
                                                 style={{
                                                   width: "100%",
                                                   height: 140,
