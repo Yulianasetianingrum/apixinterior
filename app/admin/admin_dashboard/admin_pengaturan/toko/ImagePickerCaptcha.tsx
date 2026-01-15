@@ -645,6 +645,17 @@ export default function ImagePickerCaptcha({
                       <img
                         src={it.url}
                         alt={it.title ?? `Gambar ${it.id}`}
+                        onError={(e) => {
+                          // Fallback to proxy if static file fails (404 or not served yet)
+                          const target = e.currentTarget;
+                          if (!target.src.includes("/api/img_proxy")) {
+                            // Extract filename from URL
+                            const filename = it.url.split("/").pop();
+                            if (filename) {
+                              target.src = `/api/img_proxy?file=${filename}&t=${Date.now()}`;
+                            }
+                          }
+                        }}
                         style={{
                           width: "100%",
                           height: 110,
