@@ -138,29 +138,64 @@ export default function KolaseFotoPage() {
     }
     setFormSubmitting(true);
 
-    const formData = new FormData();
+    let successCount = 0;
+    let failCount = 0;
+
     for (let i = 0; i < formFiles.length; i++) {
-      formData.append('foto', formFiles[i]); // Use 'foto' to match existing API logic 
+      const file = formFiles[i];
+
+      // Show progress in button or somewhere (using formSubmitting text logic ideally, but state is boolean)
+      // We can use a temp state or just console for now, or maybe simple alert at end.
+      // Better: Update a progress state if we had one, but let's just do it.
+
+      const formData = new FormData();
+      formData.append('foto', file);
+
+      // For the first file, use the form input title if provided (and if it's the only file? or reuse?)
+      // If multiple files, usually we want auto-title or filename.
+      // Existing logic: "If 1 file, use formTitle provided. If >1 file, use filename as title fallback usually safer"
+      // Let's pass the formTitle ONLY for the first file if user typed it? 
+      // Or if user typed "Kitchen", maybe they want "Kitchen 1", "Kitchen 2"?
+      // Simpler: Pass the title if provided. The backend handles title logic too.
+      // Let's rely on backend 'autoTitle' fallback if we send empty string.
+
+      // Strategy: 
+      // If user explicitly typed a title and we have multiple files, maybe append index?
+      // Or just send it and let backend (or next step) handle it.
+      // Actually, current backend just takes 'title' and uses it.
+      // If I upload 10 files with title "Kitchen", they all get title "Kitchen". That's fine.
+
+      formData.append('title', formTitle);
+      formData.append('tags', formTags.join(', '));
+      formData.append('category', formCategory);
+      formData.append('subcategory', formSubcategory);
+
+      try {
+        const res = await fetch('/api/admin/admin_dashboard/admin_galeri/upload_foto', {
+          method: 'POST',
+          body: formData
+        });
+        if (!res.ok) {
+          console.error(`Failed to upload ${file.name}`);
+          failCount++;
+        } else {
+          successCount++;
+        }
+      } catch (err) {
+        console.error(err);
+        failCount++;
+      }
     }
-    formData.set('title', formTitle);
-    formData.set('tags', formTags.join(', '));
-    formData.set('category', formCategory);
-    formData.set('subcategory', formSubcategory);
 
-    try {
-      const res = await fetch('/api/admin/admin_dashboard/admin_galeri/upload_foto', {
-        method: 'POST',
-        body: formData
-      });
-      if (!res.ok) throw new Error('Upload gagal');
+    setFormSubmitting(false);
+    setAddOpen(false);
+    loadData(); // Refresh
 
-      setAddOpen(false);
-      loadData(); // Refresh
-    } catch (err) {
-      alert("Gagal upload gambar.");
-      console.error(err);
-    } finally {
-      setFormSubmitting(false);
+    if (failCount > 0) {
+      alert(`Selesai. Berhasil: ${successCount}, Gagal: ${failCount}`);
+    } else {
+      // Success silently or small toast? Alert is fine for admin.
+      alert(`Berhasil mengupload ${successCount} foto.`);
     }
   }
 
