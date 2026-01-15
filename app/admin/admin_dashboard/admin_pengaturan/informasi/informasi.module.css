@@ -217,23 +217,37 @@
   }
 }
 
-/* LOGO */
+/* HEADER FLEX (Title + Reset Button) */
+.flexHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+/* LOGO Section Styles */
 .logoColumn {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  align-items: flex-start;
+}
+
+.logoUploadContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .logoPreviewWrapper {
-  width: 160px;
-  height: 160px;
-  border-radius: 24px;
+  width: 140px;
+  height: 140px;
+  border-radius: 16px;
   overflow: hidden;
-  background: #0b1531;
+  background: #0f172a;
   display: flex;
   align-items: center;
   justify-content: center;
+  border: 1px solid rgba(15, 23, 42, 0.1);
 }
 
 .logoImage {
@@ -245,44 +259,80 @@
 .logoPlaceholder {
   color: #f5c542;
   font-size: 13px;
-  text-align: center;
-  padding: 10px;
+  font-weight: 500;
+}
+
+.logoActions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.logoUploadButtonWrapper {
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
 }
 
 .logoUploadButton {
-  position: relative;
   display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px 14px;
-  border-radius: 999px;
-  border: none;
+  padding: 8px 16px;
   background: #0b1531;
-  color: #ffffff;
+  color: white;
+  border-radius: 999px;
   font-size: 13px;
   font-weight: 600;
+  border: none;
   cursor: pointer;
 }
 
 .logoUploadButton:hover {
-  background: #020617;
-  color: #ffffff;
+  background: #1e293b;
+}
+
+.mainNight .logoUploadButton {
+  background: #f5c542;
+  color: #0b1531;
 }
 
 .logoFileInput {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   opacity: 0;
   cursor: pointer;
 }
 
+.logoDeleteButton {
+  background: transparent;
+  color: #ef4444;
+  border: 1px solid #ef4444;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.logoDeleteButton:hover {
+  background: #fee2e2;
+}
+
+.mainNight .logoDeleteButton:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
 .logoHint {
   font-size: 11px;
-  color: #1f2937;
+  color: #64748b;
+  margin: 0;
 }
 
 .mainNight .logoHint {
-  color: #e5e7eb;
+  color: #94a3b8;
 }
 
 /* FORM INFORMASI */

@@ -363,79 +363,107 @@ export default function InformasiPage() {
         <h1
           className={`${layoutStyles.pageTitle} ${styles.pageTitleOutside}`}
         >
-          <button
-            type="button"
-            className={styles.infoDeleteButton}
-            onClick={handleDeleteInformasi}
-            disabled={savingInfo}
-          >
-            Hapus Informasi
-          </button>
+          Pengaturan Informasi & Cabang
         </h1>
+        <p className={`${layoutStyles.pageSubtitle} ${styles.pageSubtitleOutside}`}>
+          Atur identitas toko, logo, deskripsi, serta lokasi cabang.
+        </p>
       </header>
 
       <div className={styles.cardArea}>
         {/* INFORMASI TOKO */}
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>Informasi Toko</h2>
-          {/* ... content omitted for brevity, logic remains same ... */}
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Nama Toko</label>
-            <input
-              type="text"
-              className={styles.textInput}
-              value={namaToko}
-              onChange={(e) => setNamaToko(e.target.value)}
-              placeholder="Nama Toko Anda"
-            />
-          </div>
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Deskripsi Toko</label>
-            <textarea
-              className={styles.textArea}
-              value={deskripsi}
-              onChange={(e) => setDeskripsi(e.target.value)}
-              placeholder="Deskripsi singkat tentang toko Anda"
-              rows={4}
-            ></textarea>
-          </div>
-
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Logo Toko</label>
-            <div className={styles.logoUploadContainer}>
-              {logoUrl && (
-                <div className={styles.logoPreviewWrapper}>
-                  <img src={logoUrl} alt="Logo Toko" className={styles.logoPreview} />
-                  <button
-                    type="button"
-                    className={styles.clearLogoButton}
-                    onClick={handleClearLogo}
-                    disabled={savingInfo}
-                  >
-                    Hapus Logo
-                  </button>
-                </div>
-              )}
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleLogoChange}
-                disabled={uploadingLogo}
-                className={styles.fileInput}
-              />
-              {uploadingLogo && <p>Uploading...</p>}
-            </div>
-          </div>
-
-          <div className={styles.buttonGroup}>
+          <div className={styles.flexHeader}>
+            <h2 className={styles.sectionTitle} style={{ marginBottom: 0 }}>Informasi Toko</h2>
             <button
               type="button"
-              className={styles.saveButton}
-              onClick={handleSaveInformasi}
+              className={styles.infoDeleteButton}
+              onClick={handleDeleteInformasi}
               disabled={savingInfo}
             >
-              {savingInfo ? "Menyimpan..." : "Simpan Informasi"}
+              Reset Data Info
             </button>
+          </div>
+
+          <div className={styles.infoLayout}>
+            {/* KIRI: LOGO */}
+            <div className={styles.logoColumn}>
+              <label className={styles.label}>Logo Toko</label>
+              <div className={styles.logoUploadContainer}>
+                {logoUrl ? (
+                  <div className={styles.logoPreviewWrapper}>
+                    <img src={logoUrl} alt="Logo Toko" className={styles.logoImage} />
+                  </div>
+                ) : (
+                  <div className={styles.logoPreviewWrapper}>
+                    <span className={styles.logoPlaceholder}>No Logo</span>
+                  </div>
+                )}
+
+                <div className={styles.logoActions}>
+                  <div className={styles.logoUploadButtonWrapper}>
+                    <button type="button" className={styles.logoUploadButton}>
+                      {uploadingLogo ? "Uploading..." : "Pilih Logo"}
+                    </button>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleLogoChange}
+                      disabled={uploadingLogo}
+                      className={styles.logoFileInput}
+                    />
+                  </div>
+
+                  {logoUrl && (
+                    <button
+                      type="button"
+                      className={styles.logoDeleteButton}
+                      onClick={handleClearLogo}
+                      disabled={savingInfo}
+                    >
+                      Hapus
+                    </button>
+                  )}
+                </div>
+                <p className={styles.logoHint}>Format: JPG, PNG. Max 2MB.</p>
+              </div>
+            </div>
+
+            {/* KANAN: FORM */}
+            <div className={styles.infoForm}>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Nama Toko</label>
+                <input
+                  type="text"
+                  className={styles.textInput}
+                  value={namaToko}
+                  onChange={(e) => setNamaToko(e.target.value)}
+                  placeholder="Nama Toko Anda"
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Deskripsi Toko</label>
+                <textarea
+                  className={styles.textArea}
+                  value={deskripsi}
+                  onChange={(e) => setDeskripsi(e.target.value)}
+                  placeholder="Deskripsi singkat tentang toko Anda"
+                  rows={4}
+                ></textarea>
+              </div>
+
+              <div className={styles.buttonGroup}>
+                <button
+                  type="button"
+                  className={styles.infoButton}
+                  onClick={handleSaveInformasi}
+                  disabled={savingInfo}
+                >
+                  {savingInfo ? "Menyimpan..." : "Simpan Informasi"}
+                </button>
+              </div>
+            </div>
           </div>
         </section>
 
