@@ -77,11 +77,27 @@
 }
 
 .cardDark {
-  background: #1e293b;
+  background: #1e293b !important;
   /* Slate 800 */
-  border: 1px solid #334155;
-  color: #f1f5f9;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  color: #f1f5f9 !important;
+  border: 1px solid #334155 !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3) !important;
+}
+
+.noCardHover {
+  transition: none !important;
+  cursor: default !important;
+}
+
+.noCardHover:hover {
+  transform: none !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3) !important;
+  filter: none !important;
+}
+
+.cardDark.noCardHover:hover {
+  background: #1e293b !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3) !important;
 }
 
 .cardHeader {

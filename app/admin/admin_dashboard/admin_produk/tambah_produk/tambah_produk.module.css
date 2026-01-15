@@ -331,12 +331,31 @@
 }
 
 .cardNight {
-  background: #020617;
+  background: #1e293b !important;
+  color: #f1f5f9 !important;
+  border: 1px solid #334155 !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3) !important;
+}
+
+.noCardHover {
+  transition: none !important;
+  cursor: default !important;
 }
 
 .noCardHover:hover {
   transform: none !important;
-  box-shadow: none !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3) !important;
+  filter: none !important;
+  background: inherit !important;
+  color: inherit !important;
+  border-color: inherit !important;
+}
+
+.cardNight.noCardHover:hover {
+  background: #1e293b !important;
+  color: #f1f5f9 !important;
+  border: 1px solid #334155 !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3) !important;
 }
 
 /* ===========================
