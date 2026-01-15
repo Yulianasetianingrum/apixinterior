@@ -725,7 +725,6 @@ export default async function HomePage({
             return (
               <section key={section.id} className={`${styles.hero} ${styles.heroV1} ${heroThemeClass}`}>
                 <div className={styles.heroInner}>
-                  {(resolvedParams as any).debug ? <pre style={{ position: 'absolute', top: 0, left: 0, zIndex: 999, background: 'white', padding: 10, fontSize: 10 }}>{JSON.stringify({ id: section.id, imgId: cfg.imageId, imgUrl, cf: cfg }, null, 2)}</pre> : null}
                   <div className={styles.heroText}>
                     <div className={styles.heroTopRow}>
                       {hasEyebrow ? <div className={styles.heroEyebrow}>{cfg.eyebrow}</div> : null}
@@ -741,9 +740,7 @@ export default async function HomePage({
                   <div className={styles.heroMedia}>
                     <div className={styles.heroMediaBg} aria-hidden="true" />
                     {imgUrl ? (
-                      <div style={{ position: "relative", width: "100%", height: "100%" }}>
-                        <Image className={styles.heroImage} src={imgUrl} alt={cfg.headline || "Hero Image"} fill style={{ objectFit: "cover" }} priority sizes="(max-width: 768px) 100vw, 50vw" />
-                      </div>
+                      <img className={styles.heroImage} src={imgUrl} alt={cfg.headline || "Hero Image"} />
                     ) : <div className={styles.heroMediaPlaceholder} aria-hidden="true" />}
                     <div className={styles.heroFloatingCards} aria-hidden="true">
                       {hasFloat1 ? (
