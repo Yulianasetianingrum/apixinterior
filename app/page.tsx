@@ -501,6 +501,10 @@ export default async function HomePage({
           postalCode: "17424",
           addressCountry: "ID"
         }}
+        geo={{
+          latitude: -6.294167,
+          longitude: 106.966111
+        }}
         telephone={schemaPhone || "+6281234567890"}
         openingHours={["Mo-Su 08:00-18:00"]}
         image="/logo/logo_apixinterior_biru.png.png"
