@@ -1249,15 +1249,10 @@ export default function DaftarProdukPage() {
           <input
 
             type="text"
-
-            className={styles.searchInput}
-
+            className={`${styles.searchInput} ${isDark ? styles.searchInputDark : ""}`}
             placeholder="Cari nama / kategori..."
-
             value={search}
-
             disabled={droppingAll}
-
             onChange={(e) => setSearch(e.target.value)}
 
           />

@@ -4,6 +4,8 @@ import { useState, useEffect, ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
 import layoutStyles from "../../admin_dashboard.module.css";
 import styles from "./informasi.module.css";
+import { useAdminTheme } from "../../AdminThemeContext";
+import { useAdminTheme } from "../../AdminThemeContext";
 
 type InformasiToko = {
   id: number;
@@ -60,14 +62,15 @@ const normalizeMapsUrl = (raw: string, fallbackName?: string) => {
 export default function InformasiPage() {
   const router = useRouter();
 
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
-
+  const { isDarkMode } = useAdminTheme();
+  // removed local sidebar/darkmode
   // Informasi toko
   const [info, setInfo] = useState<InformasiToko | null>(null);
   const [namaToko, setNamaToko] = useState("");
   const [deskripsi, setDeskripsi] = useState("");
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const { isDarkMode } = useAdminTheme();
+  // removed local sidebar/darkmode
   const [savingInfo, setSavingInfo] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
 
@@ -351,382 +354,179 @@ export default function InformasiPage() {
 
   // ===== SIDE BAR =====
   const handleBack = () => {
-    router.push("/admin/admin_dashboard");
-    setSidebarOpen(false);
+    router.push("/admin/admin_dashboard/admin_pengaturan");
   };
 
   // ===== UI =====
   return (
-    <div className={layoutStyles.dashboard}>
-      {/* TOP BAR MOBILE/TABLET */}
-      <div className={layoutStyles.mobileTopBar}>
-        <button
-          type="button"
-          className={layoutStyles.mobileMenuButton}
-          onClick={() => setSidebarOpen(true)}
+    <div style={{ width: "100%" }}>
+      <header className={layoutStyles.mainHeader}>
+        <h1
+          className={`${layoutStyles.pageTitle} ${styles.pageTitleOutside}`}
         >
-          =
-        </button>
-        <div className={layoutStyles.mobileTitle}></div>
-        <div
-          className={`${styles.topRightBrand} ${darkMode ? styles.topRightBrandNight : ""
-            }`}
-        >
-          APIX INTERIOR
-        </div>
-      </div>
-
-      {/* OVERLAY HP/TABLET */}
-      {sidebarOpen && (
-        <div
-          className={layoutStyles.overlay}
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      {/* SIDEBAR */}
-      <aside
-        className={`${layoutStyles.sidebar} ${sidebarOpen ? layoutStyles.sidebarOpen : ""
-          }`}
-      >
-        <div className={layoutStyles.sidebarHeader}>
-          <div className={layoutStyles.brand}>
-            <div className={layoutStyles.brandLogo}>A</div>
-            <div className={layoutStyles.brandText}>
-              <span className={layoutStyles.brandTitle}>APIX INTERIOR</span>
-              <span className={layoutStyles.brandSubtitle}>
-                Admin Dashboard
-              </span>
-            </div>
-          </div>
-
           <button
             type="button"
-            className={styles.closeSidebarButton}
-            onClick={() => setSidebarOpen(false)}
+            className={styles.infoDeleteButton}
+            onClick={handleDeleteInformasi}
+            disabled={savingInfo}
           >
-            ×
+            Hapus Informasi
           </button>
+        </h1>
+      </header>
+
+      {/* INFORMASI TOKO */}
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>Informasi Toko</h2>
+        <div className={styles.formGroup}>
+          <label className={styles.label}>Nama Toko</label>
+          <input
+            type="text"
+            className={styles.textInput}
+            value={namaToko}
+            onChange={(e) => setNamaToko(e.target.value)}
+            placeholder="Nama Toko Anda"
+          />
+        </div>
+        <div className={styles.formGroup}>
+          <label className={styles.label}>Deskripsi Toko</label>
+          <textarea
+            className={styles.textArea}
+            value={deskripsi}
+            onChange={(e) => setDeskripsi(e.target.value)}
+            placeholder="Deskripsi singkat tentang toko Anda"
+            rows={4}
+          ></textarea>
         </div>
 
-        <div className={layoutStyles.menu}>
-          <button
-            type="button"
-            className={layoutStyles.menuItem}
-            onClick={() =>
-              router.push("/admin/admin_dashboard/admin_pengaturan/hubungi")
-            }
-          >
-            Hubungi
-          </button>
-          <button
-            type="button"
-            className={`${layoutStyles.menuItem} ${layoutStyles.menuItemActive}`}
-            onClick={() =>
-              router.push("/admin/admin_dashboard/admin_pengaturan/informasi")
-            }
-          >
-            Informasi
-          </button>
-          <button
-            type="button"
-            className={layoutStyles.menuItem}
-            onClick={() =>
-              router.push(
-                "/admin/admin_dashboard/admin_pengaturan/media_sosial"
-              )
-            }
-          >
-            Media Sosial
-          </button>
-          <button
-            type="button"
-            className={layoutStyles.menuItem}
-            onClick={() =>
-              router.push("/admin/admin_dashboard/admin_pengaturan/toko")
-            }
-          >
-            Atur Toko
-          </button>
-          <button
-            type="button"
-            className={layoutStyles.menuItem}
-            onClick={() =>
-              router.push("/admin/admin_dashboard/admin_pengaturan/faq")
-            }
-          >
-            Menu FAQ & DLL
-          </button>
-        </div>
-
-        <div className={layoutStyles.themeSwitchWrapper}>
-          <span className={layoutStyles.themeLabel}>
-            Mode tombol: {darkMode ? "Malam" : "Siang"}
-          </span>
-          <button
-            type="button"
-            className={`${layoutStyles.themeSwitch} ${darkMode ? layoutStyles.themeSwitchOn : ""
-              }`}
-            onClick={() => setDarkMode((prev) => !prev)}
-          >
-            <div className={layoutStyles.themeThumb} />
-          </button>
-        </div>
-
-        <div className={styles.sidebarBackWrapper}>
-          <button
-            type="button"
-            className={styles.sidebarBackButton}
-            onClick={handleBack}
-          >
-            KEMBALI
-          </button>
-        </div>
-
-        <div className={layoutStyles.sidebarFooter} />
-      </aside>
-
-      {/* MAIN CONTENT */}
-      <main
-        className={`${layoutStyles.main} ${darkMode ? styles.mainNight : styles.mainDay
-          }`}
-      >
-        <div className={styles.desktopTopBar}>
-          <span
-            className={`${styles.desktopBrand} ${darkMode ? styles.desktopBrandNight : ""
-              }`}
-          >
-            APIX INTERIOR
-          </span>
-        </div>
-
-        <header className={layoutStyles.mainHeader}>
-          <h1
-            className={`${layoutStyles.pageTitle} ${styles.pageTitleOutside}`}
-          >
-            Pengaturan Informasi Toko
-          </h1>
-          <p
-            className={`${layoutStyles.pageSubtitle} ${styles.pageSubtitleOutside}`}
-          >
-            Atur logo, nama toko, deskripsi, dan cabang beserta lokasi Google
-            Maps.
-          </p>
-        </header>
-
-        <div
-          className={`${styles.cardArea} ${darkMode ? styles.cardAreaNight : styles.cardAreaDay
-            }`}
-        >
-          <div className={styles.cardWrapper}>
-            <div
-              className={`${layoutStyles.card} ${styles.card} ${darkMode ? styles.cardNight : styles.cardDay
-                } ${styles.noCardHover}`}
-            >
-              <div className={styles.contentInner}>
-                {/* INFORMASI TOKO */}
-                <section className={styles.section}>
-                  <h2 className={styles.sectionTitle}>Informasi Toko</h2>
-
-                  <div className={styles.infoLayout}>
-                    <div className={styles.logoColumn}>
-                      <div className={styles.logoPreviewWrapper}>
-                        {logoUrl ? (
-                          <img
-                            src={logoUrl}
-                            alt="Logo toko"
-                            className={styles.logoImage}
-                          />
-                        ) : (
-                          <div className={styles.logoPlaceholder}>
-                            <span>Logo belum diupload</span>
-                          </div>
-                        )}
-                      </div>
-
-                      <label className={styles.logoUploadButton}>
-                        {uploadingLogo ? "Mengupload..." : "Upload Logo"}
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleLogoChange}
-                          disabled={uploadingLogo}
-                          className={styles.logoFileInput}
-                        />
-                      </label>
-
-                      {logoUrl && (
-                        <button
-                          type="button"
-                          className={styles.logoDeleteButton}
-                          onClick={handleClearLogo}
-                          disabled={savingInfo}
-                        >
-                          Hapus Logo
-                        </button>
-                      )}
-
-                      <p className={styles.logoHint}>
-                        Disarankan gambar persegi (contoh 512x512), format PNG
-                        atau JPG.
-                      </p>
-                    </div>
-
-
-                    <div className={styles.infoForm}>
-                      <div className={styles.fieldGroup}>
-                        <label className={styles.label}>Nama Toko</label>
-                        <input
-                          type="text"
-                          className={styles.textInput}
-                          value={namaToko}
-                          onChange={(e) => setNamaToko(e.target.value)}
-                          placeholder="Contoh: APIX INTERIOR"
-                        />
-                      </div>
-
-                      <div className={styles.fieldGroup}>
-                        <label className={styles.label}>Deskripsi</label>
-                        <textarea
-                          className={styles.textArea}
-                          value={deskripsi}
-                          onChange={(e) => setDeskripsi(e.target.value)}
-                          placeholder="Tuliskan deskripsi singkat tentang toko / jasa interior Anda."
-                        />
-                      </div>
-
-                      <div className={styles.infoButtonsRow}>
-                        <button
-                          type="button"
-                          className={styles.infoButton}
-                          onClick={handleSaveInformasi}
-                          disabled={savingInfo}
-                        >
-                          {savingInfo ? "Menyimpan..." : "Simpan Informasi"}
-                        </button>
-
-                        <button
-                          type="button"
-                          className={styles.infoDeleteButton}
-                          onClick={handleDeleteInformasi}
-                          disabled={savingInfo}
-                        >
-                          Hapus Informasi
-                        </button>
-                      </div>
-
-
-                    </div>
-                  </div>
-                </section>
-
-                {/* CABANG & MAPS */}
-                <section className={styles.section}>
-                  <h2 className={styles.sectionTitle}>Cabang & Lokasi Maps</h2>
-
-                  <div className={styles.branchFormRow}>
-                    <div className={styles.fieldGroup}>
-                      <label className={styles.label}>Nama Cabang</label>
-                      <input
-                        type="text"
-                        className={styles.textInput}
-                        value={cabangNama}
-                        onChange={(e) => setCabangNama(e.target.value)}
-                        placeholder="Contoh: Cabang 1 - Surabaya"
-                      />
-                    </div>
-                    <div className={styles.fieldGroup}>
-                      <label className={styles.label}>Link Google Maps</label>
-                      <input
-                        type="text"
-                        className={styles.textInput}
-                        value={cabangMaps}
-                        onChange={(e) => setCabangMaps(e.target.value)}
-                        placeholder="Paste link Google Maps di sini"
-                      />
-                    </div>
-                    <div className={styles.fieldGroupSmall}>
-                      <label className={styles.label}>Urutan</label>
-                      <input
-                        type="number"
-                        className={styles.textInput}
-                        value={cabangUrutan}
-                        onChange={(e) => setCabangUrutan(e.target.value)}
-                        placeholder="1"
-                      />
-                    </div>
-                    <button
-                      type="button"
-                      className={styles.branchButton}
-                      onClick={handleSaveCabang}
-                      disabled={savingCabang}
-                    >
-                      {editingCabangId ? "Update" : "Tambah"}
-                    </button>
-                  </div>
-
-                  {editingCabangId && (
-                    <p className={styles.editingInfo}>
-                      Sedang mengedit cabang ID: {editingCabangId}
-                    </p>
-                  )}
-
-                  <div className={styles.branchListWrapper}>
-                    <h3 className={styles.branchListTitle}>Daftar Cabang</h3>
-                    {cabangList.length === 0 && (
-                      <p className={styles.statusText}>
-                        Belum ada cabang yang ditambahkan.
-                      </p>
-                    )}
-                    <ul className={styles.branchList}>
-                      {cabangList.map((cabang) => (
-                        <li key={cabang.id} className={styles.branchItem}>
-                          <div className={styles.branchMain}>
-                            <div className={styles.branchBadge}>
-                              {cabang.urutan ?? "-"}
-                            </div>
-                            <div className={styles.branchText}>
-                              <span className={styles.branchName}>
-                                {cabang.namaCabang}
-                              </span>
-                              <a
-                                href={cabang.mapsUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className={styles.branchMaps}
-                              >
-                                {cabang.mapsUrl}
-                              </a>
-                            </div>
-                          </div>
-                          <div className={styles.branchActions}>
-                            <button
-                              type="button"
-                              className={styles.branchEditButton}
-                              onClick={() => handleEditCabang(cabang)}
-                              disabled={savingCabang}
-                            >
-                              Edit
-                            </button>
-                            <button
-                              type="button"
-                              className={styles.branchDeleteButton}
-                              onClick={() => handleDeleteCabang(cabang.id)}
-                              disabled={savingCabang}
-                            >
-                              Hapus
-                            </button>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </section>
+        <div className={styles.formGroup}>
+          <label className={styles.label}>Logo Toko</label>
+          <div className={styles.logoUploadContainer}>
+            {logoUrl && (
+              <div className={styles.logoPreviewWrapper}>
+                <img src={logoUrl} alt="Logo Toko" className={styles.logoPreview} />
+                <button
+                  type="button"
+                  className={styles.clearLogoButton}
+                  onClick={handleClearLogo}
+                  disabled={savingInfo}
+                >
+                  Hapus Logo
+                </button>
               </div>
-            </div>
+            )}
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleLogoChange}
+              disabled={uploadingLogo}
+              className={styles.fileInput}
+            />
+            {uploadingLogo && <p>Uploading...</p>}
           </div>
         </div>
-      </main>
-    </div>
-  );
+
+        <div className={styles.buttonGroup}>
+          <button
+            type="button"
+            className={styles.saveButton}
+            onClick={handleSaveInformasi}
+            disabled={savingInfo}
+          >
+            {savingInfo ? "Menyimpan..." : "Simpan Informasi"}
+          </button>
+        </div>
+      </section>
+
+
+      {/* CABANG & MAPS */}
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>Cabang & Lokasi Maps</h2>
+
+        <div className={styles.branchFormRow}>
+          <div className={styles.fieldGroup}>
+            <label className={styles.label}>Nama Cabang</label>
+            <input
+              type="text"
+              className={styles.textInput}
+              value={cabangNama}
+              onChange={(e) => setCabangNama(e.target.value)}
+              placeholder="Contoh: Cabang 1 - Surabaya"
+            />
+          </div>
+          <div className={styles.fieldGroup}>
+            <label className={styles.label}>Link Google Maps</label>
+            <input
+              type="text"
+              className={styles.textInput}
+              value={cabangMaps}
+              onChange={(e) => setCabangMaps(e.target.value)}
+              placeholder="Paste link Google Maps di sini"
+            />
+          </div>
+          <div className={styles.fieldGroupSmall}>
+            <label className={styles.label}>Urutan</label>
+            <input
+              type="number"
+              className={styles.textInput}
+              value={cabangUrutan}
+              onChange={(e) => setCabangUrutan(e.target.value)}
+              placeholder="1"
+            />
+          </div>
+          <button
+            type="button"
+            className={styles.branchButton}
+            onClick={handleSaveCabang}
+            disabled={savingCabang}
+          >
+            {editingCabangId ? "Update" : "Tambah"}
+          </button>
+        </div>
+
+        {
+          editingCabangId && (
+            <p className={styles.editingInfo}>
+              Sedang mengedit cabang ID: {editingCabangId}
+            </p>
+          )
+        }
+
+        <div className={styles.branchListWrapper}>
+          <h3 className={styles.branchListTitle}>Daftar Cabang</h3>
+          {cabangList.length === 0 && (
+            <p className={styles.statusText}>
+              Belum ada cabang yang ditambahkan.
+            </p>
+          )}
+          <ul className={styles.branchList}>
+            {cabangList.map((cabang) => (
+              <li key={cabang.id} className={styles.branchItem}>
+                <div className={styles.branchMain}>
+                  <div className={styles.branchBadge}>
+                    {cabang.urutan ?? "-"}
+                  </div>
+                  <div className={styles.branchText}>
+                    <span className={styles.branchName}>
+                      {cabang.namaCabang}
+                    </span>
+                    <a
+                      href={cabang.mapsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={styles.branchMaps}
+                    >
+                      <div className={styles.submitWrapper} style={{ marginTop: '20px' }}>
+                        <button
+                          type="button"
+                          className={styles.sidebarBackButton}
+                          onClick={handleBack}
+                          style={{ color: isDarkMode ? '#f5c542' : '#0b1531', borderColor: isDarkMode ? '#f5c542' : '#0b1531', padding: '8px 24px' }}
+                        >
+                          KEMBALI KE PENGATURAN
+                        </button>
+                      </div>
+
+                  </div >
+                  );
 }

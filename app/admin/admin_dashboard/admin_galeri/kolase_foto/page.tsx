@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import layoutStyles from '../../admin_dashboard.module.css';
 import styles from './kolase_foto.module.css';
+import { useAdminTheme } from "../../AdminThemeContext";
 
 type Gambar = {
   id: number;
@@ -72,8 +73,8 @@ export default function KolaseFotoPage() {
     }
   }, [addOpen, formFiles]); // Sync whenever modal opens or files change
 
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
+  const { isDarkMode } = useAdminTheme();
+  // sidebarOpen & darkMode local removed
 
   // Load Data
   async function loadData() {
@@ -415,7 +416,6 @@ export default function KolaseFotoPage() {
 
   function handleBack() {
     router.push('/admin/admin_dashboard/admin_galeri');
-    setSidebarOpen(false);
   }
 
   function toggleSelect(id: number) {
@@ -549,7 +549,7 @@ export default function KolaseFotoPage() {
 
   return (
     <div
-      className={layoutStyles.dashboard}
+      style={{ width: '100%', minHeight: '80vh' }}
       onDragEnter={handleDragEnter}
       onDragLeave={handleDragLeave}
       onDragOver={handleDragOver}
@@ -563,531 +563,428 @@ export default function KolaseFotoPage() {
         </div>
       )}
 
-      {/* TOP BAR HP/TABLET */}
-      <div className={layoutStyles.mobileTopBar}>
-        <button
-          type="button"
-          className={layoutStyles.mobileMenuButton}
-          onClick={() => setSidebarOpen(true)}
+      <header className={layoutStyles.mainHeader}>
+        <h1
+          className={`${layoutStyles.pageTitle} ${styles.pageTitleOutside}`}
         >
-          =
-        </button>
-        <div className={layoutStyles.mobileTitle}></div>
-        <div
-          className={`${styles.topRightBrand} ${darkMode ? styles.topRightBrandNight : ''
-            }`}
+          Kolase Gambar
+        </h1>
+        <p
+          className={`${layoutStyles.pageSubtitle} ${styles.pageSubtitleOutside}`}
         >
-          APIX INTERIOR
+          Lihat, kelola, tambah, dan edit foto galeri Anda.
+        </p>
+      </header>
+
+      {/* AREA CARD + GRID */}
+      <div
+        className={`${styles.cardArea} ${isDarkMode ? styles.cardAreaNight : styles.cardAreaDay
+          }`}
+      >
+        <div className={styles.cardWrapper}>
+          <div
+            className={`${layoutStyles.card} ${styles.card} ${isDarkMode ? styles.cardNight : styles.cardDay
+              } ${styles.noCardHover}`}
+          >
+            {/* Search bar & Actions */}
+            <div className={styles.toolbar}>
+              <input
+                type="text"
+                placeholder="Cari berdasarkan judul, tag, kategori..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className={styles.searchInput}
+              />
+              <div className={styles.toolbarActions}>
+
+                {/* ADD BUTTON */}
+                <button
+                  type="button"
+                  className={`${styles.deleteBtn} ${isDarkMode ? styles.actionBtnDark : styles.actionBtnLight}`} // reused styles
+                  onClick={openAddModal}
+                  title="Upload Foto Baru"
+                  style={{ backgroundColor: '#2563eb', color: 'white', borderColor: '#2563eb' }}
+                >
+                  + Tambah Foto
+                </button>
+
+                <button
+                  type="button"
+                  className={`${styles.deleteBtn} ${isDarkMode ? styles.deleteBtnDark : styles.deleteBtnLight
+                    }`}
+                  onClick={requestDeleteSelected}
+                  disabled={
+                    loading || deletingSelected || selectedIds.length === 0
+                  }
+                  title="Hapus gambar terpilih"
+                >
+                  {deletingSelected
+                    ? '...'
+                    : `Hapus (${selectedIds.length})`}
+                </button>
+
+                <button
+                  type="button"
+                  className={`${styles.deleteBtn} ${isDarkMode ? styles.deleteBtnDark : styles.deleteBtnLight
+                    }`}
+                  onClick={requestDropAll}
+                  disabled={loading || droppingAll || data.length === 0}
+                  title="Hapus semua gambar"
+                >
+                  {droppingAll ? '...' : 'DROP ALL'}
+                </button>
+              </div>
+            </div>
+
+            {/* Status */}
+            {loading && (
+              <p className={styles.statusText}>Memuat data...</p>
+            )}
+            {!loading && filtered.length === 0 && (
+              <p className={styles.statusText}>Belum ada gambar. Silakan upload foto.</p>
+            )}
+
+            {/* Grid */}
+            <div className={styles.galleryGrid}>
+              {filtered.map((g) => (
+                <div
+                  key={g.id}
+                  className={`${styles.galleryCard} ${isDarkMode
+                    ? styles.galleryCardNight
+                    : styles.galleryCardDay
+                    }`}
+                >
+                  <div className={`${styles.galleryCheckbox} ${isSelected(g.id) ? 'selected' : ''}`}>
+                    <input
+                      type="checkbox"
+                      checked={isSelected(g.id)}
+                      onChange={() => toggleSelect(g.id)}
+                      style={{ cursor: 'pointer', width: '16px', height: '16px' }}
+                    />
+                  </div>
+
+                  {/* EDIT BUTTON (Overlay) */}
+                  <button
+                    onClick={(e) => { e.stopPropagation(); openEditModal(g); }}
+                    style={{
+                      position: 'absolute', top: 8, right: 8, zIndex: 10,
+                      background: 'rgba(255,255,255,0.9)',
+                      border: '1px solid #ccc', borderRadius: '4px',
+                      cursor: 'pointer', padding: '2px 6px', fontSize: '10px', fontWeight: 'bold'
+                    }}
+                    title="Edit Gambar"
+                  >
+                    EDIT
+                  </button>
+
+                  <div className={styles.imageWrapper}>
+                    <img
+                      src={g.url}
+                      alt={g.title ?? ''}
+                      className={styles.galleryImage}
+                      onClick={() => openPreview(g)}
+                      onError={(e) => {
+                        e.currentTarget.src = "https://placehold.co/400x300?text=No+Image";
+                        e.currentTarget.onerror = null;
+                      }}
+                      loading="lazy"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* OVERLAY HP/TABLET */}
-      {sidebarOpen && (
-        <div
-          className={layoutStyles.overlay}
-          onClick={() => setSidebarOpen(false)}
-        />
+      {/* --- ADD MODAL --- */}
+      {addOpen && (
+        <div className={styles.modalOverlay} onClick={() => setAddOpen(false)}>
+          <div
+            className={`${styles.modalCard} ${darkMode ? styles.modalCardNight : styles.modalCardDay}`}
+            onClick={(e) => e.stopPropagation()}
+            style={{ maxWidth: '500px' }}
+          >
+            <div className={styles.modalHeader}>Tambah Foto Baru</div>
+            <form onSubmit={doAddSubmit} className={styles.modalBody} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+
+              <label className={styles.label}>
+                Pilih File (Bisa Banyak)
+                <input
+                  ref={fileInputRef}
+                  type="file" multiple accept="image/*"
+                  onChange={(e) => {
+                    if (e.target.files) {
+                      setFormFiles(e.target.files);
+                      // Auto-generate helper if simple single upload, else user types manually
+                      if (e.target.files.length === 1) handleAutoGenerate(e.target.files[0]);
+                    }
+                  }}
+                  style={{ display: 'block', marginTop: 4 }}
+                  required
+                />
+              </label>
+
+              <label className={styles.label}>
+                Judul (Opsional)
+                <input
+                  type="text" className={styles.input}
+                  value={formTitle} onChange={(e) => setFormTitle(e.target.value)}
+                  placeholder="Judul gambar..."
+                />
+              </label>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                <label className={styles.label}>
+                  Kategori
+                  <input
+                    type="text" className={styles.input}
+                    value={formCategory} onChange={(e) => setFormCategory(e.target.value)}
+                    placeholder="Contoh: Kitchen"
+                  />
+                </label>
+                <label className={styles.label}>
+                  Subkategori
+                  <input
+                    type="text" className={styles.input}
+                    value={formSubcategory} onChange={(e) => setFormSubcategory(e.target.value)}
+                    placeholder="Contoh: Kabinet"
+                  />
+                </label>
+              </div>
+
+              <label className={styles.label}>
+                Tags
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 4, padding: 4, border: '1px solid #ddd', borderRadius: 4 }}>
+                  {formTags.map(t => (
+                    <span key={t} style={{ background: '#eee', padding: '2px 6px', borderRadius: 4, fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}>
+                      #{t}
+                      <button type="button" onClick={() => removeTag(t)} style={{ border: 'none', background: 'none', cursor: 'pointer', fontWeight: 'bold' }}>×</button>
+                    </span>
+                  ))}
+                  <input
+                    type="text"
+                    value={formTagInput} onChange={(e) => setFormTagInput(e.target.value)}
+                    onKeyDown={addTag}
+                    placeholder={formTags.length === 0 ? "Ketik tag lalu Enter" : ""}
+                    style={{ border: 'none', outline: 'none', flex: 1, minWidth: 60 }}
+                  />
+                </div>
+              </label>
+
+              <div className={styles.modalActions}>
+                <button type="button" onClick={() => setAddOpen(false)}
+                  className={`${styles.modalBtn} ${darkMode ? styles.modalBtnSecondaryNight : styles.modalBtnSecondaryDay}`}>
+                  Batal
+                </button>
+                <button type="submit" disabled={formSubmitting}
+                  className={`${styles.modalBtn}`} style={{ background: '#2563eb', color: 'white' }}>
+                  {formSubmitting ? 'Mengupload...' : 'Upload'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
 
-      {/* SIDEBAR */}
-      <aside
-        className={`${layoutStyles.sidebar} ${sidebarOpen ? layoutStyles.sidebarOpen : ''
-          }`}
-      >
-        <div className={layoutStyles.sidebarHeader}>
-          <div className={layoutStyles.brand}>
-            <div className={layoutStyles.brandLogo}>A</div>
-            <div className={layoutStyles.brandText}>
-              <span className={layoutStyles.brandTitle}>APIX INTERIOR</span>
-              <span className={layoutStyles.brandSubtitle}>
-                Admin Dashboard
-              </span>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            className={styles.closeSidebarButton}
-            onClick={() => setSidebarOpen(false)}
+      {/* --- EDIT MODAL --- */}
+      {editOpen && editItem && (
+        <div className={styles.modalOverlay} onClick={() => setEditOpen(false)}>
+          <div
+            className={`${styles.modalCard} ${darkMode ? styles.modalCardNight : styles.modalCardDay}`}
+            onClick={(e) => e.stopPropagation()}
+            style={{ maxWidth: '500px' }}
           >
-            ×
-          </button>
-        </div>
+            <div className={styles.modalHeader}>Edit Foto</div>
+            <form onSubmit={doEditSubmit} className={styles.modalBody} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
 
-        <div className={layoutStyles.menu}>
-          <button
-            type="button"
-            className={`${layoutStyles.menuItem} ${layoutStyles.menuItemActive}`}
-            onClick={() =>
-              router.push('/admin/admin_dashboard/admin_galeri/kolase_foto')
-            }
-          >
-            Kolase Foto
-          </button>
-          <button
-            type="button"
-            className={layoutStyles.menuItem}
-            onClick={() =>
-              router.push('/admin/admin_dashboard/admin_galeri/upload_foto')
-            }
-          >
-            Upload Foto
-          </button>
-        </div>
+              <div style={{ textAlign: 'center' }}>
+                <img src={editItem.url} alt="Preview" style={{ maxHeight: 150, borderRadius: 8 }} />
+              </div>
 
-        <div className={layoutStyles.themeSwitchWrapper}>
-          <span className={layoutStyles.themeLabel}>
-            Mode tombol: {darkMode ? 'Malam' : 'Siang'}
-          </span>
-          <button
-            type="button"
-            className={`${layoutStyles.themeSwitch} ${darkMode ? layoutStyles.themeSwitchOn : ''
-              }`}
-            onClick={() => setDarkMode((prev) => !prev)}
-          >
-            <div className={layoutStyles.themeThumb} />
-          </button>
-        </div>
-
-        <div className={styles.sidebarBackWrapper}>
-          <button
-            type="button"
-            className={styles.sidebarBackButton}
-            onClick={handleBack}
-          >
-            KEMBALI
-          </button>
-        </div>
-
-        <div className={layoutStyles.sidebarFooter} />
-      </aside>
-
-      {/* MAIN CONTENT */}
-      <main
-        className={`${layoutStyles.main} ${darkMode ? styles.mainNight : styles.mainDay
-          }`}
-      >
-        <div className={styles.desktopTopBar}>
-          <span
-            className={`${styles.desktopBrand} ${darkMode ? styles.desktopBrandNight : ''
-              }`}
-          >
-            APIX INTERIOR
-          </span>
-        </div>
-
-        <header className={layoutStyles.mainHeader}>
-          <h1
-            className={`${layoutStyles.pageTitle} ${styles.pageTitleOutside}`}
-          >
-            Kolase Gambar
-          </h1>
-          <p
-            className={`${layoutStyles.pageSubtitle} ${styles.pageSubtitleOutside}`}
-          >
-            Lihat, kelola, tambah, dan edit foto galeri Anda.
-          </p>
-        </header>
-
-        {/* AREA CARD + GRID */}
-        <div
-          className={`${styles.cardArea} ${darkMode ? styles.cardAreaNight : styles.cardAreaDay
-            }`}
-        >
-          <div className={styles.cardWrapper}>
-            <div
-              className={`${layoutStyles.card} ${styles.card} ${darkMode ? styles.cardNight : styles.cardDay
-                } ${styles.noCardHover}`}
-            >
-              {/* Search bar & Actions */}
-              <div className={styles.toolbar}>
+              <label className={styles.label}>
+                Judul
                 <input
-                  type="text"
-                  placeholder="Cari berdasarkan judul, tag, kategori..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className={styles.searchInput}
+                  type="text" className={styles.input}
+                  value={formTitle} onChange={(e) => setFormTitle(e.target.value)}
                 />
-                <div className={styles.toolbarActions}>
+              </label>
 
-                  {/* ADD BUTTON */}
-                  <button
-                    type="button"
-                    className={`${styles.deleteBtn} ${darkMode ? styles.actionBtnDark : styles.actionBtnLight}`} // reused styles
-                    onClick={openAddModal}
-                    title="Upload Foto Baru"
-                    style={{ backgroundColor: '#2563eb', color: 'white', borderColor: '#2563eb' }}
-                  >
-                    + Tambah Foto
-                  </button>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                <label className={styles.label}>
+                  Kategori
+                  <input
+                    type="text" className={styles.input}
+                    value={formCategory} onChange={(e) => setFormCategory(e.target.value)}
+                  />
+                </label>
+                <label className={styles.label}>
+                  Subkategori
+                  <input
+                    type="text" className={styles.input}
+                    value={formSubcategory} onChange={(e) => setFormSubcategory(e.target.value)}
+                  />
+                </label>
+              </div>
 
-                  <button
-                    type="button"
-                    className={`${styles.deleteBtn} ${darkMode ? styles.deleteBtnDark : styles.deleteBtnLight
-                      }`}
-                    onClick={requestDeleteSelected}
-                    disabled={
-                      loading || deletingSelected || selectedIds.length === 0
-                    }
-                    title="Hapus gambar terpilih"
-                  >
-                    {deletingSelected
-                      ? '...'
-                      : `Hapus (${selectedIds.length})`}
-                  </button>
-
-                  <button
-                    type="button"
-                    className={`${styles.deleteBtn} ${darkMode ? styles.deleteBtnDark : styles.deleteBtnLight
-                      }`}
-                    onClick={requestDropAll}
-                    disabled={loading || droppingAll || data.length === 0}
-                    title="Hapus semua gambar"
-                  >
-                    {droppingAll ? '...' : 'DROP ALL'}
-                  </button>
+              <label className={styles.label}>
+                Tags
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 4, padding: 4, border: '1px solid #ddd', borderRadius: 4 }}>
+                  {formTags.map(t => (
+                    <span key={t} style={{ background: '#eee', padding: '2px 6px', borderRadius: 4, fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}>
+                      #{t}
+                      <button type="button" onClick={() => removeTag(t)} style={{ border: 'none', background: 'none', cursor: 'pointer', fontWeight: 'bold' }}>×</button>
+                    </span>
+                  ))}
+                  <input
+                    type="text"
+                    value={formTagInput} onChange={(e) => setFormTagInput(e.target.value)}
+                    onKeyDown={addTag}
+                    placeholder={formTags.length === 0 ? "Ketik tag lalu Enter" : ""}
+                    style={{ border: 'none', outline: 'none', flex: 1, minWidth: 60 }}
+                  />
                 </div>
+              </label>
+
+              <div className={styles.modalActions}>
+                <button type="button" onClick={() => setEditOpen(false)}
+                  className={`${styles.modalBtn} ${darkMode ? styles.modalBtnSecondaryNight : styles.modalBtnSecondaryDay}`}>
+                  Batal
+                </button>
+                <button type="submit" disabled={formSubmitting}
+                  className={`${styles.modalBtn}`} style={{ background: '#059669', color: 'white' }}>
+                  {formSubmitting ? 'Menyimpan...' : 'Simpan Perubahan'}
+                </button>
               </div>
+            </form>
+          </div>
+        </div>
+      )}
 
-              {/* Status */}
-              {loading && (
-                <p className={styles.statusText}>Memuat data...</p>
-              )}
-              {!loading && filtered.length === 0 && (
-                <p className={styles.statusText}>Belum ada gambar. Silakan upload foto.</p>
-              )}
+      {/* --- DELETE CONFIRM MODAL (Existing) --- */}
+      {confirmOpen && (
+        <div className={styles.modalOverlay} onClick={closeConfirm}>
+          <div
+            className={`${styles.modalCard} ${darkMode ? styles.modalCardNight : styles.modalCardDay
+              }`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className={styles.modalHeader}>{confirmTitle}</div>
+            <div className={styles.modalBody}>{confirmMessage}</div>
+            <div className={styles.modalActions}>
+              <button
+                type="button"
+                className={`${styles.modalBtn} ${darkMode ? styles.modalBtnSecondaryNight : styles.modalBtnSecondaryDay
+                  } ${droppingAll || deletingOne ? styles.modalBtnDisabled : ''}`}
+                onClick={closeConfirm}
+                disabled={droppingAll || deletingOne}
+              >
+                Cancel
+              </button>
 
-              {/* Grid */}
-              <div className={styles.galleryGrid}>
-                {filtered.map((g) => (
-                  <div
-                    key={g.id}
-                    className={`${styles.galleryCard} ${darkMode
-                      ? styles.galleryCardNight
-                      : styles.galleryCardDay
-                      }`}
-                  >
-                    <div className={`${styles.galleryCheckbox} ${isSelected(g.id) ? 'selected' : ''}`}>
-                      <input
-                        type="checkbox"
-                        checked={isSelected(g.id)}
-                        onChange={() => toggleSelect(g.id)}
-                        style={{ cursor: 'pointer', width: '16px', height: '16px' }}
-                      />
-                    </div>
-
-                    {/* EDIT BUTTON (Overlay) */}
-                    <button
-                      onClick={(e) => { e.stopPropagation(); openEditModal(g); }}
-                      style={{
-                        position: 'absolute', top: 8, right: 8, zIndex: 10,
-                        background: 'rgba(255,255,255,0.9)',
-                        border: '1px solid #ccc', borderRadius: '4px',
-                        cursor: 'pointer', padding: '2px 6px', fontSize: '10px', fontWeight: 'bold'
-                      }}
-                      title="Edit Gambar"
-                    >
-                      EDIT
-                    </button>
-
-                    <div className={styles.imageWrapper}>
-                      <img
-                        src={g.url}
-                        alt={g.title ?? ''}
-                        className={styles.galleryImage}
-                        onClick={() => openPreview(g)}
-                        onError={(e) => {
-                          e.currentTarget.src = "https://placehold.co/400x300?text=No+Image";
-                          e.currentTarget.onerror = null;
-                        }}
-                        loading="lazy"
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <button
+                type="button"
+                className={`${styles.modalBtn} ${darkMode ? styles.modalBtnDangerNight : styles.modalBtnDangerDay
+                  } ${droppingAll || deletingOne || deletingSelected ? styles.modalBtnDisabled : ''}`}
+                onClick={onConfirm}
+                disabled={droppingAll || deletingOne || deletingSelected}
+              >
+                {droppingAll || deletingOne || deletingSelected ? 'Menghapus...' : 'OK'}
+              </button>
             </div>
           </div>
         </div>
+      )}
 
-        {/* --- ADD MODAL --- */}
-        {addOpen && (
-          <div className={styles.modalOverlay} onClick={() => setAddOpen(false)}>
-            <div
-              className={`${styles.modalCard} ${darkMode ? styles.modalCardNight : styles.modalCardDay}`}
-              onClick={(e) => e.stopPropagation()}
-              style={{ maxWidth: '500px' }}
-            >
-              <div className={styles.modalHeader}>Tambah Foto Baru</div>
-              <form onSubmit={doAddSubmit} className={styles.modalBody} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-
-                <label className={styles.label}>
-                  Pilih File (Bisa Banyak)
-                  <input
-                    ref={fileInputRef}
-                    type="file" multiple accept="image/*"
-                    onChange={(e) => {
-                      if (e.target.files) {
-                        setFormFiles(e.target.files);
-                        // Auto-generate helper if simple single upload, else user types manually
-                        if (e.target.files.length === 1) handleAutoGenerate(e.target.files[0]);
-                      }
-                    }}
-                    style={{ display: 'block', marginTop: 4 }}
-                    required
-                  />
-                </label>
-
-                <label className={styles.label}>
-                  Judul (Opsional)
-                  <input
-                    type="text" className={styles.input}
-                    value={formTitle} onChange={(e) => setFormTitle(e.target.value)}
-                    placeholder="Judul gambar..."
-                  />
-                </label>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                  <label className={styles.label}>
-                    Kategori
-                    <input
-                      type="text" className={styles.input}
-                      value={formCategory} onChange={(e) => setFormCategory(e.target.value)}
-                      placeholder="Contoh: Kitchen"
-                    />
-                  </label>
-                  <label className={styles.label}>
-                    Subkategori
-                    <input
-                      type="text" className={styles.input}
-                      value={formSubcategory} onChange={(e) => setFormSubcategory(e.target.value)}
-                      placeholder="Contoh: Kabinet"
-                    />
-                  </label>
-                </div>
-
-                <label className={styles.label}>
-                  Tags
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 4, padding: 4, border: '1px solid #ddd', borderRadius: 4 }}>
-                    {formTags.map(t => (
-                      <span key={t} style={{ background: '#eee', padding: '2px 6px', borderRadius: 4, fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}>
-                        #{t}
-                        <button type="button" onClick={() => removeTag(t)} style={{ border: 'none', background: 'none', cursor: 'pointer', fontWeight: 'bold' }}>×</button>
-                      </span>
-                    ))}
-                    <input
-                      type="text"
-                      value={formTagInput} onChange={(e) => setFormTagInput(e.target.value)}
-                      onKeyDown={addTag}
-                      placeholder={formTags.length === 0 ? "Ketik tag lalu Enter" : ""}
-                      style={{ border: 'none', outline: 'none', flex: 1, minWidth: 60 }}
-                    />
-                  </div>
-                </label>
-
-                <div className={styles.modalActions}>
-                  <button type="button" onClick={() => setAddOpen(false)}
-                    className={`${styles.modalBtn} ${darkMode ? styles.modalBtnSecondaryNight : styles.modalBtnSecondaryDay}`}>
-                    Batal
-                  </button>
-                  <button type="submit" disabled={formSubmitting}
-                    className={`${styles.modalBtn}`} style={{ background: '#2563eb', color: 'white' }}>
-                    {formSubmitting ? 'Mengupload...' : 'Upload'}
-                  </button>
-                </div>
-              </form>
+      {/* --- PREVIEW MODAL (Existing) --- */}
+      {previewItem && (
+        <div className={styles.modalOverlay} onClick={closePreview}>
+          <div
+            className={`${styles.modalCard} ${darkMode ? styles.modalCardNight : styles.modalCardDay
+              }`}
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              maxWidth: 'min(820px, 96vw)',
+              width: '100%',
+              maxHeight: '92vh',
+              overflowY: 'auto',
+            }}
+          >
+            <div className={styles.modalHeader}>
+              {previewItem.title || 'Preview Gambar'}
             </div>
-          </div>
-        )}
-
-        {/* --- EDIT MODAL --- */}
-        {editOpen && editItem && (
-          <div className={styles.modalOverlay} onClick={() => setEditOpen(false)}>
-            <div
-              className={`${styles.modalCard} ${darkMode ? styles.modalCardNight : styles.modalCardDay}`}
-              onClick={(e) => e.stopPropagation()}
-              style={{ maxWidth: '500px' }}
-            >
-              <div className={styles.modalHeader}>Edit Foto</div>
-              <form onSubmit={doEditSubmit} className={styles.modalBody} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-
-                <div style={{ textAlign: 'center' }}>
-                  <img src={editItem.url} alt="Preview" style={{ maxHeight: 150, borderRadius: 8 }} />
-                </div>
-
-                <label className={styles.label}>
-                  Judul
-                  <input
-                    type="text" className={styles.input}
-                    value={formTitle} onChange={(e) => setFormTitle(e.target.value)}
-                  />
-                </label>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                  <label className={styles.label}>
-                    Kategori
-                    <input
-                      type="text" className={styles.input}
-                      value={formCategory} onChange={(e) => setFormCategory(e.target.value)}
-                    />
-                  </label>
-                  <label className={styles.label}>
-                    Subkategori
-                    <input
-                      type="text" className={styles.input}
-                      value={formSubcategory} onChange={(e) => setFormSubcategory(e.target.value)}
-                    />
-                  </label>
-                </div>
-
-                <label className={styles.label}>
-                  Tags
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 4, padding: 4, border: '1px solid #ddd', borderRadius: 4 }}>
-                    {formTags.map(t => (
-                      <span key={t} style={{ background: '#eee', padding: '2px 6px', borderRadius: 4, fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}>
-                        #{t}
-                        <button type="button" onClick={() => removeTag(t)} style={{ border: 'none', background: 'none', cursor: 'pointer', fontWeight: 'bold' }}>×</button>
-                      </span>
-                    ))}
-                    <input
-                      type="text"
-                      value={formTagInput} onChange={(e) => setFormTagInput(e.target.value)}
-                      onKeyDown={addTag}
-                      placeholder={formTags.length === 0 ? "Ketik tag lalu Enter" : ""}
-                      style={{ border: 'none', outline: 'none', flex: 1, minWidth: 60 }}
-                    />
-                  </div>
-                </label>
-
-                <div className={styles.modalActions}>
-                  <button type="button" onClick={() => setEditOpen(false)}
-                    className={`${styles.modalBtn} ${darkMode ? styles.modalBtnSecondaryNight : styles.modalBtnSecondaryDay}`}>
-                    Batal
-                  </button>
-                  <button type="submit" disabled={formSubmitting}
-                    className={`${styles.modalBtn}`} style={{ background: '#059669', color: 'white' }}>
-                    {formSubmitting ? 'Menyimpan...' : 'Simpan Perubahan'}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-
-        {/* --- DELETE CONFIRM MODAL (Existing) --- */}
-        {confirmOpen && (
-          <div className={styles.modalOverlay} onClick={closeConfirm}>
-            <div
-              className={`${styles.modalCard} ${darkMode ? styles.modalCardNight : styles.modalCardDay
-                }`}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className={styles.modalHeader}>{confirmTitle}</div>
-              <div className={styles.modalBody}>{confirmMessage}</div>
-              <div className={styles.modalActions}>
-                <button
-                  type="button"
-                  className={`${styles.modalBtn} ${darkMode ? styles.modalBtnSecondaryNight : styles.modalBtnSecondaryDay
-                    } ${droppingAll || deletingOne ? styles.modalBtnDisabled : ''}`}
-                  onClick={closeConfirm}
-                  disabled={droppingAll || deletingOne}
-                >
-                  Cancel
-                </button>
-
-                <button
-                  type="button"
-                  className={`${styles.modalBtn} ${darkMode ? styles.modalBtnDangerNight : styles.modalBtnDangerDay
-                    } ${droppingAll || deletingOne || deletingSelected ? styles.modalBtnDisabled : ''}`}
-                  onClick={onConfirm}
-                  disabled={droppingAll || deletingOne || deletingSelected}
-                >
-                  {droppingAll || deletingOne || deletingSelected ? 'Menghapus...' : 'OK'}
-                </button>
+            <div className={styles.previewLayout}>
+              <div className={styles.previewImageBox}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={previewItem.url}
+                  alt={previewItem.title ?? ''}
+                  className={styles.previewImage}
+                />
               </div>
-            </div>
-          </div>
-        )}
-
-        {/* --- PREVIEW MODAL (Existing) --- */}
-        {previewItem && (
-          <div className={styles.modalOverlay} onClick={closePreview}>
-            <div
-              className={`${styles.modalCard} ${darkMode ? styles.modalCardNight : styles.modalCardDay
-                }`}
-              onClick={(e) => e.stopPropagation()}
-              style={{
-                maxWidth: 'min(820px, 96vw)',
-                width: '100%',
-                maxHeight: '92vh',
-                overflowY: 'auto',
-              }}
-            >
-              <div className={styles.modalHeader}>
-                {previewItem.title || 'Preview Gambar'}
-              </div>
-              <div className={styles.previewLayout}>
-                <div className={styles.previewImageBox}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={previewItem.url}
-                    alt={previewItem.title ?? ''}
-                    className={styles.previewImage}
-                  />
+              <div className={styles.previewInfo}>
+                <div style={{ marginBottom: 12 }}>
+                  <button
+                    onClick={() => { closePreview(); openEditModal(previewItem); }}
+                    style={{ width: '100%', padding: '8px', background: '#e0f2fe', border: '1px solid #7dd3fc', borderRadius: 6, color: '#0369a1', fontWeight: 600, cursor: 'pointer' }}
+                  >
+                    ✏️ Edit Data Foto Ini
+                  </button>
                 </div>
-                <div className={styles.previewInfo}>
-                  <div style={{ marginBottom: 12 }}>
-                    <button
-                      onClick={() => { closePreview(); openEditModal(previewItem); }}
-                      style={{ width: '100%', padding: '8px', background: '#e0f2fe', border: '1px solid #7dd3fc', borderRadius: 6, color: '#0369a1', fontWeight: 600, cursor: 'pointer' }}
-                    >
-                      ✏️ Edit Data Foto Ini
-                    </button>
+                <div><b>ID:</b> {previewItem.id}</div>
+                <div><b>Tags:</b> {previewItem.tags || '-'}</div>
+                {previewItem.category && (
+                  <div>
+                    <b>Kategori:</b> {previewItem.category.name}
+                    {previewItem.subcategory
+                      ? ` / ${previewItem.subcategory.name}`
+                      : ''}
                   </div>
-                  <div><b>ID:</b> {previewItem.id}</div>
-                  <div><b>Tags:</b> {previewItem.tags || '-'}</div>
-                  {previewItem.category && (
+                )}
+                {previewMeta.loading ? (
+                  <div>Memuat info...</div>
+                ) : previewMeta.error ? (
+                  <div style={{ color: '#e11d48' }}>{previewMeta.error}</div>
+                ) : (
+                  <>
                     <div>
-                      <b>Kategori:</b> {previewItem.category.name}
-                      {previewItem.subcategory
-                        ? ` / ${previewItem.subcategory.name}`
-                        : ''}
+                      <b>Dimensi:</b>{' '}
+                      {previewMeta.width && previewMeta.height
+                        ? `${previewMeta.width} x ${previewMeta.height}px`
+                        : '-'}
                     </div>
-                  )}
-                  {previewMeta.loading ? (
-                    <div>Memuat info...</div>
-                  ) : previewMeta.error ? (
-                    <div style={{ color: '#e11d48' }}>{previewMeta.error}</div>
-                  ) : (
-                    <>
-                      <div>
-                        <b>Dimensi:</b>{' '}
-                        {previewMeta.width && previewMeta.height
-                          ? `${previewMeta.width} x ${previewMeta.height}px`
-                          : '-'}
-                      </div>
-                      <div>
-                        <b>Ukuran file:</b> {formatBytes(previewMeta.bytes)}
-                      </div>
-                    </>
-                  )}
-                </div>
-              </div>
-              <div className={styles.modalActions}>
-                <button
-                  type="button"
-                  className={`${styles.modalBtn} ${darkMode ? styles.modalBtnSecondaryNight : styles.modalBtnSecondaryDay
-                    }`}
-                  onClick={closePreview}
-                >
-                  Tutup
-                </button>
+                    <div>
+                      <b>Ukuran file:</b> {formatBytes(previewMeta.bytes)}
+                    </div>
+                  </>
+                )}
               </div>
             </div>
+            <div className={styles.modalActions}>
+              <button
+                type="button"
+                className={`${styles.modalBtn} ${darkMode ? styles.modalBtnSecondaryNight : styles.modalBtnSecondaryDay
+                  }`}
+                onClick={closePreview}
+              >
+                Tutup
+              </button>
+            </div>
           </div>
-        )}
-
-      </main>
+        </div>
+          </div>
+        </div >
+    <div className={styles.submitWrapper} style={{ marginTop: '20px' }}>
+      <button
+        type="button"
+        className={styles.sidebarBackButton}
+        onClick={handleBack}
+        style={{ color: isDarkMode ? '#f5c542' : '#0b1531', borderColor: isDarkMode ? '#f5c542' : '#0b1531', padding: '8px 24px' }}
+      >
+        KEMBALI KE GALERI
+      </button>
     </div>
+    </div >
   );
 }
+```

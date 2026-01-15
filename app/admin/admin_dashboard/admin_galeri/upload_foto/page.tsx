@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import layoutStyles from '../../admin_dashboard.module.css';
 import styles from './upload_foto.module.css';
+import { useAdminTheme } from "../../AdminThemeContext";
 
 type Category = {
   id: number;
@@ -19,9 +20,9 @@ type Subcategory = {
 export default function UploadFotoPage() {
   const router = useRouter();
 
+  const { isDarkMode } = useAdminTheme();
   const [loading, setLoading] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false); // HP & tablet
-  const [darkMode, setDarkMode] = useState(false); // style siang/malam
+  // sidebarOpen & darkMode local removed
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
@@ -161,130 +162,11 @@ export default function UploadFotoPage() {
 
   function handleBack() {
     router.push('/admin/admin_dashboard/admin_galeri');
-    setSidebarOpen(false);
   }
 
   return (
-    <div className={layoutStyles.dashboard}>
-      {/* TOP BAR HP/TABLET */}
-      <div className={layoutStyles.mobileTopBar}>
-        <button
-          type="button"
-          className={layoutStyles.mobileMenuButton}
-          onClick={() => setSidebarOpen(true)}
-        >
-          =
-        </button>
-        {/* kosong supaya tidak double judul */}
-        <div className={layoutStyles.mobileTitle}></div>
-        <div
-          className={`${styles.topRightBrand} ${darkMode ? styles.topRightBrandNight : ''
-            }`}
-        >
-          APIX INTERIOR
-        </div>
-      </div>
-
-      {/* OVERLAY HP/TABLET */}
-      {sidebarOpen && (
-        <div
-          className={layoutStyles.overlay}
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      {/* SIDEBAR */}
-      <aside
-        className={`${layoutStyles.sidebar} ${sidebarOpen ? layoutStyles.sidebarOpen : ''
-          }`}
-      >
-        <div className={layoutStyles.sidebarHeader}>
-          <div className={layoutStyles.brand}>
-            <div className={layoutStyles.brandLogo}>A</div>
-            <div className={layoutStyles.brandText}>
-              <span className={layoutStyles.brandTitle}>APIX INTERIOR</span>
-              <span className={layoutStyles.brandSubtitle}>
-                Admin Dashboard
-              </span>
-            </div>
-          </div>
-
-          {/* tombol X (HP/TABLET) */}
-          <button
-            type="button"
-            className={styles.closeSidebarButton}
-            onClick={() => setSidebarOpen(false)}
-          >
-            ×
-          </button>
-        </div>
-
-        {/* MENU */}
-        <div className={layoutStyles.menu}>
-          <button
-            type="button"
-            className={layoutStyles.menuItem}
-            onClick={() =>
-              router.push('/admin/admin_dashboard/admin_galeri/kolase_foto')
-            }
-          >
-            Kolase Foto
-          </button>
-          <button
-            type="button"
-            className={`${layoutStyles.menuItem} ${layoutStyles.menuItemActive}`}
-            onClick={() =>
-              router.push('/admin/admin_dashboard/admin_galeri/upload_foto')
-            }
-          >
-            Upload Foto
-          </button>
-        </div>
-
-        {/* SWITCH MODE */}
-        <div className={layoutStyles.themeSwitchWrapper}>
-          <span className={layoutStyles.themeLabel}>
-            Mode tombol: {darkMode ? 'Malam' : 'Siang'}
-          </span>
-          <button
-            type="button"
-            className={`${layoutStyles.themeSwitch} ${darkMode ? layoutStyles.themeSwitchOn : ''
-              }`}
-            onClick={() => setDarkMode((prev) => !prev)}
-          >
-            <div className={layoutStyles.themeThumb} />
-          </button>
-        </div>
-
-        {/* TOMBOL KEMBALI – SELALU ADA (HP, TABLET, DESKTOP) */}
-        <div className={styles.sidebarBackWrapper}>
-          <button
-            type="button"
-            className={styles.sidebarBackButton}
-            onClick={handleBack}
-          >
-            KEMBALI
-          </button>
-        </div>
-
-        <div className={layoutStyles.sidebarFooter} />
-      </aside>
-
-      {/* MAIN CONTENT */}
-      <main
-        className={`${layoutStyles.main} ${darkMode ? styles.mainNight : styles.mainDay
-          }`}
-      >
-        {/* Brand kanan atas desktop */}
-        <div className={styles.desktopTopBar}>
-          <span
-            className={`${styles.desktopBrand} ${darkMode ? styles.desktopBrandNight : ''
-              }`}
-          >
-            APIX INTERIOR
-          </span>
-        </div>
-
+    <div style={{ width: '100%' }}>
+      {/* HEADER */}
         <header className={layoutStyles.mainHeader}>
           <h1
             className={`${layoutStyles.pageTitle} ${styles.pageTitleOutside}`}
@@ -300,17 +182,17 @@ export default function UploadFotoPage() {
 
         {/* AREA CARD – BEDAKAN BACKGROUND DAY/NIGHT */}
         <div
-          className={`${styles.cardArea} ${darkMode ? styles.cardAreaNight : styles.cardAreaDay
+          className={`${styles.cardArea} ${isDarkMode ? styles.cardAreaNight : styles.cardAreaDay
             }`}
         >
           <div className={styles.cardWrapper}>
             <div
-              className={`${layoutStyles.card} ${styles.card} ${darkMode ? styles.cardNight : styles.cardDay
+              className={`${layoutStyles.card} ${styles.card} ${isDarkMode ? styles.cardNight : styles.cardDay
                 } ${styles.noCardHover}`}
             >
               <form
                 onSubmit={handleSubmit}
-                className={`${styles.form} ${darkMode ? styles.formNight : styles.formDay
+                className={`${styles.form} ${isDarkMode ? styles.formNight : styles.formDay
                   }`}
               >
                 <div className={styles.field}>
@@ -438,7 +320,7 @@ export default function UploadFotoPage() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className={`${styles.submitBtn} ${darkMode ? styles.submitBtnDark : styles.submitBtnLight
+                    className={`${styles.submitBtn} ${isDarkMode ? styles.submitBtnDark : styles.submitBtnLight
                       }`}
                   >
                     {loading ? 'Mengupload...' : 'Upload'}
@@ -446,9 +328,21 @@ export default function UploadFotoPage() {
                 </div>
               </form>
             </div>
+            </div>
           </div>
         </div>
-      </main>
-    </div>
+      <div className={styles.submitWrapper} style={{ marginTop: '20px' }}>
+          <button
+            type="button"
+            className={styles.sidebarBackButton}
+            onClick={handleBack}
+            style={{ color: isDarkMode ? '#f5c542' : '#0b1531', borderColor: isDarkMode ? '#f5c542' : '#0b1531' }}
+          >
+            KEMBALI KE GALERI
+          </button>
+      </div>
+
+    </div >
+  );
   );
 }

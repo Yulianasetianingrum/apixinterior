@@ -117,7 +117,8 @@
   padding-top: 10px;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
-  flex-direction: row;           /* label & switch sejajar */
+  flex-direction: row;
+  /* label & switch sejajar */
   align-items: center;
   justify-content: space-between;
   gap: 10px;
@@ -253,6 +254,55 @@
   .desktopBrandBar {
     display: flex;
   }
+}
+
+/* DARK MODE OVERRIDES */
+.searchInputDark {
+  background: #1e293b;
+  border-color: #334155;
+  color: #f1f5f9;
+}
+
+.statsGridDark {
+  /* optional if needed */
+}
+
+.statCardDark {
+  background: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+}
+
+.statCardDark .statTitle {
+  color: #94a3b8;
+}
+
+.statCardDark .statValue {
+  color: #f1f5f9;
+}
+
+.tableDark {
+  background: #1e293b;
+  color: #f1f5f9;
+  border-color: #334155;
+}
+
+.tableDark thead tr {
+  background: #0f172a;
+  border-bottom: 2px solid #334155;
+}
+
+.tableDark th {
+  color: #94a3b8;
+}
+
+.tableDark tbody tr:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.tableDark td {
+  border-bottom: 1px solid #334155;
+  color: #e2e8f0;
 }
 
 /* ========== HEADER & SEARCH ========== */
@@ -559,13 +609,16 @@
     width: 100%;
     overflow: visible;
   }
+
   .previewOverlay {
     align-items: flex-start;
   }
+
   .previewImage {
     max-height: 320px;
     object-fit: contain;
   }
+
   .previewInfo {
     max-height: none;
   }
@@ -663,7 +716,7 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
-  }
+}
 
 
 .previewNavCounter {
@@ -724,10 +777,12 @@
 .previewThumbStrip::-webkit-scrollbar {
   height: 6px;
 }
+
 .previewThumbStrip::-webkit-scrollbar-thumb {
   background: rgba(245, 197, 66, 0.45);
   border-radius: 999px;
 }
+
 .previewThumbStrip::-webkit-scrollbar-track {
   background: transparent;
 }

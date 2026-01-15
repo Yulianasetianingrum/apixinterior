@@ -148,6 +148,18 @@
   font-size: 18px;
 }
 
+.dashboardDark .searchInput {
+  background: #1e293b;
+  border-color: #334155;
+  color: #f1f5f9;
+}
+
+.primaryButton {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
 .brandText {
   display: flex;
   flex-direction: column;
@@ -290,6 +302,10 @@
   font-size: 22px;
   font-weight: 700;
   margin: 0 0 4px;
+}
+
+.dashboardDark .pageTitle {
+  color: #f1f5f9;
 }
 
 .pageSubtitle {
@@ -477,7 +493,12 @@
 
 .dashboardDark .cardLink:hover::after,
 .dashboardDark .cardLink:active::after {
-  color: #0b1531 !important;
+  color: #0b1531;
+}
+
+.dashboardDark .primaryButton {
+  background: #f5c542;
+  color: #0b1531;
 }
 
 /* ===========================

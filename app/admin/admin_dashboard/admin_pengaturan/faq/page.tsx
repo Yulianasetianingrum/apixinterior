@@ -4,6 +4,7 @@ import { useState, useEffect, ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
 import layoutStyles from "../../admin_dashboard.module.css";
 // import styles from "./faq.module.css"; // We'll use inline styles or layoutStyles for now to keep it simple
+import { useAdminTheme } from "../../AdminThemeContext";
 
 type DynamicPage = {
     id: number;
@@ -18,8 +19,7 @@ type DynamicPage = {
 
 export default function AdminFaqPage() {
     const router = useRouter();
-    const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [darkMode, setDarkMode] = useState(false);
+    const { isDarkMode } = useAdminTheme();
 
     // State Data
     const [pages, setPages] = useState<DynamicPage[]>([]);
@@ -161,12 +161,12 @@ export default function AdminFaqPage() {
     };
 
     const cardStyle = {
-        background: darkMode ? "#1e293b" : "#fff",
+        background: isDarkMode ? "#1e293b" : "#fff",
         borderRadius: 12,
         padding: 24,
         boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-        border: darkMode ? "1px solid #334155" : "1px solid #e2e8f0",
-        color: darkMode ? "#f8fafc" : "#0f172a",
+        border: isDarkMode ? "1px solid #334155" : "1px solid #e2e8f0",
+        color: isDarkMode ? "#f8fafc" : "#0f172a",
     };
 
     const headerStyle = {
@@ -185,7 +185,7 @@ export default function AdminFaqPage() {
     const thStyle = {
         textAlign: "left" as const,
         padding: "12px 16px",
-        background: darkMode ? "#0f172a" : "#f8fafc",
+        background: isDarkMode ? "#0f172a" : "#f8fafc",
         borderBottom: "2px solid rgba(0,0,0,0.1)",
         fontSize: 14,
         fontWeight: 600,
@@ -236,7 +236,7 @@ export default function AdminFaqPage() {
         padding: "10px",
         borderRadius: 6,
         border: "1px solid rgba(0,0,0,0.2)",
-        background: darkMode ? "#0f172a" : "#fff",
+        background: isDarkMode ? "#0f172a" : "#fff",
         color: "inherit",
         fontSize: 14,
     };
@@ -349,135 +349,12 @@ export default function AdminFaqPage() {
         }
     };
 
-    const handleBack = () => {
-        router.push("/admin/admin_dashboard");
-        setSidebarOpen(false);
-    };
+
 
     return (
         <div className={layoutStyles.dashboard}>
-            {/* TOP BAR HP/TABLET */}
-            <div className={layoutStyles.mobileTopBar}>
-                <button
-                    type="button"
-                    className={layoutStyles.mobileMenuButton}
-                    onClick={() => setSidebarOpen(true)}
-                >
-                    =
-                </button>
-                <div className={layoutStyles.topRightBrand}>
-                    APIX INTERIOR
-                </div>
-            </div>
-
-            {/* OVERLAY HP/TABLET */}
-            {sidebarOpen && (
-                <div
-                    className={layoutStyles.overlay}
-                    onClick={() => setSidebarOpen(false)}
-                />
-            )}
-
-            {/* SIDEBAR ADMIN_PENGATURAN */}
-            <aside
-                className={`${layoutStyles.sidebar} ${sidebarOpen ? layoutStyles.sidebarOpen : ""
-                    }`}
-            >
-                <div className={layoutStyles.sidebarHeader}>
-                    <div className={layoutStyles.brand}>
-                        <div className={layoutStyles.brandLogo}>A</div>
-                        <div className={layoutStyles.brandText}>
-                            <span className={layoutStyles.brandTitle}>APIX INTERIOR</span>
-                            <span className={layoutStyles.brandSubtitle}>
-                                Admin Dashboard
-                            </span>
-                        </div>
-                    </div>
-
-                    <button
-                        type="button"
-                        className={layoutStyles.closeSidebarButton}
-                        onClick={() => setSidebarOpen(false)}
-                    >
-                        ×
-                    </button>
-                </div>
-
-                <div className={layoutStyles.menu}>
-                    <button
-                        type="button"
-                        className={layoutStyles.menuItem}
-                        onClick={() =>
-                            router.push("/admin/admin_dashboard/admin_pengaturan/hubungi")
-                        }
-                    >
-                        Hubungi
-                    </button>
-                    <button
-                        type="button"
-                        className={layoutStyles.menuItem}
-                        onClick={() =>
-                            router.push("/admin/admin_dashboard/admin_pengaturan/informasi")
-                        }
-                    >
-                        Informasi
-                    </button>
-                    <button
-                        type="button"
-                        className={layoutStyles.menuItem}
-                        onClick={() =>
-                            router.push("/admin/admin_dashboard/admin_pengaturan/media_sosial")
-                        }
-                    >
-                        Media Sosial
-                    </button>
-                    <button
-                        type="button"
-                        className={layoutStyles.menuItem}
-                        onClick={() =>
-                            router.push("/admin/admin_dashboard/admin_pengaturan/toko")
-                        }
-                    >
-                        Atur Toko
-                    </button>
-                    <button
-                        type="button"
-                        className={`${layoutStyles.menuItem} ${layoutStyles.menuItemActive}`}
-                        onClick={() =>
-                            router.push("/admin/admin_dashboard/admin_pengaturan/faq")
-                        }
-                    >
-                        Menu FAQ & DLL
-                    </button>
-                </div>
-
-                <div className={layoutStyles.themeSwitchWrapper}>
-                    <span className={layoutStyles.themeLabel}>
-                        Mode tombol: {darkMode ? "Malam" : "Siang"}
-                    </span>
-                    <button
-                        type="button"
-                        className={`${layoutStyles.themeSwitch} ${darkMode ? layoutStyles.themeSwitchOn : ""
-                            }`}
-                        onClick={() => setDarkMode((prev) => !prev)}
-                    >
-                        <div className={layoutStyles.themeThumb} />
-                    </button>
-                </div>
-
-                <div className={layoutStyles.sidebarBackWrapper}>
-                    <button
-                        type="button"
-                        className={layoutStyles.sidebarBackButton}
-                        onClick={handleBack}
-                    >
-                        KEMBALI
-                    </button>
-                </div>
-            </aside>
-
             {/* MAIN CONTENT */}
-            <main className={`${layoutStyles.main} ${darkMode ? layoutStyles.mainDark : ""}`} style={{ background: darkMode ? "#0f172a" : "#f1f5f9", minHeight: "100vh" }}>
+            <main className={`${layoutStyles.main} ${isDarkMode ? layoutStyles.mainDark : ""}`} style={{ background: isDarkMode ? "#0f172a" : "#f1f5f9", minHeight: "100vh" }}>
                 <div style={containerStyle}>
 
                     <div style={headerStyle}>
@@ -525,7 +402,7 @@ export default function AdminFaqPage() {
                                     <span style={{
                                         position: "absolute",
                                         left: 10,
-                                        color: darkMode ? "#94a3b8" : "#64748b",
+                                        color: isDarkMode ? "#94a3b8" : "#64748b",
                                         fontWeight: 600,
                                         userSelect: "none"
                                     }}>/</span>

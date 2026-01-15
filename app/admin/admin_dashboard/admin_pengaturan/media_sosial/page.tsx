@@ -4,6 +4,7 @@ import { useEffect, useState, ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
 import layoutStyles from "../../admin_dashboard.module.css";
 import styles from "./media_sosial.module.css";
+import { useAdminTheme } from "../../AdminThemeContext";
 
 import type { IconType } from "react-icons";
 import {
@@ -58,8 +59,7 @@ function IconFromKey({ iconKey }: { iconKey: string }) {
 export default function MediaSosialPage() {
   const router = useRouter();
 
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
+  const { isDarkMode } = useAdminTheme();
 
   const [items, setItems] = useState<MediaSosialItem[]>([]);
   const [nama, setNama] = useState("");
@@ -227,11 +227,6 @@ export default function MediaSosialPage() {
     }
   };
 
-  const handleBack = () => {
-    router.push("/admin/admin_dashboard");
-    setSidebarOpen(false);
-  };
-
   const filteredSuggestions = PLATFORM_OPTIONS.filter((p) =>
     p.label.toLowerCase().includes(nama.toLowerCase())
   );
@@ -239,148 +234,9 @@ export default function MediaSosialPage() {
   // ====== UI ======
   return (
     <div className={layoutStyles.dashboard}>
-      {/* TOP BAR HP/TABLET */}
-      <div className={layoutStyles.mobileTopBar}>
-        <button
-          type="button"
-          className={layoutStyles.mobileMenuButton}
-          onClick={() => setSidebarOpen(true)}
-        >
-          =
-        </button>
-        <div className={layoutStyles.mobileTitle}></div>
-        <div
-          className={`${styles.topRightBrand} ${darkMode ? styles.topRightBrandNight : ""
-            }`}
-        >
-          APIX INTERIOR
-        </div>
-      </div>
-
-      {/* OVERLAY HP/TABLET */}
-      {sidebarOpen && (
-        <div
-          className={layoutStyles.overlay}
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      {/* SIDEBAR ADMIN_PENGATURAN */}
-      <aside
-        className={`${layoutStyles.sidebar} ${sidebarOpen ? layoutStyles.sidebarOpen : ""
-          }`}
-      >
-        <div className={layoutStyles.sidebarHeader}>
-          <div className={layoutStyles.brand}>
-            <div className={layoutStyles.brandLogo}>A</div>
-            <div className={layoutStyles.brandText}>
-              <span className={layoutStyles.brandTitle}>APIX INTERIOR</span>
-              <span className={layoutStyles.brandSubtitle}>
-                Admin Dashboard
-              </span>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            className={styles.closeSidebarButton}
-            onClick={() => setSidebarOpen(false)}
-          >
-            ×
-          </button>
-        </div>
-
-        <div className={layoutStyles.menu}>
-          <button
-            type="button"
-            className={layoutStyles.menuItem}
-            onClick={() =>
-              router.push("/admin/admin_dashboard/admin_pengaturan/hubungi")
-            }
-          >
-            Hubungi
-          </button>
-          <button
-            type="button"
-            className={layoutStyles.menuItem}
-            onClick={() =>
-              router.push("/admin/admin_dashboard/admin_pengaturan/informasi")
-            }
-          >
-            Informasi
-          </button>
-          <button
-            type="button"
-            className={`${layoutStyles.menuItem} ${layoutStyles.menuItemActive}`}
-            onClick={() =>
-              router.push(
-                "/admin/admin_dashboard/admin_pengaturan/media_sosial"
-              )
-            }
-          >
-            Media Sosial
-          </button>
-          <button
-            type="button"
-            className={layoutStyles.menuItem}
-            onClick={() =>
-              router.push("/admin/admin_dashboard/admin_pengaturan/toko")
-            }
-          >
-            Atur Toko
-          </button>
-          <button
-            type="button"
-            className={layoutStyles.menuItem}
-            onClick={() =>
-              router.push("/admin/admin_dashboard/admin_pengaturan/faq")
-            }
-          >
-            Menu FAQ & DLL
-          </button>
-        </div>
-
-        <div className={layoutStyles.themeSwitchWrapper}>
-          <span className={layoutStyles.themeLabel}>
-            Mode tombol: {darkMode ? "Malam" : "Siang"}
-          </span>
-          <button
-            type="button"
-            className={`${layoutStyles.themeSwitch} ${darkMode ? layoutStyles.themeSwitchOn : ""
-              }`}
-            onClick={() => setDarkMode((prev) => !prev)}
-          >
-            <div className={layoutStyles.themeThumb} />
-          </button>
-        </div>
-
-        <div className={styles.sidebarBackWrapper}>
-          <button
-            type="button"
-            className={styles.sidebarBackButton}
-            onClick={handleBack}
-          >
-            KEMBALI
-          </button>
-        </div>
-
-        <div className={layoutStyles.sidebarFooter} />
-      </aside>
-
-      {/* MAIN CONTENT */}
       <main
-        className={`${layoutStyles.main} ${darkMode ? styles.mainNight : styles.mainDay
-          }`}
+        className={`${layoutStyles.main} ${isDarkMode ? styles.mainNight : styles.mainDay}`}
       >
-        <div className={styles.desktopTopBar}>
-          <span
-            className={`${styles.desktopBrand} ${darkMode ? styles.desktopBrandNight : ""
-              }`}
-          >
-            APIX INTERIOR
-          </span>
-        </div>
-
         <header className={layoutStyles.mainHeader}>
           <h1
             className={`${layoutStyles.pageTitle} ${styles.pageTitleOutside}`}
@@ -395,13 +251,11 @@ export default function MediaSosialPage() {
         </header>
 
         <div
-          className={`${styles.cardArea} ${darkMode ? styles.cardAreaNight : styles.cardAreaDay
-            }`}
+          className={`${styles.cardArea} ${isDarkMode ? styles.cardAreaNight : styles.cardAreaDay}`}
         >
           <div className={styles.cardWrapper}>
             <div
-              className={`${layoutStyles.card} ${styles.card} ${darkMode ? styles.cardNight : styles.cardDay
-                } ${styles.noCardHover}`}
+              className={`${layoutStyles.card} ${styles.card} ${isDarkMode ? styles.cardNight : styles.cardDay} ${styles.noCardHover}`}
             >
               <div className={styles.contentInner}>
                 {/* FORM */}
