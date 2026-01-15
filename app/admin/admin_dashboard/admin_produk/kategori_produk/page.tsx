@@ -1191,7 +1191,7 @@ export default function KategoriProdukPage() {
                         <div
                           ref={dragProvided.innerRef}
                           {...dragProvided.draggableProps}
-                          className={baseStyles.item}
+                          className={`${baseStyles.item} ${isDark ? baseStyles.itemDark : ""}`}
                         >
                           <div
                             className={styles.categoryCard}

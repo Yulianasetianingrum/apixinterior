@@ -78,6 +78,8 @@ export default function ProductDetailClient({ product, waNumber }: WrapperProps)
                 {displayImages.length > 1 && (
                     <div className="carousel-scroll" style={{
                         display: "flex", // Ensure horizontal layout
+                        flexWrap: "nowrap", // Explicitly prevent wrapping
+                        maxWidth: "100%",   // Force constraint
                         gap: 12,
                         overflowX: "auto",
                         paddingBottom: 8,

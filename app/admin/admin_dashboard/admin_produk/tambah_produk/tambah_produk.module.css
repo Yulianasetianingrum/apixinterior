@@ -1,4 +1,3 @@
-
 .previewItem {
   position: relative;
   display: flex;
@@ -27,8 +26,10 @@
 .modalOverlay {
   position: fixed;
   inset: 0;
-  z-index: 999;              /* di atas semuanya */
-  background: rgba(15, 23, 42, 0.6);  /* gelap transparan */
+  z-index: 999;
+  /* di atas semuanya */
+  background: rgba(15, 23, 42, 0.6);
+  /* gelap transparan */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -36,7 +37,8 @@
 
 /* BOX MODAL */
 .modal {
-  background: #0b1531;       /* biru gelap biar nyambung tema */
+  background: #0b1531;
+  /* biru gelap biar nyambung tema */
   color: #f5c542;
   border-radius: 18px;
   padding: 12px 14px 14px;
@@ -235,20 +237,22 @@
    =========================== */
 
 .mainDay {
-  background: #f9fafb; /* putih terang */
+  background: #f9fafb;
+  /* putih terang */
   color: #0b1531;
 }
 
 .mainNight {
-  background: #020617; /* biru dongker */
-  color: #f5c542; /* text luar card = golden */
+  background: #020617;
+  /* biru dongker */
+  color: #f5c542;
+  /* text luar card = golden */
 }
 
 /* judul & subjudul di luar card */
-.pageTitleOutside {
-}
-.pageSubtitleOutside {
-}
+.pageTitleOutside {}
+
+.pageSubtitleOutside {}
 
 .mainDay .pageTitleOutside {
   color: #0b1531;
@@ -368,6 +372,7 @@
 .formDay .label {
   color: #7a4b00;
 }
+
 .formDay .input,
 .formDay .inputFile,
 .formDay .textarea,
@@ -376,8 +381,9 @@
 }
 
 .formNight .label {
-  color: #0b1531;
+  color: #f5c542;
 }
+
 .formNight .input,
 .formNight .inputFile,
 .formNight .textarea,
@@ -571,7 +577,7 @@
 }
 
 /* Input generic (dipakai di beberapa section termasuk VARIASI) */
-.input{
+.input {
   width: 100%;
   border: 1px solid rgba(15, 23, 42, 0.18);
   border-radius: 12px;
@@ -580,7 +586,8 @@
   color: #0b1531;
   font-size: 14px;
 }
-.input:focus{
+
+.input:focus {
   outline: none;
   border-color: rgba(11, 21, 49, 0.45);
   box-shadow: 0 0 0 3px rgba(11, 21, 49, 0.08);
@@ -593,7 +600,7 @@
    <div className={`${styles.section} ${styles.variasiScope}`}> ... </div>
    ========================================================= */
 
-.variasiScope{
+.variasiScope {
   border: 1px solid rgba(15, 23, 42, 0.12);
   border-radius: 16px;
   padding: 16px;
@@ -601,14 +608,14 @@
   box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
 }
 
-.variasiScope .sectionTitle{
+.variasiScope .sectionTitle {
   margin: 0 0 10px;
   color: #0b1531;
   font-weight: 900;
   letter-spacing: 0.2px;
 }
 
-.variasiScope .checkboxRow{
+.variasiScope .checkboxRow {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -620,34 +627,34 @@
   background: rgba(15, 23, 42, 0.03);
 }
 
-.variasiScope .checkboxLabel{
+.variasiScope .checkboxLabel {
   font-size: 13px;
   color: #0b1531;
   font-weight: 700;
 }
 
-.variasiScope .field{
+.variasiScope .field {
   margin-top: 8px;
 }
 
-.variasiScope .fieldRow{
+.variasiScope .fieldRow {
   grid-template-columns: 1fr 1fr;
   gap: 12px;
 }
 
-@media (max-width: 780px){
-  .variasiScope .fieldRow{
+@media (max-width: 780px) {
+  .variasiScope .fieldRow {
     grid-template-columns: 1fr;
   }
 }
 
-.variasiScope .label{
+.variasiScope .label {
   color: #0b1531;
   font-weight: 800;
   font-size: 13px;
 }
 
-.variasiScope .select{
+.variasiScope .select {
   width: 100%;
   border: 1px solid rgba(15, 23, 42, 0.18);
   border-radius: 12px;
@@ -657,18 +664,18 @@
   font-size: 14px;
 }
 
-.variasiScope .select:focus{
+.variasiScope .select:focus {
   outline: none;
   border-color: rgba(11, 21, 49, 0.45);
   box-shadow: 0 0 0 3px rgba(11, 21, 49, 0.08);
 }
 
-.variasiScope .smallBtn{
+.variasiScope .smallBtn {
   width: auto;
   padding: 10px 14px;
   border-radius: 999px;
 }
 
-.variasiScope .checkboxRow .smallBtn{
+.variasiScope .checkboxRow .smallBtn {
   flex: 1 1 170px;
 }

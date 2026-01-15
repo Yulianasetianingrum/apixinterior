@@ -2,6 +2,8 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { formatIDR, computeHargaSetelahPromo } from "@/lib/product-utils";
+import { useCart } from "@/app/context/CartContext";
+import { useWishlist } from "@/app/context/WishlistContext";
 
 type Product = {
     id: number;
@@ -13,6 +15,8 @@ type Product = {
     promoValue?: number | null;
     hargaTipe?: string | null; // Added unit field
     variasiProduk?: Variation[];
+    mainImage?: { url: string } | null; // Added for cart image fallback
+    gambar?: { url: string } | null;      // Fallback 2
 };
 
 type Variation = {
@@ -72,12 +76,16 @@ function unitSymbolShort(u: string | null | undefined) {
 }
 
 export default function ProductVariationSelector({ product, onImageChange, baseWaNumber }: Props) {
+    const { addToCart } = useCart();
+    const { isInWishlist, toggleWishlist } = useWishlist();
+
     const [selectedVarId, setSelectedVarId] = useState<number | null>(null);
     const [selectedComboIds, setSelectedComboIds] = useState<Record<number, string | null>>({
         1: null,
         2: null,
         3: null,
     });
+    const [addedToCartFeedback, setAddedToCartFeedback] = useState(false);
 
     // Init: Select first variation on mount
     useEffect(() => {
@@ -217,6 +225,60 @@ export default function ProductVariationSelector({ product, onImageChange, baseW
     }, [product, currentVar, selectedComboIds, currentCombosByLevel]);
 
 
+    // Build Variation Label String
+    const getVariationLabel = () => {
+        if (!currentVar) return "";
+        let label = cleanLabel(currentVar.nama);
+        const comboParts: string[] = [];
+
+        [1, 2, 3].forEach((lvl: any) => {
+            const cid = selectedComboIds[lvl];
+            if (!cid) return;
+            const list = currentCombosByLevel[lvl] || [];
+            const found = list.find(c => String(c.id) === String(cid));
+            if (found) {
+                comboParts.push(cleanLabel(found.nama || found.nilai));
+            }
+        });
+
+        if (comboParts.length > 0) {
+            label += ` (${comboParts.join(", ")})`;
+        }
+        return label;
+    };
+
+    // Action: Add to Cart
+    const handleAddToCart = () => {
+        const item = {
+            id: product.id,
+            slug: product.slug,
+            name: product.nama,
+            price: finalPriceData.hargaFinal,
+            image: currentVar?.imageUrl || product.mainImage?.url || product.gambar?.url || null,
+            variationId: currentVar?.id,
+            variationName: getVariationLabel()
+        };
+        addToCart(item);
+
+        // Feedback
+        setAddedToCartFeedback(true);
+        setTimeout(() => setAddedToCartFeedback(false), 2000);
+    };
+
+    // Action: Toggle Wishlist
+    const handleWishlist = () => {
+        toggleWishlist({
+            id: product.id,
+            slug: product.slug,
+            name: product.nama,
+            price: finalPriceData.hargaFinal,
+            image: product.mainImage?.url || null // Usually wishlist is just the product, not specific variation
+        });
+    };
+
+    const inWishlist = isInWishlist(product.id);
+
+
     // Action: WhatsApp Redirect
     const handlePesan = () => {
         if (!baseWaNumber) return;
@@ -255,10 +317,9 @@ export default function ProductVariationSelector({ product, onImageChange, baseW
         window.open(url, '_blank');
     };
 
-    // Get Dynamic Titles from first variation's options (if available)
+    // Get Dynamic Titles
     const dynamicTitles = useMemo(() => {
         const firstVar = product.variasiProduk?.[0];
-        // Type safety for Json
         const opts = (firstVar?.options as any)?.titles || {};
         return {
             varTitle: opts.varTitle || "Variasi",
@@ -377,7 +438,6 @@ export default function ProductVariationSelector({ product, onImageChange, baseW
                                             <img src={c.imageUrl} alt="" style={{ width: 20, height: 20, borderRadius: 4, objectFit: "cover" }} />
                                         )}
                                         {cleanLabel(c.nilai)}
-                                        {/* Show +Price? Admin view shows it implicitly via live price update. Maybe better not clutter UI unless desired. */}
                                     </button>
                                 );
                             })}
@@ -386,8 +446,70 @@ export default function ProductVariationSelector({ product, onImageChange, baseW
                 );
             })}
 
-            {/* CTA BUTTON */}
-            <div style={{ marginTop: 10 }}>
+            {/* ACTIONS: WISHLIST & CART */}
+            <div style={{ display: "flex", gap: 12, marginTop: 10 }}>
+                {/* Wishlist Button */}
+                <button
+                    onClick={handleWishlist}
+                    title={inWishlist ? "Hapus dari Favorit" : "Tambah ke Favorit"}
+                    style={{
+                        padding: "12px",
+                        borderRadius: 12,
+                        border: "1px solid #e2e8f0",
+                        background: inWishlist ? "#fee2e2" : "#fff",
+                        color: inWishlist ? "#ef4444" : "#64748b",
+                        cursor: "pointer",
+                        display: "flex", alignItems: "center", justifyContent: "center"
+                    }}
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24" height="24"
+                        viewBox="0 0 24 24"
+                        fill={inWishlist ? "currentColor" : "none"}
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round" strokeLinejoin="round"
+                    >
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                    </svg>
+                </button>
+
+                {/* Add to Cart Button */}
+                <button
+                    onClick={handleAddToCart}
+                    style={{
+                        flex: 1,
+                        padding: "14px",
+                        borderRadius: 12,
+                        background: addedToCartFeedback ? "#22c55e" : "#0f172a",
+                        color: "#ffffff",
+                        fontWeight: 700,
+                        border: "none",
+                        cursor: "pointer",
+                        transition: "background 0.3s",
+                        display: "flex", alignItems: "center", justifyContent: "center", gap: 8
+                    }}
+                >
+                    {addedToCartFeedback ? (
+                        <>
+                            <span>✓ Masuk Keranjang</span>
+                        </>
+                    ) : (
+                        <>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="9" cy="21" r="1"></circle>
+                                <circle cx="20" cy="21" r="1"></circle>
+                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                            </svg>
+                            <span>+ Keranjang</span>
+                        </>
+                    )}
+                </button>
+            </div>
+
+            {/* CTA BUTTON WA */}
+            <div>
                 <button
                     onClick={handlePesan}
                     disabled={!baseWaNumber}

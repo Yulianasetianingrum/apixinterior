@@ -1405,18 +1405,13 @@ export default function DaftarProdukPage() {
             return (
 
               <div
-
                 key={p.id}
-
-                className={`${styles.item} ${draggingId === p.id ? styles.itemDragging : ""
-
+                className={`${styles.item} ${isDark ? styles.itemDark : ""} ${draggingId === p.id ? styles.itemDragging : ""
                   }`}
-
                 draggable
-
                 onDragStart={() => handleDragStart(p.id)}
-
-                onDragOver={(e) => handleDragOver(e, p.id)}>
+                onDragOver={(e) => handleDragOver(e, p.id)}
+              >
                 <div className={styles.dragHandle}>::</div>
 
 
