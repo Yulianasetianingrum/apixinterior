@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import layoutStyles from "../../admin_dashboard.module.css";
 import styles from "./informasi.module.css";
 import { useAdminTheme } from "../../AdminThemeContext";
-import { useAdminTheme } from "../../AdminThemeContext";
+
 
 type InformasiToko = {
   id: number;
@@ -69,8 +69,7 @@ export default function InformasiPage() {
   const [namaToko, setNamaToko] = useState("");
   const [deskripsi, setDeskripsi] = useState("");
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
-  const { isDarkMode } = useAdminTheme();
-  // removed local sidebar/darkmode
+
   const [savingInfo, setSavingInfo] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
 
@@ -516,17 +515,26 @@ export default function InformasiPage() {
                       rel="noopener noreferrer"
                       className={styles.branchMaps}
                     >
-                      <div className={styles.submitWrapper} style={{ marginTop: '20px' }}>
-                        <button
-                          type="button"
-                          className={styles.sidebarBackButton}
-                          onClick={handleBack}
-                          style={{ color: isDarkMode ? '#f5c542' : '#0b1531', borderColor: isDarkMode ? '#f5c542' : '#0b1531', padding: '8px 24px' }}
-                        >
-                          KEMBALI KE PENGATURAN
-                        </button>
-                      </div>
+                      Lihat di Maps
+                    </a>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
 
-                  </div >
-                  );
+      <div className={styles.submitWrapper} style={{ marginTop: '20px' }}>
+        <button
+          type="button"
+          className={styles.sidebarBackButton}
+          onClick={handleBack}
+          style={{ color: isDarkMode ? '#f5c542' : '#0b1531', borderColor: isDarkMode ? '#f5c542' : '#0b1531', padding: '8px 24px' }}
+        >
+          KEMBALI KE PENGATURAN
+        </button>
+      </div>
+    </div>
+  );
 }

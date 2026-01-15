@@ -167,182 +167,169 @@ export default function UploadFotoPage() {
   return (
     <div style={{ width: '100%' }}>
       {/* HEADER */}
-        <header className={layoutStyles.mainHeader}>
-          <h1
-            className={`${layoutStyles.pageTitle} ${styles.pageTitleOutside}`}
-          >
-            Upload Gambar Galeri
-          </h1>
-          <p
-            className={`${layoutStyles.pageSubtitle} ${styles.pageSubtitleOutside}`}
-          >
-            Tambahkan foto baru ke kolase, lengkap dengan kategori &amp; tag.
-          </p>
-        </header>
-
-        {/* AREA CARD – BEDAKAN BACKGROUND DAY/NIGHT */}
-        <div
-          className={`${styles.cardArea} ${isDarkMode ? styles.cardAreaNight : styles.cardAreaDay
-            }`}
+      <header className={layoutStyles.mainHeader}>
+        <h1
+          className={`${layoutStyles.pageTitle} ${styles.pageTitleOutside}`}
         >
-          <div className={styles.cardWrapper}>
-            <div
-              className={`${layoutStyles.card} ${styles.card} ${isDarkMode ? styles.cardNight : styles.cardDay
-                } ${styles.noCardHover}`}
+          Upload Gambar Galeri
+        </h1>
+        <p
+          className={`${layoutStyles.pageSubtitle} ${styles.pageSubtitleOutside}`}
+        >
+          Tambahkan foto baru ke kolase, lengkap dengan kategori &amp; tag.
+        </p>
+      </header>
+
+      {/* AREA CARD – BEDAKAN BACKGROUND DAY/NIGHT */}
+      <div
+        className={`${styles.cardArea} ${isDarkMode ? styles.cardAreaNight : styles.cardAreaDay
+          }`}
+      >
+        <div className={styles.cardWrapper}>
+          <div
+            className={`${layoutStyles.card} ${styles.card} ${isDarkMode ? styles.cardNight : styles.cardDay
+              } ${styles.noCardHover}`}
+          >
+            <form
+              onSubmit={handleSubmit}
+              className={`${styles.form} ${isDarkMode ? styles.formNight : styles.formDay
+                }`}
             >
-              <form
-                onSubmit={handleSubmit}
-                className={`${styles.form} ${isDarkMode ? styles.formNight : styles.formDay
-                  }`}
-              >
-                <div className={styles.field}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                    <label className={styles.label} style={{ marginBottom: 0 }}>
-                      Judul (opsional)
-                    </label>
-                    <button
-                      type="button"
-                      onClick={handleAutoGenerate}
-                      style={{
-                        fontSize: '12px',
-                        padding: '4px 8px',
-                        cursor: 'pointer',
-                        backgroundColor: '#e2e8f0',
-                        border: 'none',
-                        borderRadius: '4px',
-                        color: '#475569',
-                        fontWeight: 600
-                      }}
-                      title="Isi judul otomatis sesuai nama file"
-                    >
-                      ✨ Auto Generate
-                    </button>
-                  </div>
-                  <input
-                    type="text"
-                    name="title"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    className={styles.input}
-                    placeholder="Contoh: Kitchen set minimalis klien Surabaya"
-                  />
-                </div>
-
-                <div className={styles.field}>
-                  <label className={styles.label}>
-                    File Gambar
-                    <input
-                      type="file"
-                      name="foto"
-                      accept="image/*"
-                      required
-                      className={styles.inputFile}
-                      onChange={(e) => {
-                        if (e.target.files && e.target.files[0]) {
-                          setSelectedFile(e.target.files[0]);
-                        }
-                      }}
-                    />
+              <div className={styles.field}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                  <label className={styles.label} style={{ marginBottom: 0 }}>
+                    Judul (opsional)
                   </label>
-                </div>
-
-                <div className={styles.field}>
-                  <label className={styles.label}>
-                    Kategori Utama
-                    <input
-                      type="text"
-                      placeholder="misal: Furniture Rumah"
-                      value={categoryInput}
-                      onChange={(e) => setCategoryInput(e.target.value)}
-                      className={styles.input}
-                    />
-                  </label>
-                </div>
-
-                <div className={styles.field}>
-                  <label className={styles.label}>
-                    Subkategori (opsional)
-                    <input
-                      type="text"
-                      placeholder="misal: Lemari pakaian"
-                      value={subcategoryInput}
-                      onChange={(e) => setSubcategoryInput(e.target.value)}
-                      className={styles.input}
-                    />
-                  </label>
-                </div>
-
-                {/* TAGS */}
-                <div className={styles.field}>
-                  <label className={styles.label}>Tags (wajib, maks 10)</label>
-                  <div className={styles.tagsContainer}>
-                    {tags.map((tag) => (
-                      <span key={tag} className={styles.tagChip}>
-                        {tag}
-                        <button
-                          type="button"
-                          onClick={() => removeTag(tag)}
-                          className={styles.tagRemove}
-                        >
-                          ×
-                        </button>
-                      </span>
-                    ))}
-
-                    <input
-                      type="text"
-                      value={tagInput}
-                      onChange={(e) => setTagInput(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ',') {
-                          e.preventDefault();
-                          if (tagInput.trim()) addTag(tagInput);
-                        }
-                        if (
-                          e.key === 'Backspace' &&
-                          !tagInput &&
-                          tags.length > 0
-                        ) {
-                          removeTag(tags[tags.length - 1]);
-                        }
-                      }}
-                      placeholder="ketik tag lalu Enter, contoh: lemari, minimalis"
-                      className={styles.tagInput}
-                    />
-                  </div>
-                  <small className={styles.helpText}>
-                    Contoh: kitchen, kabinet, minimalis, klien Surabaya
-                  </small>
-                </div>
-
-                {/* TOMBOL UPLOAD DI TENGAH */}
-                <div className={styles.submitWrapper}>
                   <button
-                    type="submit"
-                    disabled={loading}
-                    className={`${styles.submitBtn} ${isDarkMode ? styles.submitBtnDark : styles.submitBtnLight
-                      }`}
+                    type="button"
+                    onClick={handleAutoGenerate}
+                    style={{
+                      fontSize: '12px',
+                      padding: '4px 8px',
+                      cursor: 'pointer',
+                      backgroundColor: '#e2e8f0',
+                      border: 'none',
+                      borderRadius: '4px',
+                      color: '#475569',
+                      fontWeight: 600
+                    }}
+                    title="Isi judul otomatis sesuai nama file"
                   >
-                    {loading ? 'Mengupload...' : 'Upload'}
+                    ✨ Auto Generate
                   </button>
                 </div>
-              </form>
-            </div>
-            </div>
+                <input
+                  type="text"
+                  name="title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  className={styles.input}
+                  placeholder="Contoh: Kitchen set minimalis klien Surabaya"
+                />
+              </div>
+
+              <div className={styles.field}>
+                <label className={styles.label}>
+                  File Gambar
+                  <input
+                    type="file"
+                    name="foto"
+                    accept="image/*"
+                    required
+                    className={styles.inputFile}
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        setSelectedFile(e.target.files[0]);
+                      }
+                    }}
+                  />
+                </label>
+              </div>
+
+              <div className={styles.field}>
+                <label className={styles.label}>
+                  Kategori Utama
+                  <input
+                    type="text"
+                    placeholder="misal: Furniture Rumah"
+                    value={categoryInput}
+                    onChange={(e) => setCategoryInput(e.target.value)}
+                    className={styles.input}
+                  />
+                </label>
+              </div>
+
+              <div className={styles.field}>
+                <label className={styles.label}>
+                  Subkategori (opsional)
+                  <input
+                    type="text"
+                    placeholder="misal: Lemari pakaian"
+                    value={subcategoryInput}
+                    onChange={(e) => setSubcategoryInput(e.target.value)}
+                    className={styles.input}
+                  />
+                </label>
+              </div>
+
+              {/* TAGS */}
+              <div className={styles.field}>
+                <label className={styles.label}>Tags (wajib, maks 10)</label>
+                <div className={styles.tagsContainer}>
+                  {tags.map((tag) => (
+                    <span key={tag} className={styles.tagChip}>
+                      {tag}
+                      <button
+                        type="button"
+                        onClick={() => removeTag(tag)}
+                        className={styles.tagRemove}
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+
+                  <input
+                    type="text"
+                    value={tagInput}
+                    onChange={(e) => setTagInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ',') {
+                        e.preventDefault();
+                        if (tagInput.trim()) addTag(tagInput);
+                      }
+                      if (
+                        e.key === 'Backspace' &&
+                        !tagInput &&
+                        tags.length > 0
+                      ) {
+                        removeTag(tags[tags.length - 1]);
+                      }
+                    }}
+                    placeholder="ketik tag lalu Enter, contoh: lemari, minimalis"
+                    className={styles.tagInput}
+                  />
+                </div>
+                <small className={styles.helpText}>
+                  Contoh: kitchen, kabinet, minimalis, klien Surabaya
+                </small>
+              </div>
+
+              {/* TOMBOL UPLOAD DI TENGAH */}
+              <div className={styles.submitWrapper}>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className={`${styles.submitBtn} ${isDarkMode ? styles.submitBtnDark : styles.submitBtnLight
+                    }`}
+                >
+                  {loading ? 'Mengupload...' : 'Upload'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
-      <div className={styles.submitWrapper} style={{ marginTop: '20px' }}>
-          <button
-            type="button"
-            className={styles.sidebarBackButton}
-            onClick={handleBack}
-            style={{ color: isDarkMode ? '#f5c542' : '#0b1531', borderColor: isDarkMode ? '#f5c542' : '#0b1531' }}
-          >
-            KEMBALI KE GALERI
-          </button>
       </div>
-
-    </div >
-  );
+    </div>
   );
 }

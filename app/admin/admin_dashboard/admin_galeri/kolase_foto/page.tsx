@@ -74,7 +74,7 @@ export default function KolaseFotoPage() {
   }, [addOpen, formFiles]); // Sync whenever modal opens or files change
 
   const { isDarkMode } = useAdminTheme();
-  // sidebarOpen & darkMode local removed
+  // sidebarOpen & isDarkMode local removed
 
   // Load Data
   async function loadData() {
@@ -701,7 +701,7 @@ export default function KolaseFotoPage() {
       {addOpen && (
         <div className={styles.modalOverlay} onClick={() => setAddOpen(false)}>
           <div
-            className={`${styles.modalCard} ${darkMode ? styles.modalCardNight : styles.modalCardDay}`}
+            className={`${styles.modalCard} ${isDarkMode ? styles.modalCardNight : styles.modalCardDay}`}
             onClick={(e) => e.stopPropagation()}
             style={{ maxWidth: '500px' }}
           >
@@ -774,7 +774,7 @@ export default function KolaseFotoPage() {
 
               <div className={styles.modalActions}>
                 <button type="button" onClick={() => setAddOpen(false)}
-                  className={`${styles.modalBtn} ${darkMode ? styles.modalBtnSecondaryNight : styles.modalBtnSecondaryDay}`}>
+                  className={`${styles.modalBtn} ${isDarkMode ? styles.modalBtnSecondaryNight : styles.modalBtnSecondaryDay}`}>
                   Batal
                 </button>
                 <button type="submit" disabled={formSubmitting}
@@ -791,7 +791,7 @@ export default function KolaseFotoPage() {
       {editOpen && editItem && (
         <div className={styles.modalOverlay} onClick={() => setEditOpen(false)}>
           <div
-            className={`${styles.modalCard} ${darkMode ? styles.modalCardNight : styles.modalCardDay}`}
+            className={`${styles.modalCard} ${isDarkMode ? styles.modalCardNight : styles.modalCardDay}`}
             onClick={(e) => e.stopPropagation()}
             style={{ maxWidth: '500px' }}
           >
@@ -848,7 +848,7 @@ export default function KolaseFotoPage() {
 
               <div className={styles.modalActions}>
                 <button type="button" onClick={() => setEditOpen(false)}
-                  className={`${styles.modalBtn} ${darkMode ? styles.modalBtnSecondaryNight : styles.modalBtnSecondaryDay}`}>
+                  className={`${styles.modalBtn} ${isDarkMode ? styles.modalBtnSecondaryNight : styles.modalBtnSecondaryDay}`}>
                   Batal
                 </button>
                 <button type="submit" disabled={formSubmitting}
@@ -865,7 +865,7 @@ export default function KolaseFotoPage() {
       {confirmOpen && (
         <div className={styles.modalOverlay} onClick={closeConfirm}>
           <div
-            className={`${styles.modalCard} ${darkMode ? styles.modalCardNight : styles.modalCardDay
+            className={`${styles.modalCard} ${isDarkMode ? styles.modalCardNight : styles.modalCardDay
               }`}
             onClick={(e) => e.stopPropagation()}
           >
@@ -874,7 +874,7 @@ export default function KolaseFotoPage() {
             <div className={styles.modalActions}>
               <button
                 type="button"
-                className={`${styles.modalBtn} ${darkMode ? styles.modalBtnSecondaryNight : styles.modalBtnSecondaryDay
+                className={`${styles.modalBtn} ${isDarkMode ? styles.modalBtnSecondaryNight : styles.modalBtnSecondaryDay
                   } ${droppingAll || deletingOne ? styles.modalBtnDisabled : ''}`}
                 onClick={closeConfirm}
                 disabled={droppingAll || deletingOne}
@@ -884,7 +884,7 @@ export default function KolaseFotoPage() {
 
               <button
                 type="button"
-                className={`${styles.modalBtn} ${darkMode ? styles.modalBtnDangerNight : styles.modalBtnDangerDay
+                className={`${styles.modalBtn} ${isDarkMode ? styles.modalBtnDangerNight : styles.modalBtnDangerDay
                   } ${droppingAll || deletingOne || deletingSelected ? styles.modalBtnDisabled : ''}`}
                 onClick={onConfirm}
                 disabled={droppingAll || deletingOne || deletingSelected}
@@ -900,7 +900,7 @@ export default function KolaseFotoPage() {
       {previewItem && (
         <div className={styles.modalOverlay} onClick={closePreview}>
           <div
-            className={`${styles.modalCard} ${darkMode ? styles.modalCardNight : styles.modalCardDay
+            className={`${styles.modalCard} ${isDarkMode ? styles.modalCardNight : styles.modalCardDay
               }`}
             onClick={(e) => e.stopPropagation()}
             style={{
@@ -963,7 +963,7 @@ export default function KolaseFotoPage() {
             <div className={styles.modalActions}>
               <button
                 type="button"
-                className={`${styles.modalBtn} ${darkMode ? styles.modalBtnSecondaryNight : styles.modalBtnSecondaryDay
+                className={`${styles.modalBtn} ${isDarkMode ? styles.modalBtnSecondaryNight : styles.modalBtnSecondaryDay
                   }`}
                 onClick={closePreview}
               >
@@ -972,19 +972,8 @@ export default function KolaseFotoPage() {
             </div>
           </div>
         </div>
-          </div>
-        </div >
-    <div className={styles.submitWrapper} style={{ marginTop: '20px' }}>
-      <button
-        type="button"
-        className={styles.sidebarBackButton}
-        onClick={handleBack}
-        style={{ color: isDarkMode ? '#f5c542' : '#0b1531', borderColor: isDarkMode ? '#f5c542' : '#0b1531', padding: '8px 24px' }}
-      >
-        KEMBALI KE GALERI
-      </button>
+      )}
     </div>
-    </div >
   );
 }
-```
+
