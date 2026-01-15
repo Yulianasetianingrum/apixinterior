@@ -924,9 +924,10 @@ export default async function HomePage({
             const cardThemeClass = sectionThemeResolved ? `theme-${String(sectionThemeResolved).toLowerCase()}` : "";
             const colors = getHeroThemeTokens(sectionThemeResolved);
 
-            // Independent Background Logic
+            // Independent Background Logic - READ FROM RAW CONFIG
             const pair = parseThemePair(sectionThemeResolved);
-            const savedBg = (cfg as any).sectionBgTheme;
+            const savedBg = (section.config as any)?.sectionBgTheme; // Use raw config instead of normalized
+            console.log(`[BRANCHES DEBUG] Section ID: ${section.id}, savedBg: ${savedBg}, pair.a: ${pair.a}`);
             const effectiveBgToken = savedBg && ["NAVY", "GOLD", "WHITE"].includes(savedBg) ? savedBg : pair.a;
 
             const sectionBgColor = effectiveBgToken === "WHITE" ? "#FFFFFF" : effectiveBgToken === "GOLD" ? "#D4AF37" : "#0B1D3A";
