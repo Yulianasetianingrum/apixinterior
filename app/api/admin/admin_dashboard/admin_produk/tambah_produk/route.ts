@@ -930,7 +930,7 @@ export async function PUT(
     }
 
     revalidatePath("/produk");
-    revalidatePath(`/produk/${slug || ""}`);
+    // Gunakan slug yang baru dibuat/diupdate jika ada referensinya
     revalidatePath("/admin/admin_dashboard/admin_produk/daftar_produk");
     return NextResponse.json({ ok: true });
   } catch (err: any) {
