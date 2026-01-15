@@ -469,6 +469,12 @@ export default async function HomePage({
   // DEBUG: Log theme values
 
 
+  // Resolve Phone from Hubungi Data (Dynamic)
+  const contacts = Array.from(hubungiMap.values());
+  const primaryContact = contacts.find((c: any) => c.nomor && String(c.nomor).length > 5);
+  // Format phone to E.164 if possible, or just use as is if it's mostly numeric
+  const schemaPhone = primaryContact ? String(primaryContact.nomor).replace(/[^\d+]/g, "") : "";
+
   return (
     <div style={{ position: "relative" }}>
       {/* SEO Structured Data */}
@@ -486,13 +492,18 @@ export default async function HomePage({
       <WebSiteSchema />
       <LocalBusinessSchema
         name="Apix Interior"
-        description="Kontraktor Interior & Workshop Mebel Custom Terbaik. Spesialis Kitchen Set, Wardrobe, Furnitur Kantor, Hotel, Cafe & Home Decor. Melayani Jasa Desain & Build Interior Jabodetabek."
+        description="Jasa Desain Interior & Furniture Custom No. 1. Spesialis Kitchen Set, Wardrobe, & Renovasi Rumah. Melayani Jakarta, Bogor, Depok, Tangerang, Bekasi."
         priceRange="$$"
         address={{
-          addressLocality: "Jakarta",
-          addressRegion: "DKI Jakarta",
+          streetAddress: "Jl. Raya Jatiasih, Jl. Swadaya Raya, Gang K24 (Sebelah Gereja HKBP), RT.001/RW.004, Jatirasa",
+          addressLocality: "Jatiasih, Bekasi",
+          addressRegion: "Jawa Barat",
+          postalCode: "17424",
           addressCountry: "ID"
         }}
+        telephone={schemaPhone || "+6281234567890"}
+        openingHours={["Mo-Su 08:00-18:00"]}
+        image="/logo/logo_apixinterior_biru.png.png"
       />
 
       <Navbar themeOverride={navbarTheme} />
