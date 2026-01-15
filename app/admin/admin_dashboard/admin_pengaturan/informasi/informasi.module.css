@@ -128,14 +128,24 @@
 }
 
 .cardNight {
-  background: #1e293b;
+  background: #1e293b !important;
   border: 1px solid #334155;
-  color: #f8fafc;
+  color: #f8fafc !important;
 }
 
 .noCardHover:hover {
   transform: none;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.cardDay.noCardHover:hover {
+  background: #ffffff !important;
+  color: #0b1531 !important;
+}
+
+.cardNight.noCardHover:hover {
+  background: #1e293b !important;
+  color: #f8fafc !important;
 }
 
 /* SIDEBAR CLOSE BUTTON */
