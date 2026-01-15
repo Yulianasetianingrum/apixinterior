@@ -9,6 +9,7 @@ import ui from "./preview.module.css";
 
 import { CategoryGridPreview } from "./CategoryGridPreview";
 import CategoryCommerceColumns from "@/app/components/homepage/CategoryCommerceColumns.client";
+import SecureImage from "@/app/components/SecureImage";
 import { SocialIcon } from "@/app/components/homepage/social-icons";
 import { themeMetaSlug, getThemeKeyFromRow, isThemeMetaRow, getThemeKeyFromConfig, normalizeThemeKey, readSp, upperType, normalizeVoucherImageIds } from "../toko-utils";
 import {
@@ -1484,7 +1485,7 @@ export default async function TokoPreviewDraftPage({
                               <div className={ui.hcHero}>
                                 <div className={ui.hcHeroMedia}>
                                   <div className={ui.hcHeroMediaBlur} style={{ backgroundImage: `url(${heroUrl})` }} />
-                                  <img className={ui.hcHeroMediaImg} src={heroUrl} alt={headline || "Highlight"} />
+                                  <SecureImage className={ui.hcHeroMediaImg} src={heroUrl} alt={headline || "Highlight"} />
 
                                   {useOverlay ? (
                                     <div className={ui.hcHeroOverlay}>

@@ -1090,13 +1090,11 @@ export default async function HomePage({
                     </div>
                   ) : layout === "hero" ? (
                     <div className={styles.promoHero}>
-                      <div className={styles.promoHero}>
-                        <SecureImage
-                          src={items[0].url}
-                          alt=""
-                          className={styles.promoHeroImg}
-                        />
-                      </div>
+                      <SecureImage
+                        src={items[0].url}
+                        alt=""
+                        className={styles.promoHeroImg}
+                      />
                     </div>
                   ) : (
                     <div className={styles.promoCarousel}>{items.map(renderItem)}</div>
