@@ -10,8 +10,9 @@ import { useCart } from "@/app/context/CartContext";
 // Helper to ensure image URL is correct
 const ensureImageUrl = (url: string | null | undefined) => {
     if (!url) return null;
-    if (url.startsWith("http") || url.startsWith("/")) return url;
-    return `/${url}`;
+    let cleanUrl = url.replace(/^\/?public\//, "");
+    if (cleanUrl.startsWith("http") || cleanUrl.startsWith("/")) return cleanUrl;
+    return `/${cleanUrl}`;
 };
 
 export default function WishlistPageClient() {
@@ -44,7 +45,13 @@ export default function WishlistPageClient() {
                         {/* Image */}
                         <div className="relative w-20 h-20 flex-shrink-0 bg-slate-100 rounded-lg overflow-hidden">
                             {ensureImageUrl(item.image) ? (
-                                <Image src={ensureImageUrl(item.image)!} alt={item.name} fill className="object-cover" />
+                                <Image
+                                    src={ensureImageUrl(item.image)!}
+                                    alt={item.name}
+                                    fill
+                                    className="object-cover"
+                                    unoptimized
+                                />
                             ) : (
                                 <div className="flex items-center justify-center h-full text-slate-400 text-xs">No Img</div>
                             )}

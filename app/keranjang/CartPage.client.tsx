@@ -15,8 +15,11 @@ interface CartPageClientProps {
 // Helper to ensure image URL is correct
 const ensureImageUrl = (url: string | null | undefined) => {
     if (!url) return null;
-    if (url.startsWith("http") || url.startsWith("/")) return url;
-    return `/${url}`;
+    // Strip 'public/' or '/public/' if present, as it's not needed in the URL
+    let cleanUrl = url.replace(/^\/?public\//, "");
+
+    if (cleanUrl.startsWith("http") || cleanUrl.startsWith("/")) return cleanUrl;
+    return `/${cleanUrl}`;
 };
 
 export default function CartPageClient({ waNumber }: CartPageClientProps) {
@@ -80,6 +83,7 @@ export default function CartPageClient({ waNumber }: CartPageClientProps) {
                                                 width={50}
                                                 height={50}
                                                 className="cart-product-image"
+                                                unoptimized
                                             />
                                         ) : (
                                             <div className={styles.noImage}>No Image</div>
