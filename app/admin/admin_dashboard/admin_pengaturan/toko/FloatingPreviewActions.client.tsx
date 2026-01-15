@@ -84,13 +84,12 @@ export default function FloatingPreviewActions({
   return (
     <div className={styles.floatingActions}>
       <a
-        className={previewClassName}
         href={previewHref}
+        className={previewClassName}
         target="_blank"
         rel="noopener noreferrer"
-        style={{ textDecoration: "none" }}
       >
-        Preview
+        👁️ Preview
       </a>
 
       <button type="button" className={saveClassName} onClick={handleSave}>
