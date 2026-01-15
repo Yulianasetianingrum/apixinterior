@@ -240,15 +240,31 @@ export default function ImagePickerCaptcha({
         if (uploadFileRef.current) uploadFileRef.current.value = "";
 
         if (res?.imageId && onAppliedImageId) onAppliedImageId(Number(res.imageId));
+        if (res?.image && typeof res.image === "object") {
+          const newImg = res.image as GambarItem;
+          // Optimistic update: Add to list and select it
+          setItems((prev) => [newImg, ...prev]);
+          setSelected(newImg);
+        }
+
+        if (res?.imageId && onAppliedImageId) onAppliedImageId(Number(res.imageId));
+
         if (skipRefresh) return;
         if (attach && attach.startsWith("CUSTOM_PROMO")) {
+          // For Custom Promo, we might need a stronger refresh or just router refresh
           const u = new URL(window.location.href);
           u.searchParams.set("r", String(Date.now()));
-          window.location.href = u.toString();
+          // window.location.href = u.toString(); // Keeping this for specific cache busting if needed
+          router.refresh();
+          // If we want to be safe, maybe we do both or stick to router.refresh?
+          // User said "upload baru ya auto bisa ke display". 
+          // Optimistic update handles the "Picker Display". 
+          // Parent display depends on `router.refresh()` to fetch new section config.
           return;
         }
-        // FIXED: Use hard reload to ensure fresh data loads
-        window.location.reload();
+
+        // Use router.refresh() instead of hard reload
+        router.refresh();
       } catch (e: any) {
         const msg = e?.message || "Upload gagal (exception).";
         setUploadErr(msg);

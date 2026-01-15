@@ -1662,9 +1662,36 @@ export async function uploadImageToGalleryAndAttach(formData: FormData): Promise
             data: { config: finalCfg },
         });
 
+        // Create explicit return object
+        const returnedImage = {
+            id: imageIdToUse as number,
+            url: publicUrl, // We know this from earlier scope
+            title: title ?? safeName, // Approximate, or fetch if needed. 
+            // Better to fetch if we want accuracy, but we have the values here.
+            // If it was an existing image (picked), we didn't fetch details.
+            // Let's rely on what we have. If it's a new upload, we have url/title.
+        };
+
+        // If picked, we don't have URL easily available without query.
+        // But for "Upload & Attach", we definitely have it.
+        // Let's refine:
+        let finalImageObj = null;
+        if (hasUploadFile) {
+            finalImageObj = { id: imageIdToUse, url: publicUrl, title: title ?? safeName, tags: tags };
+        } else {
+            // For picked image, we might want to return it too?
+            // The frontend already has it in 'selected'.
+        }
+
         revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko");
         revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko/preview");
-        return { ok: true, imageId: imageIdToUse as number, notice: "Gambar diupload & dipakai di section draft." };
+
+        return {
+            ok: true,
+            imageId: imageIdToUse as number,
+            image: finalImageObj,
+            notice: "Gambar diupload & dipakai di section draft."
+        };
     } catch (err: any) {
         return { ok: false, error: String(err?.message || "Gagal upload/pakai gambar.") };
     }
