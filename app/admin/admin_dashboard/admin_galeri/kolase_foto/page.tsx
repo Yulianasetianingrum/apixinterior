@@ -138,14 +138,12 @@ export default function KolaseFotoPage() {
     }
     setFormSubmitting(true);
 
+    let uploadSuccessCount = 0;
+    let uploadFailCount = 0;
     const failedFilenames: string[] = [];
 
     for (let i = 0; i < formFiles.length; i++) {
       const file = formFiles[i];
-
-      // Update button text to show progress
-      // Note: formSubmitting is boolean, so we can't easily show text progress without a new state.
-      // For now, we just proceed.
 
       const formData = new FormData();
       formData.append('foto', file);
@@ -161,14 +159,14 @@ export default function KolaseFotoPage() {
         });
         if (!res.ok) {
           console.error(`Failed to upload ${file.name}`);
-          failCount++;
+          uploadFailCount++;
           failedFilenames.push(file.name);
         } else {
-          successCount++;
+          uploadSuccessCount++;
         }
       } catch (err) {
         console.error(err);
-        failCount++;
+        uploadFailCount++;
         failedFilenames.push(file.name);
       }
     }
@@ -177,10 +175,10 @@ export default function KolaseFotoPage() {
     setAddOpen(false);
     loadData(); // Refresh
 
-    if (failCount > 0) {
-      alert(`Selesai.\nBerhasil: ${successCount}\nGagal: ${failCount}\n\nFile yang gagal:\n${failedFilenames.join('\n')}`);
+    if (uploadFailCount > 0) {
+      alert(`Selesai.\nBerhasil: ${uploadSuccessCount}\nGagal: ${uploadFailCount}\n\nFile yang gagal:\n${failedFilenames.join('\n')}`);
     } else {
-      alert(`Berhasil mengupload ${successCount} foto.`);
+      alert(`Berhasil mengupload ${uploadSuccessCount} foto.`);
     }
   }
 
