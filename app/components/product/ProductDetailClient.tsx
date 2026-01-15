@@ -50,7 +50,7 @@ export default function ProductDetailClient({ product, waNumber }: WrapperProps)
         <div className="product-client-grid">
 
             {/* LEFT: GALLERY */}
-            <section style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <section style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
                 <div style={{
                     position: "relative", width: "100%", aspectRatio: "3/4",
                     background: "#fff", borderRadius: 16, overflow: "hidden",

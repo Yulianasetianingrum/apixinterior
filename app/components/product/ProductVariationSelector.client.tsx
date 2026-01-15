@@ -446,25 +446,27 @@ export default function ProductVariationSelector({ product, onImageChange, baseW
                 );
             })}
 
-            {/* ACTIONS: WISHLIST & CART */}
-            <div style={{ display: "flex", gap: 12, marginTop: 10 }}>
+            {/* ACTIONS: WISHLIST, CART, WA (One Row) */}
+            <div style={{ display: "flex", gap: 8, marginTop: 10, alignItems: "stretch" }}>
                 {/* Wishlist Button */}
                 <button
                     onClick={handleWishlist}
                     title={inWishlist ? "Hapus dari Favorit" : "Tambah ke Favorit"}
                     style={{
-                        padding: "12px",
+                        flex: "0 0 44px", // Fixed square
+                        height: "44px",
                         borderRadius: 12,
                         border: "1px solid #e2e8f0",
                         background: inWishlist ? "#fee2e2" : "#fff",
                         color: inWishlist ? "#ef4444" : "#64748b",
                         cursor: "pointer",
-                        display: "flex", alignItems: "center", justifyContent: "center"
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        padding: 0
                     }}
                 >
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        width="24" height="24"
+                        width="20" height="20"
                         viewBox="0 0 24 24"
                         fill={inWishlist ? "currentColor" : "none"}
                         stroke="currentColor"
@@ -475,78 +477,79 @@ export default function ProductVariationSelector({ product, onImageChange, baseW
                     </svg>
                 </button>
 
-                {/* Add to Cart Button */}
+                {/* Add to Cart Button (Icon Only) */}
                 <button
                     onClick={handleAddToCart}
+                    title="Tambah ke Keranjang"
                     style={{
-                        flex: 1,
-                        padding: "14px",
+                        flex: "0 0 44px", // Fixed square like Wishlist
+                        height: "44px",
                         borderRadius: 12,
                         background: addedToCartFeedback ? "#22c55e" : "#0f172a",
                         color: "#ffffff",
-                        fontWeight: 700,
                         border: "none",
                         cursor: "pointer",
                         transition: "background 0.3s",
-                        display: "flex", alignItems: "center", justifyContent: "center", gap: 8
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        padding: 0
                     }}
                 >
                     {addedToCartFeedback ? (
-                        <>
-                            <span>✓ Masuk Keranjang</span>
-                        </>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
                     ) : (
-                        <>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <circle cx="9" cy="21" r="1"></circle>
-                                <circle cx="20" cy="21" r="1"></circle>
-                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-                            </svg>
-                            <span>+ Keranjang</span>
-                        </>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="9" cy="21" r="1"></circle>
+                            <circle cx="20" cy="21" r="1"></circle>
+                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                        </svg>
                     )}
                 </button>
-            </div>
 
-            {/* CTA BUTTON WA */}
-            <div>
+                {/* CTA BUTTON WA */}
                 <button
                     onClick={handlePesan}
                     disabled={!baseWaNumber}
                     style={{
-                        width: "100%",
-                        padding: "16px",
+                        flex: "1 1 auto", // Takes remaining space
+                        height: "44px",
+                        padding: "0 12px",
                         borderRadius: 12,
                         background: baseWaNumber ? "#D4AF37" : "#cbd5e1", // Golden
                         color: "#020617", // Very Dark Navy
-                        fontSize: 16,
                         fontWeight: 700,
+                        fontSize: "14px", // Readable size
                         border: "none",
                         cursor: baseWaNumber ? "pointer" : "not-allowed",
-                        display: "flex", alignItems: "center", justifyContent: "center", gap: 12
+                        display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis"
                     }}
                 >
                     {baseWaNumber && (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
                             src="/uploads/WA_navy.png"
-                            alt="WhatsApp"
-                            style={{ width: 24, height: 24, objectFit: "contain" }}
+                            alt=""
+                            style={{ flexShrink: 0, width: 20, height: 20, objectFit: "contain" }}
                         />
                     )}
-                    <span>Hubungi via WhatsApp</span>
+                    <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>Hubungi via WhatsApp</span>
                 </button>
+            </div>
 
-                {/* Notice for details */}
-                <div style={{ marginTop: 8, fontSize: 13, color: "#64748b", fontStyle: "italic", textAlign: "left" }}>
-                    Mohon baca deskripsi untuk detail lengkapnya
-                </div>
-
+            {/* Notice for details (below buttons) */}
+            <div>
                 {!baseWaNumber && (
                     <div style={{ marginTop: 8, fontSize: 12, color: "#ef4444" }}>
                         Nomor WhatsApp belum diatur oleh Admin.
                     </div>
                 )}
+                <div style={{ marginTop: 4, fontSize: 12, color: "#64748b", fontStyle: "italic", textAlign: "left" }}>
+                    Mohon baca deskripsi untuk detail.
+                </div>
             </div>
 
         </div>
