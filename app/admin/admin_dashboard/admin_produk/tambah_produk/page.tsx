@@ -4249,9 +4249,12 @@ export default function TambahProdukPage() {
           const fEnabled = document.getElementById("vcombo_hidden_enabled") as HTMLInputElement | null;
           const fClear = document.getElementById("vcombo_hidden_clear") as HTMLInputElement | null;
           const fJson = document.getElementById("vcombo_hidden_json") as HTMLInputElement | null;
+          const fUnit = document.getElementById("vcombo_hidden_unit") as HTMLInputElement | null;
+
           if (fEnabled) fEnabled.value = "1";
           if (fClear) fClear.value = "0";
           if (fJson) fJson.value = JSON.stringify(payload);
+          if (fUnit) fUnit.value = p.hargaTipe || "";
 
           // Simpan ke localStorage supaya widget bisa render saat edit
           if (variasiStorageKey) {
@@ -4289,9 +4292,17 @@ export default function TambahProdukPage() {
           const hEnabled = form.querySelector<HTMLInputElement>("#vcombo_hidden_enabled");
           const hClear = form.querySelector<HTMLInputElement>("#vcombo_hidden_clear");
           const hJson = form.querySelector<HTMLInputElement>("#vcombo_hidden_json");
+          const hUnit = form.querySelector<HTMLInputElement>("#vcombo_hidden_unit");
           if (hEnabled) hEnabled.value = "1";
           if (hClear) hClear.value = "0";
           if (hJson) hJson.value = saved;
+          // unit juga harus di-restore jika ada di saved json (tapi saved json struktur variasi, unit ada di state.product.unit)
+          if (hUnit && !hUnit.value) {
+            try {
+              const parsed = JSON.parse(saved);
+              if (parsed?.product?.unit) hUnit.value = parsed.product.unit;
+            } catch { }
+          }
         }
       } catch { }
     }
