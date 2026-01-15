@@ -79,12 +79,18 @@ export function computeHargaSetelahPromo(p: {
     return { hargaAsli, hargaFinal, isPromo: true, promoLabel };
 }
 
-/**
- * Ensures URL has starting slash if local
- */
+// Helper to normalize image URLs (handles public/ prefix from uploads)
 export function normalizePublicUrl(url?: string | null) {
     if (!url) return null;
-    if (url.startsWith("http")) return url;
-    if (url.startsWith("/")) return url;
-    return `/${url}`;
+    let clean = url;
+
+    // If it is an external/absolute URL, trust it
+    if (clean.startsWith("http")) return clean;
+
+    // Strip common local prefixes
+    clean = clean.replace(/^public\//, "");
+    clean = clean.replace(/^\/?public\//, "");
+
+    if (clean.startsWith("/")) return clean;
+    return `/${clean}`;
 }

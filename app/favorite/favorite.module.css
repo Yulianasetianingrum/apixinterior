@@ -280,7 +280,7 @@
 
 /* ========== EMPTY STATE ========== */
 .emptyState {
-    min-height: 60vh;
+    min-height: 100vh;
     background: #ffffff;
     display: flex;
     flex-direction: column;
@@ -288,6 +288,8 @@
     justify-content: center;
     text-align: center;
     padding: 2rem;
+    padding-top: 6rem;
+    /* Visual balance: accounts for Navbar */
     margin-top: 0;
 }
 

@@ -117,151 +117,153 @@ export default function ProductRecommendations({ similarProducts, otherProducts 
         }
     };
 
-    if (similarProducts.length === 0) return null;
+    // If both are empty, then return null
+    if (similarProducts.length === 0 && otherProducts.length === 0) return null;
 
     return (
         <>
             {/* RECOMMENDATIONS: SIMILAR - Carousel */}
-            <section style={{ marginBottom: "60px" }}>
-                <h3 style={{ fontSize: "24px", fontWeight: "700", color: "#0f172a", marginBottom: "20px" }}>
-                    Produk Serupa
-                </h3>
-                <div style={{ position: "relative" }}>
-                    {/* Carousel Container */}
-                    <div
-                        ref={carouselRef}
-                        className="carousel-container"
-                        onMouseDown={handleDragStart}
-                        onMouseMove={handleDragMove}
-                        onMouseUp={handleDragEnd}
-                        onMouseLeave={handleDragEnd}
-                        onTouchStart={handleDragStart}
-                        onTouchMove={handleDragMove}
-                        onTouchEnd={handleDragEnd}
-                        style={{
-                            overflow: "hidden",
-                            position: "relative",
-                            cursor: isDragging ? "grabbing" : "grab",
-                            userSelect: "none"
-                        }}
-                    >
+            {similarProducts.length > 0 && (
+                <section style={{ marginBottom: "60px" }}>
+                    <h3 style={{ fontSize: "24px", fontWeight: "700", color: "#0f172a", marginBottom: "20px" }}>
+                        Produk Serupa
+                    </h3>
+                    <div style={{ position: "relative" }}>
+                        {/* Carousel Container */}
                         <div
-                            className="carousel-track"
+                            ref={carouselRef}
+                            className="carousel-container"
+                            onMouseDown={handleDragStart}
+                            onMouseMove={handleDragMove}
+                            onMouseUp={handleDragEnd}
+                            onMouseLeave={handleDragEnd}
+                            onTouchStart={handleDragStart}
+                            onTouchMove={handleDragMove}
+                            onTouchEnd={handleDragEnd}
                             style={{
-                                display: "flex",
-                                transition: isDragging ? "none" : "transform 0.5s ease-in-out",
-                                transform: `translateX(-${currentSlide * (100 / itemsPerView)}%)`,
+                                overflow: "hidden",
+                                position: "relative",
+                                cursor: isDragging ? "grabbing" : "grab",
+                                userSelect: "none"
                             }}
                         >
-                            {similarProducts.map((product, index) => (
-                                <div
-                                    key={product.id}
-                                    className="carousel-item"
+                            <div
+                                className="carousel-track"
+                                style={{
+                                    display: "flex",
+                                    transition: isDragging ? "none" : "transform 0.5s ease-in-out",
+                                    transform: `translateX(-${currentSlide * (100 / itemsPerView)}%)`,
+                                }}
+                            >
+                                {similarProducts.map((product, index) => (
+                                    <div
+                                        key={product.id}
+                                        className="carousel-item"
+                                        style={{
+                                            flex: `0 0 ${100 / itemsPerView}%`,
+                                            padding: "0 12px",
+                                            boxSizing: "border-box"
+                                        }}
+                                    >
+                                        <ProductCard product={product} index={index} />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Navigation Arrows */}
+                        {similarProducts.length > itemsPerView && (
+                            <>
+                                <button
+                                    onClick={prevSlide}
+                                    disabled={currentSlide === 0}
+                                    className="carousel-arrow carousel-arrow-left"
                                     style={{
-                                        flex: `0 0 ${100 / itemsPerView}%`,
-                                        padding: "0 12px",
-                                        boxSizing: "border-box"
+                                        position: "absolute",
+                                        left: "-20px",
+                                        top: "50%",
+                                        transform: "translateY(-50%)",
+                                        width: "48px",
+                                        height: "48px",
+                                        borderRadius: "50%",
+                                        background: "white",
+                                        border: "2px solid #e2e8f0",
+                                        cursor: "pointer",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                                        transition: "all 0.3s ease",
+                                        zIndex: 10,
+                                        opacity: currentSlide === 0 ? 0.5 : 1
                                     }}
                                 >
-                                    <ProductCard product={product} index={index} />
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Navigation Arrows */}
-                    {similarProducts.length > itemsPerView && (
-                        <>
-                            <button
-                                onClick={prevSlide}
-                                disabled={currentSlide === 0}
-                                className="carousel-arrow carousel-arrow-left"
-                                style={{
-                                    position: "absolute",
-                                    left: "-20px",
-                                    top: "50%",
-                                    transform: "translateY(-50%)",
-                                    width: "48px",
-                                    height: "48px",
-                                    borderRadius: "50%",
-                                    background: "white",
-                                    border: "2px solid #e2e8f0",
-                                    cursor: "pointer",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                                    transition: "all 0.3s ease",
-                                    zIndex: 10,
-                                    opacity: currentSlide === 0 ? 0.5 : 1
-                                }}
-                            >
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0f172a" strokeWidth="2">
-                                    <path d="M15 18l-6-6 6-6" />
-                                </svg>
-                            </button>
-                            <button
-                                onClick={nextSlide}
-                                disabled={currentSlide >= totalSlides - 1}
-                                className="carousel-arrow carousel-arrow-right"
-                                style={{
-                                    position: "absolute",
-                                    right: "-20px",
-                                    top: "50%",
-                                    transform: "translateY(-50%)",
-                                    width: "48px",
-                                    height: "48px",
-                                    borderRadius: "50%",
-                                    background: "white",
-                                    border: "2px solid #e2e8f0",
-                                    cursor: "pointer",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                                    transition: "all 0.3s ease",
-                                    zIndex: 10,
-                                    opacity: currentSlide >= totalSlides - 1 ? 0.5 : 1
-                                }}
-                            >
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0f172a" strokeWidth="2">
-                                    <path d="M9 18l6-6-6-6" />
-                                </svg>
-                            </button>
-                        </>
-                    )}
-
-                    {/* Indicators */}
-                    {similarProducts.length > itemsPerView && totalSlides > 1 && (
-                        <div
-                            style={{
-                                display: "flex",
-                                justifyContent: "center",
-                                gap: "8px",
-                                marginTop: "24px"
-                            }}
-                        >
-                            {Array.from({ length: totalSlides }).map((_, index) => (
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0f172a" strokeWidth="2">
+                                        <path d="M15 18l-6-6 6-6" />
+                                    </svg>
+                                </button>
                                 <button
-                                    key={index}
-                                    onClick={() => goToSlide(index)}
+                                    onClick={nextSlide}
+                                    disabled={currentSlide >= totalSlides - 1}
+                                    className="carousel-arrow carousel-arrow-right"
                                     style={{
-                                        width: currentSlide === index ? "32px" : "12px",
-                                        height: "12px",
-                                        borderRadius: "6px",
-                                        background: currentSlide === index ? "#0f172a" : "#cbd5e1",
-                                        border: "none",
+                                        position: "absolute",
+                                        right: "-20px",
+                                        top: "50%",
+                                        transform: "translateY(-50%)",
+                                        width: "48px",
+                                        height: "48px",
+                                        borderRadius: "50%",
+                                        background: "white",
+                                        border: "2px solid #e2e8f0",
                                         cursor: "pointer",
-                                        transition: "all 0.3s ease"
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                                        transition: "all 0.3s ease",
+                                        zIndex: 10,
+                                        opacity: currentSlide >= totalSlides - 1 ? 0.5 : 1
                                     }}
-                                    aria-label={`Go to slide ${index + 1}`}
-                                />
-                            ))}
-                        </div>
-                    )}
+                                >
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0f172a" strokeWidth="2">
+                                        <path d="M9 18l6-6-6-6" />
+                                    </svg>
+                                </button>
+                            </>
+                        )}
 
-                    {/* Responsive Styles */}
-                    <style jsx>{`
+                        {/* Indicators */}
+                        {similarProducts.length > itemsPerView && totalSlides > 1 && (
+                            <div
+                                style={{
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    gap: "8px",
+                                    marginTop: "24px"
+                                }}
+                            >
+                                {Array.from({ length: totalSlides }).map((_, index) => (
+                                    <button
+                                        key={index}
+                                        onClick={() => goToSlide(index)}
+                                        style={{
+                                            width: currentSlide === index ? "32px" : "12px",
+                                            height: "12px",
+                                            borderRadius: "6px",
+                                            background: currentSlide === index ? "#0f172a" : "#cbd5e1",
+                                            border: "none",
+                                            cursor: "pointer",
+                                            transition: "all 0.3s ease"
+                                        }}
+                                        aria-label={`Go to slide ${index + 1}`}
+                                    />
+                                ))}
+                            </div>
+                        )}
+
+                        {/* Responsive Styles */}
+                        <style jsx>{`
                         @media (max-width: 1024px) {
                             .carousel-arrow {
                                 width: 40px !important;
@@ -295,8 +297,8 @@ export default function ProductRecommendations({ similarProducts, otherProducts 
                             cursor: not-allowed;
                         }
                     `}</style>
-                </div>
-            </section>
+                    </div>
+                </section>
 
             {/* RECOMMENDATIONS: OTHERS - 2 Columns on Mobile */}
             <section style={{ marginBottom: "60px" }}>
