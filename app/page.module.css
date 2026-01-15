@@ -4265,6 +4265,8 @@ article[data-hc-nohero="1"] .hcCta {
 .heroTopRow {
   display: flex !important;
   align-items: center !important;
+  justify-content: center !important;
+  /* Center horizontally */
   gap: 12px;
   flex-wrap: wrap;
 }
@@ -4286,7 +4288,7 @@ article[data-hc-nohero="1"] .hcCta {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
-  margin-left: auto;
+  /* margin-left: auto; REMOVED to allow centering */
 }
 
 .heroBadge {

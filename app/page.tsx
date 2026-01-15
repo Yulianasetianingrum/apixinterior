@@ -725,6 +725,7 @@ export default async function HomePage({
             return (
               <section key={section.id} className={`${styles.hero} ${styles.heroV1} ${heroThemeClass}`}>
                 <div className={styles.heroInner}>
+                  {(resolvedParams as any).debug ? <pre style={{ position: 'absolute', top: 0, left: 0, zIndex: 999, background: 'white', padding: 10, fontSize: 10 }}>{JSON.stringify({ id: section.id, imgId: cfg.imageId, imgUrl, cf: cfg }, null, 2)}</pre> : null}
                   <div className={styles.heroText}>
                     <div className={styles.heroTopRow}>
                       {hasEyebrow ? <div className={styles.heroEyebrow}>{cfg.eyebrow}</div> : null}
