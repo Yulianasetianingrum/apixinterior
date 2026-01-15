@@ -45,16 +45,19 @@ export default function WishlistPageClient() {
                         {/* Image */}
                         <div className="relative w-20 h-20 flex-shrink-0 bg-slate-100 rounded-lg overflow-hidden">
                             {ensureImageUrl(item.image) ? (
-                                <Image
+                                /* eslint-disable-next-line @next/next/no-img-element */
+                                <img
                                     src={ensureImageUrl(item.image)!}
                                     alt={item.name}
-                                    fill
-                                    className="object-cover"
-                                    unoptimized
+                                    className="w-full h-full object-cover"
                                 />
                             ) : (
                                 <div className="flex items-center justify-center h-full text-slate-400 text-xs">No Img</div>
                             )}
+                            {/* DEBUG URL */}
+                            <div className="absolute bottom-0 left-0 bg-black/50 text-white text-[8px] p-1 w-full truncate">
+                                {item.image || "NULL"}
+                            </div>
                         </div>
 
                         {/* Details */}

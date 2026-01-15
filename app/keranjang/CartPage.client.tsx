@@ -77,17 +77,17 @@ export default function CartPageClient({ waNumber }: CartPageClientProps) {
                                 <div className={styles.productContent}>
                                     <div className={styles.imageWrapper}>
                                         {ensureImageUrl(item.image) ? (
-                                            <Image
+                                            /* eslint-disable-next-line @next/next/no-img-element */
+                                            <img
                                                 src={ensureImageUrl(item.image)!}
                                                 alt={item.name}
-                                                width={50}
-                                                height={50}
-                                                className="cart-product-image"
-                                                unoptimized
+                                                style={{ width: 50, height: 50, objectFit: "cover", borderRadius: 8 }}
                                             />
                                         ) : (
                                             <div className={styles.noImage}>No Image</div>
                                         )}
+                                        {/* DEBUG */}
+                                        <div style={{ fontSize: 8, color: 'red', maxWidth: 50, overflow: 'hidden' }}>{item.image}</div>
                                     </div>
 
                                     <div className={styles.details}>
