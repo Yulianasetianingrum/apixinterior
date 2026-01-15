@@ -123,17 +123,36 @@ export async function getEnabledSections(scope: SectionScope): Promise<SectionRo
 }
 
 export async function clearPublishedAndCopyDraft(): Promise<void> {
-  const draftTable = TABLE_BY_SCOPE.draft;
-  const pubTable = TABLE_BY_SCOPE.published;
+  // Use Prisma client to ensure safe JSON handling and valid data types
+  // 1. Fetch all draft sections
+  const drafts = await prisma.homepageSectionDraft.findMany({
+    orderBy: { sortOrder: "asc" },
+  });
 
+  // 2. Prepare data for published table
+  // Omit 'id' so published table auto-increments (or we could preserve IDs if schema allows, but auto-inc is cleaner for a snapshot ref)
+  // Mapping fields explicitly to match the schema
+  const toCreate = drafts.map((d) => ({
+    type: d.type,
+    title: d.title,
+    slug: d.slug,
+    enabled: d.enabled,
+    sortOrder: d.sortOrder,
+    config: d.config ?? {}, // Ensure not null
+    heroHeadline: d.heroHeadline,
+    heroSubheadline: d.heroSubheadline,
+    heroCtaLabel: d.heroCtaLabel,
+    heroCtaHref: d.heroCtaHref,
+    heroContent: d.heroContent,
+    description: d.description,
+  }));
+
+  // 3. Transaction: Delete all published -> Insert new
   await prisma.$transaction([
-    prisma.$executeRawUnsafe(`DELETE FROM ${pubTable}`),
-    prisma.$executeRawUnsafe(
-      `INSERT INTO ${pubTable} (type,title,slug,enabled,sortOrder,config)
-       SELECT type,title,slug,enabled,sortOrder,config
-       FROM ${draftTable}
-       ORDER BY sortOrder ASC`
-    ),
+    prisma.homepageSectionPublished.deleteMany({}),
+    prisma.homepageSectionPublished.createMany({
+      data: toCreate,
+    }),
   ]);
 }
 

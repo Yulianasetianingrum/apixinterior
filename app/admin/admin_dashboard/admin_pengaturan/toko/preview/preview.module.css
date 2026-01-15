@@ -1132,8 +1132,8 @@
 }
 
 .heroTopRow {
-  display: flex;
-  align-items: center;
+  display: flex !important;
+  align-items: center !important;
   gap: 12px;
   flex-wrap: wrap;
 }
