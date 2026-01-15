@@ -2417,7 +2417,7 @@ export default async function TokoPreviewDraftPage({
                               <>
                                 <div className={ui.footerTagsGrid}>
                                   {leftTags.map((tag: any, idx: number) => (
-                                    <span key={idx} style={{ color: "inherit", opacity: 0.6, fontSize: 12 }}>
+                                    <span key={idx} style={{ color: "inherit", opacity: 0.6, fontSize: 12, fontWeight: "bold" }}>
                                       {tag.label}
                                     </span>
                                   ))}
@@ -2425,7 +2425,7 @@ export default async function TokoPreviewDraftPage({
                                 {rightTags.length > 0 && (
                                   <div className={ui.footerTagsGrid}>
                                     {rightTags.map((tag: any, idx: number) => (
-                                      <span key={idx} style={{ color: "inherit", opacity: 0.6, fontSize: 12 }}>
+                                      <span key={idx} style={{ color: "inherit", opacity: 0.6, fontSize: 12, fontWeight: "bold" }}>
                                         {tag.label}
                                       </span>
                                     ))}

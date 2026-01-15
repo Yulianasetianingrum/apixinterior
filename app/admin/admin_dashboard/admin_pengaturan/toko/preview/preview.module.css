@@ -1064,40 +1064,6 @@
   max-width: 1400px;
   margin: 0 auto 28px;
   padding: 0 16px 24px;
-
-  /* Default tokens (override by heroTheme*) */
-  --hb-bg: #071026;
-  --hb-bg2: #050a14;
-  --hb-text: rgba(255, 255, 255, 0.96);
-  --hb-muted: rgba(255, 255, 255, 0.78);
-  --hb-accent: #ffe893;
-
-  --hb-cardBg: rgba(255, 255, 255, 0.10);
-  --hb-cardBorder: rgba(255, 255, 255, 0.18);
-  --hb-cardText: rgba(255, 255, 255, 0.96);
-
-  --hb-glassBg: rgba(255, 255, 255, 0.16);
-  --hb-glassBorder: rgba(255, 255, 255, 0.24);
-  --hb-glassShadow: 0 18px 52px rgba(0, 0, 0, 0.28);
-
-  --hb-chipBg: rgba(255, 255, 255, 0.10);
-  --hb-chipBorder: rgba(255, 255, 255, 0.18);
-
-  --hb-ctaBg: var(--hb-accent);
-  --hb-ctaText: #071026;
-  --hb-ctaBorder: rgba(0, 0, 0, 0.14);
-  --hb-ctaBgHover: #ffd84d;
-  --hb-ctaTextHover: #071026;
-
-  --hb-cta2Bg: rgba(255, 255, 255, 0.10);
-  --hb-cta2Border: rgba(255, 255, 255, 0.22);
-  --hb-cta2Text: rgba(255, 255, 255, 0.96);
-  --hb-cta2BgHover: rgba(255, 255, 255, 0.14);
-  --hb-cta2TextHover: rgba(255, 255, 255, 0.98);
-
-  --hb-floatBg: rgba(255, 255, 255, 0.92);
-  --hb-floatBorder: rgba(0, 0, 0, 0.14);
-  --hb-floatText: rgba(0, 0, 0, 0.88);
 }
 
 /* Inner: commerce gradient + warm interior accent */
@@ -1185,7 +1151,7 @@
 }
 
 .heroTitle {
-  margin: 0;
+  margin: 16px 0 0;
   font-weight: 950;
   letter-spacing: -0.03em;
   font-size: clamp(30px, 3.6vw, 54px);

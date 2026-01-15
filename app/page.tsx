@@ -1255,13 +1255,13 @@ export default async function HomePage({
                         <>
                           <div className={styles.footerTagsGrid}>
                             {leftTags.map((tag: any, i: number) => (
-                              <span key={i} style={{ color: "inherit", opacity: 0.6, fontSize: 12 }}>{tag.label}</span>
+                              <span key={i} style={{ color: "inherit", opacity: 0.6, fontSize: 12, fontWeight: "bold" }}>{tag.label}</span>
                             ))}
                           </div>
                           {rightTags.length > 0 && (
                             <div className={styles.footerTagsGrid}>
                               {rightTags.map((tag: any, i: number) => (
-                                <span key={i} style={{ color: "inherit", opacity: 0.6, fontSize: 12 }}>{tag.label}</span>
+                                <span key={i} style={{ color: "inherit", opacity: 0.6, fontSize: 12, fontWeight: "bold" }}>{tag.label}</span>
                               ))}
                             </div>
                           )}

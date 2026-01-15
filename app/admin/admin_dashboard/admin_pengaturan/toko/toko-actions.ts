@@ -398,7 +398,19 @@ export async function saveSocialConfig(formData: FormData) {
         return { iconKey: k, nama: r?.nama ?? k };
     });
 
-    await updateDraftConfigPreserveTheme(id, { selected, display: { iconsOnly } }, { title, slug });
+    const rawSectionTheme = (formData.get("sectionTheme") as string | null) ?? "";
+    const sectionTheme = normalizeThemeAttr(rawSectionTheme);
+    const sectionThemeValue =
+        sectionTheme === "FOLLOW_NAVBAR" ||
+            (sectionTheme && ALLOWED_THEMES.includes(sectionTheme as any))
+            ? sectionTheme
+            : "FOLLOW_NAVBAR";
+
+    await updateDraftConfigPreserveTheme(id, {
+        selected,
+        display: { iconsOnly },
+        sectionTheme: sectionThemeValue,
+    }, { title, slug });
     revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko");
     return redirectBack({ notice: encodeURIComponent("Config SOCIAL tersimpan.") });
 }
@@ -452,9 +464,21 @@ export async function saveBranchesConfig(formData: FormData) {
     const branchIds = parseNumArray((formData.getAll("branchIds") as string[]) ?? []);
     const layout = String(formData.get("layout") ?? "carousel") === "grid" ? "grid" : "carousel";
 
+    const rawSectionTheme = (formData.get("sectionTheme") as string | null) ?? "";
+    const sectionTheme = normalizeThemeAttr(rawSectionTheme);
+    const sectionThemeValue =
+        sectionTheme === "FOLLOW_NAVBAR" ||
+            (sectionTheme && ALLOWED_THEMES.includes(sectionTheme as any))
+            ? sectionTheme
+            : "FOLLOW_NAVBAR";
+
     const { branchIds: validBranchIds } = await sanitizeExistence({ branchIds });
 
-    await updateDraftConfigPreserveTheme(id, { branchIds: validBranchIds ?? [], layout }, { title, slug });
+    await updateDraftConfigPreserveTheme(id, {
+        branchIds: validBranchIds ?? [],
+        layout,
+        sectionTheme: sectionThemeValue,
+    }, { title, slug });
     revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko");
     return redirectBack({ notice: encodeURIComponent("Config BRANCHES tersimpan.") });
 }
@@ -484,9 +508,26 @@ export async function saveContactConfig(formData: FormData) {
     const { hubungiIds: validHubungiIds, imageIds: validImageIds } = await sanitizeExistence({ hubungiIds, imageIds: imageId ? [imageId] : [] });
     const validatedImageId = validImageIds && validImageIds.length > 0 ? validImageIds[0] : null;
 
+    const rawSectionTheme = (formData.get("sectionTheme") as string | null) ?? "";
+    const sectionTheme = normalizeThemeAttr(rawSectionTheme);
+    const sectionThemeValue =
+        sectionTheme === "FOLLOW_NAVBAR" ||
+            (sectionTheme && ALLOWED_THEMES.includes(sectionTheme as any))
+            ? sectionTheme
+            : "FOLLOW_NAVBAR";
+
     await updateDraftConfigPreserveTheme(
         id,
-        { hubungiIds: validHubungiIds ?? [], buttonLabels, mode, showImage, imageId: validatedImageId, headerText, bodyText },
+        {
+            hubungiIds: validHubungiIds ?? [],
+            buttonLabels,
+            mode,
+            showImage,
+            imageId: validatedImageId,
+            headerText,
+            bodyText,
+            sectionTheme: sectionThemeValue
+        },
         { title, slug },
     );
 
@@ -1345,11 +1386,13 @@ export async function uploadImageToGalleryAndAttach(formData: FormData): Promise
             const safeName = (title ?? (file as File).name ?? "image")
                 .toLowerCase()
                 .replace(/\s+/g, "-")
-                .replace(/[^a-z0-9-_]/g, "")
-                .slice(0, 60)
-                .replace(/\.webp$/i, "");
+                .replace(/[^a-z0-9-_\.]/g, "")
+                .replace(/\.[^/.]+$/, "")
+                .slice(0, 60);
 
-            const filename = `${Date.now()}-${Math.random().toString(16).slice(2)}-${safeName}.png`;
+            const isPng = isCommerceIconAttach || isCommerceCustomAttach;
+            const ext = isPng ? "png" : "webp";
+            const filename = `${Date.now()}-${Math.random().toString(16).slice(2)}-${safeName}.${ext}`;
             const filePath = path.join(uploadDir, filename);
             const publicUrl = `/uploads/gambar_upload/${filename}`;
 
