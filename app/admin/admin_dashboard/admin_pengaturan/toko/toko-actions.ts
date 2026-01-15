@@ -1670,12 +1670,21 @@ export async function uploadImageToGalleryAndAttach(formData: FormData): Promise
         revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko");
         revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko/preview");
 
-        // FIX: Add small delay to ensure FS flush
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        // FIX: Add cache buster to optimistic update URL
+        // FIX: Explicitly wait for file to exist on disk (max 3s)
         if (finalImageObj?.url) {
+            const relPath = finalImageObj.url.replace(/^\/uploads\/gambar_upload\//, "");
+            const checkPath = path.join(process.cwd(), "public", "uploads", "gambar_upload", relPath);
+            let retries = 30; // 30 * 100ms = 3s
+            while (retries > 0) {
+                if (fs.existsSync(checkPath)) break;
+                await new Promise(r => setTimeout(r, 100));
+                retries--;
+            }
+            // Add cache buster
             finalImageObj.url += `?t=${Date.now()}`;
+        } else {
+            // Fallback delay if no URL (unlikely for upload)
+            await new Promise(resolve => setTimeout(resolve, 500));
         }
 
         return {
