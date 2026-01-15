@@ -1202,141 +1202,7 @@ export default function DaftarProdukPage() {
 
       {/* SIDEBAR */}
 
-      <aside className={`${styles.sidebar} ${isSidebarOpen ? styles.sidebarOpen : ""}`}>
-        <div className={styles.sidebarHeader}>
 
-          <div className={styles.brand}>
-
-            <div className={styles.brandLogo}>A</div>
-
-            <div className={styles.brandText}>
-
-              <span className={styles.brandTitle}>APIX INTERIOR</span>
-
-              <span className={styles.brandSubtitle}>Admin Dashboard</span>
-
-            </div>
-
-          </div>
-
-
-
-          <button
-
-            type="button"
-
-            className={styles.sidebarClose}
-
-            onClick={() => setIsSidebarOpen(false)}>
-          </button>
-
-        </div>
-
-
-
-        <nav className={styles.menu}>
-
-          <button
-
-            type="button"
-
-            className={`${styles.menuItem} ${styles.menuItemActive}`}
-
-            onClick={() =>
-
-              router.push("/admin/admin_dashboard/admin_produk/daftar_produk")
-
-            }>
-
-            Daftar Produk
-
-          </button>
-
-
-
-          <button
-
-            type="button"
-
-            className={styles.menuItem}
-
-            onClick={() =>
-
-              router.push("/admin/admin_dashboard/admin_produk/tambah_produk")
-
-            }>
-
-            Tambah Produk
-
-          </button>
-
-
-
-          <button
-
-            type="button"
-
-            className={styles.menuItem}
-
-            onClick={() =>
-
-              router.push(
-
-                "/admin/admin_dashboard/admin_produk/kategori_produk"
-
-              )
-
-            }>
-
-            Kategori Produk
-
-          </button>
-
-        </nav>
-
-
-
-        <div className={styles.themeSection}>
-
-          <span className={styles.themeLabel}>
-
-            Mode tombol: {isDark ? "Malam" : "Siang"}
-
-          </span>
-
-          <button
-
-            type="button"
-
-            className={`${styles.themeSwitch} ${isDark ? styles.themeSwitchOn : ""
-
-              }`}
-
-            onClick={() => setIsDark((prev) => !prev)}>
-            <span className={styles.themeThumb} />
-
-          </button>
-
-        </div>
-
-
-
-        <div className={styles.sidebarBackWrapper}>
-
-          <button
-
-            type="button"
-
-            className={styles.sidebarBackButton}
-
-            onClick={() => router.push("/admin/admin_dashboard")}>
-
-            KEMBALI
-          </button>
-
-        </div>
-
-      </aside>
 
 
 
@@ -1352,20 +1218,7 @@ export default function DaftarProdukPage() {
 
       {/* TOPBAR MOBILE */}
 
-      <div className={styles.mobileTopBar}>
 
-        <button
-
-          type="button"
-
-          className={styles.mobileMenuButton}
-
-          onClick={() => setIsSidebarOpen(true)}>
-        </button>
-
-        <div className={styles.mobileBrand}>APIX INTERIOR</div>
-
-      </div>
 
 
 
@@ -2099,208 +1952,208 @@ export default function DaftarProdukPage() {
           </div>
         </div>
       )}
-    </main>
 
 
 
 
 
-      {/* Toasts */ }
 
-  {
-    toasts.length > 0 && (
+      {/* Toasts */}
 
-      <div className={styles.toastWrap} aria-live="polite">
+      {
+        toasts.length > 0 && (
 
-        {toasts.map((t) => (
+          <div className={styles.toastWrap} aria-live="polite">
 
-          <div
+            {toasts.map((t) => (
 
-            key={t.id}
+              <div
 
-            className={[
+                key={t.id}
 
-              styles.toast,
+                className={[
 
-              t.type === "success"
+                  styles.toast,
 
-                ? styles.toastSuccess
+                  t.type === "success"
 
-                : t.type === "error"
+                    ? styles.toastSuccess
 
-                  ? styles.toastError
+                    : t.type === "error"
 
-                  : styles.toastInfo,
+                      ? styles.toastError
 
-            ].join(" ")}>
-            <div className={styles.toastMsg}>{t.message}</div>
+                      : styles.toastInfo,
 
-            <button
+                ].join(" ")}>
+                <div className={styles.toastMsg}>{t.message}</div>
 
-              className={styles.toastClose}
+                <button
 
-              onClick={() => removeToast(t.id)}
+                  className={styles.toastClose}
 
-              aria-label="Tutup"
+                  onClick={() => removeToast(t.id)}
 
-              type="button">
-            </button>
+                  aria-label="Tutup"
 
-          </div>
+                  type="button">
+                </button>
 
-        ))}
+              </div>
 
-      </div>
-
-    )
-  }
-
-
-
-  {/* Confirm Modal */ }
-
-  {
-    confirmState?.open && (
-
-      <div className={styles.confirmOverlay} role="presentation">
-
-        <div className={styles.confirmCard} role="dialog" aria-modal="true">
-
-          <div className={styles.confirmHead}>
-
-            <div className={styles.confirmTitle}>{confirmState.title}</div>
-
-            <button
-
-              className={styles.confirmClose}
-
-              type="button"
-
-              onClick={() => closeConfirm(false)}
-
-              aria-label="Tutup">
-            </button>
+            ))}
 
           </div>
 
-
-
-          {confirmState.description && (
-
-            <div className={styles.confirmDesc}>{confirmState.description}</div>
-
-          )}
+        )
+      }
 
 
 
-          <div className={styles.confirmActions}>
+      {/* Confirm Modal */}
 
-            <button
+      {
+        confirmState?.open && (
 
-              className={styles.editButton}
+          <div className={styles.confirmOverlay} role="presentation">
 
-              type="button"
+            <div className={styles.confirmCard} role="dialog" aria-modal="true">
 
-              onClick={() => closeConfirm(false)}>
+              <div className={styles.confirmHead}>
 
-              {confirmState.cancelText ?? "Batal"}
-            </button>
+                <div className={styles.confirmTitle}>{confirmState.title}</div>
 
-            <button
+                <button
 
-              className={
+                  className={styles.confirmClose}
 
-                confirmState.tone === "danger"
+                  type="button"
 
-                  ? styles.deleteButton
+                  onClick={() => closeConfirm(false)}
 
-                  : styles.primaryButton
+                  aria-label="Tutup">
+                </button>
 
-              }
-
-              type="button"
-
-              onClick={() => closeConfirm(true)}>
-
-              {confirmState.confirmText ?? "OK"}
-            </button>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    )
-  }
+              </div>
 
 
 
-  {/* Message Modal */ }
+              {confirmState.description && (
 
-  {
-    messageState?.open && (
+                <div className={styles.confirmDesc}>{confirmState.description}</div>
 
-      <div className={styles.confirmOverlay} role="presentation">
-
-        <div className={styles.messageCard} role="dialog" aria-modal="true">
-
-          <div className={styles.confirmHead}>
-
-            <div className={styles.confirmTitle}>{messageState.title}</div>
-
-            <button
-
-              className={styles.confirmClose}
-
-              type="button"
-
-              onClick={() => setMessageState(null)}
-
-              aria-label="Tutup">
-            </button>
-
-          </div>
+              )}
 
 
 
-          {messageState.description && (
+              <div className={styles.confirmActions}>
 
-            <div className={styles.confirmDesc}>{messageState.description}</div>
+                <button
 
-          )}
+                  className={styles.editButton}
 
+                  type="button"
 
+                  onClick={() => closeConfirm(false)}>
 
-          {messageState.detail && (
+                  {confirmState.cancelText ?? "Batal"}
+                </button>
 
-            <pre className={styles.messageDetail}>{messageState.detail}</pre>
+                <button
 
-          )}
+                  className={
 
+                    confirmState.tone === "danger"
 
+                      ? styles.deleteButton
 
-          <div className={styles.confirmActions}>
+                      : styles.primaryButton
 
-            <button
+                  }
 
-              className={styles.primaryButton}
+                  type="button"
 
-              type="button"
+                  onClick={() => closeConfirm(true)}>
 
-              onClick={() => setMessageState(null)}>
+                  {confirmState.confirmText ?? "OK"}
+                </button>
 
-              {messageState.okText ?? "Oke"}
-            </button>
+              </div>
+
+            </div>
 
           </div>
 
-        </div>
+        )
+      }
 
-      </div>
 
-    )
-  }
+
+      {/* Message Modal */}
+
+      {
+        messageState?.open && (
+
+          <div className={styles.confirmOverlay} role="presentation">
+
+            <div className={styles.messageCard} role="dialog" aria-modal="true">
+
+              <div className={styles.confirmHead}>
+
+                <div className={styles.confirmTitle}>{messageState.title}</div>
+
+                <button
+
+                  className={styles.confirmClose}
+
+                  type="button"
+
+                  onClick={() => setMessageState(null)}
+
+                  aria-label="Tutup">
+                </button>
+
+              </div>
+
+
+
+              {messageState.description && (
+
+                <div className={styles.confirmDesc}>{messageState.description}</div>
+
+              )}
+
+
+
+              {messageState.detail && (
+
+                <pre className={styles.messageDetail}>{messageState.detail}</pre>
+
+              )}
+
+
+
+              <div className={styles.confirmActions}>
+
+                <button
+
+                  className={styles.primaryButton}
+
+                  type="button"
+
+                  onClick={() => setMessageState(null)}>
+
+                  {messageState.okText ?? "Oke"}
+                </button>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        )
+      }
 
     </div >
 

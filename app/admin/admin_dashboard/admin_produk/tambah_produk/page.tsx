@@ -13,7 +13,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import layoutStyles from "../../admin_dashboard.module.css";
 import styles from "./tambah_produk.module.css";
 import { useAdminTheme } from "../../AdminThemeContext";
-import { useAdminTheme } from "../../AdminThemeContext";
+
 import Link from "next/link";
 
 
@@ -4429,7 +4429,7 @@ export default function TambahProdukPage() {
 
   function handleBack() {
     router.push("/admin/admin_dashboard/admin_produk");
-    setSidebarOpen(false);
+
   }
 
   const hasAnyPreview =
