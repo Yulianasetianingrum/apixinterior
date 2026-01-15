@@ -11,6 +11,7 @@ type Product = {
     promoAktif?: boolean | null;
     promoTipe?: "persen" | "nominal" | null;
     promoValue?: number | null;
+    hargaTipe?: string | null; // Added unit field
     variasiProduk?: Variation[];
 };
 
@@ -23,7 +24,7 @@ type Variation = {
     promoValue?: number | null;
     imageUrl?: string | null;
     kombinasi?: Kombinasi[];
-    options?: any; // Contains dynamic titles etc
+    options?: { unitOverride?: string } & any; // Typed options
 };
 
 type Kombinasi = {
@@ -49,6 +50,22 @@ type Props = {
 const cleanLabel = (text?: string | null) =>
     (text ?? "").replace(/__dedup\d+/gi, "").replace(/#\d+/g, "").trim();
 
+// Helper: Format Unit Symbol (same as Admin)
+function unitSymbolShort(u: string | null | undefined) {
+    const s = String(u || "").trim();
+    if (!s || s === "tetap") return ""; // 'tetap' usually implies no specific unit shown or 'fixed'
+    const up = s.toUpperCase();
+    if (up === "M2") return "/ m²";
+    if (up === "M3") return "/ m³";
+    if (up === "CM2") return "/ cm²";
+    if (up === "CM3") return "/ cm³";
+    if (up === "MM2") return "/ mm²";
+    if (up === "MM3") return "/ mm³";
+    if (up === "M") return "/ m";
+    if (up === "LARI") return "/ m'"; // lari often denoted as m'
+    return `/ ${s.toLowerCase()}`;
+}
+
 export default function ProductVariationSelector({ product, onImageChange, baseWaNumber }: Props) {
     const [selectedVarId, setSelectedVarId] = useState<number | null>(null);
     const [selectedComboIds, setSelectedComboIds] = useState<Record<number, string | null>>({
@@ -69,6 +86,16 @@ export default function ProductVariationSelector({ product, onImageChange, baseW
     const currentVar = useMemo(() => {
         return product.variasiProduk?.find((v) => v.id === selectedVarId) || null;
     }, [product, selectedVarId]);
+
+    // Derived: Unit Display
+    const displayUnit = useMemo(() => {
+        // 1. Check variation override
+        if (currentVar?.options?.unitOverride) {
+            return unitSymbolShort(currentVar.options.unitOverride);
+        }
+        // 2. Fallback to product default
+        return unitSymbolShort(product.hargaTipe);
+    }, [currentVar, product.hargaTipe]);
 
     // Derived: Combos grouped by Level for current variation
     const currentCombosByLevel = useMemo(() => {
@@ -217,6 +244,7 @@ export default function ProductVariationSelector({ product, onImageChange, baseW
         }
 
         text += `\nEstimasi Harga: ${formatIDR(finalPriceData.hargaFinal)}`;
+        if (displayUnit) text += ` ${displayUnit}`; // Include unit in WA message too
 
         const url = `https://wa.me/${baseWaNumber}?text=${encodeURIComponent(text)}`;
         window.open(url, '_blank');
@@ -243,6 +271,7 @@ export default function ProductVariationSelector({ product, onImageChange, baseW
             <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
                 <div style={{ fontSize: 24, fontWeight: 700, color: "#0b1d3a" }}>
                     {formatIDR(finalPriceData.hargaFinal)}
+                    {displayUnit && <span style={{ fontSize: 16, fontWeight: 500, color: "#64748b", marginLeft: 4 }}>{displayUnit}</span>}
                 </div>
                 {finalPriceData.isPromo && (
                     <>
