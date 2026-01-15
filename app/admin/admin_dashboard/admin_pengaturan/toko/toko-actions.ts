@@ -1324,12 +1324,15 @@ export async function uploadImageToGalleryAndAttach(formData: FormData): Promise
 
         if (hasUploadFile) {
             if (isCommerceIconAttach || isCommerceCustomAttach) {
+                // Relaxed: allow any image format
+                /*
                 const mime = String((file as File).type ?? "").toLowerCase();
                 const mimeOk = mime === "image/png";
                 const nameOk = /\.png$/i.test(String((file as File).name ?? ""));
                 if (!mimeOk && !nameOk) {
                     return { ok: false, error: "Icon CATEGORY_GRID_COMMERCE wajib PNG." };
                 }
+                */
             }
 
             // 1) Save file to /public/uploads/gambar_upload (same as galeri) dengan auto compress -> WebP
@@ -1431,9 +1434,12 @@ export async function uploadImageToGalleryAndAttach(formData: FormData): Promise
 
         if (isCommerceIconAttach || isCommerceCustomAttach) {
             const rec = await prisma.gambarUpload.findUnique({ where: { id: imageIdToUse }, select: { url: true } });
+            // Relaxed: no PNG validation
+            /*
             if (!rec?.url || !/\.png(\?|#|$)/i.test(String(rec.url))) {
                 return { ok: false, error: "Icon CATEGORY_GRID_COMMERCE wajib PNG." };
             }
+            */
         }
 
         const metaFromDisk = async (imgId: number) => {
