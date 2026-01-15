@@ -1,7 +1,7 @@
-// app/api/admin/admin_dashboard/admin_produk/[id]/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import sharp from "sharp";
+import { revalidatePath } from "next/cache";
 import path from "path";
 import fs from "fs/promises";
 import { randomUUID } from "crypto";
@@ -689,7 +689,9 @@ export async function PUT(
     const promoValue = promoAktif && promoTipe && promoValueInt > 0 ? promoValueInt : null;
 
     // --------- HARGA ---------
-    const hargaTipe = String(formData.get("hargaTipe") || "tetap");
+    const unitInput = String(formData.get("product_unit") || "").trim();
+    const hargaTipeRaw = String(formData.get("hargaTipe") || "tetap");
+    const hargaTipe = unitInput || hargaTipeRaw;
 
     const tipeOrder = String(formData.get("tipeOrder") || "ready");
     const estimasiPengerjaan = String(formData.get("estimasiPengerjaan") || "").trim();
@@ -935,6 +937,11 @@ export async function PUT(
         });
       }
     }
+
+    revalidatePath("/produk");
+    // Gunakan slug baru jika ada, atau slug lama
+    // Kita invalidate global list juga
+    revalidatePath("/admin/admin_dashboard/admin_produk/daftar_produk");
 
     return NextResponse.json({ ok: true });
   } catch (err: any) {
