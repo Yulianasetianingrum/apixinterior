@@ -54,6 +54,11 @@ const cleanLabel = (text?: string | null) =>
 function unitSymbolShort(u: string | null | undefined) {
     const s = String(u || "").trim();
     if (!s || s === "tetap") return ""; // 'tetap' usually implies no specific unit shown or 'fixed'
+
+    // Validate: Don't show numeric/promo status as unit
+    const lower = s.toLowerCase();
+    if (lower === "mulai_dari" || lower === "mulai dari") return "";
+
     const up = s.toUpperCase();
     if (up === "M2") return "/ m²";
     if (up === "M3") return "/ m³";
@@ -63,7 +68,7 @@ function unitSymbolShort(u: string | null | undefined) {
     if (up === "MM3") return "/ mm³";
     if (up === "M") return "/ m";
     if (up === "LARI") return "/ m'"; // lari often denoted as m'
-    return `/ ${s.toLowerCase()}`;
+    return `/ ${lower}`;
 }
 
 export default function ProductVariationSelector({ product, onImageChange, baseWaNumber }: Props) {
