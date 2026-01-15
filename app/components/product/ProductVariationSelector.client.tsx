@@ -358,7 +358,7 @@ export default function ProductVariationSelector({ product, onImageChange, baseW
                     <div style={{ fontSize: 13, fontWeight: 600, color: "#64748b", marginBottom: 8, textTransform: "uppercase" }}>
                         {dynamicTitles.varTitle}
                     </div>
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                    <div className="var-grid">
                         {product.variasiProduk.map(v => {
                             const isSel = selectedVarId === v.id;
                             const label = cleanLabel(v.nama);
@@ -411,7 +411,7 @@ export default function ProductVariationSelector({ product, onImageChange, baseW
                         <div style={{ fontSize: 13, fontWeight: 600, color: "#64748b", marginBottom: 8, textTransform: "uppercase" }}>
                             {sectionTitle}
                         </div>
-                        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                        <div className="var-grid">
                             {list.map(c => {
                                 const isActive = String(selectedComboIds[lvl]) === String(c.id);
                                 return (
@@ -552,6 +552,26 @@ export default function ProductVariationSelector({ product, onImageChange, baseW
                 </div>
             </div>
 
+            <style jsx>{`
+                .var-grid {
+                    display: grid;
+                    grid-template-columns: repeat(2, 1fr);
+                    gap: 8px;
+                }
+                .var-grid > button {
+                    width: 100%;
+                    justify-content: flex-start; /* Keep image and text aligned left */
+                }
+                @media (min-width: 640px) {
+                    .var-grid {
+                        display: flex;
+                        flex-wrap: wrap;
+                    }
+                    .var-grid > button {
+                        width: auto; /* Reset for desktop flex */
+                    }
+                }
+            `}</style>
         </div>
     );
 }

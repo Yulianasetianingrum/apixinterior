@@ -7,6 +7,13 @@ import Link from "next/link";
 import { FaTrash, FaCartShopping } from "react-icons/fa6";
 import { useCart } from "@/app/context/CartContext";
 
+// Helper to ensure image URL is correct
+const ensureImageUrl = (url: string | null | undefined) => {
+    if (!url) return null;
+    if (url.startsWith("http") || url.startsWith("/")) return url;
+    return `/${url}`;
+};
+
 export default function WishlistPageClient() {
     const { items, removeFromWishlist } = useWishlist();
     const { addToCart } = useCart();
@@ -36,8 +43,8 @@ export default function WishlistPageClient() {
                     <div key={item.id} className="flex gap-4 md:gap-6 p-4 border border-slate-200 rounded-xl bg-white shadow-sm items-center">
                         {/* Image */}
                         <div className="relative w-20 h-20 flex-shrink-0 bg-slate-100 rounded-lg overflow-hidden">
-                            {item.image ? (
-                                <Image src={item.image} alt={item.name} fill className="object-cover" />
+                            {ensureImageUrl(item.image) ? (
+                                <Image src={ensureImageUrl(item.image)!} alt={item.name} fill className="object-cover" />
                             ) : (
                                 <div className="flex items-center justify-center h-full text-slate-400 text-xs">No Img</div>
                             )}

@@ -12,6 +12,13 @@ interface CartPageClientProps {
     waNumber: string;
 }
 
+// Helper to ensure image URL is correct
+const ensureImageUrl = (url: string | null | undefined) => {
+    if (!url) return null;
+    if (url.startsWith("http") || url.startsWith("/")) return url;
+    return `/${url}`;
+};
+
 export default function CartPageClient({ waNumber }: CartPageClientProps) {
     const { items, updateQuantity, removeFromCart, totalPrice, totalItems } = useCart();
     const [isClient, setIsClient] = useState(false);
@@ -66,9 +73,9 @@ export default function CartPageClient({ waNumber }: CartPageClientProps) {
                             <div key={`${item.id}-${item.variationId || 'base'}`} className={styles.productCard}>
                                 <div className={styles.productContent}>
                                     <div className={styles.imageWrapper}>
-                                        {item.image ? (
+                                        {ensureImageUrl(item.image) ? (
                                             <Image
-                                                src={item.image}
+                                                src={ensureImageUrl(item.image)!}
                                                 alt={item.name}
                                                 width={50}
                                                 height={50}
