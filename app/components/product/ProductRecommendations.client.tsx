@@ -299,6 +299,7 @@ export default function ProductRecommendations({ similarProducts, otherProducts 
                     `}</style>
                     </div>
                 </section>
+            )}
 
             {/* RECOMMENDATIONS: OTHERS - 2 Columns on Mobile */}
             <section style={{ marginBottom: "60px" }}>
