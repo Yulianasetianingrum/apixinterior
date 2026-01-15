@@ -9,6 +9,7 @@ import type { DragEvent } from "react";
 import { useRouter } from "next/navigation";
 
 import styles from "./daftar_produk.module.css";
+import { useAdminTheme } from "../../AdminThemeContext";
 
 
 
@@ -320,10 +321,8 @@ export default function DaftarProdukPage() {
 
 
   // ========== UI STATE ==========
+  const { isDarkMode: isDark } = useAdminTheme();
 
-  const [isDark, setIsDark] = useState(false);
-
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
 
 
@@ -1199,7 +1198,7 @@ export default function DaftarProdukPage() {
 
   return (
 
-    <div className={wrapperClass}>
+    <div style={{ width: '100%' }} onDragEnd={droppingAll ? undefined : handleDrop}>
 
       {/* SIDEBAR */}
 
@@ -1343,975 +1342,967 @@ export default function DaftarProdukPage() {
 
       {/* OVERLAY MOBILE */}
 
-      {isSidebarOpen && (
 
-        <div
-
-          className={styles.overlay}
-
-          onClick={() => setIsSidebarOpen(false)}
-
-        />
-
-      )}
 
 
 
       {/* MAIN */}
 
-      <main className={styles.main} onDragEnd={droppingAll ? undefined : handleDrop}>
 
-        {/* TOPBAR MOBILE */}
 
-        <div className={styles.mobileTopBar}>
+      {/* TOPBAR MOBILE */}
+
+      <div className={styles.mobileTopBar}>
+
+        <button
+
+          type="button"
+
+          className={styles.mobileMenuButton}
+
+          onClick={() => setIsSidebarOpen(true)}>
+        </button>
+
+        <div className={styles.mobileBrand}>APIX INTERIOR</div>
+
+      </div>
+
+
+
+      {/* BRAND DESKTOP (KANAN ATAS) */}
+
+
+
+
+
+      {/* HEADER */}
+
+      <header className={styles.header}>
+
+        <h1 className={styles.pageTitle}>Daftar Produk</h1>
+
+        <p className={styles.pageSubtitle}>
+
+          Atur urutan, edit, dan hapus produk. Drag &amp; drop untuk mengatur
+
+          posisi tampil di website.
+
+        </p>
+
+
+
+        <div className={styles.headerRight}>
+
+          <input
+
+            type="text"
+
+            className={styles.searchInput}
+
+            placeholder="Cari nama / kategori..."
+
+            value={search}
+
+            disabled={droppingAll}
+
+            onChange={(e) => setSearch(e.target.value)}
+
+          />
 
           <button
 
             type="button"
 
-            className={styles.mobileMenuButton}
+            className={styles.primaryButton}
 
-            onClick={() => setIsSidebarOpen(true)}>
+            disabled={droppingAll}
+
+            onClick={() =>
+
+              router.push(
+
+                "/admin/admin_dashboard/admin_produk/tambah_produk"
+
+              )
+
+            }>
+            + Tambah Produk
+
           </button>
 
-          <div className={styles.mobileBrand}>APIX INTERIOR</div>
+          <button
+
+            type="button"
+
+            className={styles.dangerButton}
+
+            disabled={loading || !!error || droppingAll || products.length === 0}
+
+            onClick={handleDropAll}
+
+            title={
+
+              products.length === 0
+
+                ? "Tidak ada produk"
+
+                : "Hapus semua produk sekaligus"
+
+            }>
+
+            Drop All
+          </button>
 
         </div>
 
+      </header>
 
 
-        {/* BRAND DESKTOP (KANAN ATAS) */}
 
-        <div className={styles.desktopBrandBar}>
+      {/* STATUS BAR */}
 
-          <span className={styles.desktopBrand}>APIX INTERIOR</span>
+      {loading && (
+
+        <p className={styles.infoText}>Memuat produk...</p>
+
+      )}
+
+
+
+      {error && (
+
+        <div className={styles.errorBox}>
+
+          <span>{error}</span>
+
+          <button
+
+            type="button"
+
+            className={styles.retryButton}
+
+            onClick={() => fetchProducts()}>
+
+            Coba lagi
+          </button>
 
         </div>
 
-
-
-        {/* HEADER */}
-
-        <header className={styles.header}>
-
-          <h1 className={styles.pageTitle}>Daftar Produk</h1>
-
-          <p className={styles.pageSubtitle}>
-
-            Atur urutan, edit, dan hapus produk. Drag &amp; drop untuk mengatur
-
-            posisi tampil di website.
-
-          </p>
+      )}
 
 
 
-          <div className={styles.headerRight}>
+      {/* LIST PRODUK */}
 
-            <input
+      {!loading && !error && (
 
-              type="text"
+        <div className={styles.list}>
 
-              className={styles.searchInput}
+          {filteredProducts.map((p) => {
 
-              placeholder="Cari nama / kategori..."
+            const images: string[] = [];
+            const variationImages: string[] = [];
+            const variationCount = Array.isArray(p.variations) ? p.variations.length : 0;
+            const comboLevelsCount: Record<number, number> = { 1: 0, 2: 0, 3: 0 };
 
-              value={search}
+            (p.variations || []).forEach((v) => {
+              if (v.imageUrl) variationImages.push(v.imageUrl);
+              if (v.galleryUrls?.length) {
+                variationImages.push(...v.galleryUrls.filter((u): u is string => !!u));
+              }
+              (v.combos || []).forEach((c) => {
+                if (c.imageUrl) variationImages.push(c.imageUrl);
+                if (c.level && comboLevelsCount[c.level] !== undefined) {
+                  comboLevelsCount[c.level] += 1;
+                }
+              });
+            });
 
-              disabled={droppingAll}
 
-              onChange={(e) => setSearch(e.target.value)}
+            if (p.mainImageUrl) {
 
-            />
+              images.push(p.mainImageUrl);
 
-            <button
+            }
 
-              type="button"
 
-              className={styles.primaryButton}
 
-              disabled={droppingAll}
+            if (p.galleryImageUrls && p.galleryImageUrls.length) {
 
-              onClick={() =>
+              images.push(
 
-                router.push(
+                ...p.galleryImageUrls.filter(
 
-                  "/admin/admin_dashboard/admin_produk/tambah_produk"
+                  (url): url is string => !!url
 
                 )
 
-              }>
-              + Tambah Produk
+              );
 
-            </button>
+            }
 
-            <button
 
-              type="button"
+            if (variationImages.length) {
+              images.push(...variationImages);
+            }
 
-              className={styles.dangerButton}
 
-              disabled={loading || !!error || droppingAll || products.length === 0}
+            const mediaCount =
+              p.mediaCount && p.mediaCount > 0 ? p.mediaCount : images.length;
 
-              onClick={handleDropAll}
+            const pr = computeBestPriceForProduct(p);
 
-              title={
 
-                products.length === 0
 
-                  ? "Tidak ada produk"
+            return (
 
-                  : "Hapus semua produk sekaligus"
+              <div
 
-              }>
+                key={p.id}
 
-              Drop All
-            </button>
+                className={`${styles.item} ${draggingId === p.id ? styles.itemDragging : ""
 
-          </div>
+                  }`}
 
-        </header>
+                draggable
 
+                onDragStart={() => handleDragStart(p.id)}
 
+                onDragOver={(e) => handleDragOver(e, p.id)}>
+                <div className={styles.dragHandle}>::</div>
 
-        {/* STATUS BAR */}
 
-        {loading && (
 
-          <p className={styles.infoText}>Memuat produk...</p>
+                {/* THUMBNAIL / CAROUSEL MEDIA */}
 
-        )}
+                <div className={styles.thumbWrapper}>
 
+                  {images.length ? (
 
+                    <div className={styles.thumbCarousel}>
 
-        {error && (
+                      {images.map((url, idx) => (
 
-          <div className={styles.errorBox}>
+                        <button
 
-            <span>{error}</span>
+                          key={idx}
 
-            <button
+                          type="button"
 
-              type="button"
+                          className={styles.thumbSlide}
 
-              className={styles.retryButton}
+                          onClick={() => openPreview(p, idx)}>
 
-              onClick={() => fetchProducts()}>
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
 
-              Coba lagi
-            </button>
+                          <img
 
-          </div>
+                            src={url}
 
-        )}
+                            alt={`${p.nama} ${idx + 1}`}
 
+                            className={styles.thumb}
 
+                          />
 
-        {/* LIST PRODUK */}
+                        </button>
 
-        {!loading && !error && (
+                      ))}
 
-          <div className={styles.list}>
+                    </div>
 
-            {filteredProducts.map((p) => {
+                  ) : (
 
-              const images: string[] = [];
-              const variationImages: string[] = [];
-              const variationCount = Array.isArray(p.variations) ? p.variations.length : 0;
-              const comboLevelsCount: Record<number, number> = { 1: 0, 2: 0, 3: 0 };
+                    <div className={styles.thumbPlaceholder}>No Image</div>
 
-              (p.variations || []).forEach((v) => {
-                if (v.imageUrl) variationImages.push(v.imageUrl);
-                if (v.galleryUrls?.length) {
-                  variationImages.push(...v.galleryUrls.filter((u): u is string => !!u));
-                }
-                (v.combos || []).forEach((c) => {
-                  if (c.imageUrl) variationImages.push(c.imageUrl);
-                  if (c.level && comboLevelsCount[c.level] !== undefined) {
-                    comboLevelsCount[c.level] += 1;
-                  }
-                });
-              });
+                  )}
 
 
-              if (p.mainImageUrl) {
 
-                images.push(p.mainImageUrl);
+                  {mediaCount > 0 && (
 
-              }
+                    <div className={styles.mediaBadge}>
 
+                      | {mediaCount} foto
 
+                    </div>
 
-              if (p.galleryImageUrls && p.galleryImageUrls.length) {
+                  )}
 
-                images.push(
+                </div>
 
-                  ...p.galleryImageUrls.filter(
 
-                    (url): url is string => !!url
 
-                  )
+                {/* KONTEN & AKSI */}
 
-                );
+                <div className={styles.cardContent}>
 
-              }
+                  <div className={styles.cardText}>
 
+                    <div className={styles.productName}>{p.nama}</div>
 
-              if (variationImages.length) {
-                images.push(...variationImages);
-              }
+                    <div className={styles.productCategory}>
 
+                      {p.kategori}
 
-              const mediaCount =
-                p.mediaCount && p.mediaCount > 0 ? p.mediaCount : images.length;
+                      {p.subkategori ? " > " + p.subkategori : ""}
 
-              const pr = computeBestPriceForProduct(p);
+                    </div>
 
+                    <div className={styles.productPrice}>
 
+                      {pr.isPromo ? (
 
-              return (
+                        <>
 
-                <div
+                          <span style={{ fontWeight: 800 }}>
 
-                  key={p.id}
+                            {formatRupiah(pr.hargaFinal)}
 
-                  className={`${styles.item} ${draggingId === p.id ? styles.itemDragging : ""
+                          </span>
 
-                    }`}
+                          <span
 
-                  draggable
+                            style={{
 
-                  onDragStart={() => handleDragStart(p.id)}
+                              marginLeft: 10,
 
-                  onDragOver={(e) => handleDragOver(e, p.id)}>
-                  <div className={styles.dragHandle}>::</div>
+                              textDecoration: "line-through",
 
+                              opacity: 0.6,
 
+                            }}>
 
-                  {/* THUMBNAIL / CAROUSEL MEDIA */}
+                            {formatRupiah(pr.hargaAsli)}
+                          </span>
 
-                  <div className={styles.thumbWrapper}>
+                          <span style={{ marginLeft: 10, fontWeight: 800 }}>
 
-                    {images.length ? (
+                            {pr.promoLabel}
 
-                      <div className={styles.thumbCarousel}>
+                          </span>
 
-                        {images.map((url, idx) => (
+                          {" | "}ID {p.id}
 
-                          <button
+                        </>
 
-                            key={idx}
+                      ) : (
 
-                            type="button"
+                        <>
 
-                            className={styles.thumbSlide}
+                          Rp {p.harga.toLocaleString("id-ID")} | ID {p.id}
 
-                            onClick={() => openPreview(p, idx)}>
+                        </>
+                      )}
 
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                      {mediaCount > 0 && (
+                        <span className={styles.productMediaInfo}>
+                          | {mediaCount} foto
+                          {variationCount > 0 ? ` · ${variationCount} variasi` : ""}
+                          {comboLevelsCount[1] > 0 ? ` · Lv1 ${comboLevelsCount[1]}` : ""}
+                          {comboLevelsCount[2] > 0 ? ` · Lv2 ${comboLevelsCount[2]}` : ""}
+                          {comboLevelsCount[3] > 0 ? ` · Lv3 ${comboLevelsCount[3]}` : ""}
+                        </span>
+                      )}
 
-                            <img
 
-                              src={url}
 
-                              alt={`${p.nama} ${idx + 1}`}
-
-                              className={styles.thumb}
-
-                            />
-
-                          </button>
-
-                        ))}
-
-                      </div>
-
-                    ) : (
-
-                      <div className={styles.thumbPlaceholder}>No Image</div>
-
-                    )}
-
-
-
-                    {mediaCount > 0 && (
-
-                      <div className={styles.mediaBadge}>
-
-                        | {mediaCount} foto
-
-                      </div>
-
-                    )}
+                    </div>
 
                   </div>
 
 
 
-                  {/* KONTEN & AKSI */}
+                  <div className={styles.cardActions}>
 
-                  <div className={styles.cardContent}>
+                    <button
 
-                    <div className={styles.cardText}>
+                      type="button"
 
-                      <div className={styles.productName}>{p.nama}</div>
+                      className={styles.editButton}
 
-                      <div className={styles.productCategory}>
+                      onClick={() => handleEdit(p.id)}
 
-                        {p.kategori}
+                      disabled={droppingAll}>
 
-                        {p.subkategori ? " > " + p.subkategori : ""}
+                      Edit
+                    </button>
 
-                      </div>
+                    <button
 
-                      <div className={styles.productPrice}>
+                      type="button"
 
-                        {pr.isPromo ? (
+                      className={styles.deleteButton}
 
-                          <>
+                      onClick={() => handleDelete(p.id)}
 
-                            <span style={{ fontWeight: 800 }}>
+                      disabled={droppingAll}>
 
-                              {formatRupiah(pr.hargaFinal)}
-
-                            </span>
-
-                            <span
-
-                              style={{
-
-                                marginLeft: 10,
-
-                                textDecoration: "line-through",
-
-                                opacity: 0.6,
-
-                              }}>
-
-                              {formatRupiah(pr.hargaAsli)}
-                            </span>
-
-                            <span style={{ marginLeft: 10, fontWeight: 800 }}>
-
-                              {pr.promoLabel}
-
-                            </span>
-
-                            {" | "}ID {p.id}
-
-                          </>
-
-                        ) : (
-
-                          <>
-
-                            Rp {p.harga.toLocaleString("id-ID")} | ID {p.id}
-
-                          </>
-                        )}
-
-                        {mediaCount > 0 && (
-                          <span className={styles.productMediaInfo}>
-                            | {mediaCount} foto
-                            {variationCount > 0 ? ` · ${variationCount} variasi` : ""}
-                            {comboLevelsCount[1] > 0 ? ` · Lv1 ${comboLevelsCount[1]}` : ""}
-                            {comboLevelsCount[2] > 0 ? ` · Lv2 ${comboLevelsCount[2]}` : ""}
-                            {comboLevelsCount[3] > 0 ? ` · Lv3 ${comboLevelsCount[3]}` : ""}
-                          </span>
-                        )}
-
-
-
-                      </div>
-
-                    </div>
-
-
-
-                    <div className={styles.cardActions}>
-
-                      <button
-
-                        type="button"
-
-                        className={styles.editButton}
-
-                        onClick={() => handleEdit(p.id)}
-
-                        disabled={droppingAll}>
-
-                        Edit
-                      </button>
-
-                      <button
-
-                        type="button"
-
-                        className={styles.deleteButton}
-
-                        onClick={() => handleDelete(p.id)}
-
-                        disabled={droppingAll}>
-
-                        Hapus
-                      </button>
-
-                    </div>
+                      Hapus
+                    </button>
 
                   </div>
 
                 </div>
 
-              );
+              </div>
 
-            })}
+            );
 
+          })}
+
+        </div>
+
+      )}
+
+
+
+      {savingOrder && (
+
+        <p className={styles.infoText}>Menyimpan urutan produk...</p>
+
+      )}
+
+
+
+      {droppingAll && dropProgress && (
+
+        <p className={styles.infoText}>
+
+          Menghapus semua produk... ({dropProgress.done}/{dropProgress.total})
+
+        </p>
+
+      )}
+
+
+
+      {/* MODAL PREVIEW MEDIA + INFO PRODUK */}
+
+      {previewProduct && currentPreviewImages.length > 0 && (
+
+        <div
+
+          className={styles.previewOverlay}
+
+          onClick={closePreview}>
+          <div
+
+            className={styles.previewModal}
+
+            onClick={(e) => e.stopPropagation()}>
+            <button
+
+              type="button"
+
+              className={styles.previewClose}
+
+              onClick={closePreview}>
+              &times;
+            </button>
+
+
+
+            {/* BAGIAN GAMBAR */}
+
+            <div className={styles.previewImageBox}>
+
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+
+              <img
+                src={currentPreviewImages[previewIndex]}
+                alt={`${previewProduct.nama} preview`}
+                className={styles.previewImage}
+                draggable={false}
+                onTouchStart={onTouchStart}
+                onTouchMove={onTouchMove}
+                onTouchEnd={onTouchEnd}
+                onMouseDown={onMouseDown}
+                onMouseMove={onMouseMove}
+                onMouseUp={onMouseUp}
+                onMouseLeave={onMouseUp}
+              />
+
+
+              {currentPreviewImages.length > 1 && (
+                <div className={styles.previewControls}>
+                  <div className={styles.previewThumbStrip}>
+                    {currentPreviewImages.map((url, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        className={`${styles.previewThumb} ${idx === previewIndex ? styles.previewThumbActive : ""
+                          }`}
+                        onClick={() => setPreviewIndex(idx)}
+                        aria-label={`Gambar ${idx + 1}`}
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={url} alt={`${previewProduct.nama} ${idx + 1}`} />
+                      </button>
+                    ))}
+                  </div>
+                  <div className={styles.previewNavHit} aria-hidden="true">
+                    <button
+                      type="button"
+                      className={styles.previewNavCircle}
+                      onClick={showPrevImage}
+                      aria-label="Prev"
+                    >
+                      &lsaquo;
+                    </button>
+                    <span className={styles.previewNavCounter}>
+                      {previewIndex + 1} / {currentPreviewImages.length}
+                    </span>
+                    <button
+                      type="button"
+                      className={styles.previewNavCircle}
+                      onClick={showNextImage}
+                      aria-label="Next"
+                    >
+                      &rsaquo;
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className={styles.previewInfo}>
+
+              <h3 className={styles.previewTitle}>{previewProduct.nama}</h3>
+
+              <p className={styles.previewCategory}>
+
+                {previewProduct.kategori || "-"}
+
+                {previewProduct.subkategori
+
+                  ? "  " + previewProduct.subkategori
+
+                  : ""}
+
+              </p>
+
+              {previewProduct.variations && previewProduct.variations.length > 0 && (
+                <div className={styles.variationPills}>
+                  {previewProduct.variations.map((v) => {
+                    const isActiveVar = selectedVarId === v.id;
+                    const thumb =
+                      v.imageUrl ||
+                      v.galleryUrls?.find((u) => !!u) ||
+                      v.combos?.find((c) => c.imageUrl)?.imageUrl ||
+                      null;
+                    const label = cleanLabel(v.nama) || `Variasi ${v.id}`;
+                    return (
+                      <button
+                        type="button"
+                        key={v.id}
+                        className={`${styles.variationPill} ${isActiveVar ? styles.variationPillActive : ""
+                          }`}
+                        onClick={() => {
+                          setSelectedVarId(v.id);
+                          setSelectedComboIds({ 1: null, 2: null, 3: null });
+                          focusPreviewImage(thumb || undefined);
+                        }}
+                      >
+                        {thumb ? (
+                          <span className={styles.variationPillThumb}>
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={thumb} alt={label} />
+                          </span>
+                        ) : null}
+                        <span className={styles.variationPillName}>{label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              {currentVar && (
+                <div className={styles.comboPills} style={{ marginTop: 6 }}>
+                  {[1, 2, 3].map((lvl) => {
+                    const list = currentCombosByLevel[lvl] || [];
+                    if (!list.length) return null;
+                    return (
+                      <div key={lvl} className={styles.comboGroup}>
+                        <div className={styles.comboList}>
+                          {list.map((c) => {
+                            const cid = String(c.id);
+                            const isActive = selectedComboIds[lvl]
+                              ? String(selectedComboIds[lvl]) === cid
+                              : false;
+                            return (
+                              <button
+                                type="button"
+                                key={cid}
+                                className={`${styles.variationPill} ${isActive ? styles.variationPillActive : ""
+                                  }`}
+                                onClick={() => {
+                                  selectCombo(lvl, isActive ? null : Number(cid));
+                                  if (c.imageUrl) focusPreviewImage(c.imageUrl);
+                                }}
+                              >
+                                {c.imageUrl ? (
+                                  <span className={styles.variationPillThumb}>
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                    <img src={c.imageUrl} alt={c.nama || c.nilai} />
+                                  </span>
+                                ) : null}
+                                <span className={styles.variationPillName}>
+                                  {cleanLabel(c.nilai || c.nama) || `Lv${lvl}`}
+                                </span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              <p className={styles.previewPrice}>
+                {(() => {
+                  const pr = previewPrice || computeHargaSetelahPromo(previewProduct);
+                  return (
+                    <>
+                      {pr.isPromo ? (
+                        <>
+                          <span style={{ fontWeight: 800 }}>
+                            {formatRupiah(pr.hargaFinal)}
+                          </span>
+                          <span
+                            style={{
+                              marginLeft: 10,
+                              textDecoration: "line-through",
+                              opacity: 0.7,
+                            }}>
+                            {formatRupiah(pr.hargaAsli)}
+                          </span>
+                          <span
+                            style={{
+                              marginLeft: 10,
+                              fontSize: 12,
+                              fontWeight: 800,
+                              padding: "2px 8px",
+                              borderRadius: 999,
+                              border: "1px solid currentColor",
+                              opacity: 0.9,
+                              display: "inline-block",
+                            }}>
+                            {pr.promoLabel}
+                          </span>
+                        </>
+                      ) : (
+                        <span>{formatRupiah(pr.hargaAsli)}</span>
+                      )}
+                      <span style={{ marginLeft: 10 }}>
+                        ID {previewProduct.id}
+                      </span>
+                    </>
+                  );
+                })()}
+              </p>
+
+              {previewProduct.deskripsiSingkat && (
+                <p className={styles.previewDesc}>
+                  {previewProduct.deskripsiSingkat}
+                </p>
+              )}
+
+              <div className={styles.previewSpecs}>
+                {(() => {
+                  const parts: Array<{ label: string; value: string }> = [];
+                  const dim = [
+                    previewProduct.panjang,
+                    previewProduct.lebar,
+                    previewProduct.tinggi,
+                  ].filter((n) => Number.isFinite(n) && (n as number) > 0) as number[];
+                  if (dim.length === 3) {
+                    parts.push({
+                      label: "Dimensi",
+                      value: `${dim[0]} x ${dim[1]} x ${dim[2]} cm`,
+                    });
+                  }
+                  if (previewProduct.berat && previewProduct.berat > 0) {
+                    parts.push({
+                      label: "Berat",
+                      value: `${previewProduct.berat} kg`,
+                    });
+                  }
+                  if (previewProduct.material) {
+                    parts.push({ label: "Material", value: previewProduct.material });
+                  }
+                  if (previewProduct.finishing) {
+                    parts.push({ label: "Finishing", value: previewProduct.finishing });
+                  }
+                  if (previewProduct.warna) {
+                    parts.push({ label: "Warna", value: previewProduct.warna });
+                  }
+                  if (previewProduct.tipeOrder) {
+                    parts.push({ label: "Tipe Order", value: previewProduct.tipeOrder });
+                  }
+                  if (previewProduct.estimasiPengerjaan) {
+                    parts.push({
+                      label: "Estimasi",
+                      value: previewProduct.estimasiPengerjaan,
+                    });
+                  }
+                  if (previewProduct.jasaPasang) {
+                    parts.push({
+                      label: "Jasa Pasang",
+                      value: previewProduct.jasaPasang,
+                    });
+                  }
+                  parts.push({
+                    label: "Custom",
+                    value: previewProduct.isCustom ? "Bisa full custom" : "Non custom",
+                  });
+                  parts.push({
+                    label: "Ukuran custom",
+                    value: previewProduct.bisaCustomUkuran ? "Bisa" : "Tidak",
+                  });
+
+                  return parts.map((item) => (
+                    <div key={item.label} className={styles.specRow}>
+                      <span className={styles.specLabel}>{item.label}</span>
+                      <span className={styles.specValue}>{item.value}</span>
+                    </div>
+                  ));
+                })()}
+              </div>
+
+              {previewProduct.tags && (
+                <div className={styles.previewTags}>
+                  {previewProduct.tags
+                    .split(",")
+                    .map((t) => t.trim())
+                    .filter(Boolean)
+                    .map((tag) => (
+                      <span key={tag} className={styles.tagChip}>
+                        {tag}
+                      </span>
+                    ))}
+                </div>
+              )}
+
+              {previewProduct.variations && previewProduct.variations.length > 0 && (
+                <div className={styles.variationSection}>
+                  <div className={styles.variationTitle}>Variasi</div>
+                  <div className={styles.variationList} />
+                </div>
+              )}
+
+              <p className={styles.previewHint}>
+                Ini preview media & info singkat. Untuk edit detail lengkap,
+                gunakan tombol <b>Edit</b> di kartu produk.
+              </p>
+            </div>
           </div>
-
-        )}
-
-
-
-        {savingOrder && (
-
-          <p className={styles.infoText}>Menyimpan urutan produk...</p>
-
-        )}
+        </div>
+      )}
+    </main>
 
 
 
-        {droppingAll && dropProgress && (
-
-          <p className={styles.infoText}>
-
-            Menghapus semua produk... ({dropProgress.done}/{dropProgress.total})
-
-          </p>
-
-        )}
 
 
+      {/* Toasts */ }
 
-        {/* MODAL PREVIEW MEDIA + INFO PRODUK */}
+  {
+    toasts.length > 0 && (
 
-        {previewProduct && currentPreviewImages.length > 0 && (
+      <div className={styles.toastWrap} aria-live="polite">
+
+        {toasts.map((t) => (
 
           <div
 
-            className={styles.previewOverlay}
+            key={t.id}
 
-            onClick={closePreview}>
-            <div
+            className={[
 
-              className={styles.previewModal}
+              styles.toast,
 
-              onClick={(e) => e.stopPropagation()}>
-              <button
+              t.type === "success"
 
-                type="button"
+                ? styles.toastSuccess
 
-                className={styles.previewClose}
+                : t.type === "error"
 
-                onClick={closePreview}>
-                &times;
-              </button>
+                  ? styles.toastError
 
+                  : styles.toastInfo,
 
+            ].join(" ")}>
+            <div className={styles.toastMsg}>{t.message}</div>
 
-              {/* BAGIAN GAMBAR */}
+            <button
 
-              <div className={styles.previewImageBox}>
+              className={styles.toastClose}
 
-                {/* eslint-disable-next-line @next/next/no-img-element */}
+              onClick={() => removeToast(t.id)}
 
-                <img
-                  src={currentPreviewImages[previewIndex]}
-                  alt={`${previewProduct.nama} preview`}
-                  className={styles.previewImage}
-                  draggable={false}
-                  onTouchStart={onTouchStart}
-                  onTouchMove={onTouchMove}
-                  onTouchEnd={onTouchEnd}
-                  onMouseDown={onMouseDown}
-                  onMouseMove={onMouseMove}
-                  onMouseUp={onMouseUp}
-                  onMouseLeave={onMouseUp}
-                />
+              aria-label="Tutup"
 
+              type="button">
+            </button>
 
-                {currentPreviewImages.length > 1 && (
-                  <div className={styles.previewControls}>
-                    <div className={styles.previewThumbStrip}>
-                      {currentPreviewImages.map((url, idx) => (
-                        <button
-                          key={idx}
-                          type="button"
-                          className={`${styles.previewThumb} ${idx === previewIndex ? styles.previewThumbActive : ""
-                            }`}
-                          onClick={() => setPreviewIndex(idx)}
-                          aria-label={`Gambar ${idx + 1}`}
-                        >
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={url} alt={`${previewProduct.nama} ${idx + 1}`} />
-                        </button>
-                      ))}
-                    </div>
-                    <div className={styles.previewNavHit} aria-hidden="true">
-                      <button
-                        type="button"
-                        className={styles.previewNavCircle}
-                        onClick={showPrevImage}
-                        aria-label="Prev"
-                      >
-                        &lsaquo;
-                      </button>
-                      <span className={styles.previewNavCounter}>
-                        {previewIndex + 1} / {currentPreviewImages.length}
-                      </span>
-                      <button
-                        type="button"
-                        className={styles.previewNavCircle}
-                        onClick={showNextImage}
-                        aria-label="Next"
-                      >
-                        &rsaquo;
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-              <div className={styles.previewInfo}>
-
-                <h3 className={styles.previewTitle}>{previewProduct.nama}</h3>
-
-                <p className={styles.previewCategory}>
-
-                  {previewProduct.kategori || "-"}
-
-                  {previewProduct.subkategori
-
-                    ? "  " + previewProduct.subkategori
-
-                    : ""}
-
-                </p>
-
-                {previewProduct.variations && previewProduct.variations.length > 0 && (
-                  <div className={styles.variationPills}>
-                    {previewProduct.variations.map((v) => {
-                      const isActiveVar = selectedVarId === v.id;
-                      const thumb =
-                        v.imageUrl ||
-                        v.galleryUrls?.find((u) => !!u) ||
-                        v.combos?.find((c) => c.imageUrl)?.imageUrl ||
-                        null;
-                      const label = cleanLabel(v.nama) || `Variasi ${v.id}`;
-                      return (
-                        <button
-                          type="button"
-                          key={v.id}
-                          className={`${styles.variationPill} ${isActiveVar ? styles.variationPillActive : ""
-                            }`}
-                          onClick={() => {
-                            setSelectedVarId(v.id);
-                            setSelectedComboIds({ 1: null, 2: null, 3: null });
-                            focusPreviewImage(thumb || undefined);
-                          }}
-                        >
-                          {thumb ? (
-                            <span className={styles.variationPillThumb}>
-                              {/* eslint-disable-next-line @next/next/no-img-element */}
-                              <img src={thumb} alt={label} />
-                            </span>
-                          ) : null}
-                          <span className={styles.variationPillName}>{label}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-
-                {currentVar && (
-                  <div className={styles.comboPills} style={{ marginTop: 6 }}>
-                    {[1, 2, 3].map((lvl) => {
-                      const list = currentCombosByLevel[lvl] || [];
-                      if (!list.length) return null;
-                      return (
-                        <div key={lvl} className={styles.comboGroup}>
-                          <div className={styles.comboList}>
-                            {list.map((c) => {
-                              const cid = String(c.id);
-                              const isActive = selectedComboIds[lvl]
-                                ? String(selectedComboIds[lvl]) === cid
-                                : false;
-                              return (
-                                <button
-                                  type="button"
-                                  key={cid}
-                                  className={`${styles.variationPill} ${isActive ? styles.variationPillActive : ""
-                                    }`}
-                                  onClick={() => {
-                                    selectCombo(lvl, isActive ? null : Number(cid));
-                                    if (c.imageUrl) focusPreviewImage(c.imageUrl);
-                                  }}
-                                >
-                                  {c.imageUrl ? (
-                                    <span className={styles.variationPillThumb}>
-                                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                                      <img src={c.imageUrl} alt={c.nama || c.nilai} />
-                                    </span>
-                                  ) : null}
-                                  <span className={styles.variationPillName}>
-                                    {cleanLabel(c.nilai || c.nama) || `Lv${lvl}`}
-                                  </span>
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-
-                <p className={styles.previewPrice}>
-                  {(() => {
-                    const pr = previewPrice || computeHargaSetelahPromo(previewProduct);
-                    return (
-                      <>
-                        {pr.isPromo ? (
-                          <>
-                            <span style={{ fontWeight: 800 }}>
-                              {formatRupiah(pr.hargaFinal)}
-                            </span>
-                            <span
-                              style={{
-                                marginLeft: 10,
-                                textDecoration: "line-through",
-                                opacity: 0.7,
-                              }}>
-                              {formatRupiah(pr.hargaAsli)}
-                            </span>
-                            <span
-                              style={{
-                                marginLeft: 10,
-                                fontSize: 12,
-                                fontWeight: 800,
-                                padding: "2px 8px",
-                                borderRadius: 999,
-                                border: "1px solid currentColor",
-                                opacity: 0.9,
-                                display: "inline-block",
-                              }}>
-                              {pr.promoLabel}
-                            </span>
-                          </>
-                        ) : (
-                          <span>{formatRupiah(pr.hargaAsli)}</span>
-                        )}
-                        <span style={{ marginLeft: 10 }}>
-                          ID {previewProduct.id}
-                        </span>
-                      </>
-                    );
-                  })()}
-                </p>
-
-                {previewProduct.deskripsiSingkat && (
-                  <p className={styles.previewDesc}>
-                    {previewProduct.deskripsiSingkat}
-                  </p>
-                )}
-
-                <div className={styles.previewSpecs}>
-                  {(() => {
-                    const parts: Array<{ label: string; value: string }> = [];
-                    const dim = [
-                      previewProduct.panjang,
-                      previewProduct.lebar,
-                      previewProduct.tinggi,
-                    ].filter((n) => Number.isFinite(n) && (n as number) > 0) as number[];
-                    if (dim.length === 3) {
-                      parts.push({
-                        label: "Dimensi",
-                        value: `${dim[0]} x ${dim[1]} x ${dim[2]} cm`,
-                      });
-                    }
-                    if (previewProduct.berat && previewProduct.berat > 0) {
-                      parts.push({
-                        label: "Berat",
-                        value: `${previewProduct.berat} kg`,
-                      });
-                    }
-                    if (previewProduct.material) {
-                      parts.push({ label: "Material", value: previewProduct.material });
-                    }
-                    if (previewProduct.finishing) {
-                      parts.push({ label: "Finishing", value: previewProduct.finishing });
-                    }
-                    if (previewProduct.warna) {
-                      parts.push({ label: "Warna", value: previewProduct.warna });
-                    }
-                    if (previewProduct.tipeOrder) {
-                      parts.push({ label: "Tipe Order", value: previewProduct.tipeOrder });
-                    }
-                    if (previewProduct.estimasiPengerjaan) {
-                      parts.push({
-                        label: "Estimasi",
-                        value: previewProduct.estimasiPengerjaan,
-                      });
-                    }
-                    if (previewProduct.jasaPasang) {
-                      parts.push({
-                        label: "Jasa Pasang",
-                        value: previewProduct.jasaPasang,
-                      });
-                    }
-                    parts.push({
-                      label: "Custom",
-                      value: previewProduct.isCustom ? "Bisa full custom" : "Non custom",
-                    });
-                    parts.push({
-                      label: "Ukuran custom",
-                      value: previewProduct.bisaCustomUkuran ? "Bisa" : "Tidak",
-                    });
-
-                    return parts.map((item) => (
-                      <div key={item.label} className={styles.specRow}>
-                        <span className={styles.specLabel}>{item.label}</span>
-                        <span className={styles.specValue}>{item.value}</span>
-                      </div>
-                    ));
-                  })()}
-                </div>
-
-                {previewProduct.tags && (
-                  <div className={styles.previewTags}>
-                    {previewProduct.tags
-                      .split(",")
-                      .map((t) => t.trim())
-                      .filter(Boolean)
-                      .map((tag) => (
-                        <span key={tag} className={styles.tagChip}>
-                          {tag}
-                        </span>
-                      ))}
-                  </div>
-                )}
-
-                {previewProduct.variations && previewProduct.variations.length > 0 && (
-                  <div className={styles.variationSection}>
-                    <div className={styles.variationTitle}>Variasi</div>
-                    <div className={styles.variationList} />
-                  </div>
-                )}
-
-                <p className={styles.previewHint}>
-                  Ini preview media & info singkat. Untuk edit detail lengkap,
-                  gunakan tombol <b>Edit</b> di kartu produk.
-                </p>
-              </div>
-            </div>
           </div>
-        )}
-      </main>
 
+        ))}
 
+      </div>
 
+    )
+  }
 
 
-      {/* Toasts */}
 
-      {toasts.length > 0 && (
+  {/* Confirm Modal */ }
 
-        <div className={styles.toastWrap} aria-live="polite">
+  {
+    confirmState?.open && (
 
-          {toasts.map((t) => (
+      <div className={styles.confirmOverlay} role="presentation">
 
-            <div
+        <div className={styles.confirmCard} role="dialog" aria-modal="true">
 
-              key={t.id}
+          <div className={styles.confirmHead}>
 
-              className={[
+            <div className={styles.confirmTitle}>{confirmState.title}</div>
 
-                styles.toast,
+            <button
 
-                t.type === "success"
+              className={styles.confirmClose}
 
-                  ? styles.toastSuccess
+              type="button"
 
-                  : t.type === "error"
+              onClick={() => closeConfirm(false)}
 
-                    ? styles.toastError
+              aria-label="Tutup">
+            </button>
 
-                    : styles.toastInfo,
+          </div>
 
-              ].join(" ")}>
-              <div className={styles.toastMsg}>{t.message}</div>
 
-              <button
 
-                className={styles.toastClose}
+          {confirmState.description && (
 
-                onClick={() => removeToast(t.id)}
+            <div className={styles.confirmDesc}>{confirmState.description}</div>
 
-                aria-label="Tutup"
+          )}
 
-                type="button">
-              </button>
 
-            </div>
 
-          ))}
+          <div className={styles.confirmActions}>
 
-        </div>
+            <button
 
-      )}
+              className={styles.editButton}
 
+              type="button"
 
+              onClick={() => closeConfirm(false)}>
 
-      {/* Confirm Modal */}
+              {confirmState.cancelText ?? "Batal"}
+            </button>
 
-      {confirmState?.open && (
+            <button
 
-        <div className={styles.confirmOverlay} role="presentation">
+              className={
 
-          <div className={styles.confirmCard} role="dialog" aria-modal="true">
+                confirmState.tone === "danger"
 
-            <div className={styles.confirmHead}>
+                  ? styles.deleteButton
 
-              <div className={styles.confirmTitle}>{confirmState.title}</div>
+                  : styles.primaryButton
 
-              <button
+              }
 
-                className={styles.confirmClose}
+              type="button"
 
-                type="button"
+              onClick={() => closeConfirm(true)}>
 
-                onClick={() => closeConfirm(false)}
-
-                aria-label="Tutup">
-              </button>
-
-            </div>
-
-
-
-            {confirmState.description && (
-
-              <div className={styles.confirmDesc}>{confirmState.description}</div>
-
-            )}
-
-
-
-            <div className={styles.confirmActions}>
-
-              <button
-
-                className={styles.editButton}
-
-                type="button"
-
-                onClick={() => closeConfirm(false)}>
-
-                {confirmState.cancelText ?? "Batal"}
-              </button>
-
-              <button
-
-                className={
-
-                  confirmState.tone === "danger"
-
-                    ? styles.deleteButton
-
-                    : styles.primaryButton
-
-                }
-
-                type="button"
-
-                onClick={() => closeConfirm(true)}>
-
-                {confirmState.confirmText ?? "OK"}
-              </button>
-
-            </div>
+              {confirmState.confirmText ?? "OK"}
+            </button>
 
           </div>
 
         </div>
 
-      )}
+      </div>
+
+    )
+  }
 
 
 
-      {/* Message Modal */}
+  {/* Message Modal */ }
 
-      {messageState?.open && (
+  {
+    messageState?.open && (
 
-        <div className={styles.confirmOverlay} role="presentation">
+      <div className={styles.confirmOverlay} role="presentation">
 
-          <div className={styles.messageCard} role="dialog" aria-modal="true">
+        <div className={styles.messageCard} role="dialog" aria-modal="true">
 
-            <div className={styles.confirmHead}>
+          <div className={styles.confirmHead}>
 
-              <div className={styles.confirmTitle}>{messageState.title}</div>
+            <div className={styles.confirmTitle}>{messageState.title}</div>
 
-              <button
+            <button
 
-                className={styles.confirmClose}
+              className={styles.confirmClose}
 
-                type="button"
+              type="button"
 
-                onClick={() => setMessageState(null)}
+              onClick={() => setMessageState(null)}
 
-                aria-label="Tutup">
-              </button>
+              aria-label="Tutup">
+            </button>
 
-            </div>
-
-
-
-            {messageState.description && (
-
-              <div className={styles.confirmDesc}>{messageState.description}</div>
-
-            )}
+          </div>
 
 
 
-            {messageState.detail && (
+          {messageState.description && (
 
-              <pre className={styles.messageDetail}>{messageState.detail}</pre>
+            <div className={styles.confirmDesc}>{messageState.description}</div>
 
-            )}
+          )}
 
 
 
-            <div className={styles.confirmActions}>
+          {messageState.detail && (
 
-              <button
+            <pre className={styles.messageDetail}>{messageState.detail}</pre>
 
-                className={styles.primaryButton}
+          )}
 
-                type="button"
 
-                onClick={() => setMessageState(null)}>
 
-                {messageState.okText ?? "Oke"}
-              </button>
+          <div className={styles.confirmActions}>
 
-            </div>
+            <button
+
+              className={styles.primaryButton}
+
+              type="button"
+
+              onClick={() => setMessageState(null)}>
+
+              {messageState.okText ?? "Oke"}
+            </button>
 
           </div>
 
         </div>
 
-      )}
+      </div>
 
-    </div>
+    )
+  }
+
+    </div >
 
   );
 

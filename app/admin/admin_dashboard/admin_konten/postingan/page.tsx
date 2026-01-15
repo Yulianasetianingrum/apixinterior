@@ -2,7 +2,7 @@
 
 import { useState, useEffect, ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
-import layoutStyles from "../../admin_dashboard.module.css";
+import { useAdminTheme } from "../../AdminThemeContext";
 
 // Type Definitions
 type Post = {
@@ -27,8 +27,7 @@ type Gambar = {
 
 export default function AdminPostinganPage() {
     const router = useRouter();
-    const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [darkMode, setDarkMode] = useState(false);
+    const { isDarkMode: darkMode } = useAdminTheme();
 
     // Data State
     const [posts, setPosts] = useState<Post[]>([]);
@@ -301,182 +300,151 @@ export default function AdminPostinganPage() {
     };
 
     return (
-        <div className={layoutStyles.dashboard}>
+        <>
             {/* Mobile Top Bar */}
-            <div className={layoutStyles.mobileTopBar}>
-                <button className={layoutStyles.mobileMenuButton} onClick={() => setSidebarOpen(true)}>=</button>
-                <div className={layoutStyles.topRightBrand}>APIX INTERIOR</div>
-            </div>
-            {sidebarOpen && <div className={layoutStyles.overlay} onClick={() => setSidebarOpen(false)} />}
 
-            {/* SIDEBAR ADMIN_KONTEN (Sub-Menu Pattern) */}
-            <aside className={`${layoutStyles.sidebar} ${sidebarOpen ? layoutStyles.sidebarOpen : ""}`}>
-                <div className={layoutStyles.sidebarHeader}>
-                    <div className={layoutStyles.brand}>
-                        <div className={layoutStyles.brandLogo}>A</div>
-                        <div className={layoutStyles.brandText}>
-                            <span className={layoutStyles.brandTitle}>APIX INTERIOR</span>
-                            <span className={layoutStyles.brandSubtitle}>Admin Dashboard</span>
-                        </div>
-                    </div>
-                    <button className={layoutStyles.closeSidebarButton} onClick={() => setSidebarOpen(false)}>×</button>
-                </div>
-                <div className={layoutStyles.menu}>
-                    <button
-                        className={`${layoutStyles.menuItem} ${layoutStyles.menuItemActive}`}
-                        onClick={() => router.push("/admin/admin_dashboard/admin_konten/postingan")}
-                    >
-                        Postingan
-                    </button>
-                    {/* Future content items can be added here */}
-                </div>
-                <div className={layoutStyles.themeSwitchWrapper}>
-                    <span className={layoutStyles.themeLabel}>Mode: {darkMode ? "Malam" : "Siang"}</span>
-                    <button className={`${layoutStyles.themeSwitch} ${darkMode ? layoutStyles.themeSwitchOn : ""}`} onClick={() => setDarkMode(!darkMode)}><div className={layoutStyles.themeThumb} /></button>
-                </div>
-                <div className={layoutStyles.sidebarBackWrapper}>
-                    <button className={layoutStyles.sidebarBackButton} onClick={() => router.push("/admin/admin_dashboard")}>KEMBALI</button>
-                </div>
-            </aside>
+
+
+
 
             {/* Main Content */}
-            <main className={`${layoutStyles.main} ${darkMode ? layoutStyles.mainDark : ""}`} style={{ background: darkMode ? "#0f172a" : "#f1f5f9", minHeight: "100vh" }}>
-                <div style={containerStyle}>
-                    <div style={headerStyle}>
-                        <div>
-                            <h1 style={{ fontSize: 24, fontWeight: 700, margin: "0 0 8px 0" }}>Konten Posting & Artikel</h1>
-                            <p style={{ margin: 0, opacity: 0.7 }}>Kelola artikel blog, berita, dan konten tekstual lainnya.</p>
-                        </div>
-                        {!isEditing && (
-                            <button style={primaryBtn} onClick={handleCreateNew}>+ Buat Postingan Baru</button>
-                        )}
+
+            <div style={containerStyle}>
+                <div style={headerStyle}>
+                    <div>
+                        <h1 style={{ fontSize: 24, fontWeight: 700, margin: "0 0 8px 0" }}>Konten Posting & Artikel</h1>
+                        <p style={{ margin: 0, opacity: 0.7 }}>Kelola artikel blog, berita, dan konten tekstual lainnya.</p>
                     </div>
-
-                    {isEditing ? (
-                        <div style={cardStyle}>
-                            <h2 style={{ borderBottom: "1px solid rgba(0,0,0,0.1)", paddingBottom: 16, marginBottom: 24 }}>
-                                {editId ? "Edit Postingan" : "Buat Postingan Baru"}
-                            </h2>
-
-                            <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 24 }}>
-                                <div>
-                                    <div style={formGroup}>
-                                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
-                                            <label style={labelStyle}>Judul Artikel</label>
-                                            <button
-                                                type="button"
-                                                style={{ ...ghostBtn, padding: "2px 8px", fontSize: 11, marginBottom: 6, color: "#d97706", borderColor: "#d97706" }}
-                                                onClick={handleAutoGenerate}
-                                                title="Buat konten & gambar otomatis sesuai judul"
-                                            >
-                                                ✨ Auto Generate
-                                            </button>
-                                        </div>
-                                        <input style={inputStyle} type="text" value={formTitle} onChange={handleAutoSlug} placeholder="Judul artikel menarik..." />
-                                    </div>
-                                    <div style={formGroup}>
-                                        <label style={labelStyle}>Slug (URL)</label>
-                                        <input style={inputStyle} type="text" value={formSlug} onChange={(e) => setFormSlug(e.target.value)} placeholder="judul-artikel-menarik" />
-                                    </div>
-                                    <div style={formGroup}>
-                                        <label style={labelStyle}>Ringkasan (Excerpt)</label>
-                                        <textarea style={{ ...inputStyle, minHeight: 80 }} value={formExcerpt} onChange={(e) => setFormExcerpt(e.target.value)} placeholder="Ringkasan singkat untuk preview..." />
-                                    </div>
-                                    <div style={formGroup}>
-                                        <label style={labelStyle}>Konten Lengkap (HTML Support)</label>
-                                        <textarea style={{ ...inputStyle, minHeight: 400, fontFamily: "monospace" }} value={formContent} onChange={(e) => setFormContent(e.target.value)} placeholder="<p>Isi artikel...</p>" />
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <div style={formGroup}>
-                                        <label style={labelStyle}>Cover Image</label>
-                                        <div style={{ marginBottom: 8, border: "1px dashed rgba(0,0,0,0.2)", borderRadius: 6, minHeight: 150, display: "flex", alignItems: "center", justifyContent: "center", background: "#f8fafc", overflow: "hidden" }}>
-                                            {formCoverImage ? (
-                                                <img src={formCoverImage} alt="Cover" style={{ maxWidth: "100%", maxHeight: 200, objectFit: "cover" }} />
-                                            ) : (
-                                                <span style={{ opacity: 0.5, fontSize: 12 }}>Belum ada gambar</span>
-                                            )}
-                                        </div>
-                                        <div style={{ display: "flex", gap: 8 }}>
-                                            <input style={inputStyle} type="text" value={formCoverImage} onChange={(e) => setFormCoverImage(e.target.value)} placeholder="https://..." />
-                                            <button type="button" style={{ ...ghostBtn, padding: "0 12px", whiteSpace: "nowrap" }} onClick={openGallery} title="Pilih dari Galeri">📂 Pilih</button>
-                                        </div>
-                                    </div>
-
-                                    <div style={formGroup}>
-                                        <label style={labelStyle}>Penulis</label>
-                                        <input style={inputStyle} type="text" value={formAuthor} onChange={(e) => setFormAuthor(e.target.value)} />
-                                    </div>
-
-                                    <div style={{ ...formGroup, display: "flex", alignItems: "center", gap: 12, marginTop: 24, padding: 12, border: "1px solid rgba(0,0,0,0.1)", borderRadius: 6 }}>
-                                        <input type="checkbox" id="pubCheck" checked={formPublished} onChange={(e) => setFormPublished(e.target.checked)} style={{ width: 20, height: 20 }} />
-                                        <label htmlFor="pubCheck" style={{ ...labelStyle, marginBottom: 0, cursor: "pointer" }}>Publikasikan?</label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div style={{ display: "flex", gap: 12, justifyContent: "flex-end", marginTop: 24, borderTop: "1px solid rgba(0,0,0,0.1)", paddingTop: 16 }}>
-                                <button style={ghostBtn} onClick={() => setIsEditing(false)} disabled={saving}>Batal</button>
-                                <button style={primaryBtn} onClick={handleSave} disabled={saving}>{saving ? "Menyimpan..." : "Simpan Artikel"}</button>
-                            </div>
-                        </div>
-                    ) : (
-                        <div style={cardStyle}>
-                            {loading ? <p>Memuat...</p> : (
-                                <div style={{ overflowX: "auto" }}>
-                                    <table style={tableStyle}>
-                                        <thead>
-                                            <tr>
-                                                <th style={thStyle}>Judul</th>
-                                                <th style={thStyle}>Tanggal</th>
-                                                <th style={thStyle}>Status</th>
-                                                <th style={thStyle}>Aksi</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {posts.length === 0 ? (
-                                                <tr><td colSpan={4} style={{ ...tdStyle, textAlign: "center", padding: 24, opacity: 0.6 }}>Belum ada postingan.</td></tr>
-                                            ) : (
-                                                posts.map(post => (
-                                                    <tr key={post.id}>
-                                                        <td style={tdStyle}>
-                                                            <div style={{ fontWeight: 600 }}>{post.title}</div>
-                                                            <div style={{ fontSize: 12, opacity: 0.7 }}>/{post.slug}</div>
-                                                        </td>
-                                                        <td style={tdStyle}>{new Date(post.updatedAt).toLocaleDateString()}</td>
-                                                        <td style={tdStyle}>
-                                                            {post.isPublished ? (
-                                                                <span style={{ padding: "4px 8px", borderRadius: 99, background: "#dcfce7", color: "#166534", fontSize: 11, fontWeight: 700 }}>PUBLISHED</span>
-                                                            ) : (
-                                                                <span style={{ padding: "4px 8px", borderRadius: 99, background: "#f1f5f9", color: "#64748b", fontSize: 11, fontWeight: 700 }}>DRAFT</span>
-                                                            )}
-                                                        </td>
-                                                        <td style={tdStyle}>
-                                                            <div style={{ display: "flex", gap: 8 }}>
-                                                                <a
-                                                                    href={`/artikel/${post.slug}`}
-                                                                    target="_blank"
-                                                                    rel="noopener noreferrer"
-                                                                    style={{ ...btnStyle, padding: "4px 8px", fontSize: 12, background: "#f0fdf4", color: "#15803d", textDecoration: "none", display: "inline-flex", alignItems: "center" }}
-                                                                >
-                                                                    Lihat
-                                                                </a>
-                                                                <button style={{ ...btnStyle, padding: "4px 8px", fontSize: 12, background: "#e0f2fe", color: "#0369a1" }} onClick={() => handleEdit(post)}>Edit</button>
-                                                                <button style={{ ...btnStyle, padding: "4px 8px", fontSize: 12, background: "#fee2e2", color: "#b91c1c" }} onClick={() => handleDelete(post.id)}>Hapus</button>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                ))
-                                            )}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            )}
-                        </div>
+                    {!isEditing && (
+                        <button style={primaryBtn} onClick={handleCreateNew}>+ Buat Postingan Baru</button>
                     )}
                 </div>
-            </main>
+
+                {isEditing ? (
+                    <div style={cardStyle}>
+                        <h2 style={{ borderBottom: "1px solid rgba(0,0,0,0.1)", paddingBottom: 16, marginBottom: 24 }}>
+                            {editId ? "Edit Postingan" : "Buat Postingan Baru"}
+                        </h2>
+
+                        <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 24 }}>
+                            <div>
+                                <div style={formGroup}>
+                                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+                                        <label style={labelStyle}>Judul Artikel</label>
+                                        <button
+                                            type="button"
+                                            style={{ ...ghostBtn, padding: "2px 8px", fontSize: 11, marginBottom: 6, color: "#d97706", borderColor: "#d97706" }}
+                                            onClick={handleAutoGenerate}
+                                            title="Buat konten & gambar otomatis sesuai judul"
+                                        >
+                                            ✨ Auto Generate
+                                        </button>
+                                    </div>
+                                    <input style={inputStyle} type="text" value={formTitle} onChange={handleAutoSlug} placeholder="Judul artikel menarik..." />
+                                </div>
+                                <div style={formGroup}>
+                                    <label style={labelStyle}>Slug (URL)</label>
+                                    <input style={inputStyle} type="text" value={formSlug} onChange={(e) => setFormSlug(e.target.value)} placeholder="judul-artikel-menarik" />
+                                </div>
+                                <div style={formGroup}>
+                                    <label style={labelStyle}>Ringkasan (Excerpt)</label>
+                                    <textarea style={{ ...inputStyle, minHeight: 80 }} value={formExcerpt} onChange={(e) => setFormExcerpt(e.target.value)} placeholder="Ringkasan singkat untuk preview..." />
+                                </div>
+                                <div style={formGroup}>
+                                    <label style={labelStyle}>Konten Lengkap (HTML Support)</label>
+                                    <textarea style={{ ...inputStyle, minHeight: 400, fontFamily: "monospace" }} value={formContent} onChange={(e) => setFormContent(e.target.value)} placeholder="<p>Isi artikel...</p>" />
+                                </div>
+                            </div>
+
+                            <div>
+                                <div style={formGroup}>
+                                    <label style={labelStyle}>Cover Image</label>
+                                    <div style={{ marginBottom: 8, border: "1px dashed rgba(0,0,0,0.2)", borderRadius: 6, minHeight: 150, display: "flex", alignItems: "center", justifyContent: "center", background: "#f8fafc", overflow: "hidden" }}>
+                                        {formCoverImage ? (
+                                            <img src={formCoverImage} alt="Cover" style={{ maxWidth: "100%", maxHeight: 200, objectFit: "cover" }} />
+                                        ) : (
+                                            <span style={{ opacity: 0.5, fontSize: 12 }}>Belum ada gambar</span>
+                                        )}
+                                    </div>
+                                    <div style={{ display: "flex", gap: 8 }}>
+                                        <input style={inputStyle} type="text" value={formCoverImage} onChange={(e) => setFormCoverImage(e.target.value)} placeholder="https://..." />
+                                        <button type="button" style={{ ...ghostBtn, padding: "0 12px", whiteSpace: "nowrap" }} onClick={openGallery} title="Pilih dari Galeri">📂 Pilih</button>
+                                    </div>
+                                </div>
+
+                                <div style={formGroup}>
+                                    <label style={labelStyle}>Penulis</label>
+                                    <input style={inputStyle} type="text" value={formAuthor} onChange={(e) => setFormAuthor(e.target.value)} />
+                                </div>
+
+                                <div style={{ ...formGroup, display: "flex", alignItems: "center", gap: 12, marginTop: 24, padding: 12, border: "1px solid rgba(0,0,0,0.1)", borderRadius: 6 }}>
+                                    <input type="checkbox" id="pubCheck" checked={formPublished} onChange={(e) => setFormPublished(e.target.checked)} style={{ width: 20, height: 20 }} />
+                                    <label htmlFor="pubCheck" style={{ ...labelStyle, marginBottom: 0, cursor: "pointer" }}>Publikasikan?</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style={{ display: "flex", gap: 12, justifyContent: "flex-end", marginTop: 24, borderTop: "1px solid rgba(0,0,0,0.1)", paddingTop: 16 }}>
+                            <button style={ghostBtn} onClick={() => setIsEditing(false)} disabled={saving}>Batal</button>
+                            <button style={primaryBtn} onClick={handleSave} disabled={saving}>{saving ? "Menyimpan..." : "Simpan Artikel"}</button>
+                        </div>
+                    </div>
+                ) : (
+                    <div style={cardStyle}>
+                        {loading ? <p>Memuat...</p> : (
+                            <div style={{ overflowX: "auto" }}>
+                                <table style={tableStyle}>
+                                    <thead>
+                                        <tr>
+                                            <th style={thStyle}>Judul</th>
+                                            <th style={thStyle}>Tanggal</th>
+                                            <th style={thStyle}>Status</th>
+                                            <th style={thStyle}>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {posts.length === 0 ? (
+                                            <tr><td colSpan={4} style={{ ...tdStyle, textAlign: "center", padding: 24, opacity: 0.6 }}>Belum ada postingan.</td></tr>
+                                        ) : (
+                                            posts.map(post => (
+                                                <tr key={post.id}>
+                                                    <td style={tdStyle}>
+                                                        <div style={{ fontWeight: 600 }}>{post.title}</div>
+                                                        <div style={{ fontSize: 12, opacity: 0.7 }}>/{post.slug}</div>
+                                                    </td>
+                                                    <td style={tdStyle}>{new Date(post.updatedAt).toLocaleDateString()}</td>
+                                                    <td style={tdStyle}>
+                                                        {post.isPublished ? (
+                                                            <span style={{ padding: "4px 8px", borderRadius: 99, background: "#dcfce7", color: "#166534", fontSize: 11, fontWeight: 700 }}>PUBLISHED</span>
+                                                        ) : (
+                                                            <span style={{ padding: "4px 8px", borderRadius: 99, background: "#f1f5f9", color: "#64748b", fontSize: 11, fontWeight: 700 }}>DRAFT</span>
+                                                        )}
+                                                    </td>
+                                                    <td style={tdStyle}>
+                                                        <div style={{ display: "flex", gap: 8 }}>
+                                                            <a
+                                                                href={`/artikel/${post.slug}`}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                style={{ ...btnStyle, padding: "4px 8px", fontSize: 12, background: "#f0fdf4", color: "#15803d", textDecoration: "none", display: "inline-flex", alignItems: "center" }}
+                                                            >
+                                                                Lihat
+                                                            </a>
+                                                            <button style={{ ...btnStyle, padding: "4px 8px", fontSize: 12, background: "#e0f2fe", color: "#0369a1" }} onClick={() => handleEdit(post)}>Edit</button>
+                                                            <button style={{ ...btnStyle, padding: "4px 8px", fontSize: 12, background: "#fee2e2", color: "#b91c1c" }} onClick={() => handleDelete(post.id)}>Hapus</button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
+
 
             {/* GALLERY MODAL */}
             {galleryOpen && (
@@ -502,6 +470,6 @@ export default function AdminPostinganPage() {
                     </div>
                 </div>
             )}
-        </div>
+        </>
     );
 }

@@ -11,6 +11,7 @@ import {
 
 import styles from "./kategori_produk.module.css";
 import baseStyles from "../daftar_produk/daftar_produk.module.css";
+import { useAdminTheme } from "../../AdminThemeContext";
 
 type Product = {
   id: number;
@@ -85,8 +86,7 @@ export default function KategoriProdukPage() {
   const router = useRouter();
 
   // UI global (sidebar + dark mode)
-  const [isDark, setIsDark] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { isDarkMode: isDark } = useAdminTheme();
 
   // data kategori
   const [categories, setCategories] = useState<Category[]>([]);

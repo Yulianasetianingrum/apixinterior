@@ -12,6 +12,9 @@ import {
 import { useRouter, useSearchParams } from "next/navigation";
 import layoutStyles from "../../admin_dashboard.module.css";
 import styles from "./tambah_produk.module.css";
+import { useAdminTheme } from "../../AdminThemeContext";
+import { useAdminTheme } from "../../AdminThemeContext";
+import Link from "next/link";
 
 
 type GambarKolase = {
@@ -3632,8 +3635,8 @@ export default function TambahProdukPage() {
   const variasiStorageKey = editId ? `apix_cms_vcombo_${editId}` : null;
 
   const [loading, setLoading] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
+  const { isDarkMode: darkMode } = useAdminTheme();
+
 
   // popup info (pengganti alert browser)
   const [infoMsg, setInfoMsg] = useState<string | null>(null);
@@ -5749,336 +5752,270 @@ export default function TambahProdukPage() {
   }
 
   /* ================= RENDER ================= */
+  /* ================= RENDER ================= */
   return (
-    <div className={layoutStyles.dashboard}>
-      {/* TOP BAR MOBILE */}
-      <div className={layoutStyles.mobileTopBar}>
-        <button
-          type="button"
-          className={layoutStyles.mobileMenuButton}
-          onClick={() => setSidebarOpen(true)}
+    <>
+      <header className={layoutStyles.mainHeader}>
+        <h1
+          className={`${layoutStyles.pageTitle} ${styles.pageTitleOutside}`}
         >
-          =
-        </button>
-        <div className={layoutStyles.mobileTitle}></div>
-        <div
-          className={`${styles.topRightBrand} ${darkMode ? styles.topRightBrandNight : ""
-            }`}
+          {isEditMode ? "Edit Produk" : "Tambah Produk"}
+        </h1>
+        <p
+          className={`${layoutStyles.pageSubtitle} ${styles.pageSubtitleOutside}`}
         >
-          APIX INTERIOR
-        </div>
-      </div>
+          Lengkapi detail produk yang akan ditampilkan ke pengunjung website.
+        </p>
+      </header>
 
-      {/* OVERLAY MOBILE */}
-      {sidebarOpen && (
-        <div
-          className={layoutStyles.overlay}
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      {/* SIDEBAR */}
-      <aside
-        className={`${layoutStyles.sidebar} ${sidebarOpen ? layoutStyles.sidebarOpen : ""
+      <div
+        className={`${styles.cardArea} ${darkMode ? styles.cardAreaNight : styles.cardAreaDay
           }`}
       >
-        <div className={layoutStyles.sidebarHeader}>
-          <div className={layoutStyles.brand}>
-            <div className={layoutStyles.brandLogo}>A</div>
-            <div className={layoutStyles.brandText}>
-              <span className={layoutStyles.brandTitle}>APIX INTERIOR</span>
-              <span className={layoutStyles.brandSubtitle}>
-                Admin Dashboard
-              </span>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            className={styles.closeSidebarButton}
-            onClick={() => setSidebarOpen(false)}
+        <div className={styles.cardWrapper}>
+          <div
+            className={`${layoutStyles.card} ${styles.card} ${darkMode ? styles.cardNight : styles.cardDay
+              } ${styles.noCardHover}`}
           >
-            ×
-          </button>
-        </div>
-
-        <div className={layoutStyles.menu}>
-          <button
-            type="button"
-            className={layoutStyles.menuItem}
-            onClick={() =>
-              router.push("/admin/admin_dashboard/admin_produk/daftar_produk")
-            }
-          >
-            Daftar Produk
-          </button>
-          <button
-            type="button"
-            className={layoutStyles.menuItem}
-            onClick={() =>
-              router.push("/admin/admin_dashboard/admin_produk/kategori_produk")
-            }
-          >
-            Kategori Produk
-          </button>
-          <button
-            type="button"
-            className={`${layoutStyles.menuItem} ${layoutStyles.menuItemActive}`}
-            onClick={() =>
-              router.push("/admin/admin_dashboard/admin_produk/tambah_produk")
-            }
-          >
-            Tambah Produk
-          </button>
-        </div>
-
-        <div className={layoutStyles.themeSwitchWrapper}>
-          <span className={layoutStyles.themeLabel}>
-            Mode tombol: {darkMode ? "Malam" : "Siang"}
-          </span>
-          <button
-            type="button"
-            className={`${layoutStyles.themeSwitch} ${darkMode ? layoutStyles.themeSwitchOn : ""
-              }`}
-            onClick={() => setDarkMode((prev) => !prev)}
-          >
-            <div className={layoutStyles.themeThumb} />
-          </button>
-        </div>
-
-        <div className={styles.sidebarBackWrapper}>
-          <button
-            type="button"
-            className={styles.sidebarBackButton}
-            onClick={handleBack}
-          >
-            KEMBALI
-          </button>
-        </div>
-
-        <div className={layoutStyles.sidebarFooter} />
-      </aside>
-
-      {/* MAIN */}
-      <main
-        className={`${layoutStyles.main} ${darkMode ? styles.mainNight : styles.mainDay
-          }`}
-      >
-        <div className={styles.desktopTopBar}>
-          <span
-            className={`${styles.desktopBrand} ${darkMode ? styles.desktopBrandNight : ""
-              }`}
-          >
-            APIX INTERIOR
-          </span>
-        </div>
-
-        <header className={layoutStyles.mainHeader}>
-          <h1
-            className={`${layoutStyles.pageTitle} ${styles.pageTitleOutside}`}
-          >
-            {isEditMode ? "Edit Produk" : "Tambah Produk"}
-          </h1>
-          <p
-            className={`${layoutStyles.pageSubtitle} ${styles.pageSubtitleOutside}`}
-          >
-            Lengkapi detail produk yang akan ditampilkan ke pengunjung website.
-          </p>
-        </header>
-
-        <div
-          className={`${styles.cardArea} ${darkMode ? styles.cardAreaNight : styles.cardAreaDay
-            }`}
-        >
-          <div className={styles.cardWrapper}>
-            <div
-              className={`${layoutStyles.card} ${styles.card} ${darkMode ? styles.cardNight : styles.cardDay
-                } ${styles.noCardHover}`}
-            >
-              {/* AI TOOLBAR */}
-              <div className={styles.aiToolbar}>
-                <button
-                  type="button"
-                  className={styles.aiButton}
-                  onClick={handleAutoGenerate}
-                >
-                  ⚡ AI Auto Generate
-                </button>
-
-                <button
-                  type="button"
-                  className={styles.aiButton}
-                  onClick={handleDropAll}
-                >
-                  🗑️ Drop All
-                </button>
-              </div>
-
-              <form
-                ref={formRef}
-                onSubmit={handleSubmit}
-                className={`${styles.form} ${darkMode ? styles.formNight : styles.formDay
-                  }`}
+            {/* AI TOOLBAR */}
+            <div className={styles.aiToolbar}>
+              <button
+                type="button"
+                className={styles.aiButton}
+                onClick={handleAutoGenerate}
               >
-                {/* INFORMASI UTAMA */}
-                <div className={styles.section}>
-                  <h2 className={styles.sectionTitle}>Informasi Utama</h2>
+                ⚡ AI Auto Generate
+              </button>
 
-                  <div className={styles.fieldRow}>
-                    <div className={styles.field}>
-                      <label className={styles.label}>
-                        Nama Produk *
-                        <input
-                          type="text"
-                          name="nama"
-                          required
-                          className={styles.input}
-                          placeholder="Contoh: Lemari Pakaian Pintu Geser"
-                        />
-                      </label>
-                    </div>
+              <button
+                type="button"
+                className={styles.aiButton}
+                onClick={handleDropAll}
+              >
+                🗑️ Drop All
+              </button>
+            </div>
 
-                    <div className={styles.field}>
-                      <label className={styles.label}>
-                        Slug / URL (opsional)
-                        <input
-                          type="text"
-                          name="slug"
-                          className={styles.input}
-                          placeholder="lemari-pakaian-pintu-geser"
-                        />
-                      </label>
-                    </div>
-                  </div>
+            <form
+              ref={formRef}
+              onSubmit={handleSubmit}
+              className={`${styles.form} ${darkMode ? styles.formNight : styles.formDay
+                }`}
+            >
+              {/* INFORMASI UTAMA */}
+              <div className={styles.section}>
+                <h2 className={styles.sectionTitle}>Informasi Utama</h2>
 
-                  <div className={styles.fieldRow}>
-                    <div className={styles.field}>
-                      <label className={styles.label}>
-                        Kategori
-                        <input
-                          type="text"
-                          name="kategori"
-                          className={styles.input}
-                          placeholder="misal: Furniture Rumah"
-                        />
-                      </label>
-                    </div>
-                    <div className={styles.field}>
-                      <label className={styles.label}>
-                        Subkategori
-                        <input
-                          type="text"
-                          name="subkategori"
-                          className={styles.input}
-                          placeholder="misal: Lemari pakaian"
-                        />
-                      </label>
-                    </div>
-                  </div>
-                </div>
-
-
-                {/* PROMO (OPSIONAL) */}
-                <div className={styles.section}>
-                  <h2 className={styles.sectionTitle}>Promo (opsional)</h2>
-
-                  <div className={styles.checkboxRow}>
-                    <label className={styles.checkboxLabel}>
+                <div className={styles.fieldRow}>
+                  <div className={styles.field}>
+                    <label className={styles.label}>
+                      Nama Produk *
                       <input
-                        type="checkbox"
-                        name="promoAktif"
-                        value="1"
-                        className={styles.checkbox}
-                        checked={promoAktif}
-                        onChange={(e) => setPromoAktif(e.target.checked)}
+                        type="text"
+                        name="nama"
+                        required
+                        className={styles.input}
+                        placeholder="Contoh: Lemari Pakaian Pintu Geser"
                       />
-                      Aktifkan diskon untuk produk ini
                     </label>
                   </div>
 
-                  <div className={styles.fieldRow}>
-                    <div className={styles.field}>
-                      <span className={styles.label}>Tipe Diskon</span>
-                      <div className={styles.radioRow}>
-                        <label className={styles.radioLabel}>
-                          <input
-                            type="radio"
-                            name="promoTipe"
-                            value="persen"
-                            checked={promoAktif && promoTipe === "persen"}
-                            className={styles.radio}
-                            disabled={!promoAktif}
-                            onChange={(e) => setPromoTipe(e.target.value as "persen" | "nominal")}
-                          />
-                          Persen (%)
-                        </label>
-
-                        <label className={styles.radioLabel}>
-                          <input
-                            type="radio"
-                            name="promoTipe"
-                            value="nominal"
-                            className={styles.radio}
-                            disabled={!promoAktif}
-                            checked={promoAktif && promoTipe === "nominal"}
-                            onChange={(e) => setPromoTipe(e.target.value as "persen" | "nominal")}
-                          />
-                          Nominal (Rp)
-                        </label>
-                      </div>
-                    </div>
-
-                    <div className={styles.field}>
-                      <label className={styles.label}>
-                        Nilai Diskon
-                        <input
-                          type="number"
-                          name="promoValue"
-                          className={styles.input}
-                          placeholder="contoh: 10 atau 150000"
-                          min={0}
-                          disabled={!promoAktif}
-                          value={promoValue}
-                          onChange={(e) => setPromoValue(Number(e.target.value) || 0)}
-                        />
-                      </label>
-                    </div>
+                  <div className={styles.field}>
+                    <label className={styles.label}>
+                      Slug / URL (opsional)
+                      <input
+                        type="text"
+                        name="slug"
+                        className={styles.input}
+                        placeholder="lemari-pakaian-pintu-geser"
+                      />
+                    </label>
                   </div>
                 </div>
 
-                {/* MEDIA PRODUK */}
-                <div className={styles.section}>
-                  <h2 className={styles.sectionTitle}>Media Produk</h2>
+                <div className={styles.fieldRow}>
+                  <div className={styles.field}>
+                    <label className={styles.label}>
+                      Kategori
+                      <input
+                        type="text"
+                        name="kategori"
+                        className={styles.input}
+                        placeholder="misal: Furniture Rumah"
+                      />
+                    </label>
+                  </div>
+                  <div className={styles.field}>
+                    <label className={styles.label}>
+                      Subkategori
+                      <input
+                        type="text"
+                        name="subkategori"
+                        className={styles.input}
+                        placeholder="misal: Lemari pakaian"
+                      />
+                    </label>
+                  </div>
+                </div>
+              </div>
 
-                  {hasAnyPreview && (
-                    <div className={styles.previewBox}>
-                      {fotoMode === "upload" && uploadMainPreview && (
+
+              {/* PROMO (OPSIONAL) */}
+              <div className={styles.section}>
+                <h2 className={styles.sectionTitle}>Promo (opsional)</h2>
+
+                <div className={styles.checkboxRow}>
+                  <label className={styles.checkboxLabel}>
+                    <input
+                      type="checkbox"
+                      name="promoAktif"
+                      value="1"
+                      className={styles.checkbox}
+                      checked={promoAktif}
+                      onChange={(e) => setPromoAktif(e.target.checked)}
+                    />
+                    Aktifkan diskon untuk produk ini
+                  </label>
+                </div>
+
+                <div className={styles.fieldRow}>
+                  <div className={styles.field}>
+                    <span className={styles.label}>Tipe Diskon</span>
+                    <div className={styles.radioRow}>
+                      <label className={styles.radioLabel}>
+                        <input
+                          type="radio"
+                          name="promoTipe"
+                          value="persen"
+                          checked={promoAktif && promoTipe === "persen"}
+                          className={styles.radio}
+                          disabled={!promoAktif}
+                          onChange={(e) => setPromoTipe(e.target.value as "persen" | "nominal")}
+                        />
+                        Persen (%)
+                      </label>
+
+                      <label className={styles.radioLabel}>
+                        <input
+                          type="radio"
+                          name="promoTipe"
+                          value="nominal"
+                          className={styles.radio}
+                          disabled={!promoAktif}
+                          checked={promoAktif && promoTipe === "nominal"}
+                          onChange={(e) => setPromoTipe(e.target.value as "persen" | "nominal")}
+                        />
+                        Nominal (Rp)
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className={styles.field}>
+                    <label className={styles.label}>
+                      Nilai Diskon
+                      <input
+                        type="number"
+                        name="promoValue"
+                        className={styles.input}
+                        placeholder="contoh: 10 atau 150000"
+                        min={0}
+                        disabled={!promoAktif}
+                        value={promoValue}
+                        onChange={(e) => setPromoValue(Number(e.target.value) || 0)}
+                      />
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              {/* MEDIA PRODUK */}
+              <div className={styles.section}>
+                <h2 className={styles.sectionTitle}>Media Produk</h2>
+
+                {hasAnyPreview && (
+                  <div className={styles.previewBox}>
+                    {fotoMode === "upload" && uploadMainPreview && (
+                      <div
+                        className={styles.previewItem}
+                        draggable={isDesktopDnd}
+                        onDragStart={(e) => {
+                          if (!isDesktopDnd) return;
+                          e.dataTransfer?.setData?.(
+                            INTERNAL_DND_MIME,
+                            JSON.stringify({ from: "main" })
+                          );
+                          e.dataTransfer.effectAllowed = "move";
+                          setDragSrc({ from: "main" });
+                        }}
+                        onDragOver={(e) => {
+                          if (!isDesktopDnd) return;
+                          e.preventDefault();
+                          setIsOverMain(true);
+                        }}
+                        onDragLeave={() => {
+                          if (!isDesktopDnd) return;
+                          setIsOverMain(false);
+                        }}
+                        onDrop={handleDropOnMain}
+                        style={{
+                          outline: isOverMain
+                            ? "2px dashed rgba(0,0,0,0.55)"
+                            : undefined,
+                          borderRadius: 12,
+                        }}
+                      >
+                        <button
+                          type="button"
+                          className={styles.previewRemove}
+                          onClick={() => {
+                            updateUploadMedia(null, uploadGalleryFiles);
+                          }}
+                        >
+                          ×
+                        </button>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={uploadMainPreview}
+                          alt="Foto utama"
+                          draggable={false}
+                          className={styles.previewImage}
+                        />
+                        <div className={styles.previewMeta}>
+                          <div className={styles.previewTitle}>Foto Utama</div>
+                        </div>
+                      </div>
+                    )}
+
+                    {fotoMode === "upload" &&
+                      uploadGalleryPreview.map((url, idx) => (
                         <div
+                          key={idx}
                           className={styles.previewItem}
                           draggable={isDesktopDnd}
                           onDragStart={(e) => {
                             if (!isDesktopDnd) return;
                             e.dataTransfer?.setData?.(
                               INTERNAL_DND_MIME,
-                              JSON.stringify({ from: "main" })
+                              JSON.stringify({ from: "gallery", index: idx })
                             );
                             e.dataTransfer.effectAllowed = "move";
-                            setDragSrc({ from: "main" });
+                            setDragSrc({ from: "gallery", index: idx });
                           }}
                           onDragOver={(e) => {
                             if (!isDesktopDnd) return;
                             e.preventDefault();
-                            setIsOverMain(true);
+                            setOverGalleryIdx(idx);
                           }}
                           onDragLeave={() => {
                             if (!isDesktopDnd) return;
-                            setIsOverMain(false);
+                            setOverGalleryIdx(null);
                           }}
-                          onDrop={handleDropOnMain}
+                          onDrop={(e) => handleDropOnGalleryIdx(e, idx)}
                           style={{
-                            outline: isOverMain
-                              ? "2px dashed rgba(0,0,0,0.55)"
-                              : undefined,
+                            outline:
+                              overGalleryIdx === idx
+                                ? "2px dashed rgba(0,0,0,0.55)"
+                                : undefined,
                             borderRadius: 12,
                           }}
                         >
@@ -6086,701 +6023,645 @@ export default function TambahProdukPage() {
                             type="button"
                             className={styles.previewRemove}
                             onClick={() => {
-                              updateUploadMedia(null, uploadGalleryFiles);
+                              const next = uploadGalleryFiles.filter((_, i) => i !== idx);
+                              updateUploadMedia(uploadMainFile, next);
                             }}
                           >
                             ×
                           </button>
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
-                            src={uploadMainPreview}
-                            alt="Foto utama"
+                            src={url}
+                            alt={`Galeri ${idx + 1}`}
                             draggable={false}
                             className={styles.previewImage}
                           />
                           <div className={styles.previewMeta}>
-                            <div className={styles.previewTitle}>Foto Utama</div>
+                            <div className={styles.previewTitle}>
+                              Galeri {idx + 1}
+                            </div>
                           </div>
                         </div>
-                      )}
+                      ))}
 
-                      {fotoMode === "upload" &&
-                        uploadGalleryPreview.map((url, idx) => (
-                          <div
-                            key={idx}
-                            className={styles.previewItem}
-                            draggable={isDesktopDnd}
-                            onDragStart={(e) => {
-                              if (!isDesktopDnd) return;
-                              e.dataTransfer?.setData?.(
-                                INTERNAL_DND_MIME,
-                                JSON.stringify({ from: "gallery", index: idx })
-                              );
-                              e.dataTransfer.effectAllowed = "move";
-                              setDragSrc({ from: "gallery", index: idx });
-                            }}
-                            onDragOver={(e) => {
-                              if (!isDesktopDnd) return;
-                              e.preventDefault();
-                              setOverGalleryIdx(idx);
-                            }}
-                            onDragLeave={() => {
-                              if (!isDesktopDnd) return;
-                              setOverGalleryIdx(null);
-                            }}
-                            onDrop={(e) => handleDropOnGalleryIdx(e, idx)}
-                            style={{
-                              outline:
-                                overGalleryIdx === idx
-                                  ? "2px dashed rgba(0,0,0,0.55)"
-                                  : undefined,
-                              borderRadius: 12,
-                            }}
+                    {fotoMode === "kolase" &&
+                      kolaseImages.map((img, idx) => (
+                        <div key={img.id} className={styles.previewItem}>
+                          <button
+                            type="button"
+                            className={styles.previewRemove}
+                            onClick={() =>
+                              setKolaseImages((prev) =>
+                                prev.filter((p) => p.id !== img.id)
+                              )
+                            }
                           >
-                            <button
-                              type="button"
-                              className={styles.previewRemove}
-                              onClick={() => {
-                                const next = uploadGalleryFiles.filter((_, i) => i !== idx);
-                                updateUploadMedia(uploadMainFile, next);
-                              }}
-                            >
-                              ×
-                            </button>
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                              src={url}
-                              alt={`Galeri ${idx + 1}`}
-                              draggable={false}
-                              className={styles.previewImage}
-                            />
-                            <div className={styles.previewMeta}>
-                              <div className={styles.previewTitle}>
-                                Galeri {idx + 1}
-                              </div>
+                            ×
+                          </button>
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={img.url}
+                            alt={img.title ?? ""}
+                            draggable={false}
+                            className={styles.previewImage}
+                          />
+                          <div className={styles.previewMeta}>
+                            <div className={styles.previewTitle}>
+                              {idx === 0 ? "Foto Utama" : `Galeri ${idx}`}
+                            </div>
+                            <div className={styles.previewTags}>
+                              {img.title || "Tanpa judul"}
                             </div>
                           </div>
-                        ))}
+                        </div>
+                      ))}
 
-                      {fotoMode === "kolase" &&
-                        kolaseImages.map((img, idx) => (
-                          <div key={img.id} className={styles.previewItem}>
-                            <button
-                              type="button"
-                              className={styles.previewRemove}
-                              onClick={() =>
-                                setKolaseImages((prev) =>
-                                  prev.filter((p) => p.id !== img.id)
-                                )
-                              }
-                            >
-                              ×
-                            </button>
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                              src={img.url}
-                              alt={img.title ?? ""}
-                              draggable={false}
-                              className={styles.previewImage}
-                            />
-                            <div className={styles.previewMeta}>
-                              <div className={styles.previewTitle}>
-                                {idx === 0 ? "Foto Utama" : `Galeri ${idx}`}
-                              </div>
-                              <div className={styles.previewTags}>
-                                {img.title || "Tanpa judul"}
-                              </div>
+                    {varMediaPreview.length > 0 &&
+                      varMediaPreview.map((img, idx) => (
+                        <div
+                          key={`${img.varId ?? idx}-${img.url}`}
+                          className={styles.previewItem}
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={img.url}
+                            alt={`Variasi ${img.label || idx + 1}`}
+                            draggable={false}
+                            className={styles.previewImage}
+                          />
+                          <div className={styles.previewMeta}>
+                            <div className={styles.previewTitle}>
+                              {img.label ? `Variasi: ${img.label}` : `Variasi ${idx + 1}`}
+                            </div>
+                            <div className={styles.previewTags}>
+                              Foto variasi {img.mode === "upload" ? "(upload)" : "(kolase)"}
                             </div>
                           </div>
-                        ))}
+                        </div>
+                      ))}
+                  </div>
+                )}
 
-                      {varMediaPreview.length > 0 &&
-                        varMediaPreview.map((img, idx) => (
-                          <div
-                            key={`${img.varId ?? idx}-${img.url}`}
-                            className={styles.previewItem}
-                          >
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                              src={img.url}
-                              alt={`Variasi ${img.label || idx + 1}`}
-                              draggable={false}
-                              className={styles.previewImage}
-                            />
-                            <div className={styles.previewMeta}>
-                              <div className={styles.previewTitle}>
-                                {img.label ? `Variasi: ${img.label}` : `Variasi ${idx + 1}`}
-                              </div>
-                              <div className={styles.previewTags}>
-                                Foto variasi {img.mode === "upload" ? "(upload)" : "(kolase)"}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
+                <div className={styles.field}>
+                  <span className={styles.label}>Sumber Foto *</span>
+                  <div className={styles.radioRow}>
+                    <label className={styles.radioLabel}>
+                      <input
+                        type="radio"
+                        className={styles.radio}
+                        checked={fotoMode === "upload"}
+                        onChange={switchToUpload}
+                      />
+                      Upload Baru
+                    </label>
+                    <label className={styles.radioLabel}>
+                      <input
+                        type="radio"
+                        className={styles.radio}
+                        checked={fotoMode === "kolase"}
+                        onChange={switchToKolase}
+                      />
+                      Pilih dari Kolase
+                    </label>
+                  </div>
+                  {fotoMode === "kolase" && (
+                    <div style={{ marginTop: 8 }}>
+                      <button
+                        type="button"
+                        onClick={() => setPickerOpen(true)}
+                        style={{
+                          background: "#0B1B3A",
+                          color: "#D4AF37",
+                          border: "1px solid #D4AF37",
+                          padding: "10px 14px",
+                          borderRadius: 6,
+                          fontWeight: 700,
+                          cursor: "pointer",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: 8,
+                        }}
+                      >
+                        pilih dari Galeri
+                      </button>
                     </div>
                   )}
 
-                  <div className={styles.field}>
-                    <span className={styles.label}>Sumber Foto *</span>
-                    <div className={styles.radioRow}>
-                      <label className={styles.radioLabel}>
+                </div>
+
+                {fotoMode === "upload" && (
+                  <>
+                    <div className={styles.field}>
+                      <label className={styles.label}>
+                        Foto Utama (upload) *
                         <input
-                          type="radio"
-                          className={styles.radio}
-                          checked={fotoMode === "upload"}
-                          onChange={switchToUpload}
+                          type="file"
+                          name="fotoUtamaUpload"
+                          accept="image/*"
+                          required={!isEditMode && fotoMode === "upload" && !uploadMainFile}
+                          className={styles.inputFile}
+                          onChange={(e) => {
+                            const file = e.target.files?.[0] ?? null;
+                            updateUploadMedia(file, uploadGalleryFiles);
+                          }}
                         />
-                        Upload Baru
-                      </label>
-                      <label className={styles.radioLabel}>
-                        <input
-                          type="radio"
-                          className={styles.radio}
-                          checked={fotoMode === "kolase"}
-                          onChange={switchToKolase}
-                        />
-                        Pilih dari Kolase
                       </label>
                     </div>
-                    {fotoMode === "kolase" && (
-                      <div style={{ marginTop: 8 }}>
-                        <button
-                          type="button"
-                          onClick={() => setPickerOpen(true)}
+
+                    <div className={styles.field}>
+                      <label className={styles.label}>
+                        Galeri Foto Tambahan (maks 4, total 5 dengan foto
+                        utama)
+                        <input
+                          type="file"
+                          name="galeriUpload"
+                          accept="image/*"
+                          multiple
+                          className={styles.inputFile}
+                          onChange={(e) => {
+                            const newFiles = Array.from(e.target.files || []);
+                            const maxGallery = 4;
+
+                            if (uploadGalleryFiles.length + newFiles.length > maxGallery) {
+                              notify(
+                                "Total galeri maksimal 4 foto (total 5 dengan foto utama)."
+                              );
+                            }
+
+                            const combined = [...uploadGalleryFiles, ...newFiles].slice(
+                              0,
+                              maxGallery
+                            );
+
+                            updateUploadMedia(uploadMainFile, combined);
+
+                            // reset input supaya file yang sama bisa dipilih ulang
+                            e.currentTarget.value = "";
+                          }}
+                        />
+                      </label>
+                    </div>
+
+                    {isDesktopDnd && (
+                      <div className={styles.field}>
+                        <div
+                          onDragOver={(e) => {
+                            e.preventDefault();
+                            setIsOverGalleryArea(true);
+                          }}
+                          onDragLeave={() => setIsOverGalleryArea(false)}
+                          onDrop={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setIsOverGalleryArea(false);
+
+                            if (!isDesktopDnd) return;
+                            if (fotoMode !== "upload") return;
+
+                            // Abaikan drop internal reorder/swap supaya tidak dianggap file-drop
+                            const internal = readInternalDnd(e as any);
+                            if (internal) {
+                              setDragSrc(null);
+                              return;
+                            }
+
+                            const files = normalizeImageFiles(
+                              Array.from(e.dataTransfer.files || [])
+                            );
+                            addDroppedToUpload(files, "auto");
+                          }}
                           style={{
-                            background: "#0B1B3A",
-                            color: "#D4AF37",
-                            border: "1px solid #D4AF37",
-                            padding: "10px 14px",
-                            borderRadius: 6,
-                            fontWeight: 700,
-                            cursor: "pointer",
-                            display: "inline-flex",
-                            alignItems: "center",
-                            gap: 8,
+                            marginTop: 8,
+                            padding: 12,
+                            border: "2px dashed rgba(0,0,0,0.25)",
+                            borderRadius: 12,
+                            background: isOverGalleryArea
+                              ? "rgba(0,0,0,0.04)"
+                              : "transparent",
                           }}
                         >
-                          pilih dari Galeri
-                        </button>
+                          <div style={{ fontWeight: 700, marginBottom: 4 }}>
+                            Drag & drop foto (desktop)
+                          </div>
+                          <div style={{ fontSize: 13, opacity: 0.85 }}>
+                            Drop pertama otomatis jadi <b>Foto Utama</b> kalau belum ada. Kamu juga
+                            bisa <b>drag thumbnail galeri</b> ke slot Foto Utama untuk ganti gambar
+                            utama.
+                          </div>
+                        </div>
                       </div>
                     )}
 
-                  </div>
+                  </>
+                )}
 
-                  {fotoMode === "upload" && (
-                    <>
-                      <div className={styles.field}>
-                        <label className={styles.label}>
-                          Foto Utama (upload) *
-                          <input
-                            type="file"
-                            name="fotoUtamaUpload"
-                            accept="image/*"
-                            required={!isEditMode && fotoMode === "upload" && !uploadMainFile}
-                            className={styles.inputFile}
-                            onChange={(e) => {
-                              const file = e.target.files?.[0] ?? null;
-                              updateUploadMedia(file, uploadGalleryFiles);
-                            }}
-                          />
-                        </label>
-                      </div>
+              </div>
+              {/* HARGA & STATUS */}
+              <div className={styles.section}>
+                <h2 className={styles.sectionTitle}>Harga & Status</h2>
 
-                      <div className={styles.field}>
-                        <label className={styles.label}>
-                          Galeri Foto Tambahan (maks 4, total 5 dengan foto
-                          utama)
-                          <input
-                            type="file"
-                            name="galeriUpload"
-                            accept="image/*"
-                            multiple
-                            className={styles.inputFile}
-                            onChange={(e) => {
-                              const newFiles = Array.from(e.target.files || []);
-                              const maxGallery = 4;
-
-                              if (uploadGalleryFiles.length + newFiles.length > maxGallery) {
-                                notify(
-                                  "Total galeri maksimal 4 foto (total 5 dengan foto utama)."
-                                );
-                              }
-
-                              const combined = [...uploadGalleryFiles, ...newFiles].slice(
-                                0,
-                                maxGallery
-                              );
-
-                              updateUploadMedia(uploadMainFile, combined);
-
-                              // reset input supaya file yang sama bisa dipilih ulang
-                              e.currentTarget.value = "";
-                            }}
-                          />
-                        </label>
-                      </div>
-
-                      {isDesktopDnd && (
-                        <div className={styles.field}>
-                          <div
-                            onDragOver={(e) => {
-                              e.preventDefault();
-                              setIsOverGalleryArea(true);
-                            }}
-                            onDragLeave={() => setIsOverGalleryArea(false)}
-                            onDrop={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              setIsOverGalleryArea(false);
-
-                              if (!isDesktopDnd) return;
-                              if (fotoMode !== "upload") return;
-
-                              // Abaikan drop internal reorder/swap supaya tidak dianggap file-drop
-                              const internal = readInternalDnd(e as any);
-                              if (internal) {
-                                setDragSrc(null);
-                                return;
-                              }
-
-                              const files = normalizeImageFiles(
-                                Array.from(e.dataTransfer.files || [])
-                              );
-                              addDroppedToUpload(files, "auto");
-                            }}
-                            style={{
-                              marginTop: 8,
-                              padding: 12,
-                              border: "2px dashed rgba(0,0,0,0.25)",
-                              borderRadius: 12,
-                              background: isOverGalleryArea
-                                ? "rgba(0,0,0,0.04)"
-                                : "transparent",
-                            }}
-                          >
-                            <div style={{ fontWeight: 700, marginBottom: 4 }}>
-                              Drag & drop foto (desktop)
-                            </div>
-                            <div style={{ fontSize: 13, opacity: 0.85 }}>
-                              Drop pertama otomatis jadi <b>Foto Utama</b> kalau belum ada. Kamu juga
-                              bisa <b>drag thumbnail galeri</b> ke slot Foto Utama untuk ganti gambar
-                              utama.
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                    </>
-                  )}
-
-                </div>
-                {/* HARGA & STATUS */}
-                <div className={styles.section}>
-                  <h2 className={styles.sectionTitle}>Harga & Status</h2>
-
-                  <div className={styles.fieldRow}>
-                    <div className={styles.field}>
-                      <label className={styles.label}>
-                        Harga *
-                        <input
-                          type="number"
-                          name="harga"
-                          min={0}
-                          required
-                          className={styles.input}
-                          placeholder="1500000"
-                        />
-                      </label>
-                    </div>
-
-                    <div className={styles.field}>
-                      <label className={styles.label}>
-                        Tipe Harga
-                        <select
-                          name="hargaTipe"
-                          defaultValue="fixed"
-                          className={styles.select}
-                        >
-                          <option value="fixed">Harga tetap</option>
-                          <option value="mulai_dari">Mulai dari</option>
-                        </select>
-                      </label>
-                    </div>
-
-
-                  </div>
-
-                  <div className={styles.fieldRow}>
-                    <div className={styles.field}>
-                      <label className={styles.label}>
-                        Tipe Order
-                        <select
-                          name="tipeOrder"
-                          defaultValue="pre_order"
-                          className={styles.select}
-                        >
-                          <option value="ready_stock">Ready stock</option>
-                          <option value="pre_order">Pre-order</option>
-                        </select>
-                      </label>
-                    </div>
-
-                    <div className={styles.field}>
-                      <label className={styles.label}>
-                        Estimasi Pengerjaan
-                        <input
-                          type="text"
-                          name="estimasiPengerjaan"
-                          className={styles.input}
-                          placeholder="Contoh: 14–21 hari"
-                        />
-                      </label>
-                    </div>
-                  </div>
-
-                  <div className={styles.checkboxRow}>
-                    <label className={styles.checkboxLabel}>
+                <div className={styles.fieldRow}>
+                  <div className={styles.field}>
+                    <label className={styles.label}>
+                      Harga *
                       <input
-                        type="checkbox"
-                        name="isCustom"
-                        className={styles.checkbox}
+                        type="number"
+                        name="harga"
+                        min={0}
+                        required
+                        className={styles.input}
+                        placeholder="1500000"
                       />
-                      Produk ini bisa full custom (ukuran / material / warna)
                     </label>
                   </div>
-                </div>
-
-                {/* DESKRIPSI */}
-                <div className={styles.section}>
-                  <h2 className={styles.sectionTitle}>Deskripsi Produk</h2>
 
                   <div className={styles.field}>
                     <label className={styles.label}>
-                      Deskripsi Singkat
+                      Tipe Harga
+                      <select
+                        name="hargaTipe"
+                        defaultValue="fixed"
+                        className={styles.select}
+                      >
+                        <option value="fixed">Harga tetap</option>
+                        <option value="mulai_dari">Mulai dari</option>
+                      </select>
+                    </label>
+                  </div>
+
+
+                </div>
+
+                <div className={styles.fieldRow}>
+                  <div className={styles.field}>
+                    <label className={styles.label}>
+                      Tipe Order
+                      <select
+                        name="tipeOrder"
+                        defaultValue="pre_order"
+                        className={styles.select}
+                      >
+                        <option value="ready_stock">Ready stock</option>
+                        <option value="pre_order">Pre-order</option>
+                      </select>
+                    </label>
+                  </div>
+
+                  <div className={styles.field}>
+                    <label className={styles.label}>
+                      Estimasi Pengerjaan
                       <input
                         type="text"
-                        name="deskripsiSingkat"
+                        name="estimasiPengerjaan"
                         className={styles.input}
-                        placeholder="1–2 kalimat keunggulan utama produk"
+                        placeholder="Contoh: 14–21 hari"
                       />
                     </label>
                   </div>
+                </div>
 
+                <div className={styles.checkboxRow}>
+                  <label className={styles.checkboxLabel}>
+                    <input
+                      type="checkbox"
+                      name="isCustom"
+                      className={styles.checkbox}
+                    />
+                    Produk ini bisa full custom (ukuran / material / warna)
+                  </label>
+                </div>
+              </div>
+
+              {/* DESKRIPSI */}
+              <div className={styles.section}>
+                <h2 className={styles.sectionTitle}>Deskripsi Produk</h2>
+
+                <div className={styles.field}>
+                  <label className={styles.label}>
+                    Deskripsi Singkat
+                    <input
+                      type="text"
+                      name="deskripsiSingkat"
+                      className={styles.input}
+                      placeholder="1–2 kalimat keunggulan utama produk"
+                    />
+                  </label>
+                </div>
+
+                <div className={styles.field}>
+                  <label className={styles.label}>
+                    Deskripsi Lengkap
+                    <textarea
+                      name="deskripsiLengkap"
+                      rows={4}
+                      className={styles.textarea}
+                      placeholder="Jelaskan konsep desain, fungsi, dan keunggulan produk."
+                    />
+                  </label>
+                </div>
+              </div>
+
+
+              {/* VARIASI & KOMBINASI (OPSIONAL) */}
+              <div className={styles.section}>
+                <h2 className={styles.sectionTitle}>Variasi & Kombinasi (Opsional)</h2>
+                <VariasiKombinasiWidget notify={notify} storageKey={variasiStorageKey} />
+              </div>
+
+              {/* SPESIFIKASI */}
+              <div className={styles.section}>
+                <h2 className={styles.sectionTitle}>Spesifikasi Teknis</h2>
+
+                <div className={styles.fieldRow}>
                   <div className={styles.field}>
                     <label className={styles.label}>
-                      Deskripsi Lengkap
-                      <textarea
-                        name="deskripsiLengkap"
-                        rows={4}
-                        className={styles.textarea}
-                        placeholder="Jelaskan konsep desain, fungsi, dan keunggulan produk."
-                      />
-                    </label>
-                  </div>
-                </div>
-
-
-                {/* VARIASI & KOMBINASI (OPSIONAL) */}
-                <div className={styles.section}>
-                  <h2 className={styles.sectionTitle}>Variasi & Kombinasi (Opsional)</h2>
-                  <VariasiKombinasiWidget notify={notify} storageKey={variasiStorageKey} />
-                </div>
-
-                {/* SPESIFIKASI */}
-                <div className={styles.section}>
-                  <h2 className={styles.sectionTitle}>Spesifikasi Teknis</h2>
-
-                  <div className={styles.fieldRow}>
-                    <div className={styles.field}>
-                      <label className={styles.label}>
-                        Panjang (cm)
-                        <input
-                          type="number"
-                          name="panjang"
-                          min={0}
-                          className={styles.input}
-                        />
-                      </label>
-                    </div>
-                    <div className={styles.field}>
-                      <label className={styles.label}>
-                        Lebar (cm)
-                        <input
-                          type="number"
-                          name="lebar"
-                          min={0}
-                          className={styles.input}
-                        />
-                      </label>
-                    </div>
-                    <div className={styles.field}>
-                      <label className={styles.label}>
-                        Tinggi (cm)
-                        <input
-                          type="number"
-                          name="tinggi"
-                          min={0}
-                          className={styles.input}
-                        />
-                      </label>
-                    </div>
-                  </div>
-
-                  <div className={styles.checkboxRow}>
-                    <label className={styles.checkboxLabel}>
+                      Panjang (cm)
                       <input
-                        type="checkbox"
-                        name="bisaCustomUkuran"
-                        className={styles.checkbox}
+                        type="number"
+                        name="panjang"
+                        min={0}
+                        className={styles.input}
                       />
-                      Ukuran bisa custom
                     </label>
                   </div>
-
-                  <div className={styles.fieldRow}>
-                    <div className={styles.field}>
-                      <label className={styles.label}>
-                        Material Utama
-                        <input
-                          type="text"
-                          name="material"
-                          className={styles.input}
-                          placeholder="Contoh: Multipleks 18mm + HPL"
-                        />
-                      </label>
-                    </div>
-                    <div className={styles.field}>
-                      <label className={styles.label}>
-                        Finishing / Coating
-                        <input
-                          type="text"
-                          name="finishing"
-                          className={styles.input}
-                          placeholder="Contoh: HPL motif kayu / Duco doff"
-                        />
-                      </label>
-                    </div>
+                  <div className={styles.field}>
+                    <label className={styles.label}>
+                      Lebar (cm)
+                      <input
+                        type="number"
+                        name="lebar"
+                        min={0}
+                        className={styles.input}
+                      />
+                    </label>
                   </div>
-
-                  <div className={styles.fieldRow}>
-                    <div className={styles.field}>
-                      <label className={styles.label}>
-                        Warna / Tone
-                        <input
-                          type="text"
-                          name="warna"
-                          className={styles.input}
-                          placeholder="Contoh: Oak muda / Putih doff"
-                        />
-                      </label>
-                    </div>
-                    <div className={styles.field}>
-                      <label className={styles.label}>
-                        Berat (kg, opsional)
-                        <input
-                          type="number"
-                          name="berat"
-                          min={0}
-                          className={styles.input}
-                        />
-                      </label>
-                    </div>
-                    <div className={styles.field}>
-                      <label className={styles.label}>
-                        Garansi (opsional)
-                        <input
-                          type="text"
-                          name="garansi"
-                          className={styles.input}
-                          placeholder="Contoh: Garansi 6 bulan konstruksi"
-                        />
-                      </label>
-                    </div>
+                  <div className={styles.field}>
+                    <label className={styles.label}>
+                      Tinggi (cm)
+                      <input
+                        type="number"
+                        name="tinggi"
+                        min={0}
+                        className={styles.input}
+                      />
+                    </label>
                   </div>
                 </div>
 
-                {/* LAYANAN & LAINNYA */}
-                <div className={styles.section}>
-                  <h2 className={styles.sectionTitle}>Layanan & Lainnya</h2>
+                <div className={styles.checkboxRow}>
+                  <label className={styles.checkboxLabel}>
+                    <input
+                      type="checkbox"
+                      name="bisaCustomUkuran"
+                      className={styles.checkbox}
+                    />
+                    Ukuran bisa custom
+                  </label>
+                </div>
 
-                  <div className={styles.field}>
-                    <span className={styles.label}>
-                      Termasuk jasa pasang?
-                    </span>
-                    <div className={styles.radioRow}>
-                      <label className={styles.radioLabel}>
-                        <input
-                          type="radio"
-                          name="jasaPasang"
-                          value="ya"
-                          defaultChecked
-                          className={styles.radio}
-                        />
-                        Ya
-                      </label>
-                      <label className={styles.radioLabel}>
-                        <input
-                          type="radio"
-                          name="jasaPasang"
-                          value="tidak"
-                          className={styles.radio}
-                        />
-                        Tidak
-                      </label>
-                    </div>
-                  </div>
-
+                <div className={styles.fieldRow}>
                   <div className={styles.field}>
                     <label className={styles.label}>
-                      Catatan Khusus / Disclaimer
-                      <textarea
-                        name="catatanKhusus"
-                        rows={3}
-                        className={styles.textarea}
-                        placeholder="Contoh: Warna pada foto dapat sedikit berbeda dengan aslinya."
-                      />
-                    </label>
-                  </div>
-
-                  <div className={styles.field}>
-                    <label className={styles.label}>
-                      Tag / Keyword (pisahkan dengan koma)
+                      Material Utama
                       <input
                         type="text"
-                        name="tags"
+                        name="material"
                         className={styles.input}
-                        placeholder="lemari pakaian, pintu geser, penyimpanan kamar"
+                        placeholder="Contoh: Multipleks 18mm + HPL"
                       />
                     </label>
                   </div>
-                </div>
-
-                {/* SEO */}
-                <div className={styles.section}>
-                  <h2 className={styles.sectionTitle}>SEO (opsional)</h2>
-
                   <div className={styles.field}>
                     <label className={styles.label}>
-                      Meta Title
+                      Finishing / Coating
                       <input
                         type="text"
-                        name="metaTitle"
+                        name="finishing"
                         className={styles.input}
-                        placeholder="Kalau kosong, pakai nama produk"
+                        placeholder="Contoh: HPL motif kayu / Duco doff"
                       />
                     </label>
                   </div>
+                </div>
 
+                <div className={styles.fieldRow}>
                   <div className={styles.field}>
                     <label className={styles.label}>
-                      Meta Description
-                      <textarea
-                        name="metaDescription"
-                        rows={3}
-                        className={styles.textarea}
-                        placeholder="Deskripsi singkat untuk SEO, biasanya 1–2 kalimat."
+                      Warna / Tone
+                      <input
+                        type="text"
+                        name="warna"
+                        className={styles.input}
+                        placeholder="Contoh: Oak muda / Putih doff"
+                      />
+                    </label>
+                  </div>
+                  <div className={styles.field}>
+                    <label className={styles.label}>
+                      Berat (kg, opsional)
+                      <input
+                        type="number"
+                        name="berat"
+                        min={0}
+                        className={styles.input}
+                      />
+                    </label>
+                  </div>
+                  <div className={styles.field}>
+                    <label className={styles.label}>
+                      Garansi (opsional)
+                      <input
+                        type="text"
+                        name="garansi"
+                        className={styles.input}
+                        placeholder="Contoh: Garansi 6 bulan konstruksi"
                       />
                     </label>
                   </div>
                 </div>
+              </div>
 
-                {/* SUBMIT */}
-                <div className={styles.submitWrapper}>
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className={`${styles.submitBtn} ${darkMode ? styles.submitBtnDark : styles.submitBtnLight
-                      }`}
-                  >
-                    {loading
-                      ? "Menyimpan..."
-                      : isEditMode
-                        ? "Simpan Perubahan"
-                        : "Simpan Produk"}
-                  </button>
+              {/* LAYANAN & LAINNYA */}
+              <div className={styles.section}>
+                <h2 className={styles.sectionTitle}>Layanan & Lainnya</h2>
+
+                <div className={styles.field}>
+                  <span className={styles.label}>
+                    Termasuk jasa pasang?
+                  </span>
+                  <div className={styles.radioRow}>
+                    <label className={styles.radioLabel}>
+                      <input
+                        type="radio"
+                        name="jasaPasang"
+                        value="ya"
+                        defaultChecked
+                        className={styles.radio}
+                      />
+                      Ya
+                    </label>
+                    <label className={styles.radioLabel}>
+                      <input
+                        type="radio"
+                        name="jasaPasang"
+                        value="tidak"
+                        className={styles.radio}
+                      />
+                      Tidak
+                    </label>
+                  </div>
                 </div>
-              </form>
+
+                <div className={styles.field}>
+                  <label className={styles.label}>
+                    Catatan Khusus / Disclaimer
+                    <textarea
+                      name="catatanKhusus"
+                      rows={3}
+                      className={styles.textarea}
+                      placeholder="Contoh: Warna pada foto dapat sedikit berbeda dengan aslinya."
+                    />
+                  </label>
+                </div>
+
+                <div className={styles.field}>
+                  <label className={styles.label}>
+                    Tag / Keyword (pisahkan dengan koma)
+                    <input
+                      type="text"
+                      name="tags"
+                      className={styles.input}
+                      placeholder="lemari pakaian, pintu geser, penyimpanan kamar"
+                    />
+                  </label>
+                </div>
+              </div>
+
+              {/* SEO */}
+              <div className={styles.section}>
+                <h2 className={styles.sectionTitle}>SEO (opsional)</h2>
+
+                <div className={styles.field}>
+                  <label className={styles.label}>
+                    Meta Title
+                    <input
+                      type="text"
+                      name="metaTitle"
+                      className={styles.input}
+                      placeholder="Kalau kosong, pakai nama produk"
+                    />
+                  </label>
+                </div>
+
+                <div className={styles.field}>
+                  <label className={styles.label}>
+                    Meta Description
+                    <textarea
+                      name="metaDescription"
+                      rows={3}
+                      className={styles.textarea}
+                      placeholder="Deskripsi singkat untuk SEO, biasanya 1–2 kalimat."
+                    />
+                  </label>
+                </div>
+              </div>
+
+              {/* SUBMIT */}
+              <div className={styles.submitWrapper}>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className={`${styles.submitBtn} ${darkMode ? styles.submitBtnDark : styles.submitBtnLight
+                    }`}
+                >
+                  {loading
+                    ? "Menyimpan..."
+                    : isEditMode
+                      ? "Simpan Perubahan"
+                      : "Simpan Produk"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <ImagePickerModal
+        open={pickerOpen}
+        onClose={() => setPickerOpen(false)}
+        initialSelectedIds={kolaseImages.map((img) => img.id)}
+        onNotify={notify}
+        onSelect={(imgs) => {
+          setKolaseImages(imgs.slice(0, 15));
+        }}
+      />
+
+      <ImagePickerModal
+        open={varPickerOpen}
+        maxPick={1}
+        onClose={() => {
+          setVarPickerOpen(false);
+          setVarPickerVarId(null);
+          setVarPickerInitialIds([]);
+        }}
+        initialSelectedIds={varPickerInitialIds}
+        onNotify={notify}
+        onSelect={(imgs) => {
+          const picked = imgs?.[0];
+          const varId = varPickerVarId;
+          setVarPickerOpen(false);
+          setVarPickerVarId(null);
+          setVarPickerInitialIds([]);
+
+          if (!picked || !varId) return;
+
+          window.dispatchEvent(
+            new CustomEvent("apix:varKolasePicked", {
+              detail: { varId, imageId: picked.id, url: picked.url },
+            })
+          );
+        }}
+      />
+
+
+      {infoMsg && (
+        <div
+          className={styles.modalOverlay}
+          onMouseDown={() => setInfoMsg(null)}
+        >
+          <div
+            className={styles.modal}
+            style={{ width: "min(560px, 100%)", maxHeight: "none" }}
+            onMouseDown={(e) => e.stopPropagation()}
+          >
+            <div className={styles.modalHeader}>
+              <div className={styles.modalTitle}>Info</div>
+              <button
+                type="button"
+                className={styles.modalCloseBtn}
+                onClick={() => setInfoMsg(null)}
+                aria-label="Tutup"
+              >
+                ×
+              </button>
+            </div>
+
+            <div style={{ padding: 14, color: "#e5e7eb", fontSize: 14, lineHeight: 1.6 }}>
+              {infoMsg}
+            </div>
+
+            <div className={styles.modalFooter}>
+              <button
+                type="button"
+                className={styles.modalConfirm}
+                onClick={() => setInfoMsg(null)}
+              >
+                OK
+              </button>
             </div>
           </div>
         </div>
-
-        <ImagePickerModal
-          open={pickerOpen}
-          onClose={() => setPickerOpen(false)}
-          initialSelectedIds={kolaseImages.map((img) => img.id)}
-          onNotify={notify}
-          onSelect={(imgs) => {
-            setKolaseImages(imgs.slice(0, 15));
-          }}
-        />
-
-        <ImagePickerModal
-          open={varPickerOpen}
-          maxPick={1}
-          onClose={() => {
-            setVarPickerOpen(false);
-            setVarPickerVarId(null);
-            setVarPickerInitialIds([]);
-          }}
-          initialSelectedIds={varPickerInitialIds}
-          onNotify={notify}
-          onSelect={(imgs) => {
-            const picked = imgs?.[0];
-            const varId = varPickerVarId;
-            setVarPickerOpen(false);
-            setVarPickerVarId(null);
-            setVarPickerInitialIds([]);
-
-            if (!picked || !varId) return;
-
-            window.dispatchEvent(
-              new CustomEvent("apix:varKolasePicked", {
-                detail: { varId, imageId: picked.id, url: picked.url },
-              })
-            );
-          }}
-        />
-
-
-        {infoMsg && (
-          <div
-            className={styles.modalOverlay}
-            onMouseDown={() => setInfoMsg(null)}
-          >
-            <div
-              className={styles.modal}
-              style={{ width: "min(560px, 100%)", maxHeight: "none" }}
-              onMouseDown={(e) => e.stopPropagation()}
-            >
-              <div className={styles.modalHeader}>
-                <div className={styles.modalTitle}>Info</div>
-                <button
-                  type="button"
-                  className={styles.modalCloseBtn}
-                  onClick={() => setInfoMsg(null)}
-                  aria-label="Tutup"
-                >
-                  ×
-                </button>
-              </div>
-
-              <div style={{ padding: 14, color: "#e5e7eb", fontSize: 14, lineHeight: 1.6 }}>
-                {infoMsg}
-              </div>
-
-              <div className={styles.modalFooter}>
-                <button
-                  type="button"
-                  className={styles.modalConfirm}
-                  onClick={() => setInfoMsg(null)}
-                >
-                  OK
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </main>
-    </div>
+      )}
+    </>
   );
 }
