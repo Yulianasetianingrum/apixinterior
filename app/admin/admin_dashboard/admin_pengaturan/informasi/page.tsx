@@ -374,166 +374,169 @@ export default function InformasiPage() {
         </h1>
       </header>
 
-      {/* INFORMASI TOKO */}
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Informasi Toko</h2>
-        <div className={styles.formGroup}>
-          <label className={styles.label}>Nama Toko</label>
-          <input
-            type="text"
-            className={styles.textInput}
-            value={namaToko}
-            onChange={(e) => setNamaToko(e.target.value)}
-            placeholder="Nama Toko Anda"
-          />
-        </div>
-        <div className={styles.formGroup}>
-          <label className={styles.label}>Deskripsi Toko</label>
-          <textarea
-            className={styles.textArea}
-            value={deskripsi}
-            onChange={(e) => setDeskripsi(e.target.value)}
-            placeholder="Deskripsi singkat tentang toko Anda"
-            rows={4}
-          ></textarea>
-        </div>
-
-        <div className={styles.formGroup}>
-          <label className={styles.label}>Logo Toko</label>
-          <div className={styles.logoUploadContainer}>
-            {logoUrl && (
-              <div className={styles.logoPreviewWrapper}>
-                <img src={logoUrl} alt="Logo Toko" className={styles.logoPreview} />
-                <button
-                  type="button"
-                  className={styles.clearLogoButton}
-                  onClick={handleClearLogo}
-                  disabled={savingInfo}
-                >
-                  Hapus Logo
-                </button>
-              </div>
-            )}
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleLogoChange}
-              disabled={uploadingLogo}
-              className={styles.fileInput}
-            />
-            {uploadingLogo && <p>Uploading...</p>}
-          </div>
-        </div>
-
-        <div className={styles.buttonGroup}>
-          <button
-            type="button"
-            className={styles.saveButton}
-            onClick={handleSaveInformasi}
-            disabled={savingInfo}
-          >
-            {savingInfo ? "Menyimpan..." : "Simpan Informasi"}
-          </button>
-        </div>
-      </section>
-
-
-      {/* CABANG & MAPS */}
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Cabang & Lokasi Maps</h2>
-
-        <div className={styles.branchFormRow}>
-          <div className={styles.fieldGroup}>
-            <label className={styles.label}>Nama Cabang</label>
+      <div className={styles.cardArea}>
+        {/* INFORMASI TOKO */}
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>Informasi Toko</h2>
+          {/* ... content omitted for brevity, logic remains same ... */}
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Nama Toko</label>
             <input
               type="text"
               className={styles.textInput}
-              value={cabangNama}
-              onChange={(e) => setCabangNama(e.target.value)}
-              placeholder="Contoh: Cabang 1 - Surabaya"
+              value={namaToko}
+              onChange={(e) => setNamaToko(e.target.value)}
+              placeholder="Nama Toko Anda"
             />
           </div>
-          <div className={styles.fieldGroup}>
-            <label className={styles.label}>Link Google Maps</label>
-            <input
-              type="text"
-              className={styles.textInput}
-              value={cabangMaps}
-              onChange={(e) => setCabangMaps(e.target.value)}
-              placeholder="Paste link Google Maps di sini"
-            />
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Deskripsi Toko</label>
+            <textarea
+              className={styles.textArea}
+              value={deskripsi}
+              onChange={(e) => setDeskripsi(e.target.value)}
+              placeholder="Deskripsi singkat tentang toko Anda"
+              rows={4}
+            ></textarea>
           </div>
-          <div className={styles.fieldGroupSmall}>
-            <label className={styles.label}>Urutan</label>
-            <input
-              type="number"
-              className={styles.textInput}
-              value={cabangUrutan}
-              onChange={(e) => setCabangUrutan(e.target.value)}
-              placeholder="1"
-            />
-          </div>
-          <button
-            type="button"
-            className={styles.branchButton}
-            onClick={handleSaveCabang}
-            disabled={savingCabang}
-          >
-            {editingCabangId ? "Update" : "Tambah"}
-          </button>
-        </div>
 
-        {
-          editingCabangId && (
-            <p className={styles.editingInfo}>
-              Sedang mengedit cabang ID: {editingCabangId}
-            </p>
-          )
-        }
-
-        <div className={styles.branchListWrapper}>
-          <h3 className={styles.branchListTitle}>Daftar Cabang</h3>
-          {cabangList.length === 0 && (
-            <p className={styles.statusText}>
-              Belum ada cabang yang ditambahkan.
-            </p>
-          )}
-          <ul className={styles.branchList}>
-            {cabangList.map((cabang) => (
-              <li key={cabang.id} className={styles.branchItem}>
-                <div className={styles.branchMain}>
-                  <div className={styles.branchBadge}>
-                    {cabang.urutan ?? "-"}
-                  </div>
-                  <div className={styles.branchText}>
-                    <span className={styles.branchName}>
-                      {cabang.namaCabang}
-                    </span>
-                    <a
-                      href={cabang.mapsUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={styles.branchMaps}
-                    >
-                      Lihat di Maps
-                    </a>
-                  </div>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Logo Toko</label>
+            <div className={styles.logoUploadContainer}>
+              {logoUrl && (
+                <div className={styles.logoPreviewWrapper}>
+                  <img src={logoUrl} alt="Logo Toko" className={styles.logoPreview} />
+                  <button
+                    type="button"
+                    className={styles.clearLogoButton}
+                    onClick={handleClearLogo}
+                    disabled={savingInfo}
+                  >
+                    Hapus Logo
+                  </button>
                 </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
+              )}
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleLogoChange}
+                disabled={uploadingLogo}
+                className={styles.fileInput}
+              />
+              {uploadingLogo && <p>Uploading...</p>}
+            </div>
+          </div>
 
-      <div className={styles.submitWrapper} style={{ marginTop: '20px' }}>
-        <button
-          type="button"
-          className={styles.sidebarBackButton}
-          onClick={handleBack}
-          style={{ color: isDarkMode ? '#f5c542' : '#0b1531', borderColor: isDarkMode ? '#f5c542' : '#0b1531', padding: '8px 24px' }}
-        >
-          KEMBALI KE PENGATURAN
-        </button>
+          <div className={styles.buttonGroup}>
+            <button
+              type="button"
+              className={styles.saveButton}
+              onClick={handleSaveInformasi}
+              disabled={savingInfo}
+            >
+              {savingInfo ? "Menyimpan..." : "Simpan Informasi"}
+            </button>
+          </div>
+        </section>
+
+
+        {/* CABANG & MAPS */}
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>Cabang & Lokasi Maps</h2>
+
+          <div className={styles.branchFormRow}>
+            <div className={styles.fieldGroup}>
+              <label className={styles.label}>Nama Cabang</label>
+              <input
+                type="text"
+                className={styles.textInput}
+                value={cabangNama}
+                onChange={(e) => setCabangNama(e.target.value)}
+                placeholder="Contoh: Cabang 1 - Surabaya"
+              />
+            </div>
+            <div className={styles.fieldGroup}>
+              <label className={styles.label}>Link Google Maps</label>
+              <input
+                type="text"
+                className={styles.textInput}
+                value={cabangMaps}
+                onChange={(e) => setCabangMaps(e.target.value)}
+                placeholder="Paste link Google Maps di sini"
+              />
+            </div>
+            <div className={styles.fieldGroupSmall}>
+              <label className={styles.label}>Urutan</label>
+              <input
+                type="number"
+                className={styles.textInput}
+                value={cabangUrutan}
+                onChange={(e) => setCabangUrutan(e.target.value)}
+                placeholder="1"
+              />
+            </div>
+            <button
+              type="button"
+              className={styles.branchButton}
+              onClick={handleSaveCabang}
+              disabled={savingCabang}
+            >
+              {editingCabangId ? "Update" : "Tambah"}
+            </button>
+          </div>
+
+          {
+            editingCabangId && (
+              <p className={styles.editingInfo}>
+                Sedang mengedit cabang ID: {editingCabangId}
+              </p>
+            )
+          }
+
+          <div className={styles.branchListWrapper}>
+            <h3 className={styles.branchListTitle}>Daftar Cabang</h3>
+            {cabangList.length === 0 && (
+              <p className={styles.statusText}>
+                Belum ada cabang yang ditambahkan.
+              </p>
+            )}
+            <ul className={styles.branchList}>
+              {cabangList.map((cabang) => (
+                <li key={cabang.id} className={styles.branchItem}>
+                  <div className={styles.branchMain}>
+                    <div className={styles.branchBadge}>
+                      {cabang.urutan ?? "-"}
+                    </div>
+                    <div className={styles.branchText}>
+                      <span className={styles.branchName}>
+                        {cabang.namaCabang}
+                      </span>
+                      <a
+                        href={cabang.mapsUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={styles.branchMaps}
+                      >
+                        Lihat di Maps
+                      </a>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
+        <div className={styles.submitWrapper} style={{ marginTop: '20px' }}>
+          <button
+            type="button"
+            className={styles.sidebarBackButton}
+            onClick={handleBack}
+            style={{ color: isDarkMode ? '#f5c542' : '#0b1531', borderColor: isDarkMode ? '#f5c542' : '#0b1531', padding: '8px 24px' }}
+          >
+            KEMBALI KE PENGATURAN
+          </button>
+        </div>
       </div>
     </div>
   );

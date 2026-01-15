@@ -388,12 +388,21 @@
   font-size: 12px;
   cursor: pointer;
   color: #0b1531 !important;
-  /* fix text hilang */
+  /* Default (Day) */
 }
 
 .secondaryButton:hover {
   background: #d1d5db;
-  color: #0b1531 !important;
+}
+
+.mainNight .secondaryButton {
+  background: #334155;
+  color: #f1f5f9 !important;
+}
+
+.mainNight .secondaryButton:hover {
+  background: #475569;
+  color: #ffffff !important;
 }
 
 /* Tombol Hapus */
@@ -403,13 +412,23 @@
   border: none;
   background: #fee2e2;
   color: #b91c1c !important;
+  /* Default (Day) */
   font-size: 12px;
   cursor: pointer;
 }
 
 .dangerButton:hover {
   background: #fecaca;
-  color: #7f1d1d !important;
+}
+
+.mainNight .dangerButton {
+  background: #7f1d1d;
+  color: #fecaca !important;
+}
+
+.mainNight .dangerButton:hover {
+  background: #991b1b;
+  color: #ffffff !important;
 }
 
 /* WARNA TEKS DALAM LIST SECARA UMUM */

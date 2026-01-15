@@ -488,11 +488,21 @@
   border: none;
   font-size: 12px;
   cursor: pointer;
+  color: #0b1531;
+}
+
+.secondaryButton:hover {
+  background: #d1d5db;
 }
 
 .mainNight .secondaryButton {
   background: #334155;
   color: #f1f5f9;
+}
+
+.mainNight .secondaryButton:hover {
+  background: #475569;
+  color: #ffffff;
 }
 
 /* Tombol Hapus */
@@ -506,9 +516,19 @@
   cursor: pointer;
 }
 
+.dangerButton:hover {
+  background: #fecaca;
+  color: #7f1d1d;
+}
+
 .mainNight .dangerButton {
   background: #7f1d1d;
   color: #fecaca;
+}
+
+.mainNight .dangerButton:hover {
+  background: #991b1b;
+  color: #ffffff;
 }
 
 /* ============================================================

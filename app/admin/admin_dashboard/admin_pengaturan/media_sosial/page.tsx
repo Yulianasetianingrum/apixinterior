@@ -386,6 +386,5 @@ export default function MediaSosialPage() {
           </div>
         </div>
       </div>
-    </div>
-  );
+      );
 }
