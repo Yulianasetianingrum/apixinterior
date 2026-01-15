@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import sharp from "sharp";
+import { revalidatePath } from "next/cache";
 import { randomUUID } from "crypto";
 import path from "path";
 import fs from "fs/promises";
@@ -928,6 +929,9 @@ export async function PUT(
       }
     }
 
+    revalidatePath("/produk");
+    revalidatePath(`/produk/${slug || ""}`);
+    revalidatePath("/admin/admin_dashboard/admin_produk/daftar_produk");
     return NextResponse.json({ ok: true });
   } catch (err: any) {
     console.error("[admin_produk][PUT id] error:", err);

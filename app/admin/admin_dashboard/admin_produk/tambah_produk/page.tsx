@@ -4326,6 +4326,16 @@ export default function TambahProdukPage() {
       formData.set("promoTipe", promoAktif ? promoTipe : "");
       formData.set("promoValue", promoAktif ? String(promoValue || 0) : "");
 
+      // DEBUG: Cek unit yang terkirim
+      console.log("FINAL SUBMIT DATA:", {
+        unit: formData.get("product_unit"),
+        hargaTipe: formData.get("hargaTipe"),
+        rawUnit: raw.get("product_unit"),
+        hiddenUnit: (form.querySelector("#vcombo_hidden_unit") as HTMLInputElement)?.value
+      });
+
+      // --- normalisasi tags ---
+
       // --- normalisasi tags ---
       const rawTags = raw.get("tags");
       if (typeof rawTags === "string") {
