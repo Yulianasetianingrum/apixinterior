@@ -555,6 +555,9 @@ const VariasiKombinasiWidget = memo(function VariasiKombinasiWidget({
           if (fClear) fClear.value = state.enabled ? "0" : "1";
           if (fJson) fJson.value = state.enabled ? JSON.stringify(state) : "";
 
+          const fUnit = d.getElementById("vcombo_hidden_unit");
+          if (fUnit) fUnit.value = state.product?.unit || "";
+
           // jika variasi dimatikan, file upload variasi jangan ikut tersubmit
           const v = vaultEl();
           if (v) {
@@ -1268,7 +1271,7 @@ const VariasiKombinasiWidget = memo(function VariasiKombinasiWidget({
       </div>
       <div>
         <label>Dijual per</label>
-        <select id="pUnit" name="product_unit" autocomplete="on">
+        <select id="pUnit" autocomplete="on">
           ${UNIT_OPTIONS.map(u => `<option value="${u.v}">${esc(u.label)}</option>`).join("")}
         </select>
       </div>
@@ -3570,6 +3573,7 @@ const VariasiKombinasiWidget = memo(function VariasiKombinasiWidget({
       <input id="vcombo_hidden_enabled" type="hidden" name="variasiEnabled" defaultValue="0" />
       <input id="vcombo_hidden_clear" type="hidden" name="variasiClear" defaultValue="1" />
       <input id="vcombo_hidden_json" type="hidden" name="variasiJson" defaultValue="" />
+      <input id="vcombo_hidden_unit" type="hidden" name="product_unit" defaultValue="" />
 
       <div className="wrap">
         <div className="card">
