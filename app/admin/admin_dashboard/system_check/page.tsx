@@ -2,19 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAdminTheme } from '../AdminThemeContext';
 
 export default function SystemCheckPage() {
     const router = useRouter();
     const [report, setReport] = useState<any>(null);
     const [loading, setLoading] = useState(true);
-
-    // Import admin theme hook (assuming it's available in context)
-    // Note: Since this is a standalone page inside admin_dashboard structure, 
-    // it likely has access to AdminThemeProvider if layout wraps it.
-    // We'll trust the layout. If not, we default to light or check localStorage.
-    // But safely, let's try to import it. If it fails build due to path, we'll fix.
-    // Based on file structure: ../../../AdminThemeContext
-    const { isDarkMode } = require('../../AdminThemeContext').useAdminTheme?.() || { isDarkMode: false };
+    const { isDarkMode } = useAdminTheme();
 
     // Fallback if hook fails (e.g. context missing)
     // We can also just use a simple state check if needed, but let's try consistent theme.
