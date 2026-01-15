@@ -306,5 +306,8 @@ export default function HubungiPage() {
               </div>
             </div>
           </div>
-          );
+        </div>
+      </div>
+    </div>
+  );
 }
