@@ -315,9 +315,34 @@ export default function TopItemEnhancedPage() {
                     </div>
                 ) : (
                     <>
+                        {/* HIGHLIGHT CARDS */}
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "20px", marginBottom: "30px" }}>
+                            {/* MOST VIEWED */}
+                            <div style={{ background: "white", padding: "20px", borderRadius: "12px", boxShadow: "0 1px 3px rgba(0,0,0,0.1)", borderLeft: "5px solid #3b82f6" }}>
+                                <h4 style={{ margin: 0, color: "#64748b", fontSize: "14px", fontWeight: "600" }}>Paling Banyak Dilihat (View)</h4>
+                                <div style={{ marginTop: "10px", fontSize: "20px", fontWeight: "bold", color: "#0f172a" }}>
+                                    {topItems.length > 0 ? [...topItems].sort((a, b) => b.cardViews - a.cardViews)[0].nama : "-"}
+                                </div>
+                                <div style={{ marginTop: "5px", color: "#3b82f6", fontWeight: "600" }}>
+                                    {topItems.length > 0 ? [...topItems].sort((a, b) => b.cardViews - a.cardViews)[0].cardViews.toLocaleString() : 0} Views
+                                </div>
+                            </div>
+
+                            {/* MOST CONTACTED */}
+                            <div style={{ background: "white", padding: "20px", borderRadius: "12px", boxShadow: "0 1px 3px rgba(0,0,0,0.1)", borderLeft: "5px solid #10b981" }}>
+                                <h4 style={{ margin: 0, color: "#64748b", fontSize: "14px", fontWeight: "600" }}>Paling Sering Dikontak (WA)</h4>
+                                <div style={{ marginTop: "10px", fontSize: "20px", fontWeight: "bold", color: "#0f172a" }}>
+                                    {topItems.length > 0 ? [...topItems].sort((a, b) => b.contactClicks - a.contactClicks)[0].nama : "-"}
+                                </div>
+                                <div style={{ marginTop: "5px", color: "#10b981", fontWeight: "600" }}>
+                                    {topItems.length > 0 ? [...topItems].sort((a, b) => b.contactClicks - a.contactClicks)[0].contactClicks.toLocaleString() : 0} Klik
+                                </div>
+                            </div>
+                        </div>
+
                         <div style={{ marginBottom: "20px", padding: "15px", background: "#f1f5f9", borderRadius: "8px" }}>
                             <p style={{ fontSize: "14px", color: "#64748b", margin: 0 }}>
-                                📊 Total {topItems.length} produk paling populer berdasarkan jumlah views
+                                📊 Detail Semua Produk
                             </p>
                         </div>
 

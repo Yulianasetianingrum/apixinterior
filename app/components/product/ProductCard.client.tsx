@@ -145,6 +145,7 @@ export default function ProductCard({ product: pRaw, index }: ProductCardProps) 
                             style={{ objectFit: "cover" }}
                             sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, (max-width: 1200px) 33vw, 25vw"
                             priority={index < 4}
+                            unoptimized
                         />
                     ) : (
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", color: "#ccc" }}>

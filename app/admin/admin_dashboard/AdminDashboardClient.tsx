@@ -341,20 +341,22 @@ export default function AdminDashboardClient() {
               </div>
             </div>
 
+// ...existing code...
             <div
               className={styles.statCard}
               onClick={() => goToSubPage("/admin/admin_dashboard/admin_statistik/top_item")}
               role="button"
               tabIndex={0}
             >
-              <span className={styles.statLabel}>Top Item</span>
+              <span className={styles.statLabel}>Top Item (Hubungi)</span>
               <span className={styles.statValue} style={{ fontSize: '18px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                 {stats.topItem.name}
               </span>
               <span className={styles.statHint}>
-                Dilihat <b>{stats.topItem.views}</b> kali
+                {(stats.topItem as any).clickLabel || `Dilihat ${stats.topItem.views} kali`}
               </span>
             </div>
+// ...existing code...
           </div>
         </section>
       </main>

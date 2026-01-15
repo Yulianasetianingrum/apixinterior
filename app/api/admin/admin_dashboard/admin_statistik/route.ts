@@ -20,76 +20,58 @@ export async function GET() {
             ]
         };
 
-        // 1. Visitor Stats
-        const [todayCount, thisWeekCount, thisMonthCount, totalCount] = await Promise.all([
+        const [todayViews, weekViews, monthViews, totalViews] = await Promise.all([
             prisma.pageView.count({
-                where: {
-                    createdAt: { gte: today },
-                    ...excludeConditions
-                }
+                where: { createdAt: { gte: today }, ...excludeConditions }
             }),
             prisma.pageView.count({
-                where: {
-                    createdAt: { gte: startOfWeek },
-                    ...excludeConditions
-                }
+                where: { createdAt: { gte: startOfWeek }, ...excludeConditions }
             }),
             prisma.pageView.count({
-                where: {
-                    createdAt: { gte: startOfMonth },
-                    ...excludeConditions
-                }
+                where: { createdAt: { gte: startOfMonth }, ...excludeConditions }
             }),
             prisma.pageView.count({
-                where: excludeConditions
-            }),
+                where: { ...excludeConditions }
+            })
         ]);
 
-        // 2. Top Product (Detail Views)
-        // Group by produkId manually or via rawQuery if needed.
-        // Prisma `groupBy` is easiest:
-        const topView = await prisma.productView.groupBy({
+        // Fetch Top Item (Most Contact Clicks)
+        // Group by produkId, count, order by count desc, take 1
+        const topContact = await prisma.productContactClick.groupBy({
             by: ['produkId'],
-            where: { viewType: 'detail_view' },
-            _count: {
-                id: true
-            },
+            _count: { id: true },
             orderBy: {
-                _count: {
-                    id: 'desc'
-                }
+                _count: { id: 'desc' }
             },
             take: 1
         });
 
-        let topItemName = "-";
-        let topItemCount = 0;
+        let topItemData = { name: "-", views: 0, clickLabel: "diklik 0 kali" };
 
-        if (topView.length > 0) {
-            const topId = topView[0].produkId;
-            const count = topView[0]._count.id;
+        if (topContact.length > 0) {
             const product = await prisma.produk.findUnique({
-                where: { id: topId },
+                where: { id: topContact[0].produkId },
                 select: { nama: true }
             });
             if (product) {
-                topItemName = product.nama;
-                topItemCount = count;
+                topItemData = {
+                    name: product.nama,
+                    views: topContact[0]._count.id,
+                    clickLabel: `diklik ${topContact[0]._count.id} kali`
+                };
             }
         }
 
         return NextResponse.json({
-            today: todayCount,
-            thisWeek: thisWeekCount,
-            thisMonth: thisMonthCount,
-            total: totalCount,
-            topItem: {
-                name: topItemName,
-                views: topItemCount
-            }
+            today: todayViews,
+            thisWeek: weekViews,
+            thisMonth: monthViews,
+            total: totalViews,
+            topItem: topItemData
         });
+
     } catch (error) {
-        console.error("Stats API Error:", error);
+        console.error("Dashboard Stats Error:", error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }

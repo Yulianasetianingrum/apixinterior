@@ -65,6 +65,7 @@ export default function ProductDetailClient({ product, waNumber }: WrapperProps)
                             priority
                             style={{ objectFit: "contain" }}
                             sizes="(max-width: 900px) 100vw, 50vw"
+                            unoptimized
                         />
                     ) : (
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", color: "#94a3b8" }}>
@@ -102,7 +103,7 @@ export default function ProductDetailClient({ product, waNumber }: WrapperProps)
                                     scrollSnapAlign: "start"
                                 }}
                             >
-                                <Image src={src} alt="" fill style={{ objectFit: "cover" }} />
+                                <Image src={src} alt="" fill style={{ objectFit: "cover" }} unoptimized />
                             </button>
                         ))}
                     </div>
