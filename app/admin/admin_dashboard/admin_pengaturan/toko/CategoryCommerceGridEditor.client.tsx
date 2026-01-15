@@ -371,12 +371,12 @@ function SortRow({
               action={uploadAction}
               sectionId={sectionId}
               attach={`CATEGORY_GRID_COMMERCE:icon:${item.kategoriId}`}
-              endpoint="/api/admin/admin_dashboard/admin_galeri/list_gambar?png=1"
+              endpoint="/api/admin/admin_dashboard/admin_galeri/list_gambar"
               limit={60}
-              buttonLabel="Pilih/Upload PNG"
+              buttonLabel="Pilih/Upload Gambar"
               allowUpload
               autoApplyOnSelect
-              accept="image/png"
+              accept="image/*"
               skipRefresh
               onAppliedImageId={(id) => onUpdate(item.key, { imageId: id })}
             />
@@ -385,12 +385,12 @@ function SortRow({
               action={uploadAction}
               sectionId={sectionId}
               attach={`CATEGORY_GRID_COMMERCE:custom:${item.key}`}
-              endpoint="/api/admin/admin_dashboard/admin_galeri/list_gambar?png=1"
+              endpoint="/api/admin/admin_dashboard/admin_galeri/list_gambar"
               limit={60}
-              buttonLabel="Pilih/Upload PNG (custom)"
+              buttonLabel="Pilih/Upload Gambar (Custom)"
               allowUpload
               autoApplyOnSelect
-              accept="image/png"
+              accept="image/*"
               skipRefresh
               onAppliedImageId={(id) => onUpdate(item.key, { imageId: id })}
             />
@@ -720,6 +720,8 @@ export default function CategoryCommerceGridEditor({
       const targetId = targetItems[i].kategoriId;
       const targetKey = targetItems[i].key;
       if (!targetId || targetItems[i].type !== "category") continue;
+      /*
+      // Relaxed restriction: allow any image
       const mime = String(file.type ?? "").toLowerCase();
       const mimeOk = mime === "image/png";
       const nameOk = /\.png$/i.test(String(file.name ?? ""));
@@ -727,6 +729,7 @@ export default function CategoryCommerceGridEditor({
         setUploadErr("Icon harus PNG.");
         continue;
       }
+      */
 
       setUploadErr(null);
       setUploadingId(targetId);
