@@ -255,8 +255,21 @@ export default async function ProdukDetailPage({ params }: PageProps) {
 
       </main>
 
-      {/* 3. Global Footer */}
       <GlobalFooter />
     </div>
   );
+}
+
+// Helper to map hargaTipe to readable label
+function resolveUnitLabel(code: string | null | undefined) {
+  const s = String(code || "").trim().toUpperCase();
+  if (!s || s === "TETAP") return "-";
+
+  if (s === "M2") return "Meter Persegi (m²)";
+  if (s === "M") return "Meter Lari (m)";
+  if (s === "POINT") return "Titik (per point)";
+  if (s === "PCS") return "Pcs (Satuan)";
+  if (s === "SERVICE") return "Paket / Jasa";
+  // Fallback if custom
+  return s;
 }
