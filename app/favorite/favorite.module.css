@@ -280,7 +280,7 @@
 
 /* ========== EMPTY STATE ========== */
 .emptyState {
-    min-height: calc(100vh - 150px);
+    min-height: 60vh;
     background: #ffffff;
     display: flex;
     flex-direction: column;
@@ -288,7 +288,7 @@
     justify-content: center;
     text-align: center;
     padding: 2rem;
-    margin-top: -4rem;
+    margin-top: 0;
 }
 
 .emptyIcon {

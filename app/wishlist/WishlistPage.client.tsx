@@ -66,6 +66,11 @@ export default function WishlistPageClient() {
                             ) : (
                                 <div className="flex items-center justify-center h-full text-slate-400 text-xs">No Img</div>
                             )}
+                            {/* DEBUG INFO */}
+                            <div className="absolute top-0 left-0 bg-black/80 text-white text-[8px] p-1 w-full z-50 overflow-hidden leading-tight">
+                                <div>RAW: {item.image || "NULL"}</div>
+                                <div className="text-green-300">FIX: {ensureImageUrl(item.image)}</div>
+                            </div>
                         </div>
 
                         {/* Details */}

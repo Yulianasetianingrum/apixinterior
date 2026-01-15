@@ -10,8 +10,25 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./favorite.module.css";
 
+// Helper to ensure image URL is correct
+const ensureImageUrl = (url: string | null | undefined) => {
+    if (!url) return null;
+    let clean = url;
+
+    // If it is an external/absolute URL, trust it
+    if (clean.startsWith("http")) return clean;
+
+    // Strip common local prefixes
+    clean = clean.replace(/^public\//, "");
+    clean = clean.replace(/^\/?public\//, "");
+
+    if (clean.startsWith("/")) return clean;
+    return `/${clean}`;
+};
+
 export default function FavoritePageClient() {
     const { items, removeFromWishlist } = useWishlist();
+    // ... (rest of hook usage)
     const { addToCart } = useCart();
     const router = useRouter();
     const [isClient, setIsClient] = useState(false);
@@ -26,6 +43,7 @@ export default function FavoritePageClient() {
     }
 
     const handleAddToCart = (item: any) => {
+        // ... (existing handleAddToCart logic)
         const now = Date.now();
         console.log('handleAddToCart called - last:', lastAddTimeRef.current, 'now:', now, 'diff:', now - lastAddTimeRef.current);
 
@@ -82,13 +100,16 @@ export default function FavoritePageClient() {
                         <div key={item.id} className={styles.productCard}>
                             <div className={styles.productContent}>
                                 <div className={styles.imageWrapper}>
-                                    {item.image ? (
-                                        <Image
-                                            src={item.image}
+                                    {ensureImageUrl(item.image) ? (
+                                        /* eslint-disable-next-line @next/next/no-img-element */
+                                        <img
+                                            src={ensureImageUrl(item.image)!}
                                             alt={item.name}
-                                            width={50}
-                                            height={50}
                                             className="favorite-product-image"
+                                            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                                            onError={(e) => {
+                                                (e.target as HTMLImageElement).src = "https://placehold.co/100x100?text=Error";
+                                            }}
                                         />
                                     ) : (
                                         <div className={styles.noImage}>No Image</div>
