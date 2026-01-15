@@ -1685,10 +1685,12 @@ export async function uploadImageToGalleryAndAttach(formData: FormData): Promise
                 await new Promise(r => setTimeout(r, 100));
                 retries--;
             }
-            // Add cache buster
-            finalImageObj.url += `?t=${Date.now()}`;
+
+            // FIX: Use Proxy URL for immediate optimistic display to avoid static file race conditions
+            const safeFilename = path.basename(finalImageObj.url);
+            finalImageObj.url = `/api/img_proxy?file=${safeFilename}&t=${Date.now()}`;
         } else {
-            // Fallback delay if no URL (unlikely for upload)
+            // Fallback delay
             await new Promise(resolve => setTimeout(resolve, 500));
         }
 
