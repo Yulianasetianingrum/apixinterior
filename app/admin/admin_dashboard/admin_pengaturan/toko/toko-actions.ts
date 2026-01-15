@@ -1670,6 +1670,14 @@ export async function uploadImageToGalleryAndAttach(formData: FormData): Promise
         revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko");
         revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko/preview");
 
+        // FIX: Add small delay to ensure FS flush
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // FIX: Add cache buster to optimistic update URL
+        if (finalImageObj?.url) {
+            finalImageObj.url += `?t=${Date.now()}`;
+        }
+
         return {
             ok: true,
             imageId: imageIdToUse as number,
