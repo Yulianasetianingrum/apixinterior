@@ -354,6 +354,11 @@ export default function ProductVariationSelector({ product, onImageChange, baseW
 
             {/* CTA BUTTON */}
             <div style={{ marginTop: 10 }}>
+                {/* Notice for details */}
+                <div style={{ marginBottom: 8, fontSize: 13, color: "#64748b", fontStyle: "italic", textAlign: "center" }}>
+                    Mohon baca deskripsi untuk detail lengkapnya
+                </div>
+
                 <button
                     onClick={handlePesan}
                     disabled={!baseWaNumber}

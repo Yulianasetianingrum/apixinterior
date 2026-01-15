@@ -340,8 +340,6 @@ export default function AdminDashboardClient() {
                 </div>
               </div>
             </div>
-
-// ...existing code...
             <div
               className={styles.statCard}
               onClick={() => goToSubPage("/admin/admin_dashboard/admin_statistik/top_item")}
@@ -356,7 +354,6 @@ export default function AdminDashboardClient() {
                 {(stats.topItem as any).clickLabel || `Dilihat ${stats.topItem.views} kali`}
               </span>
             </div>
-// ...existing code...
           </div>
         </section>
       </main>

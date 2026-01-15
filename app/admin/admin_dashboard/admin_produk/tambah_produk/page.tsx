@@ -721,7 +721,7 @@ const VariasiKombinasiWidget = memo(function VariasiKombinasiWidget({
           comboTab: 1,
           combo: { lv2Enabled: false, lv3Enabled: false },
           titles: { varTitle: "", lv1Title: "", lv2Title: "", lv3Title: "" },
-          product: { title: "", unit: "M2", basePrice: "", status: "" },
+          product: { title: "", unit: "M", basePrice: "", status: "" },
           variations: [],
           preview: { varId: null, lv1Id: null, lv2Id: null, lv3Id: null, qty: 1 },
           ui: { selLv1ByVar: {}, selLv2ByVarLv1: {} },
@@ -734,7 +734,7 @@ const VariasiKombinasiWidget = memo(function VariasiKombinasiWidget({
         // Default tampilan selalu mulai dari tab Produk (biar tidak langsung munculin form variasi).
         state.step = 0;
         if (!state.titles) state.titles = { varTitle: "", lv1Title: "", lv2Title: "", lv3Title: "" };
-        if (!state.product) state.product = { title: "", unit: "M2", basePrice: "", status: "" };
+        if (!state.product) state.product = { title: "", unit: "M", basePrice: "", status: "" };
         if (state.product.status === undefined) state.product.status = "";
         if (!state.variations) state.variations = [];
         if (!state.preview) state.preview = { varId: null, lv1Id: null, lv2Id: null, lv3Id: null, qty: 1 };
