@@ -415,7 +415,10 @@ export async function POST(req: NextRequest) {
     if (promoTipe === "persen") promoValueInt = Math.max(0, Math.min(100, promoValueInt));
     const promoValue = promoAktif && promoTipe && promoValueInt > 0 ? promoValueInt : null;
 
-    const hargaTipe = String(formData.get("hargaTipe") || "tetap");
+    const unit = String(formData.get("product_unit") || "").trim();
+    // Jika unit dipilih, simpan ke hargaTipe. Kalau kosong, pakai default "tetap".
+    const hargaTipeRaw = String(formData.get("hargaTipe") || "tetap");
+    const hargaTipe = unit || hargaTipeRaw;
 
     const tipeOrder = String(formData.get("tipeOrder") || "ready");
     const estimasiPengerjaan = String(formData.get("estimasiPengerjaan") || "").trim();
@@ -685,7 +688,11 @@ export async function PUT(
     const promoValue = promoAktif && promoTipe && promoValueInt > 0 ? promoValueInt : null;
 
     // --------- HARGA ---------
-    const hargaTipe = String(formData.get("hargaTipe") || "tetap");
+    // --------- HARGA ---------
+    const unit = String(formData.get("product_unit") || "").trim();
+    // Jika unit dipilih, simpan ke hargaTipe. Kalau kosong, pakai default "tetap".
+    const hargaTipeRaw = String(formData.get("hargaTipe") || "tetap");
+    const hargaTipe = unit || hargaTipeRaw;
 
     const tipeOrder = String(formData.get("tipeOrder") || "ready");
     const estimasiPengerjaan = String(formData.get("estimasiPengerjaan") || "").trim();
