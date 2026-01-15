@@ -233,160 +233,159 @@ export default function MediaSosialPage() {
 
   // ====== UI ======
   return (
-    <div className={layoutStyles.dashboard}>
-      <main
-        className={`${layoutStyles.main} ${isDarkMode ? styles.mainNight : styles.mainDay}`}
-      >
-        <header className={layoutStyles.mainHeader}>
-          <h1
-            className={`${layoutStyles.pageTitle} ${styles.pageTitleOutside}`}
-          >
-            Pengaturan Media Sosial
-          </h1>
-          <p
-            className={`${layoutStyles.pageSubtitle} ${styles.pageSubtitleOutside}`}
-          >
-            Tambahkan dan atur akun media sosial yang akan tampil di website.
-          </p>
-        </header>
-
-        <div
-          className={`${styles.cardArea} ${isDarkMode ? styles.cardAreaNight : styles.cardAreaDay}`}
+    <div
+      className={isDarkMode ? styles.mainNight : styles.mainDay}
+      style={{ minHeight: "100%", width: "100%" }}
+    >
+      <header className={layoutStyles.mainHeader}>
+        <h1
+          className={`${layoutStyles.pageTitle} ${styles.pageTitleOutside}`}
         >
-          <div className={styles.cardWrapper}>
-            <div
-              className={`${layoutStyles.card} ${styles.card} ${isDarkMode ? styles.cardNight : styles.cardDay} ${styles.noCardHover}`}
-            >
-              <div className={styles.contentInner}>
-                {/* FORM */}
-                <div className={styles.formRow}>
-                  <div className={styles.fieldGroup}>
-                    <label className={styles.label}>Platform</label>
-                    <div className={styles.platformWrapper}>
-                      <input
-                        type="text"
-                        className={styles.input}
-                        placeholder="Contoh: Instagram, TikTok, LinkedIn"
-                        value={nama}
-                        onChange={handleNamaChange}
-                        onFocus={() => setShowSuggestions(true)}
-                      />
-                      {showSuggestions && filteredSuggestions.length > 0 && (
-                        <ul className={styles.suggestionList}>
-                          {filteredSuggestions.map((p) => (
-                            <li
-                              key={p.key}
-                              className={styles.suggestionItem}
-                              onClick={() => handleSelectPlatform(p)}
-                            >
-                              <p.Icon className={styles.suggestionIcon} />
-                              <span>{p.label}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </div>
-                  </div>
+          Pengaturan Media Sosial
+        </h1>
+        <p
+          className={`${layoutStyles.pageSubtitle} ${styles.pageSubtitleOutside}`}
+        >
+          Tambahkan dan atur akun media sosial yang akan tampil di website.
+        </p>
+      </header>
 
-                  <div className={styles.fieldGroup}>
-                    <label className={styles.label}>URL</label>
+      <div
+        className={`${styles.cardArea} ${isDarkMode ? styles.cardAreaNight : styles.cardAreaDay}`}
+      >
+        <div className={styles.cardWrapper}>
+          <div
+            className={`${layoutStyles.card} ${styles.card} ${isDarkMode ? styles.cardNight : styles.cardDay} ${styles.noCardHover}`}
+          >
+            <div className={styles.contentInner}>
+              {/* FORM */}
+              <div className={styles.formRow}>
+                <div className={styles.fieldGroup}>
+                  <label className={styles.label}>Platform</label>
+                  <div className={styles.platformWrapper}>
                     <input
                       type="text"
                       className={styles.input}
-                      placeholder="https://instagram.com/apix_interior"
-                      value={url}
-                      onChange={handleUrlChange}
+                      placeholder="Contoh: Instagram, TikTok, LinkedIn"
+                      value={nama}
+                      onChange={handleNamaChange}
+                      onFocus={() => setShowSuggestions(true)}
                     />
+                    {showSuggestions && filteredSuggestions.length > 0 && (
+                      <ul className={styles.suggestionList}>
+                        {filteredSuggestions.map((p) => (
+                          <li
+                            key={p.key}
+                            className={styles.suggestionItem}
+                            onClick={() => handleSelectPlatform(p)}
+                          >
+                            <p.Icon className={styles.suggestionIcon} />
+                            <span>{p.label}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
-
-                  <button
-                    type="button"
-                    className={styles.button}
-                    onClick={handleSave}
-                    disabled={loading}
-                  >
-                    {editingId ? "Update" : "Tambah"}
-                  </button>
                 </div>
 
-                {editingId && (
-                  <p className={styles.editingInfo}>
-                    Sedang mengedit media sosial ID: {editingId}
+                <div className={styles.fieldGroup}>
+                  <label className={styles.label}>URL</label>
+                  <input
+                    type="text"
+                    className={styles.input}
+                    placeholder="https://instagram.com/apix_interior"
+                    value={url}
+                    onChange={handleUrlChange}
+                  />
+                </div>
+
+                <button
+                  type="button"
+                  className={styles.button}
+                  onClick={handleSave}
+                  disabled={loading}
+                >
+                  {editingId ? "Update" : "Tambah"}
+                </button>
+              </div>
+
+              {editingId && (
+                <p className={styles.editingInfo}>
+                  Sedang mengedit media sosial ID: {editingId}
+                </p>
+              )}
+
+              {/* LIST */}
+              <div className={styles.listWrapper}>
+                <h2 className={styles.listTitle}>Daftar Media Sosial</h2>
+                {items.length === 0 && (
+                  <p className={styles.statusText}>
+                    Belum ada akun media sosial yang disimpan.
                   </p>
                 )}
 
-                {/* LIST */}
-                <div className={styles.listWrapper}>
-                  <h2 className={styles.listTitle}>Daftar Media Sosial</h2>
-                  {items.length === 0 && (
-                    <p className={styles.statusText}>
-                      Belum ada akun media sosial yang disimpan.
-                    </p>
-                  )}
-
-                  <ul className={styles.list}>
-                    {items.map((item) => (
-                      <li key={item.id} className={styles.listItem}>
-                        <div className={styles.listMain}>
-                          <div className={styles.iconBubble}>
-                            <IconFromKey iconKey={item.iconKey} />
-                          </div>
-                          <div className={styles.listText}>
-                            <span className={styles.listName}>
-                              {item.nama}
-                            </span>
-                            <a
-                              href={item.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className={styles.listUrl}
-                            >
-                              {item.url}
-                            </a>
-                          </div>
-                          {item.prioritas && (
-                            <span className={styles.priorityBadge}>
-                              Prioritas
-                            </span>
-                          )}
+                <ul className={styles.list}>
+                  {items.map((item) => (
+                    <li key={item.id} className={styles.listItem}>
+                      <div className={styles.listMain}>
+                        <div className={styles.iconBubble}>
+                          <IconFromKey iconKey={item.iconKey} />
                         </div>
-
-                        <div className={styles.listActions}>
-                          <label className={styles.priorityToggle}>
-                            <input
-                              type="radio"
-                              name="prioritasSocial"
-                              checked={item.prioritas}
-                              onChange={() => handleSetPriority(item.id)}
-                            />
+                        <div className={styles.listText}>
+                          <span className={styles.listName}>
+                            {item.nama}
+                          </span>
+                          <a
+                            href={item.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={styles.listUrl}
+                          >
+                            {item.url}
+                          </a>
+                        </div>
+                        {item.prioritas && (
+                          <span className={styles.priorityBadge}>
                             Prioritas
-                          </label>
-                          <button
-                            type="button"
-                            className={styles.secondaryButton}
-                            onClick={() => handleEdit(item)}
-                            disabled={loading}
-                          >
-                            Edit
-                          </button>
-                          <button
-                            type="button"
-                            className={styles.dangerButton}
-                            onClick={() => handleDelete(item.id)}
-                            disabled={loading}
-                          >
-                            Hapus
-                          </button>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                          </span>
+                        )}
+                      </div>
+
+                      <div className={styles.listActions}>
+                        <label className={styles.priorityToggle}>
+                          <input
+                            type="radio"
+                            name="prioritasSocial"
+                            checked={item.prioritas}
+                            onChange={() => handleSetPriority(item.id)}
+                          />
+                          Prioritas
+                        </label>
+                        <button
+                          type="button"
+                          className={styles.secondaryButton}
+                          onClick={() => handleEdit(item)}
+                          disabled={loading}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          className={styles.dangerButton}
+                          onClick={() => handleDelete(item.id)}
+                          disabled={loading}
+                        >
+                          Hapus
+                        </button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 }

@@ -358,7 +358,7 @@ export default function InformasiPage() {
 
   // ===== UI =====
   return (
-    <div style={{ width: "100%" }}>
+    <div className={isDarkMode ? styles.mainNight : styles.mainDay} style={{ minHeight: "100%", width: "100%" }}>
       <header className={layoutStyles.mainHeader}>
         <h1
           className={`${layoutStyles.pageTitle} ${styles.pageTitleOutside}`}

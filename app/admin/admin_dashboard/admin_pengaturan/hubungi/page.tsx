@@ -183,129 +183,127 @@ export default function HubungiPage() {
 
   // ================== UI ==================
   return (
-    <div className={layoutStyles.dashboard}>
-      {/* MAIN CONTENT */}
-      <main
-        className={`${layoutStyles.main} ${isDarkMode ? styles.mainNight : styles.mainDay}`}
-      >
-        {/* Brand kanan atas desktop */}
+    <div
+      className={isDarkMode ? styles.mainNight : styles.mainDay}
+      style={{ minHeight: "100%" }}
+    >
+      {/* Brand kanan atas desktop */}
 
 
-        <header className={layoutStyles.mainHeader}>
-          <h1
-            className={`${layoutStyles.pageTitle} ${styles.pageTitleOutside}`}
-          >
-            Pengaturan Nomor WhatsApp
-          </h1>
-          <p
-            className={`${layoutStyles.pageSubtitle} ${styles.pageSubtitleOutside}`}
-          >
-            Kelola hingga 5 nomor WhatsApp, pilih salah satu sebagai nomor
-            prioritas untuk redirect di website utama.
-          </p>
-        </header>
-
-        {/* CARD KUNING BESAR (PERSIS STYLE KOLOSE) */}
-        <div
-          className={`${styles.cardArea} ${isDarkMode ? styles.cardAreaNight : styles.cardAreaDay}`}
+      <header className={layoutStyles.mainHeader}>
+        <h1
+          className={`${layoutStyles.pageTitle} ${styles.pageTitleOutside}`}
         >
-          <div className={styles.cardWrapper}>
-            <div
-              className={`${layoutStyles.card} ${styles.card} ${isDarkMode ? styles.cardNight : styles.cardDay} ${styles.noCardHover}`}
-            >
-              <div className={styles.settingsInner}>
-                {/* FORM INPUT */}
-                <div className={styles.formRow}>
-                  <input
-                    type="text"
-                    placeholder="0821xxxxx / +62821xxxxx"
-                    value={inputNumber}
-                    onChange={handleChange}
-                    className={styles.input}
-                    disabled={loading || (!editingId && isFull)}
-                  />
-                  <button
-                    type="button"
-                    className={styles.button}
-                    onClick={handleSave}
-                    disabled={loading || (!editingId && isFull)}
-                  >
-                    {editingId ? "Update" : "Tambah"}
-                  </button>
-                </div>
+          Pengaturan Nomor WhatsApp
+        </h1>
+        <p
+          className={`${layoutStyles.pageSubtitle} ${styles.pageSubtitleOutside}`}
+        >
+          Kelola hingga 5 nomor WhatsApp, pilih salah satu sebagai nomor
+          prioritas untuk redirect di website utama.
+        </p>
+      </header>
 
-                <p className={styles.infoText}>
-                  Nomor boleh diawali 0 atau +62 dan boleh ditempel langsung
-                  dari WhatsApp. Tanda hubung, spasi, dll akan otomatis
-                  dibersihkan. Maksimal {max} nomor (saat ini {items.length}/
-                  {max}).
+      {/* CARD KUNING BESAR (PERSIS STYLE KOLOSE) */}
+      <div
+        className={`${styles.cardArea} ${isDarkMode ? styles.cardAreaNight : styles.cardAreaDay}`}
+      >
+        <div className={styles.cardWrapper}>
+          <div
+            className={`${layoutStyles.card} ${styles.card} ${isDarkMode ? styles.cardNight : styles.cardDay} ${styles.noCardHover}`}
+          >
+            <div className={styles.settingsInner}>
+              {/* FORM INPUT */}
+              <div className={styles.formRow}>
+                <input
+                  type="text"
+                  placeholder="0821xxxxx / +62821xxxxx"
+                  value={inputNumber}
+                  onChange={handleChange}
+                  className={styles.input}
+                  disabled={loading || (!editingId && isFull)}
+                />
+                <button
+                  type="button"
+                  className={styles.button}
+                  onClick={handleSave}
+                  disabled={loading || (!editingId && isFull)}
+                >
+                  {editingId ? "Update" : "Tambah"}
+                </button>
+              </div>
+
+              <p className={styles.infoText}>
+                Nomor boleh diawali 0 atau +62 dan boleh ditempel langsung
+                dari WhatsApp. Tanda hubung, spasi, dll akan otomatis
+                dibersihkan. Maksimal {max} nomor (saat ini {items.length}/
+                {max}).
+              </p>
+
+              {editingId && (
+                <p className={styles.editingInfo}>
+                  Sedang mengedit nomor dengan ID: {editingId}
                 </p>
+              )}
 
-                {editingId && (
-                  <p className={styles.editingInfo}>
-                    Sedang mengedit nomor dengan ID: {editingId}
+              {/* LIST NOMOR */}
+              <div className={styles.listWrapper}>
+                <h2 className={styles.listTitle}>Daftar Nomor WhatsApp</h2>
+                {items.length === 0 && (
+                  <p className={styles.statusText}>
+                    Belum ada nomor yang disimpan.
                   </p>
                 )}
-
-                {/* LIST NOMOR */}
-                <div className={styles.listWrapper}>
-                  <h2 className={styles.listTitle}>Daftar Nomor WhatsApp</h2>
-                  {items.length === 0 && (
-                    <p className={styles.statusText}>
-                      Belum ada nomor yang disimpan.
-                    </p>
-                  )}
-                  <ul className={styles.list}>
-                    {items.map((item) => (
-                      <li key={item.id} className={styles.listItem}>
-                        <div className={styles.listMain}>
-                          <span className={styles.listNumber}>
-                            {formatForDisplay(item.nomor)}
+                <ul className={styles.list}>
+                  {items.map((item) => (
+                    <li key={item.id} className={styles.listItem}>
+                      <div className={styles.listMain}>
+                        <span className={styles.listNumber}>
+                          {formatForDisplay(item.nomor)}
+                        </span>
+                        {item.prioritas && (
+                          <span className={styles.priorityBadge}>
+                            Prioritas
                           </span>
-                          {item.prioritas && (
-                            <span className={styles.priorityBadge}>
-                              Prioritas
-                            </span>
-                          )}
-                        </div>
+                        )}
+                      </div>
 
-                        <div className={styles.listActions}>
-                          <label className={styles.priorityToggle}>
-                            <input
-                              type="radio"
-                              name="prioritasWa"
-                              checked={item.prioritas}
-                              onChange={() => handleSetPriority(item.id)}
-                            />
-                            Jadikan prioritas
-                          </label>
+                      <div className={styles.listActions}>
+                        <label className={styles.priorityToggle}>
+                          <input
+                            type="radio"
+                            name="prioritasWa"
+                            checked={item.prioritas}
+                            onChange={() => handleSetPriority(item.id)}
+                          />
+                          Jadikan prioritas
+                        </label>
 
-                          <button
-                            type="button"
-                            className={styles.secondaryButton}
-                            onClick={() => handleEdit(item)}
-                            disabled={loading}
-                          >
-                            Edit
-                          </button>
-                          <button
-                            type="button"
-                            className={styles.dangerButton}
-                            onClick={() => handleDelete(item.id)}
-                            disabled={loading}
-                          >
-                            Hapus
-                          </button>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                        <button
+                          type="button"
+                          className={styles.secondaryButton}
+                          onClick={() => handleEdit(item)}
+                          disabled={loading}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          className={styles.dangerButton}
+                          onClick={() => handleDelete(item.id)}
+                          disabled={loading}
+                        >
+                          Hapus
+                        </button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 }

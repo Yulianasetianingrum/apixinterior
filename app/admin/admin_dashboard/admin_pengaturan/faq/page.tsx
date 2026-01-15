@@ -352,181 +352,178 @@ export default function AdminFaqPage() {
 
 
     return (
-        <div className={layoutStyles.dashboard}>
-            {/* MAIN CONTENT */}
-            <main className={`${layoutStyles.main} ${isDarkMode ? layoutStyles.mainDark : ""}`} style={{ background: isDarkMode ? "#0f172a" : "#f1f5f9", minHeight: "100vh" }}>
-                <div style={containerStyle}>
+        <div style={{ background: isDarkMode ? "#0f172a" : "#f1f5f9", minHeight: "100%" }}>
+            <div style={containerStyle}>
 
-                    <div style={headerStyle}>
-                        <div>
-                            <h1 style={{ fontSize: 24, fontWeight: 700, margin: "0 0 8px 0" }}>Halamanan Dinamis (FAQ, dll)</h1>
-                            <p style={{ margin: 0, opacity: 0.7 }}>Kelola halaman tambahan website seperti FAQ, Terms, Privacy Policy.</p>
+                <div style={headerStyle}>
+                    <div>
+                        <h1 style={{ fontSize: 24, fontWeight: 700, margin: "0 0 8px 0" }}>Halamanan Dinamis (FAQ, dll)</h1>
+                        <p style={{ margin: 0, opacity: 0.7 }}>Kelola halaman tambahan website seperti FAQ, Terms, Privacy Policy.</p>
+                    </div>
+                    {!isEditing && (
+                        <button style={primaryBtn} onClick={handleCreateNew} disabled={loading}>
+                            + Tambah Halaman
+                        </button>
+                    )}
+                </div>
+
+                {isEditing ? (
+                    <div style={cardStyle}>
+                        <h2 style={{ marginTop: 0, marginBottom: 24, borderBottom: "1px solid rgba(0,0,0,0.1)", paddingBottom: 16 }}>
+                            {editId ? "Edit Halaman" : "Buat Halaman Baru"}
+                        </h2>
+
+                        <div style={formGroup}>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+                                <label style={labelStyle}>Judul Halaman</label>
+                                <button
+                                    type="button"
+                                    style={{ ...ghostBtn, padding: "4px 8px", fontSize: 12, marginBottom: 6, color: "#d97706", borderColor: "#d97706" }}
+                                    onClick={handleAutoGenerate}
+                                    title="Isi konten otomatis berdasarkan judul/slug"
+                                >
+                                    ✨ Auto Generate Isi Konten
+                                </button>
+                            </div>
+                            <input
+                                style={inputStyle}
+                                type="text"
+                                value={formTitle}
+                                onChange={handleAutoSlug}
+                                placeholder="Contoh: Frequently Asked Questions"
+                            />
                         </div>
-                        {!isEditing && (
-                            <button style={primaryBtn} onClick={handleCreateNew} disabled={loading}>
-                                + Tambah Halaman
+
+                        <div style={formGroup}>
+                            <label style={labelStyle}>Slug (URL)</label>
+                            <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+                                <span style={{
+                                    position: "absolute",
+                                    left: 10,
+                                    color: isDarkMode ? "#94a3b8" : "#64748b",
+                                    fontWeight: 600,
+                                    userSelect: "none"
+                                }}>/</span>
+                                <input
+                                    style={{ ...inputStyle, paddingLeft: 24 }}
+                                    type="text"
+                                    value={formSlug}
+                                    onChange={(e) => {
+                                        // Remove slashes and spaces, keep mostly alphanumeric
+                                        const clean = e.target.value.replace(/[^a-z0-9-]/gi, "");
+                                        setFormSlug(clean);
+                                    }}
+                                    placeholder="faq"
+                                />
+                            </div>
+                            <small style={{ display: "block", marginTop: 4, opacity: 0.6 }}>Link: yoursite.com/{formSlug || "..."}</small>
+                        </div>
+
+                        <div style={formGroup}>
+                            <label style={labelStyle}>Konten Halaman (HTML Support)</label>
+                            <textarea
+                                style={{ ...inputStyle, minHeight: 300, fontFamily: "monospace" }}
+                                value={formContent}
+                                onChange={(e) => setFormContent(e.target.value)}
+                                placeholder="<p>Tulis konten di sini...</p>"
+                            />
+                            <small style={{ display: "block", marginTop: 4, opacity: 0.6 }}>Tips: Gunakan tag &lt;h2&gt;, &lt;p&gt;, &lt;ul&gt; untuk format rapi.</small>
+                        </div>
+
+                        <div style={{ ...formGroup, display: "flex", alignItems: "center", gap: 12 }}>
+                            <input
+                                type="checkbox"
+                                id="pubCheck"
+                                checked={formPublished}
+                                onChange={(e) => setFormPublished(e.target.checked)}
+                                style={{ width: 20, height: 20 }}
+                            />
+                            <label htmlFor="pubCheck" style={{ ...labelStyle, marginBottom: 0, cursor: "pointer" }}>Publikasikan Halaman ini?</label>
+                        </div>
+
+                        <details style={{ marginBottom: 24, background: "rgba(0,0,0,0.02)", padding: 12, borderRadius: 6 }}>
+                            <summary style={{ cursor: "pointer", fontWeight: 600 }}>SEO Settings (Optional)</summary>
+                            <div style={{ marginTop: 12 }}>
+                                <div style={formGroup}>
+                                    <label style={labelStyle}>SEO Title</label>
+                                    <input style={inputStyle} value={formSeoTitle} onChange={(e) => setFormSeoTitle(e.target.value)} />
+                                </div>
+                                <div style={formGroup}>
+                                    <label style={labelStyle}>Meta Description</label>
+                                    <textarea style={{ ...inputStyle, minHeight: 80 }} value={formSeoDesc} onChange={(e) => setFormSeoDesc(e.target.value)} />
+                                </div>
+                            </div>
+                        </details>
+
+                        <div style={{ display: "flex", gap: 12, justifyContent: "flex-end" }}>
+                            <button style={ghostBtn} onClick={() => setIsEditing(false)} disabled={loading}>
+                                Batal
                             </button>
+                            <button style={primaryBtn} onClick={handleSave} disabled={loading}>
+                                {loading ? "Menyimpan..." : "Simpan"}
+                            </button>
+                        </div>
+                    </div>
+                ) : (
+                    <div style={cardStyle}>
+                        {pages.length === 0 ? (
+                            <div style={{ textAlign: "center", padding: 40, opacity: 0.6 }}>
+                                <p>Belum ada halaman dinamis.</p>
+                                <p>Silakan buat halaman FAQ, Privacy Policy, dll.</p>
+                                <button
+                                    style={{ ...primaryBtn, marginTop: 16 }}
+                                    onClick={handleCreateNew}
+                                >
+                                    Buat Halaman Pertama
+                                </button>
+                            </div>
+                        ) : (
+                            <div style={{ overflowX: "auto" }}>
+                                <table style={tableStyle}>
+                                    <thead>
+                                        <tr>
+                                            <th style={thStyle}>Judul</th>
+                                            <th style={thStyle}>URL Slug</th>
+                                            <th style={thStyle}>Status</th>
+                                            <th style={thStyle}>Last Updated</th>
+                                            <th style={thStyle}>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {pages.map((p) => (
+                                            <tr key={p.id}>
+                                                <td style={tdStyle}>
+                                                    <strong>{p.title}</strong>
+                                                </td>
+                                                <td style={{ ...tdStyle, fontFamily: "monospace" }}>/{p.slug}</td>
+                                                <td style={tdStyle}>
+                                                    {p.isPublished ? (
+                                                        <span style={{ padding: "4px 8px", borderRadius: 99, background: "#dcfce7", color: "#166534", fontSize: 12, fontWeight: 700 }}>Published</span>
+                                                    ) : (
+                                                        <span style={{ padding: "4px 8px", borderRadius: 99, background: "#f1f5f9", color: "#64748b", fontSize: 12, fontWeight: 700 }}>Draft</span>
+                                                    )}
+                                                </td>
+                                                <td style={tdStyle}>{new Date(p.updatedAt).toLocaleDateString()}</td>
+                                                <td style={tdStyle}>
+                                                    <div style={{ display: "flex", gap: 8 }}>
+                                                        <button style={{ ...btnStyle, padding: "6px 12px", background: "#f0f9ff", color: "#0369a1", fontSize: 12 }} onClick={() => handleEdit(p)}>
+                                                            Edit
+                                                        </button>
+                                                        <button style={{ ...btnStyle, padding: "6px 12px", background: "#fef2f2", color: "#b91c1c", fontSize: 12 }} onClick={() => handleDelete(p.id)}>
+                                                            Hapus
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
                         )}
                     </div>
+                )}
 
-                    {isEditing ? (
-                        <div style={cardStyle}>
-                            <h2 style={{ marginTop: 0, marginBottom: 24, borderBottom: "1px solid rgba(0,0,0,0.1)", paddingBottom: 16 }}>
-                                {editId ? "Edit Halaman" : "Buat Halaman Baru"}
-                            </h2>
-
-                            <div style={formGroup}>
-                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
-                                    <label style={labelStyle}>Judul Halaman</label>
-                                    <button
-                                        type="button"
-                                        style={{ ...ghostBtn, padding: "4px 8px", fontSize: 12, marginBottom: 6, color: "#d97706", borderColor: "#d97706" }}
-                                        onClick={handleAutoGenerate}
-                                        title="Isi konten otomatis berdasarkan judul/slug"
-                                    >
-                                        ✨ Auto Generate Isi Konten
-                                    </button>
-                                </div>
-                                <input
-                                    style={inputStyle}
-                                    type="text"
-                                    value={formTitle}
-                                    onChange={handleAutoSlug}
-                                    placeholder="Contoh: Frequently Asked Questions"
-                                />
-                            </div>
-
-                            <div style={formGroup}>
-                                <label style={labelStyle}>Slug (URL)</label>
-                                <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
-                                    <span style={{
-                                        position: "absolute",
-                                        left: 10,
-                                        color: isDarkMode ? "#94a3b8" : "#64748b",
-                                        fontWeight: 600,
-                                        userSelect: "none"
-                                    }}>/</span>
-                                    <input
-                                        style={{ ...inputStyle, paddingLeft: 24 }}
-                                        type="text"
-                                        value={formSlug}
-                                        onChange={(e) => {
-                                            // Remove slashes and spaces, keep mostly alphanumeric
-                                            const clean = e.target.value.replace(/[^a-z0-9-]/gi, "");
-                                            setFormSlug(clean);
-                                        }}
-                                        placeholder="faq"
-                                    />
-                                </div>
-                                <small style={{ display: "block", marginTop: 4, opacity: 0.6 }}>Link: yoursite.com/{formSlug || "..."}</small>
-                            </div>
-
-                            <div style={formGroup}>
-                                <label style={labelStyle}>Konten Halaman (HTML Support)</label>
-                                <textarea
-                                    style={{ ...inputStyle, minHeight: 300, fontFamily: "monospace" }}
-                                    value={formContent}
-                                    onChange={(e) => setFormContent(e.target.value)}
-                                    placeholder="<p>Tulis konten di sini...</p>"
-                                />
-                                <small style={{ display: "block", marginTop: 4, opacity: 0.6 }}>Tips: Gunakan tag &lt;h2&gt;, &lt;p&gt;, &lt;ul&gt; untuk format rapi.</small>
-                            </div>
-
-                            <div style={{ ...formGroup, display: "flex", alignItems: "center", gap: 12 }}>
-                                <input
-                                    type="checkbox"
-                                    id="pubCheck"
-                                    checked={formPublished}
-                                    onChange={(e) => setFormPublished(e.target.checked)}
-                                    style={{ width: 20, height: 20 }}
-                                />
-                                <label htmlFor="pubCheck" style={{ ...labelStyle, marginBottom: 0, cursor: "pointer" }}>Publikasikan Halaman ini?</label>
-                            </div>
-
-                            <details style={{ marginBottom: 24, background: "rgba(0,0,0,0.02)", padding: 12, borderRadius: 6 }}>
-                                <summary style={{ cursor: "pointer", fontWeight: 600 }}>SEO Settings (Optional)</summary>
-                                <div style={{ marginTop: 12 }}>
-                                    <div style={formGroup}>
-                                        <label style={labelStyle}>SEO Title</label>
-                                        <input style={inputStyle} value={formSeoTitle} onChange={(e) => setFormSeoTitle(e.target.value)} />
-                                    </div>
-                                    <div style={formGroup}>
-                                        <label style={labelStyle}>Meta Description</label>
-                                        <textarea style={{ ...inputStyle, minHeight: 80 }} value={formSeoDesc} onChange={(e) => setFormSeoDesc(e.target.value)} />
-                                    </div>
-                                </div>
-                            </details>
-
-                            <div style={{ display: "flex", gap: 12, justifyContent: "flex-end" }}>
-                                <button style={ghostBtn} onClick={() => setIsEditing(false)} disabled={loading}>
-                                    Batal
-                                </button>
-                                <button style={primaryBtn} onClick={handleSave} disabled={loading}>
-                                    {loading ? "Menyimpan..." : "Simpan"}
-                                </button>
-                            </div>
-                        </div>
-                    ) : (
-                        <div style={cardStyle}>
-                            {pages.length === 0 ? (
-                                <div style={{ textAlign: "center", padding: 40, opacity: 0.6 }}>
-                                    <p>Belum ada halaman dinamis.</p>
-                                    <p>Silakan buat halaman FAQ, Privacy Policy, dll.</p>
-                                    <button
-                                        style={{ ...primaryBtn, marginTop: 16 }}
-                                        onClick={handleCreateNew}
-                                    >
-                                        Buat Halaman Pertama
-                                    </button>
-                                </div>
-                            ) : (
-                                <div style={{ overflowX: "auto" }}>
-                                    <table style={tableStyle}>
-                                        <thead>
-                                            <tr>
-                                                <th style={thStyle}>Judul</th>
-                                                <th style={thStyle}>URL Slug</th>
-                                                <th style={thStyle}>Status</th>
-                                                <th style={thStyle}>Last Updated</th>
-                                                <th style={thStyle}>Aksi</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {pages.map((p) => (
-                                                <tr key={p.id}>
-                                                    <td style={tdStyle}>
-                                                        <strong>{p.title}</strong>
-                                                    </td>
-                                                    <td style={{ ...tdStyle, fontFamily: "monospace" }}>/{p.slug}</td>
-                                                    <td style={tdStyle}>
-                                                        {p.isPublished ? (
-                                                            <span style={{ padding: "4px 8px", borderRadius: 99, background: "#dcfce7", color: "#166534", fontSize: 12, fontWeight: 700 }}>Published</span>
-                                                        ) : (
-                                                            <span style={{ padding: "4px 8px", borderRadius: 99, background: "#f1f5f9", color: "#64748b", fontSize: 12, fontWeight: 700 }}>Draft</span>
-                                                        )}
-                                                    </td>
-                                                    <td style={tdStyle}>{new Date(p.updatedAt).toLocaleDateString()}</td>
-                                                    <td style={tdStyle}>
-                                                        <div style={{ display: "flex", gap: 8 }}>
-                                                            <button style={{ ...btnStyle, padding: "6px 12px", background: "#f0f9ff", color: "#0369a1", fontSize: 12 }} onClick={() => handleEdit(p)}>
-                                                                Edit
-                                                            </button>
-                                                            <button style={{ ...btnStyle, padding: "6px 12px", background: "#fef2f2", color: "#b91c1c", fontSize: 12 }} onClick={() => handleDelete(p.id)}>
-                                                                Hapus
-                                                            </button>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            )}
-                        </div>
-                    )}
-
-                </div>
-            </main>
+            </div>
         </div>
     );
 }
