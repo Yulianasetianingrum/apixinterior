@@ -263,7 +263,7 @@ export default async function ProdukDetailPage({ params }: PageProps) {
 // Helper to map hargaTipe to readable label
 function resolveUnitLabel(code: string | null | undefined) {
   const s = String(code || "").trim().toUpperCase();
-  if (!s || s === "TETAP") return "-";
+  if (!s || s === "TETAP" || s.includes("MULAI")) return "-";
 
   if (s === "M2") return "Meter Persegi (m²)";
   if (s === "M") return "Meter Lari (m)";
