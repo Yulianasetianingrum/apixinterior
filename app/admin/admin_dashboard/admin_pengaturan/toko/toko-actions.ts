@@ -1676,7 +1676,12 @@ export async function uploadImageToGalleryAndAttach(formData: FormData): Promise
             const checkPath = path.join(process.cwd(), "public", "uploads", "gambar_upload", relPath);
             let retries = 30; // 30 * 100ms = 3s
             while (retries > 0) {
-                if (fs.existsSync(checkPath)) break;
+                try {
+                    await fs.access(checkPath);
+                    break;
+                } catch {
+                    // wait
+                }
                 await new Promise(r => setTimeout(r, 100));
                 retries--;
             }
