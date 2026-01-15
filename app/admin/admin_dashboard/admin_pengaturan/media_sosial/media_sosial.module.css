@@ -9,11 +9,7 @@
   color: #f5c542;
 }
 
-.pageTitleOutside {
-}
 
-.pageSubtitleOutside {
-}
 
 .mainDay .pageTitleOutside {
   color: #0b1531;
@@ -51,7 +47,8 @@
 
 /* List item di mode malam: background gelap + teks terang */
 .mainNight .listItem {
-  background: #020617; /* selaras dengan cardNight */
+  background: #020617;
+  /* selaras dengan cardNight */
   border-color: rgba(248, 250, 252, 0.12);
 }
 
@@ -92,56 +89,43 @@
 
 /* CARD BESAR AREA */
 .cardArea {
-  padding: 8px 0 24px;
-}
-
-.cardAreaDay {
-  background: transparent;
-}
-
-.cardAreaNight {
-  background: transparent;
+  padding: 24px;
+  max-width: 1000px;
+  margin: 0 auto;
 }
 
 .cardWrapper {
-  display: flex;
-  justify-content: center;
+  display: block;
+  /* Remove center flex */
 }
 
 .card {
-  max-width: 1100px;
   width: 100%;
-  border-radius: 24px;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   transition: none;
 }
 
 .cardDay {
-  background: #f5c542; /* kuning */
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  color: #0b1531;
 }
 
 .cardNight {
-  background: #020617; /* biru gelap */
+  background: #1e293b;
+  border: 1px solid #334155;
+  color: #f8fafc;
 }
 
 .noCardHover:hover {
-  transform: none !important;
-  box-shadow: none !important;
+  transform: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-/* TOMBOL X DI SIDEBAR (MOBILE) */
 .closeSidebarButton {
-  border: none;
-  background: transparent;
-  color: #f5c542;
-  font-size: 22px;
-  margin-left: auto;
-  cursor: pointer;
-}
-
-@media (min-width: 1024px) {
-  .closeSidebarButton {
-    display: none;
-  }
+  display: none;
 }
 
 /* TOMBOL KEMBALI DI BAWAH SIDEBAR */
@@ -209,7 +193,8 @@
   min-width: 260px;
   font-size: 14px;
   background: #ffffff;
-  color: #111827; /* teks selalu gelap */
+  color: #111827;
+  /* teks selalu gelap */
 }
 
 .input::placeholder {
@@ -385,11 +370,13 @@
   align-items: center;
   gap: 4px;
   font-size: 12px;
-  color: #0b1531 !important; /* siang: gelap, biar kebaca di kuning */
+  color: #0b1531 !important;
+  /* siang: gelap, biar kebaca di kuning */
 }
 
 .mainNight .priorityToggle {
-  color: #f5f5f5 !important; /* malam: terang, kebaca di biru tua */
+  color: #f5f5f5 !important;
+  /* malam: terang, kebaca di biru tua */
 }
 
 /* Tombol Edit */
@@ -400,7 +387,8 @@
   background: #e5e7eb;
   font-size: 12px;
   cursor: pointer;
-  color: #0b1531 !important; /* fix text hilang */
+  color: #0b1531 !important;
+  /* fix text hilang */
 }
 
 .secondaryButton:hover {
@@ -441,26 +429,32 @@
 /* ===== RESPONSIVE: TABLET & HP ===== */
 @media (max-width: 1024px) {
   .listItem {
-    flex-direction: column;      /* dari row -> column */
+    flex-direction: column;
+    /* dari row -> column */
     align-items: flex-start;
     gap: 8px;
   }
 
   .listMain {
-    width: 100%;                 /* teks & link full width */
+    width: 100%;
+    /* teks & link full width */
   }
 
   .listActions {
     width: 100%;
-    margin-top: 8px;             /* geser ke bawah link */
-    justify-content: flex-start; /* tombol mulai dari kiri */
-    flex-wrap: wrap;             /* kalau sempit boleh turun baris lagi */
+    margin-top: 8px;
+    /* geser ke bawah link */
+    justify-content: flex-start;
+    /* tombol mulai dari kiri */
+    flex-wrap: wrap;
+    /* kalau sempit boleh turun baris lagi */
     gap: 6px;
   }
 
   .priorityToggle,
   .secondaryButton,
   .dangerButton {
-    font-size: 12px;             /* sedikit lebih kecil di mobile */
+    font-size: 12px;
+    /* sedikit lebih kecil di mobile */
   }
 }

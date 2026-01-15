@@ -12,11 +12,7 @@
   color: #f5c542;
 }
 
-.pageTitleOutside {
-}
 
-.pageSubtitleOutside {
-}
 
 .mainDay .pageTitleOutside {
   color: #0b1531;
@@ -72,70 +68,43 @@
    =========================== */
 
 .cardArea {
-  padding: 8px 0 24px;
-}
-
-.cardAreaDay {
-  background: transparent;
-}
-
-.cardAreaNight {
-  background: transparent;
+  padding: 24px;
+  max-width: 1000px;
+  margin: 0 auto;
 }
 
 .cardWrapper {
-  display: flex;
-  justify-content: center;
+  display: block;
 }
 
 .card {
-  max-width: 1100px;
   width: 100%;
-  border-radius: 24px;
-  transition: none;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-/* SIANG: card besar golden */
+/* SIANG: Clean white */
 .cardDay {
-  background: #f5c542;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  color: #0b1531;
 }
 
-/* MALAM: card besar biru dongker */
+/* MALAM: Slate dark */
 .cardNight {
-  background: #020617;
+  background: #1e293b;
+  border: 1px solid #334155;
+  color: #f8fafc;
 }
 
 .noCardHover:hover {
-  transform: none !important;
-  box-shadow: none !important;
+  transform: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
-
-/* ===========================
-   STATUS TEXT
-   =========================== */
-
-.statusText {
-  font-size: 13px;
-  margin-top: 4px;
-}
-
-/* ===========================
-   SIDEBAR (PERSIS KOLASE)
-   =========================== */
 
 .closeSidebarButton {
-  border: none;
-  background: transparent;
-  color: #f5c542;
-  font-size: 22px;
-  margin-left: auto;
-  cursor: pointer;
-}
-
-@media (min-width: 1024px) {
-  .closeSidebarButton {
-    display: none;
-  }
+  display: none;
 }
 
 .sidebarBackWrapper {
@@ -318,6 +287,7 @@
 .mainDay .pageTitleOutside {
   color: #0b1531;
 }
+
 .mainNight .pageTitleOutside {
   color: #f8fafc;
 }
@@ -325,6 +295,7 @@
 .mainDay .pageSubtitleOutside {
   color: #4b5563;
 }
+
 .mainNight .pageSubtitleOutside {
   color: #cbd5e1;
 }
@@ -396,6 +367,7 @@
   font-weight: 600;
   cursor: pointer;
 }
+
 .button:disabled {
   opacity: 0.6;
 }
@@ -410,6 +382,7 @@
   margin-bottom: 8px;
   color: #1f2937;
 }
+
 .mainNight .infoText {
   color: #cbd5e1;
 }
@@ -418,6 +391,7 @@
   font-size: 13px;
   color: #6b7280;
 }
+
 .mainNight .editingInfo {
   color: #94a3b8;
 }
@@ -436,6 +410,7 @@
   margin-bottom: 8px;
   color: #020617;
 }
+
 .mainNight .listTitle {
   color: white;
 }

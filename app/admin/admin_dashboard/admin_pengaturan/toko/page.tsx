@@ -744,7 +744,7 @@ export default async function TokoPengaturanPage({
 
 
   return (
-    <main className={styles.page}>
+    <div className={styles.page}>
       <h1 className={styles.title}>Pengaturan Toko</h1>
       <p className={styles.subtitle}>
         Atur tampilan homepage versi <strong>Draft</strong>, preview, lalu publish ke website utama.
@@ -3713,7 +3713,7 @@ export default async function TokoPengaturanPage({
       <script dangerouslySetInnerHTML={{ __html: voucherLinkScript }} />
       <script dangerouslySetInnerHTML={{ __html: scrollRestoreScript }} />
       <script dangerouslySetInnerHTML={{ __html: formFocusScript }} />
-    </main>
+    </div>
   );
 }
 
