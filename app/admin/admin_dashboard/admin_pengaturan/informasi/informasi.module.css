@@ -9,9 +9,7 @@
   color: #f5c542;
 }
 
-.pageTitleOutside {}
 
-.pageSubtitleOutside {}
 
 .mainDay .pageTitleOutside {
   color: #0b1531;
@@ -318,200 +316,195 @@
   border-radius: 999px;
   border: 1px solid rgba(15, 23, 42, 0.18);
   font-size: 14px;
+  background: #ffffff;
+  color: #111827;
+}
 
-  .textInput,
-  .textArea {
-    /* ... existing basic styles handled by previous lines ... */
-    background: #ffffff;
-    color: #111827;
-    /* Force dark text on white background always */
-  }
+.textInput:disabled,
+.textArea:disabled {
+  background: #e5e7eb;
+  cursor: not-allowed;
+}
 
-  .textInput:disabled,
-  .textArea:disabled {
-    background: #e5e7eb;
-    cursor: not-allowed;
-  }
+.textArea {
+  min-height: 90px;
+  padding: 9px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(15, 23, 42, 0.18);
+  font-size: 14px;
+  resize: vertical;
+  background: #ffffff;
+  color: #111827;
+}
 
-  .textArea {
-    min-height: 90px;
-    padding: 9px 12px;
-    border-radius: 14px;
-    border: 1px solid rgba(15, 23, 42, 0.18);
-    font-size: 14px;
-    resize: vertical;
-    background: #ffffff;
-    color: #111827;
-  }
+.textArea::placeholder {
+  color: #9ca3af;
+}
 
-  .textArea::placeholder {
-    color: #9ca3af;
-  }
+.textArea:focus {
+  outline: none;
+  border-color: #0b1531;
+  box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.15);
+}
 
-  .textArea:focus {
-    outline: none;
-    border-color: #0b1531;
-    box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.15);
-  }
+.infoButton {
+  margin-top: 4px;
+  align-self: flex-start;
+  padding: 9px 16px;
+  border-radius: 999px;
+  border: none;
+  background: #0b1531;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
 
-  .infoButton {
-    margin-top: 4px;
-    align-self: flex-start;
-    padding: 9px 16px;
-    border-radius: 999px;
-    border: none;
-    background: #0b1531;
-    color: #ffffff;
-    font-weight: 600;
-    font-size: 14px;
-    cursor: pointer;
-  }
+.infoButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
 
-  .infoButton:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
+/* CABANG FORM */
+.branchFormRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 2fr) 80px 110px;
+  gap: 10px;
+  align-items: flex-end;
+  margin-bottom: 8px;
+}
 
-  /* CABANG FORM */
+@media (max-width: 900px) {
   .branchFormRow {
-    display: grid;
-    grid-template-columns: minmax(0, 1.3fr) minmax(0, 2fr) 80px 110px;
-    gap: 10px;
-    align-items: flex-end;
-    margin-bottom: 8px;
+    grid-template-columns: minmax(0, 1fr);
   }
+}
 
-  @media (max-width: 900px) {
-    .branchFormRow {
-      grid-template-columns: minmax(0, 1fr);
-    }
-  }
+.branchButton {
+  padding: 9px 14px;
+  border-radius: 999px;
+  border: none;
+  background: #0b1531;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
 
-  .branchButton {
-    padding: 9px 14px;
-    border-radius: 999px;
-    border: none;
-    background: #0b1531;
-    color: #ffffff;
-    font-weight: 600;
-    font-size: 14px;
-    cursor: pointer;
-  }
+.branchButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
 
-  .branchButton:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
+/* STATUS */
+.statusText {
+  font-size: 13px;
+  color: #374151;
+}
 
-  /* STATUS */
-  .statusText {
-    font-size: 13px;
-    color: #374151;
-  }
+/* LIST CABANG */
+.branchListWrapper {
+  margin-top: 10px;
+}
 
-  /* LIST CABANG */
-  .branchListWrapper {
-    margin-top: 10px;
-  }
+.branchListTitle {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #0b1531;
+}
 
-  .branchListTitle {
-    font-size: 15px;
-    font-weight: 600;
-    margin-bottom: 6px;
-    color: #0b1531;
-  }
+.mainNight .branchListTitle {
+  color: #f5f5f5;
+}
 
-  .mainNight .branchListTitle {
-    color: #f5f5f5;
-  }
+.branchList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
 
-  .branchList {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
+.branchItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #fefce8;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  margin-bottom: 8px;
+}
 
-  .branchItem {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 12px;
-    border-radius: 12px;
-    background: #fefce8;
-    border: 1px solid rgba(15, 23, 42, 0.12);
-    margin-bottom: 8px;
-  }
+.branchMain {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
-  .branchMain {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
+.branchBadge {
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  background: #0b1531;
+  color: #f5c542;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+}
 
-  .branchBadge {
-    width: 30px;
-    height: 30px;
-    border-radius: 999px;
-    background: #0b1531;
-    color: #f5c542;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 13px;
-    font-weight: 600;
-  }
+.branchText {
+  display: flex;
+  flex-direction: column;
+}
 
-  .branchText {
-    display: flex;
-    flex-direction: column;
-  }
+.branchName {
+  font-weight: 600;
+  font-size: 14px;
+  color: #0b1531;
+}
 
-  .branchName {
-    font-weight: 600;
-    font-size: 14px;
-    color: #0b1531;
-  }
+.branchMaps {
+  font-size: 12px;
+  color: #1d4ed8;
+  text-decoration: underline;
+  word-break: break-all;
+}
 
-  .branchMaps {
-    font-size: 12px;
-    color: #1d4ed8;
-    text-decoration: underline;
-    word-break: break-all;
-  }
+.branchActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
-  .branchActions {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
+/* TOMBOL LIST: pastikan teks tidak menghilang */
+.branchEditButton {
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: none;
+  background: #e5e7eb;
+  font-size: 12px;
+  cursor: pointer;
+  color: #0b1531 !important;
+}
 
-  /* TOMBOL LIST: pastikan teks tidak menghilang */
-  .branchEditButton {
-    padding: 6px 10px;
-    border-radius: 999px;
-    border: none;
-    background: #e5e7eb;
-    font-size: 12px;
-    cursor: pointer;
-    color: #0b1531 !important;
-  }
+.branchEditButton:hover {
+  background: #d1d5db;
+  color: #0b1531 !important;
+}
 
-  .branchEditButton:hover {
-    background: #d1d5db;
-    color: #0b1531 !important;
-  }
+.branchDeleteButton {
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: none;
+  background: #fee2e2;
+  font-size: 12px;
+  cursor: pointer;
+  color: #b91c1c !important;
+}
 
-  .branchDeleteButton {
-    padding: 6px 10px;
-    border-radius: 999px;
-    border: none;
-    background: #fee2e2;
-    font-size: 12px;
-    cursor: pointer;
-    color: #b91c1c !important;
-  }
-
-  .branchDeleteButton:hover {
-    background: #fecaca;
-    color: #7f1d1d !important;
-  }
+.branchDeleteButton:hover {
+  background: #fecaca;
+  color: #7f1d1d !important;
+}
