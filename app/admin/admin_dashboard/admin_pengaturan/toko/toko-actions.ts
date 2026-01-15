@@ -1349,6 +1349,7 @@ export async function uploadImageToGalleryAndAttach(formData: FormData): Promise
 
         let imageIdToUse: number | null =
             Number.isFinite(pickedImageId) && pickedImageId > 0 ? pickedImageId : null;
+        let finalImageObj: { id: number; url?: string; title?: string; tags?: string | null } | null = null;
         if (!sectionId || Number.isNaN(sectionId)) {
             return { ok: false, error: "SectionId tidak valid." };
         }
@@ -1469,6 +1470,7 @@ export async function uploadImageToGalleryAndAttach(formData: FormData): Promise
             });
 
             imageIdToUse = Number(created.id);
+            finalImageObj = { id: imageIdToUse, url: publicUrl, title: title ?? safeName, tags };
         }
 
         // 3) Attach to Draft section config (ONLY if attach is provided)
@@ -1663,25 +1665,7 @@ export async function uploadImageToGalleryAndAttach(formData: FormData): Promise
         });
 
         // Create explicit return object
-        const returnedImage = {
-            id: imageIdToUse as number,
-            url: publicUrl, // We know this from earlier scope
-            title: title ?? safeName, // Approximate, or fetch if needed. 
-            // Better to fetch if we want accuracy, but we have the values here.
-            // If it was an existing image (picked), we didn't fetch details.
-            // Let's rely on what we have. If it's a new upload, we have url/title.
-        };
-
-        // If picked, we don't have URL easily available without query.
-        // But for "Upload & Attach", we definitely have it.
-        // Let's refine:
-        let finalImageObj = null;
-        if (hasUploadFile) {
-            finalImageObj = { id: imageIdToUse, url: publicUrl, title: title ?? safeName, tags: tags };
-        } else {
-            // For picked image, we might want to return it too?
-            // The frontend already has it in 'selected'.
-        }
+        // finalImageObj is already populated if upload occurred
 
         revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko");
         revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko/preview");
