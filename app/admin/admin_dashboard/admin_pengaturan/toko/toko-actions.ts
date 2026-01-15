@@ -1328,7 +1328,7 @@ export async function uploadImageToGallery(formData: FormData) {
     return redirectBack({ notice: encodeURIComponent("Gambar berhasil diupload ke galeri.") });
 }
 
-export async function uploadImageToGalleryAndAttach(formData: FormData): Promise<{ ok: true; imageId: number; notice?: string } | { ok: false; error: string }> {
+export async function uploadImageToGalleryAndAttach(formData: FormData): Promise<{ ok: true; imageId: number; image?: { id: number; url?: string; title?: string; tags?: string | null } | null; notice?: string } | { ok: false; error: string }> {
     try {
         const sectionId = Number(formData.get("sectionId"));
         const attach = (formData.get("attach") as string | null) ?? "";
