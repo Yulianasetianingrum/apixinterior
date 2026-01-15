@@ -58,6 +58,20 @@ export default function KolaseFotoPage() {
   const [formTagInput, setFormTagInput] = useState('');
   const [formSubmitting, setFormSubmitting] = useState(false);
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (addOpen && formFiles && formFiles.length > 0 && fileInputRef.current) {
+      const dt = new DataTransfer();
+      // Calculate limit to avoid performance issues if someone drops 1000 files, though DataTransfer is fast.
+      // Copy files from state to DataTransfer
+      for (let i = 0; i < formFiles.length; i++) {
+        dt.items.add(formFiles[i]);
+      }
+      fileInputRef.current.files = dt.files;
+    }
+  }, [addOpen, formFiles]); // Sync whenever modal opens or files change
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
 
@@ -792,6 +806,7 @@ export default function KolaseFotoPage() {
                 <label className={styles.label}>
                   Pilih File (Bisa Banyak)
                   <input
+                    ref={fileInputRef}
                     type="file" multiple accept="image/*"
                     onChange={(e) => {
                       if (e.target.files) {
