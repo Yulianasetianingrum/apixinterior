@@ -1,0 +1,15 @@
+/* Dark mode for modal */
+.modalOverlay { background: rgba(0, 0, 0, 0.7); }
+.aiOverlay { background: rgba(0, 0, 0, 0.8); }
+.modal { background: #ffffff; color: #1f2937; }
+.aiModal { background: #1e293b !important; color: #f1f5f9 !important; }
+.modalHeader { background: #f9fafb; border-bottom: 1px solid #e5e7eb; }
+.aiModalHeader { background: #0f172a !important; border-bottom: 1px solid #334155 !important; color: #f1f5f9 !important; }
+.modalContent { background: #ffffff; }
+.aiModalContent { background: #1e293b !important; }
+.modalLeft, .modalRight { background: transparent; }
+.aiModalLeft, .aiModalRight { background: transparent !important; }
+.select { background: #ffffff; color: #1f2937; border: 1px solid #d1d5db; }
+.aiFieldGroup select, .aiFieldGroup input[type="text"] { background: #0f172a !important; color: #f1f5f9 !important; border-color: #334155 !important; }
+.modalFooter { border-top: 1px solid #e5e7eb; }
+.aiModalFooter { border-top: 1px solid #334155 !important; color: #f1f5f9 !important; }

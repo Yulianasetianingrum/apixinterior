@@ -1,0 +1,36 @@
+
+
+/* ========================= HERO SECTION ========================= */
+.hero { max-width: 1400px; margin: 0 auto 28px; padding: 0 16px 24px; --hb-bg: #071026; --hb-text: rgba(255, 255, 255, 0.96); --hb-accent: #ffe893; --hb-chipBg: rgba(255, 255, 255, 0.10); --hb-chipBorder: rgba(255, 255, 255, 0.18); }
+.heroInner { position: relative; display: flex; gap: clamp(14px, 2.2vw, 28px); align-items: center; padding: clamp(16px, 2.6vw, 30px); border-radius: 26px; overflow: hidden; background: linear-gradient(180deg, var(--hb-bg), #050a14); border: 1px solid rgba(0, 0, 0, 0.10); box-shadow: 0 18px 40px rgba(0, 0, 0, 0.10); }
+.heroText { flex: 1 1 560px; display: flex; flex-direction: column; gap: 10px; max-width: 720px; }
+.heroTopRow { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.heroTopBadges { display: flex; gap: 8px; flex-wrap: wrap; margin-left: auto; }
+.heroBadge { padding: 7px 10px; border-radius: 999px; font-size: 12px; font-weight: 850; background: var(--hb-chipBg); border: 1px solid var(--hb-chipBorder); color: var(--hb-text); }
+.heroTitle { margin: 0; font-weight: 950; font-size: clamp(30px, 3.6vw, 54px); line-height: 1.06; color: var(--hb-text); font-family: ui-serif, Georgia, serif; }
+.heroDescription { margin: 0; font-size: clamp(14px, 1.2vw, 18px); color: rgba(255, 255, 255, 0.78); }
+.heroMedia { flex: 1 1 440px; position: relative; border-radius: 24px; height: clamp(320px, 36vw, 540px); overflow: hidden; }
+.heroImage { display: block; width: 100%; height: 100%; position: absolute; inset: 0; object-fit: cover; }
+.heroMediaBg { position: absolute; inset: 0; opacity: 0.14; }
+.heroMediaPlaceholder { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0.1), rgba(0,0,0,0.3)); }
+.heroV1 .heroImage { filter: drop-shadow(0 18px 26px rgba(0, 0, 0, 0.16)); }
+.heroActions { display: flex; gap: 10px; margin-top: 6px; }
+.heroCta { display: inline-flex; padding: 12px 16px; border-radius: 18px; font-weight: 950; text-decoration: none; }
+.heroCtaPrimary { background: var(--hb-accent) !important; color: #071026 !important; }
+.heroHighlights { margin: 7px 0 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+.heroHighlightItem { display: flex; gap: 10px; padding: 10px 12px; border-radius: 16px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.18); }
+.heroHighlightIcon { width: 22px; height: 22px; display: grid; place-items: center; color: var(--hb-accent); background: rgba(255,200,0,0.14); border-radius: 999px; }
+.heroHighlightText { font-weight: 850; }
+.heroTrustRow { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
+.heroTrustChip { padding: 8px 10px; border-radius: 999px; font-size: 12px; font-weight: 850; background: var(--hb-chipBg); border: 1px solid var(--hb-chipBorder); color: var(--hb-text); }
+.heroMiniInfoRow { margin-top: 14px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.heroMiniInfoCard { padding: 10px 12px; border-radius: 16px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.18); }
+.heroFloatingCards { position: absolute; inset: 0; pointer-events: none; }
+.heroFloatCard { position: absolute; padding: 12px; border-radius: 18px; background: rgba(255,255,255,0.92); border: 1px solid rgba(0,0,0,0.14); box-shadow: 0 18px 40px rgba(0,0,0,0.22); }
+.heroFloatCardRight { right: 22px; top: 22px; }
+.heroFloatCardWide { left: 22px; bottom: 22px; width: min(320px, 72%); }
+.heroFloatLabel { font-size: 12px; font-weight: 950; opacity: 0.72; }
+.heroFloatRow { display: flex; gap: 8px; padding: 6px 0; }
+.heroFloatDot { width: 10px; height: 10px; border-radius: 999px; background: var(--hb-accent); }
+.heroEyebrow { padding: 8px 12px; border-radius: 999px; font-size: 11px; font-weight: 850; text-transform: uppercase; background: rgba(255,200,0,0.1); border: 1px solid rgba(255,200,0,0.22); color: var(--hb-text); }
+@media (max-width: 640px) { .heroFloatingCards { display: none; } .heroV1 .heroInner { flex-direction: column; } .heroV1 .heroMedia { display: none !important; } .heroV1 .heroTopBadges { display: none !important; } }
