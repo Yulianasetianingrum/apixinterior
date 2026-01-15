@@ -4300,7 +4300,11 @@ export default function TambahProdukPage() {
           if (hUnit && !hUnit.value) {
             try {
               const parsed = JSON.parse(saved);
-              if (parsed?.product?.unit) hUnit.value = parsed.product.unit;
+              if (parsed?.product?.unit) {
+                hUnit.value = parsed.product.unit;
+                // PENTING: update juga 'raw' FormData karena sudah terlanjur dibuat di atas
+                raw.set("product_unit", parsed.product.unit);
+              }
             } catch { }
           }
         }
