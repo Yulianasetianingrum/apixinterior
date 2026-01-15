@@ -205,14 +205,15 @@
 /* INFORMASI TOKO LAYOUT */
 .infoLayout {
   display: grid;
-  grid-template-columns: minmax(0, 260px) minmax(0, 1fr);
-  gap: 16px;
-
+  grid-template-columns: 240px 1fr;
+  gap: 32px;
+  align-items: start;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   .infoLayout {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: 1fr;
+    gap: 24px;
   }
 }
 
@@ -308,6 +309,8 @@
   font-size: 13px;
   font-weight: 500;
   color: #0b1531;
+  margin-bottom: 4px;
+  display: block;
 }
 
 .mainNight .label {
@@ -315,12 +318,90 @@
 }
 
 .textInput {
-  padding: 9px 12px;
+  padding: 10px 14px;
   border-radius: 999px;
   border: 1px solid rgba(15, 23, 42, 0.18);
   font-size: 14px;
   background: #ffffff;
   color: #111827;
+  width: 100%;
+}
+
+.mainNight .textInput {
+  background: #1e293b;
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #f8fafc;
+}
+
+.textInput:disabled,
+.textArea:disabled {
+  background: #e5e7eb;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.mainNight .textInput:disabled,
+.mainNight .textArea:disabled {
+  background: #334155;
+  color: #94a3b8;
+}
+
+.textArea {
+  min-height: 100px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(15, 23, 42, 0.18);
+  font-size: 14px;
+  resize: vertical;
+  background: #ffffff;
+  color: #111827;
+  width: 100%;
+}
+
+.mainNight .textArea {
+  background: #1e293b;
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #f8fafc;
+}
+
+.textArea::placeholder {
+  color: #9ca3af;
+}
+
+.textInput:focus,
+.textArea:focus {
+  outline: none;
+  border-color: #0b1531;
+  box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.15);
+}
+
+.mainNight .textInput:focus,
+.mainNight .textArea:focus {
+  border-color: #f5c542;
+  box-shadow: 0 0 0 2px rgba(245, 197, 66, 0.2);
+}
+
+.infoButton {
+  margin-top: 12px;
+  align-self: flex-start;
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: none;
+  background: #0b1531;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.infoButton:hover {
+  opacity: 0.9;
+}
+
+.mainNight .infoButton {
+  background: #f5c542;
+  color: #0b1531;
 }
 
 .textInput:disabled,
