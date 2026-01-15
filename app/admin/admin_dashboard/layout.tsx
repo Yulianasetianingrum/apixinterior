@@ -2,6 +2,8 @@
 import { ReactNode } from "react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { AdminThemeProvider } from "./AdminThemeContext";
+import AdminLayoutFrame from "./AdminLayoutFrame.client";
 
 export default async function AdminDashboardLayout({
   children,
@@ -18,5 +20,11 @@ export default async function AdminDashboardLayout({
     redirect("/admin/admin_form?from=/admin/admin_dashboard");
   }
 
-  return <>{children}</>;
+  return (
+    <AdminThemeProvider>
+      <AdminLayoutFrame>
+        {children}
+      </AdminLayoutFrame>
+    </AdminThemeProvider>
+  );
 }
