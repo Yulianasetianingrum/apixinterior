@@ -1034,309 +1034,478 @@ export default function KategoriProdukPage() {
   }
 
   // ===== WRAPPER CLASS (DARK / LIGHT) =====
-  const wrapperClass = `${baseStyles.wrapper} ${isDark ? baseStyles.wrapperDark : baseStyles.wrapperLight
-    }`;
+
 
   // ===== RENDER =====
   return (
-    <div className={wrapperClass}>
+    <div style={{ width: '100%' }}>
       {/* SIDEBAR */}
-      <aside
-        className={`${baseStyles.sidebar} ${isSidebarOpen ? baseStyles.sidebarOpen : ""
-          }`}
-      >
-        <div className={baseStyles.sidebarHeader}>
-          <div className={baseStyles.brand}>
-            <div className={baseStyles.brandLogo}>A</div>
-            <div className={baseStyles.brandText}>
-              <span className={baseStyles.brandTitle}>APIX INTERIOR</span>
-              <span className={baseStyles.brandSubtitle}>
-                Admin Dashboard
-              </span>
-            </div>
-          </div>
 
-          <button
-            type="button"
-            className={baseStyles.sidebarClose}
-            onClick={() => setIsSidebarOpen(false)}
-          >
-            ✕
-          </button>
-        </div>
-
-        <nav className={baseStyles.menu}>
-          <button
-            type="button"
-            className={baseStyles.menuItem}
-            onClick={() =>
-              router.push("/admin/admin_dashboard/admin_produk/daftar_produk")
-            }
-          >
-            Daftar Produk
-          </button>
-
-          <button
-            type="button"
-            className={baseStyles.menuItem}
-            onClick={() =>
-              router.push("/admin/admin_dashboard/admin_produk/tambah_produk")
-            }
-          >
-            Tambah Produk
-          </button>
-
-          <button
-            type="button"
-            className={`${baseStyles.menuItem} ${baseStyles.menuItemActive}`}
-          >
-            Kategori Produk
-          </button>
-        </nav>
-
-        <div className={baseStyles.themeSection}>
-          <span className={baseStyles.themeLabel}>
-            Mode tombol: {isDark ? "Malam" : "Siang"}
-          </span>
-          <button
-            type="button"
-            className={`${baseStyles.themeSwitch} ${isDark ? baseStyles.themeSwitchOn : ""
-              }`}
-            onClick={() => setIsDark((prev) => !prev)}
-          >
-            <span className={baseStyles.themeThumb} />
-          </button>
-        </div>
-
-        <div className={baseStyles.sidebarBackWrapper}>
-          <button
-            type="button"
-            className={baseStyles.sidebarBackButton}
-            onClick={() => router.push("/admin/admin_dashboard")}
-          >
-            KEMBALI
-          </button>
-        </div>
-      </aside>
 
       {/* OVERLAY MOBILE */}
-      {isSidebarOpen && (
-        <div
-          className={baseStyles.overlay}
-          onClick={() => setIsSidebarOpen(false)}
-        />
-      )}
+
 
       {/* MAIN CONTENT */}
-      <main className={baseStyles.main}>
 
-        {/* TOAST (gantikan alert() bawaan browser) */}
-        {toastOpen && (
-          <div className={`${styles.toastWrap} ${styles[`toast_${toastKind}`]}`} role="status" aria-live="polite">
-            <div className={styles.toastCard}>
-              <div className={styles.toastHeader}>
-                <div className={styles.toastTitle}>{toastTitle}</div>
-                <button
-                  type="button"
-                  className={styles.toastClose}
-                  onClick={() => setToastOpen(false)}
-                  aria-label="Tutup"
-                  title="Tutup"
-                >
-                  ✕
-                </button>
-              </div>
-              <div className={styles.toastMessage}>{toastMessage}</div>
+
+      {/* TOAST (gantikan alert() bawaan browser) */}
+      {toastOpen && (
+        <div className={`${styles.toastWrap} ${styles[`toast_${toastKind}`]}`} role="status" aria-live="polite">
+          <div className={styles.toastCard}>
+            <div className={styles.toastHeader}>
+              <div className={styles.toastTitle}>{toastTitle}</div>
+              <button
+                type="button"
+                className={styles.toastClose}
+                onClick={() => setToastOpen(false)}
+                aria-label="Tutup"
+                title="Tutup"
+              >
+                ✕
+              </button>
             </div>
+            <div className={styles.toastMessage}>{toastMessage}</div>
           </div>
-        )}
-        {/* TOPBAR MOBILE */}
-        <div className={baseStyles.mobileTopBar}>
+        </div>
+      )}
+      {/* TOPBAR MOBILE */}
+
+
+      {/* BRAND DESKTOP */}
+
+
+      {/* HEADER */}
+      <header className={baseStyles.header}>
+        <h1 className={baseStyles.pageTitle}>Kategori Produk</h1>
+        <p className={baseStyles.pageSubtitle}>
+          Buat kategori bebas dan isi dengan produk dari daftar produk.
+        </p>
+
+        <div className={baseStyles.headerRight}>
+          <input
+            type="text"
+            className={baseStyles.searchInput}
+            placeholder="Nama kategori baru..."
+            disabled={creatingCategory || droppingAllCategories || genBusy}
+            value={newCategoryName}
+            onChange={(e) => setNewCategoryName(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !creatingCategory) {
+                e.preventDefault();
+                handleCreateCategory();
+              }
+            }}
+          />
           <button
             type="button"
-            className={baseStyles.mobileMenuButton}
-            onClick={() => setIsSidebarOpen(true)}
+            className={baseStyles.primaryButton}
+            disabled={creatingCategory || droppingAllCategories || genBusy}
+            onClick={handleCreateCategory}
           >
-            ☰
+            {creatingCategory ? "Menyimpan..." : "+ Tambah Kategori"}
           </button>
-          <div className={baseStyles.mobileBrand}>APIX INTERIOR</div>
+          <button
+            type="button"
+            className={baseStyles.editButton}
+            disabled={
+              creatingCategory ||
+              droppingAllCategories ||
+              loading ||
+              genBusy
+            }
+            onClick={openGenerateModal}
+            title="Generate kategori otomatis dari daftar produk"
+          >
+            {genBusy ? "Generate..." : "⚡ Generate Otomatis"}
+          </button>
+          <button
+            type="button"
+            className={`${baseStyles.deleteButton} ${styles.dropAllButton}`}
+            disabled={
+              creatingCategory ||
+              droppingAllCategories ||
+              loading ||
+              genBusy ||
+              categories.length === 0
+            }
+            onClick={handleDropAllCategories}
+            title={
+              categories.length === 0
+                ? "Tidak ada kategori"
+                : "Hapus semua kategori sekaligus"
+            }
+          >
+            {droppingAllCategories ? "Menghapus..." : "Drop All"}
+
+            {droppingAllCategories && dropAllProgress && (
+              <p className={styles.dropProgress}>{dropAllProgress}</p>
+            )}
+
+          </button>
+
         </div>
+      </header>
 
-        {/* BRAND DESKTOP */}
-        <div className={baseStyles.desktopBrandBar}>
-          <span className={baseStyles.desktopBrand}>APIX INTERIOR</span>
+      {/* STATUS */}
+      {loading && (
+        <p className={baseStyles.infoText}>Memuat kategori...</p>
+      )}
+
+      {error && (
+        <div className={baseStyles.errorBox}>
+          <span>{error}</span>
+          <button
+            type="button"
+            className={baseStyles.retryButton}
+            onClick={fetchCategories}
+          >
+            Coba lagi
+          </button>
         </div>
+      )}
 
-        {/* HEADER */}
-        <header className={baseStyles.header}>
-          <h1 className={baseStyles.pageTitle}>Kategori Produk</h1>
-          <p className={baseStyles.pageSubtitle}>
-            Buat kategori bebas dan isi dengan produk dari daftar produk.
-          </p>
+      {/* LIST KATEGORI + DRAG & DROP */}
+      {!mounted && !loading && !error && (
+        <p className={baseStyles.infoText}>Menyiapkan tampilan...</p>
+      )}
 
-          <div className={baseStyles.headerRight}>
-            <input
-              type="text"
-              className={baseStyles.searchInput}
-              placeholder="Nama kategori baru..."
-              disabled={creatingCategory || droppingAllCategories || genBusy}
-              value={newCategoryName}
-              onChange={(e) => setNewCategoryName(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !creatingCategory) {
-                  e.preventDefault();
-                  handleCreateCategory();
-                }
-              }}
-            />
-            <button
-              type="button"
-              className={baseStyles.primaryButton}
-              disabled={creatingCategory || droppingAllCategories || genBusy}
-              onClick={handleCreateCategory}
-            >
-              {creatingCategory ? "Menyimpan..." : "+ Tambah Kategori"}
-            </button>
-            <button
-              type="button"
-              className={baseStyles.editButton}
-              disabled={
-                creatingCategory ||
-                droppingAllCategories ||
-                loading ||
-                genBusy
-              }
-              onClick={openGenerateModal}
-              title="Generate kategori otomatis dari daftar produk"
-            >
-              {genBusy ? "Generate..." : "⚡ Generate Otomatis"}
-            </button>
-            <button
-              type="button"
-              className={`${baseStyles.deleteButton} ${styles.dropAllButton}`}
-              disabled={
-                creatingCategory ||
-                droppingAllCategories ||
-                loading ||
-                genBusy ||
-                categories.length === 0
-              }
-              onClick={handleDropAllCategories}
-              title={
-                categories.length === 0
-                  ? "Tidak ada kategori"
-                  : "Hapus semua kategori sekaligus"
-              }
-            >
-              {droppingAllCategories ? "Menghapus..." : "Drop All"}
-
-              {droppingAllCategories && dropAllProgress && (
-                <p className={styles.dropProgress}>{dropAllProgress}</p>
-              )}
-
-            </button>
-
-          </div>
-        </header>
-
-        {/* STATUS */}
-        {loading && (
-          <p className={baseStyles.infoText}>Memuat kategori...</p>
-        )}
-
-        {error && (
-          <div className={baseStyles.errorBox}>
-            <span>{error}</span>
-            <button
-              type="button"
-              className={baseStyles.retryButton}
-              onClick={fetchCategories}
-            >
-              Coba lagi
-            </button>
-          </div>
-        )}
-
-        {/* LIST KATEGORI + DRAG & DROP */}
-        {!mounted && !loading && !error && (
-          <p className={baseStyles.infoText}>Menyiapkan tampilan...</p>
-        )}
-
-        {mounted && !loading && !error && (
-          <DragDropContext onDragEnd={handleDragEnd}>
-            <Droppable droppableId="categories">
-              {(provided) => (
-                <div
-                  className={baseStyles.list}
-                  ref={provided.innerRef}
-                  {...provided.droppableProps}
-                >
-                  {categories.map((cat, index) => {
-                    const thumbs = cat.items.slice(0, 4);
-                    return (
-                      <Draggable
-                        key={cat.id}
-                        draggableId={String(cat.id)}
-                        index={index}
-                        isDragDisabled={droppingAllCategories}
-                      >
-                        {(dragProvided) => (
+      {mounted && !loading && !error && (
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <Droppable droppableId="categories">
+            {(provided) => (
+              <div
+                className={baseStyles.list}
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+              >
+                {categories.map((cat, index) => {
+                  const thumbs = cat.items.slice(0, 4);
+                  return (
+                    <Draggable
+                      key={cat.id}
+                      draggableId={String(cat.id)}
+                      index={index}
+                      isDragDisabled={droppingAllCategories}
+                    >
+                      {(dragProvided) => (
+                        <div
+                          ref={dragProvided.innerRef}
+                          {...dragProvided.draggableProps}
+                          className={baseStyles.item}
+                        >
                           <div
-                            ref={dragProvided.innerRef}
-                            {...dragProvided.draggableProps}
-                            className={baseStyles.item}
+                            className={styles.categoryCard}
+                            style={
+                              cat.isPromo
+                                ? {
+                                  border: "2px solid rgba(212,175,55,0.9)",
+                                  boxShadow: "0 12px 30px rgba(212,175,55,0.18)",
+                                }
+                                : undefined
+                            }
                           >
-                            <div
-                              className={styles.categoryCard}
-                              style={
-                                cat.isPromo
-                                  ? {
-                                    border: "2px solid rgba(212,175,55,0.9)",
-                                    boxShadow: "0 12px 30px rgba(212,175,55,0.18)",
-                                  }
-                                  : undefined
-                              }
-                            >
-                              <div className={styles.categoryHeaderRow}>
-                                <span
-                                  className={styles.categoryDragHandle}
-                                  {...dragProvided.dragHandleProps}
-                                >
-                                  ⠿
-                                </span>
-                                <div className={styles.categoryInfo}>
-                                  <div className={styles.categoryName}>
-                                    {cat.nama}
-                                    {cat.isPromo && (
-                                      <span
-                                        style={{
-                                          border: "1px solid rgba(212,175,55,0.9)",
-                                          background: "rgba(212,175,55,0.14)",
-                                          color: "rgba(120,86,0,1)",
-                                          padding: "4px 10px",
-                                          borderRadius: 999,
-                                          fontSize: 12,
-                                          fontWeight: 800,
-                                          letterSpacing: 0.6,
-                                        }}
-                                      >
-                                        PROMO
-                                      </span>
-                                    )}
-                                  </div>
-                                  <div className={styles.categoryCount}>
-                                    {cat.items.length} produk
-                                  </div>
+                            <div className={styles.categoryHeaderRow}>
+                              <span
+                                className={styles.categoryDragHandle}
+                                {...dragProvided.dragHandleProps}
+                              >
+                                ⠿
+                              </span>
+                              <div className={styles.categoryInfo}>
+                                <div className={styles.categoryName}>
+                                  {cat.nama}
+                                  {cat.isPromo && (
+                                    <span
+                                      style={{
+                                        border: "1px solid rgba(212,175,55,0.9)",
+                                        background: "rgba(212,175,55,0.14)",
+                                        color: "rgba(120,86,0,1)",
+                                        padding: "4px 10px",
+                                        borderRadius: 999,
+                                        fontSize: 12,
+                                        fontWeight: 800,
+                                        letterSpacing: 0.6,
+                                      }}
+                                    >
+                                      PROMO
+                                    </span>
+                                  )}
+                                </div>
+                                <div className={styles.categoryCount}>
+                                  {cat.items.length} produk
                                 </div>
                               </div>
+                            </div>
 
-                              <div className={styles.thumbStrip}>
-                                {thumbs.map((p) => (
-                                  <div
-                                    key={p.id}
-                                    className={styles.thumbItem}
-                                    title={p.nama}
-                                  >
+                            <div className={styles.thumbStrip}>
+                              {thumbs.map((p) => (
+                                <div
+                                  key={p.id}
+                                  className={styles.thumbItem}
+                                  title={p.nama}
+                                >
+                                  {p.mainImageUrl ? (
+                                    // eslint-disable-next-line @next/next/no-img-element
+                                    <img
+                                      src={p.mainImageUrl}
+                                      alt={p.nama}
+                                    />
+                                  ) : (
+                                    <div className={styles.noImg}>No</div>
+                                  )}
+                                </div>
+                              ))}
+                              {cat.items.length > 4 && (
+                                <div className={styles.thumbMore}>
+                                  +{cat.items.length - 4}
+                                </div>
+                              )}
+                            </div>
+
+                            <div className={styles.cardButtons}>
+                              <button
+                                type="button"
+                                className={baseStyles.editButton}
+                                disabled={droppingAllCategories}
+                                onClick={() => openModal(cat)}
+                              >
+                                Kelola Produk
+                              </button>
+
+                              <button
+                                type="button"
+                                className={baseStyles.editButton}
+                                style={{
+                                  borderColor: "rgba(212,175,55,0.9)",
+                                  color: "rgba(212,175,55,0.95)",
+                                  background: "transparent",
+                                }}
+                                disabled={droppingAllCategories || promoToggleBusyId !== null}
+                                onClick={() => toggleCategoryPromo(cat)}
+                                title={
+                                  cat.isPromo
+                                    ? "Matikan status promo untuk kategori ini"
+                                    : "Jadikan kategori ini khusus promo"
+                                }
+                              >
+                                {promoToggleBusyId === cat.id
+                                  ? "..."
+                                  : cat.isPromo
+                                    ? "Matikan Promo"
+                                    : "Jadikan Promo"}
+                              </button>
+                              <button
+                                type="button"
+                                className={baseStyles.deleteButton}
+                                disabled={droppingAllCategories}
+                                onClick={() =>
+                                  handleDeleteCategory(cat.id)
+                                }
+                              >
+                                Hapus
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </Draggable>
+                  );
+                })}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+
+          {/* MODAL KELOLA PRODUK */}
+          {modalOpen && modalCategory && (
+            <div className={`${styles.modalOverlay} ${styles.aiOverlay}`}>
+              <div className={`${styles.modal} ${styles.aiModal}`}>
+                <div className={`${styles.modalHeader} ${styles.aiModalHeader}`}>
+                  <h2>
+                    Kelola Produk: <b>{modalCategory.nama}</b>
+                  </h2>
+                  <button
+                    className={styles.modalClose}
+                    onClick={() => {
+                      setModalOpen(false);
+                      setModalCategory(null);
+                    }}
+                  >
+                    ×
+                  </button>
+                </div>
+
+                <div className={`${styles.modalContent} ${styles.aiModalContent}`}>
+                  {/* KIRI: filter + grid produk */}
+                  <div className={`${styles.modalLeft} ${styles.aiModalLeft}`}>
+                    <div className={`${styles.filterRow} ${styles.aiFieldGroup}`}>
+                      <input
+                        className={baseStyles.searchInput}
+                        placeholder="Cari produk…"
+                        value={productSearch}
+                        onChange={(e) => setProductSearch(e.target.value)}
+                      />
+
+                      <select
+                        className={styles.select}
+                        value={sortOption}
+                        onChange={(e) =>
+                          setSortOption(e.target.value as SortOption)
+                        }
+                      >
+                        <option value="default">Urutan default</option>
+                        <option value="name-asc">Nama A-Z</option>
+                        <option value="price-asc">
+                          Harga: rendah → tinggi
+                        </option>
+                        <option value="price-desc">
+                          Harga: tinggi → rendah
+                        </option>
+                        <option value="discount-desc">Diskon terbesar</option>
+                      </select>
+
+                      <label style={{ display: "flex", alignItems: "center", gap: 8, whiteSpace: "nowrap" }}>
+                        <input
+                          type="checkbox"
+                          checked={promoOnly}
+                          onChange={(e) => setPromoOnly(e.target.checked)}
+                        />
+                        Promo saja
+                      </label>
+                    </div>
+
+                    <div className={`${styles.filterRow} ${styles.aiFieldGroup}`}>
+                      <select
+                        className={styles.select}
+                        value={filterKategori}
+                        onChange={(e) => setFilterKategori(e.target.value)}
+                      >
+                        <option value="all">Semua kategori</option>
+                        {kategoriOptions.map((k) => (
+                          <option key={k} value={k}>
+                            {k}
+                          </option>
+                        ))}
+                      </select>
+
+                      <select
+                        className={styles.select}
+                        value={filterSubkategori}
+                        onChange={(e) => setFilterSubkategori(e.target.value)}
+                      >
+                        <option value="all">Semua subkategori</option>
+                        {subkategoriOptions.map((s) => (
+                          <option key={s} value={s}>
+                            {s}
+                          </option>
+                        ))}
+                      </select>
+
+                      <label style={{ display: "flex", alignItems: "center", gap: 8, whiteSpace: "nowrap" }}>
+                        <input
+                          type="checkbox"
+                          checked={promoOnly}
+                          onChange={(e) => setPromoOnly(e.target.checked)}
+                        />
+                        Promo saja
+                      </label>
+                    </div>
+
+                    <div className={styles.modalGrid}>
+                      {isLoadingProducts ? (
+                        <p>Memuat produk...</p>
+                      ) : filteredProducts.length === 0 ? (
+                        <p>Tidak ada produk.</p>
+                      ) : (
+                        filteredProducts.map((p) => (
+                          <label key={p.id} className={styles.modalItem}>
+                            <input
+                              type="checkbox"
+                              checked={selectedProductIds.has(p.id)}
+                              onChange={() => toggleProduct(p.id)}
+                            />
+
+                            <div className={styles.modalThumb}>
+                              {p.mainImageUrl ? (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img src={p.mainImageUrl} alt={p.nama} />
+                              ) : (
+                                <div className={styles.noImg}>No</div>
+                              )}
+                            </div>
+
+                            <div className={styles.modalName}>{p.nama}</div>
+                            <div className={styles.modalPrice}>
+                              {(() => {
+                                const pr = computeHargaSetelahPromo(p);
+                                return pr.isPromo ? (
+                                  <>
+                                    <span style={{ fontWeight: 800 }}>
+                                      {formatRupiah(pr.hargaFinal)}
+                                    </span>
+                                    <span
+                                      style={{
+                                        marginLeft: 10,
+                                        textDecoration: "line-through",
+                                        opacity: 0.6,
+                                      }}
+                                    >
+                                      {formatRupiah(pr.hargaAsli)}
+                                    </span>
+                                    <span style={{ marginLeft: 10, fontWeight: 800 }}>
+                                      {pr.promoLabel}
+                                    </span>
+                                  </>
+                                ) : (
+                                  <>{formatRupiah(p.harga)}</>
+                                );
+                              })()}
+                            </div>
+                            {(p.kategori || p.subkategori) && (
+                              <div className={styles.modalMeta}>
+                                {[p.kategori, p.subkategori]
+                                  .filter(Boolean)
+                                  .join(" · ")}
+                              </div>
+                            )}
+                          </label>
+                        ))
+                      )}
+                    </div>
+                  </div>
+
+                  {/* KANAN: produk di kategori (drag & drop urutan) */}
+                  <div className={`${styles.modalRight} ${styles.aiModalRight}`}>
+                    <div className={styles.selectedHeader}>
+                      <span>
+                        Produk dalam kategori ({selectedOrder.length})
+                      </span>
+                      <span className={styles.selectedHint}>
+                        Tarik untuk mengubah urutan
+                      </span>
+                    </div>
+
+                    <Droppable droppableId="selectedProducts">
+                      {(providedSelected) => (
+                        <div
+                          className={styles.selectedList}
+                          ref={providedSelected.innerRef}
+                          {...providedSelected.droppableProps}
+                        >
+                          {selectedProductsOrdered.map((p, index) => (
+                            <Draggable
+                              key={p.id}
+                              draggableId={`sel-${p.id}`}
+                              index={index}
+                            >
+                              {(dragProvidedSel) => (
+                                <div
+                                  ref={dragProvidedSel.innerRef}
+                                  {...dragProvidedSel.draggableProps}
+                                  {...dragProvidedSel.dragHandleProps}
+                                  className={styles.selectedItem}
+                                >
+                                  <div className={styles.selectedThumb}>
                                     {p.mainImageUrl ? (
                                       // eslint-disable-next-line @next/next/no-img-element
                                       <img
@@ -1347,699 +1516,437 @@ export default function KategoriProdukPage() {
                                       <div className={styles.noImg}>No</div>
                                     )}
                                   </div>
-                                ))}
-                                {cat.items.length > 4 && (
-                                  <div className={styles.thumbMore}>
-                                    +{cat.items.length - 4}
-                                  </div>
-                                )}
-                              </div>
-
-                              <div className={styles.cardButtons}>
-                                <button
-                                  type="button"
-                                  className={baseStyles.editButton}
-                                  disabled={droppingAllCategories}
-                                  onClick={() => openModal(cat)}
-                                >
-                                  Kelola Produk
-                                </button>
-
-                                <button
-                                  type="button"
-                                  className={baseStyles.editButton}
-                                  style={{
-                                    borderColor: "rgba(212,175,55,0.9)",
-                                    color: "rgba(212,175,55,0.95)",
-                                    background: "transparent",
-                                  }}
-                                  disabled={droppingAllCategories || promoToggleBusyId !== null}
-                                  onClick={() => toggleCategoryPromo(cat)}
-                                  title={
-                                    cat.isPromo
-                                      ? "Matikan status promo untuk kategori ini"
-                                      : "Jadikan kategori ini khusus promo"
-                                  }
-                                >
-                                  {promoToggleBusyId === cat.id
-                                    ? "..."
-                                    : cat.isPromo
-                                      ? "Matikan Promo"
-                                      : "Jadikan Promo"}
-                                </button>
-                                <button
-                                  type="button"
-                                  className={baseStyles.deleteButton}
-                                  disabled={droppingAllCategories}
-                                  onClick={() =>
-                                    handleDeleteCategory(cat.id)
-                                  }
-                                >
-                                  Hapus
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </Draggable>
-                    );
-                  })}
-                  {provided.placeholder}
-                </div>
-              )}
-            </Droppable>
-
-            {/* MODAL KELOLA PRODUK */}
-            {modalOpen && modalCategory && (
-              <div className={`${styles.modalOverlay} ${styles.aiOverlay}`}>
-                <div className={`${styles.modal} ${styles.aiModal}`}>
-                  <div className={`${styles.modalHeader} ${styles.aiModalHeader}`}>
-                    <h2>
-                      Kelola Produk: <b>{modalCategory.nama}</b>
-                    </h2>
-                    <button
-                      className={styles.modalClose}
-                      onClick={() => {
-                        setModalOpen(false);
-                        setModalCategory(null);
-                      }}
-                    >
-                      ×
-                    </button>
-                  </div>
-
-                  <div className={`${styles.modalContent} ${styles.aiModalContent}`}>
-                    {/* KIRI: filter + grid produk */}
-                    <div className={`${styles.modalLeft} ${styles.aiModalLeft}`}>
-                      <div className={`${styles.filterRow} ${styles.aiFieldGroup}`}>
-                        <input
-                          className={baseStyles.searchInput}
-                          placeholder="Cari produk…"
-                          value={productSearch}
-                          onChange={(e) => setProductSearch(e.target.value)}
-                        />
-
-                        <select
-                          className={styles.select}
-                          value={sortOption}
-                          onChange={(e) =>
-                            setSortOption(e.target.value as SortOption)
-                          }
-                        >
-                          <option value="default">Urutan default</option>
-                          <option value="name-asc">Nama A-Z</option>
-                          <option value="price-asc">
-                            Harga: rendah → tinggi
-                          </option>
-                          <option value="price-desc">
-                            Harga: tinggi → rendah
-                          </option>
-                          <option value="discount-desc">Diskon terbesar</option>
-                        </select>
-
-                        <label style={{ display: "flex", alignItems: "center", gap: 8, whiteSpace: "nowrap" }}>
-                          <input
-                            type="checkbox"
-                            checked={promoOnly}
-                            onChange={(e) => setPromoOnly(e.target.checked)}
-                          />
-                          Promo saja
-                        </label>
-                      </div>
-
-                      <div className={`${styles.filterRow} ${styles.aiFieldGroup}`}>
-                        <select
-                          className={styles.select}
-                          value={filterKategori}
-                          onChange={(e) => setFilterKategori(e.target.value)}
-                        >
-                          <option value="all">Semua kategori</option>
-                          {kategoriOptions.map((k) => (
-                            <option key={k} value={k}>
-                              {k}
-                            </option>
-                          ))}
-                        </select>
-
-                        <select
-                          className={styles.select}
-                          value={filterSubkategori}
-                          onChange={(e) => setFilterSubkategori(e.target.value)}
-                        >
-                          <option value="all">Semua subkategori</option>
-                          {subkategoriOptions.map((s) => (
-                            <option key={s} value={s}>
-                              {s}
-                            </option>
-                          ))}
-                        </select>
-
-                        <label style={{ display: "flex", alignItems: "center", gap: 8, whiteSpace: "nowrap" }}>
-                          <input
-                            type="checkbox"
-                            checked={promoOnly}
-                            onChange={(e) => setPromoOnly(e.target.checked)}
-                          />
-                          Promo saja
-                        </label>
-                      </div>
-
-                      <div className={styles.modalGrid}>
-                        {isLoadingProducts ? (
-                          <p>Memuat produk...</p>
-                        ) : filteredProducts.length === 0 ? (
-                          <p>Tidak ada produk.</p>
-                        ) : (
-                          filteredProducts.map((p) => (
-                            <label key={p.id} className={styles.modalItem}>
-                              <input
-                                type="checkbox"
-                                checked={selectedProductIds.has(p.id)}
-                                onChange={() => toggleProduct(p.id)}
-                              />
-
-                              <div className={styles.modalThumb}>
-                                {p.mainImageUrl ? (
-                                  // eslint-disable-next-line @next/next/no-img-element
-                                  <img src={p.mainImageUrl} alt={p.nama} />
-                                ) : (
-                                  <div className={styles.noImg}>No</div>
-                                )}
-                              </div>
-
-                              <div className={styles.modalName}>{p.nama}</div>
-                              <div className={styles.modalPrice}>
-                                {(() => {
-                                  const pr = computeHargaSetelahPromo(p);
-                                  return pr.isPromo ? (
-                                    <>
-                                      <span style={{ fontWeight: 800 }}>
-                                        {formatRupiah(pr.hargaFinal)}
-                                      </span>
-                                      <span
-                                        style={{
-                                          marginLeft: 10,
-                                          textDecoration: "line-through",
-                                          opacity: 0.6,
-                                        }}
-                                      >
-                                        {formatRupiah(pr.hargaAsli)}
-                                      </span>
-                                      <span style={{ marginLeft: 10, fontWeight: 800 }}>
-                                        {pr.promoLabel}
-                                      </span>
-                                    </>
-                                  ) : (
-                                    <>{formatRupiah(p.harga)}</>
-                                  );
-                                })()}
-                              </div>
-                              {(p.kategori || p.subkategori) && (
-                                <div className={styles.modalMeta}>
-                                  {[p.kategori, p.subkategori]
-                                    .filter(Boolean)
-                                    .join(" · ")}
-                                </div>
-                              )}
-                            </label>
-                          ))
-                        )}
-                      </div>
-                    </div>
-
-                    {/* KANAN: produk di kategori (drag & drop urutan) */}
-                    <div className={`${styles.modalRight} ${styles.aiModalRight}`}>
-                      <div className={styles.selectedHeader}>
-                        <span>
-                          Produk dalam kategori ({selectedOrder.length})
-                        </span>
-                        <span className={styles.selectedHint}>
-                          Tarik untuk mengubah urutan
-                        </span>
-                      </div>
-
-                      <Droppable droppableId="selectedProducts">
-                        {(providedSelected) => (
-                          <div
-                            className={styles.selectedList}
-                            ref={providedSelected.innerRef}
-                            {...providedSelected.droppableProps}
-                          >
-                            {selectedProductsOrdered.map((p, index) => (
-                              <Draggable
-                                key={p.id}
-                                draggableId={`sel-${p.id}`}
-                                index={index}
-                              >
-                                {(dragProvidedSel) => (
-                                  <div
-                                    ref={dragProvidedSel.innerRef}
-                                    {...dragProvidedSel.draggableProps}
-                                    {...dragProvidedSel.dragHandleProps}
-                                    className={styles.selectedItem}
-                                  >
-                                    <div className={styles.selectedThumb}>
-                                      {p.mainImageUrl ? (
-                                        // eslint-disable-next-line @next/next/no-img-element
-                                        <img
-                                          src={p.mainImageUrl}
-                                          alt={p.nama}
-                                        />
-                                      ) : (
-                                        <div className={styles.noImg}>No</div>
-                                      )}
+                                  <div className={styles.selectedInfo}>
+                                    <div className={styles.selectedName}>
+                                      {p.nama}
                                     </div>
-                                    <div className={styles.selectedInfo}>
-                                      <div className={styles.selectedName}>
-                                        {p.nama}
-                                      </div>
-                                      <div className={styles.selectedPrice}>
-                                        {(() => {
-                                          const pr = computeHargaSetelahPromo(p);
-                                          return pr.isPromo ? (
-                                            <>
-                                              <span style={{ fontWeight: 800 }}>
-                                                {formatRupiah(pr.hargaFinal)}
-                                              </span>
-                                              <span
-                                                style={{
-                                                  marginLeft: 10,
-                                                  textDecoration: "line-through",
-                                                  opacity: 0.6,
-                                                }}
-                                              >
-                                                {formatRupiah(pr.hargaAsli)}
-                                              </span>
-                                              <span style={{ marginLeft: 10, fontWeight: 800 }}>
-                                                {pr.promoLabel}
-                                              </span>
-                                            </>
-                                          ) : (
-                                            <>{formatRupiah(p.harga)}</>
-                                          );
-                                        })()}
-                                      </div>
-
-                                      {/* TOMBOL TOGGLE PROMO (NEW) */}
-                                      <button
-                                        type="button"
-                                        style={{
-                                          marginTop: 4,
-                                          fontSize: 11,
-                                          padding: "2px 8px",
-                                          borderRadius: 4,
-                                          border: p.promoAktif ? "1px solid #d4af37" : "1px solid #ccc",
-                                          background: p.promoAktif ? "rgba(212,175,55,0.1)" : "transparent",
-                                          color: p.promoAktif ? "#d4af37" : "#666",
-                                          cursor: "pointer"
-                                        }}
-                                        onClick={() => toggleProductPromo(p)}
-                                      >
-                                        {p.promoAktif ? "Promo Aktif" : "Jadikan Promo"}
-                                      </button>
+                                    <div className={styles.selectedPrice}>
+                                      {(() => {
+                                        const pr = computeHargaSetelahPromo(p);
+                                        return pr.isPromo ? (
+                                          <>
+                                            <span style={{ fontWeight: 800 }}>
+                                              {formatRupiah(pr.hargaFinal)}
+                                            </span>
+                                            <span
+                                              style={{
+                                                marginLeft: 10,
+                                                textDecoration: "line-through",
+                                                opacity: 0.6,
+                                              }}
+                                            >
+                                              {formatRupiah(pr.hargaAsli)}
+                                            </span>
+                                            <span style={{ marginLeft: 10, fontWeight: 800 }}>
+                                              {pr.promoLabel}
+                                            </span>
+                                          </>
+                                        ) : (
+                                          <>{formatRupiah(p.harga)}</>
+                                        );
+                                      })()}
                                     </div>
+
+                                    {/* TOMBOL TOGGLE PROMO (NEW) */}
                                     <button
                                       type="button"
-                                      className={styles.selectedRemove}
-                                      onClick={() => toggleProduct(p.id)}
+                                      style={{
+                                        marginTop: 4,
+                                        fontSize: 11,
+                                        padding: "2px 8px",
+                                        borderRadius: 4,
+                                        border: p.promoAktif ? "1px solid #d4af37" : "1px solid #ccc",
+                                        background: p.promoAktif ? "rgba(212,175,55,0.1)" : "transparent",
+                                        color: p.promoAktif ? "#d4af37" : "#666",
+                                        cursor: "pointer"
+                                      }}
+                                      onClick={() => toggleProductPromo(p)}
                                     >
-                                      ×
+                                      {p.promoAktif ? "Promo Aktif" : "Jadikan Promo"}
                                     </button>
                                   </div>
-                                )}
-                              </Draggable>
-                            ))}
-                            {providedSelected.placeholder}
-                          </div>
-                        )}
-                      </Droppable>
-                    </div>
-                  </div>
-
-                  <div className={`${styles.modalFooter} ${styles.aiModalFooter}`}>
-                    <span>Dipilih: {selectedOrder.length} produk</span>
-                    <button
-                      type="button"
-                      className={baseStyles.primaryButton}
-                      disabled={savingCategoryProducts}
-                      onClick={() => handleSaveCategoryProducts()}
-                    >
-                      {savingCategoryProducts
-                        ? "Menyimpan..."
-                        : "Simpan ke kategori"}
-                    </button>
+                                  <button
+                                    type="button"
+                                    className={styles.selectedRemove}
+                                    onClick={() => toggleProduct(p.id)}
+                                  >
+                                    ×
+                                  </button>
+                                </div>
+                              )}
+                            </Draggable>
+                          ))}
+                          {providedSelected.placeholder}
+                        </div>
+                      )}
+                    </Droppable>
                   </div>
                 </div>
+
+                <div className={`${styles.modalFooter} ${styles.aiModalFooter}`}>
+                  <span>Dipilih: {selectedOrder.length} produk</span>
+                  <button
+                    type="button"
+                    className={baseStyles.primaryButton}
+                    disabled={savingCategoryProducts}
+                    onClick={() => handleSaveCategoryProducts()}
+                  >
+                    {savingCategoryProducts
+                      ? "Menyimpan..."
+                      : "Simpan ke kategori"}
+                  </button>
+                </div>
               </div>
+            </div>
 
-            )}
+          )}
 
-            {/* MODAL GENERATE KATEGORI OTOMATIS (AI) */}
-            {genModalOpen && (
-              <div className={styles.modalOverlay}>
-                <div className={styles.modal}>
-                  <div className={styles.modalHeader}>
-                    <h2>Generate Kategori Otomatis (AI)</h2>
-                    <button
-                      className={styles.modalClose}
-                      disabled={genBusy}
-                      onClick={() => {
-                        if (genBusy) return;
-                        setGenModalOpen(false);
-                      }}
-                      title={genBusy ? "Sedang memproses..." : "Tutup"}
-                    >
-                      ×
-                    </button>
-                  </div>
+          {/* MODAL GENERATE KATEGORI OTOMATIS (AI) */}
+          {genModalOpen && (
+            <div className={styles.modalOverlay}>
+              <div className={styles.modal}>
+                <div className={styles.modalHeader}>
+                  <h2>Generate Kategori Otomatis (AI)</h2>
+                  <button
+                    className={styles.modalClose}
+                    disabled={genBusy}
+                    onClick={() => {
+                      if (genBusy) return;
+                      setGenModalOpen(false);
+                    }}
+                    title={genBusy ? "Sedang memproses..." : "Tutup"}
+                  >
+                    ×
+                  </button>
+                </div>
 
-                  <div className={styles.modalContent}>
-                    <div className={styles.modalLeft}>
-                      <div className={`${styles.filterRow} ${styles.aiFieldGroup}`}>
-                        <input
-                          type="text"
-                          inputMode="numeric"
-                          pattern="[0-9]*"
-                          className={baseStyles.searchInput}
-                          value={genTargetCount}
-                          onChange={(e) => {
-                            // Hilangkan leading zero: "022" -> "22"
-                            let raw = (e.target.value ?? "");
-                            raw = raw.replace(/\D+/g, ""); // digits only
-                            raw = raw.replace(/^0+(?=\d)/, "");
-                            if (raw === "") {
-                              setGenTargetCount("");
-                              return;
-                            }
-                            const n = Math.max(1, Math.min(10, parseInt(raw, 10) || 1));
-                            setGenTargetCount(String(n));
-                          }}
-                          disabled={genBusy}
-                          placeholder="Kuantitas kategori (1-10)"
-                        />
-
-                        <div className={`${styles.filterRow} ${styles.aiFieldGroup}`}>
-                          <select
-                            className={baseStyles.searchInput}
-                            value={genLangMode}
-                            onChange={(e) => setGenLangMode((e.target.value as any) === "EN" ? "EN" : "ID")}
-                            disabled={genBusy}
-                            aria-label="Bahasa kategori"
-                            title="Pilih bahasa output kategori"
-                          >
-                            <option value="ID">Bahasa Indonesia</option>
-                            <option value="EN">English</option>
-                          </select>
-
-                          <label style={{ display: "flex", alignItems: "center", gap: 8, whiteSpace: "nowrap" }}>
-                            <input
-                              type="checkbox"
-                              checked={promoOnly}
-                              onChange={(e) => setPromoOnly(e.target.checked)}
-                            />
-                            Promo saja
-                          </label>
-                        </div>
-                      </div>
+                <div className={styles.modalContent}>
+                  <div className={styles.modalLeft}>
+                    <div className={`${styles.filterRow} ${styles.aiFieldGroup}`}>
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        className={baseStyles.searchInput}
+                        value={genTargetCount}
+                        onChange={(e) => {
+                          // Hilangkan leading zero: "022" -> "22"
+                          let raw = (e.target.value ?? "");
+                          raw = raw.replace(/\D+/g, ""); // digits only
+                          raw = raw.replace(/^0+(?=\d)/, "");
+                          if (raw === "") {
+                            setGenTargetCount("");
+                            return;
+                          }
+                          const n = Math.max(1, Math.min(10, parseInt(raw, 10) || 1));
+                          setGenTargetCount(String(n));
+                        }}
+                        disabled={genBusy}
+                        placeholder="Kuantitas kategori (1-10)"
+                      />
 
                       <div className={`${styles.filterRow} ${styles.aiFieldGroup}`}>
-                        <textarea
+                        <select
                           className={baseStyles.searchInput}
-                          style={{ height: 84, resize: "vertical" }}
-                          value={genAspects}
-                          onChange={(e) => setGenAspects(e.target.value)}
+                          value={genLangMode}
+                          onChange={(e) => setGenLangMode((e.target.value as any) === "EN" ? "EN" : "ID")}
                           disabled={genBusy}
-                          placeholder='Deskripsi/aspek (opsional). Contoh: "ruangan, material, style"'
-                        />
-                      </div>
-
-                      <p className={baseStyles.infoText}>
-                        Klik tombol di bawah untuk generate kategori dari data produk, lalu otomatis dibuat dan diisi produknya.
-                      </p>
-
-                      {isLoadingProducts && (
-                        <p className={baseStyles.infoText}>Memuat produk...</p>
-                      )}
-
-                      {genProgress && (
-                        <p className={baseStyles.infoText}>{genProgress}</p>
-                      )}
-
-                      {genError && (
-                        <div className={baseStyles.errorBox}>
-                          <span>{genError}</span>
-                        </div>
-                      )}
-
-                      {genResult && (
-                        <div
-                          style={{
-                            marginTop: 12,
-                            padding: 12,
-                            borderRadius: 12,
-                            border: "1px solid rgba(0,0,0,0.12)",
-                            background: "rgba(0,0,0,0.04)",
-                          }}
+                          aria-label="Bahasa kategori"
+                          title="Pilih bahasa output kategori"
                         >
-                          <div>
-                            <b>Berhasil:</b> {genResult.created.length} kategori
-                            {genResult.failed.length > 0 && (
-                              <>
-                                {" "}
-                                · <b>Gagal:</b> {genResult.failed.length}
-                              </>
-                            )}
-                          </div>
+                          <option value="ID">Bahasa Indonesia</option>
+                          <option value="EN">English</option>
+                        </select>
 
-                          {(genResult.reviewCount > 0 ||
-                            genResult.unassignedCount > 0) && (
-                              <div style={{ marginTop: 8 }}>
-                                <div>
-                                  Review: {genResult.reviewCount} produk · Unassigned:{" "}
-                                  {genResult.unassignedCount} produk
-                                </div>
-                                {genResult.catatan && (
-                                  <div style={{ marginTop: 6 }}>
-                                    <i>{genResult.catatan}</i>
-                                  </div>
-                                )}
-                              </div>
-                            )}
-
-                          {genResult.created.length > 0 && (
-                            <div style={{ marginTop: 10 }}>
-                              <b>Daftar kategori (max 12):</b>
-                              <ul style={{ marginTop: 6, paddingLeft: 18 }}>
-                                {genResult?.created?.slice(0, 12).map((c) => (
-                                  <li key={c.id}>
-                                    {c.nama} ({c.produkCount} produk)
-                                  </li>
-                                ))}
-                                {(genResult?.created?.length ?? 0) > 12 && (
-                                  <li>
-                                    +{(genResult?.created?.length ?? 0) - 12} lainnya...
-                                  </li>
-                                )}
-                              </ul>
-                            </div>
-                          )}
-                        </div>
-                      )}
+                        <label style={{ display: "flex", alignItems: "center", gap: 8, whiteSpace: "nowrap" }}>
+                          <input
+                            type="checkbox"
+                            checked={promoOnly}
+                            onChange={(e) => setPromoOnly(e.target.checked)}
+                          />
+                          Promo saja
+                        </label>
+                      </div>
                     </div>
 
-                    <div className={styles.modalRight}>
-                      <div className={styles.selectedHeader}>
-                        <span>Ringkasan</span>
-                        <span className={styles.selectedHint}>
-                          Target:{" "}
-                          {Math.max(
-                            1,
-                            Math.min(10, parseInt(genTargetCount || "1", 10) || 1)
-                          )}{" "}
-                          kategori
-                        </span>
+                    <div className={`${styles.filterRow} ${styles.aiFieldGroup}`}>
+                      <textarea
+                        className={baseStyles.searchInput}
+                        style={{ height: 84, resize: "vertical" }}
+                        value={genAspects}
+                        onChange={(e) => setGenAspects(e.target.value)}
+                        disabled={genBusy}
+                        placeholder='Deskripsi/aspek (opsional). Contoh: "ruangan, material, style"'
+                      />
+                    </div>
+
+                    <p className={baseStyles.infoText}>
+                      Klik tombol di bawah untuk generate kategori dari data produk, lalu otomatis dibuat dan diisi produknya.
+                    </p>
+
+                    {isLoadingProducts && (
+                      <p className={baseStyles.infoText}>Memuat produk...</p>
+                    )}
+
+                    {genProgress && (
+                      <p className={baseStyles.infoText}>{genProgress}</p>
+                    )}
+
+                    {genError && (
+                      <div className={baseStyles.errorBox}>
+                        <span>{genError}</span>
                       </div>
+                    )}
 
-                      <div className={styles.selectedList} style={{ padding: 12 }}>
-                        <p className={baseStyles.infoText}>
-                          Tips: Kalau hasil terlalu sedikit, turunkan kuantitas atau kosongkan deskripsi/aspek.
-                        </p>
+                    {genResult && (
+                      <div
+                        style={{
+                          marginTop: 12,
+                          padding: 12,
+                          borderRadius: 12,
+                          border: "1px solid rgba(0,0,0,0.12)",
+                          background: "rgba(0,0,0,0.04)",
+                        }}
+                      >
+                        <div>
+                          <b>Berhasil:</b> {genResult.created.length} kategori
+                          {genResult.failed.length > 0 && (
+                            <>
+                              {" "}
+                              · <b>Gagal:</b> {genResult.failed.length}
+                            </>
+                          )}
+                        </div>
 
-                        {genResult?.failed && genResult.failed.length > 0 && (
-                          <div className={styles.aiResultSection}>
-                            <h4>
-                              ⚠️ Gagal dibuat ({genResult.failed.length})
-                            </h4>
-                            <ul className={styles.aiResultList}>
-                              {genResult?.failed?.map((f, i) => (
-                                <li key={i} className={styles.aiResultItemError}>
-                                  <strong>{f.nama}</strong>: {f.error}
+                        {(genResult.reviewCount > 0 ||
+                          genResult.unassignedCount > 0) && (
+                            <div style={{ marginTop: 8 }}>
+                              <div>
+                                Review: {genResult.reviewCount} produk · Unassigned:{" "}
+                                {genResult.unassignedCount} produk
+                              </div>
+                              {genResult.catatan && (
+                                <div style={{ marginTop: 6 }}>
+                                  <i>{genResult.catatan}</i>
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                        {genResult.created.length > 0 && (
+                          <div style={{ marginTop: 10 }}>
+                            <b>Daftar kategori (max 12):</b>
+                            <ul style={{ marginTop: 6, paddingLeft: 18 }}>
+                              {genResult?.created?.slice(0, 12).map((c) => (
+                                <li key={c.id}>
+                                  {c.nama} ({c.produkCount} produk)
                                 </li>
                               ))}
+                              {(genResult?.created?.length ?? 0) > 12 && (
+                                <li>
+                                  +{(genResult?.created?.length ?? 0) - 12} lainnya...
+                                </li>
+                              )}
                             </ul>
                           </div>
                         )}
                       </div>
+                    )}
+                  </div>
+
+                  <div className={styles.modalRight}>
+                    <div className={styles.selectedHeader}>
+                      <span>Ringkasan</span>
+                      <span className={styles.selectedHint}>
+                        Target:{" "}
+                        {Math.max(
+                          1,
+                          Math.min(10, parseInt(genTargetCount || "1", 10) || 1)
+                        )}{" "}
+                        kategori
+                      </span>
+                    </div>
+
+                    <div className={styles.selectedList} style={{ padding: 12 }}>
+                      <p className={baseStyles.infoText}>
+                        Tips: Kalau hasil terlalu sedikit, turunkan kuantitas atau kosongkan deskripsi/aspek.
+                      </p>
+
+                      {genResult?.failed && genResult.failed.length > 0 && (
+                        <div className={styles.aiResultSection}>
+                          <h4>
+                            ⚠️ Gagal dibuat ({genResult.failed.length})
+                          </h4>
+                          <ul className={styles.aiResultList}>
+                            {genResult?.failed?.map((f, i) => (
+                              <li key={i} className={styles.aiResultItemError}>
+                                <strong>{f.nama}</strong>: {f.error}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
                     </div>
                   </div>
-
-                  <div className={styles.modalFooter}>
-                    <button
-                      type="button"
-                      className={baseStyles.deleteButton}
-                      disabled={genBusy}
-                      onClick={() => setGenModalOpen(false)}
-                    >
-                      Tutup
-                    </button>
-
-                    <button
-                      type="button"
-                      className={baseStyles.primaryButton}
-                      disabled={genBusy || isLoadingProducts}
-                      onClick={handleGenerateCategories}
-                    >
-                      {genBusy ? "Memproses..." : "Generate & Buat Kategori"}
-                    </button>
-                  </div>
                 </div>
+
+                <div className={styles.modalFooter}>
+                  <button
+                    type="button"
+                    className={baseStyles.deleteButton}
+                    disabled={genBusy}
+                    onClick={() => setGenModalOpen(false)}
+                  >
+                    Tutup
+                  </button>
+
+                  <button
+                    type="button"
+                    className={baseStyles.primaryButton}
+                    disabled={genBusy || isLoadingProducts}
+                    onClick={handleGenerateCategories}
+                  >
+                    {genBusy ? "Memproses..." : "Generate & Buat Kategori"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </DragDropContext>
+      )}
+
+      {/* MODAL KONFIRMASI HAPUS SEMUA (ESTETIK, bukan confirm bawaan browser) */}
+
+      {/* MODAL KONFIRMASI HAPUS SATU (ESTETIK) */}
+      {deleteOneConfirmOpen && (
+        <div className={`${styles.modalOverlay} ${styles.confirmOverlay}`}>
+          <div className={`${styles.modal} ${styles.confirmModal}`} role="dialog" aria-modal="true">
+            <div className={`${styles.modalHeader} ${styles.confirmHeader}`}>
+              <div>
+                <div className={styles.confirmTitle}>Hapus Kategori</div>
+                <div className={styles.confirmSubtitle}>
+                  Kamu akan menghapus: <b>{deleteOneName}</b>
+                </div>
+              </div>
+              <button
+                type="button"
+                className={styles.confirmClose}
+                onClick={() => !deleteOneBusy && setDeleteOneConfirmOpen(false)}
+                disabled={deleteOneBusy}
+                aria-label="Tutup"
+                title="Tutup"
+              >
+                ✕
+              </button>
+            </div>
+
+            {deleteOneBusy && (
+              <div className={styles.confirmProgressWrap} aria-label="Menghapus">
+                <div className={styles.confirmProgressBar} />
               </div>
             )}
-          </DragDropContext>
-        )}
 
-        {/* MODAL KONFIRMASI HAPUS SEMUA (ESTETIK, bukan confirm bawaan browser) */}
-
-        {/* MODAL KONFIRMASI HAPUS SATU (ESTETIK) */}
-        {deleteOneConfirmOpen && (
-          <div className={`${styles.modalOverlay} ${styles.confirmOverlay}`}>
-            <div className={`${styles.modal} ${styles.confirmModal}`} role="dialog" aria-modal="true">
-              <div className={`${styles.modalHeader} ${styles.confirmHeader}`}>
-                <div>
-                  <div className={styles.confirmTitle}>Hapus Kategori</div>
-                  <div className={styles.confirmSubtitle}>
-                    Kamu akan menghapus: <b>{deleteOneName}</b>
-                  </div>
+            <div className={styles.confirmBody}>
+              <div className={styles.confirmWarning}>
+                <div className={styles.confirmBadge}>Tidak Bisa Dibatalkan</div>
+                <div className={styles.confirmText}>
+                  Catatan: tindakan ini tidak bisa dibatalkan. Pastikan kamu benar-benar yakin sebelum lanjut.
                 </div>
-                <button
-                  type="button"
-                  className={styles.confirmClose}
-                  onClick={() => !deleteOneBusy && setDeleteOneConfirmOpen(false)}
-                  disabled={deleteOneBusy}
-                  aria-label="Tutup"
-                  title="Tutup"
-                >
-                  ✕
-                </button>
-              </div>
-
-              {deleteOneBusy && (
-                <div className={styles.confirmProgressWrap} aria-label="Menghapus">
-                  <div className={styles.confirmProgressBar} />
-                </div>
-              )}
-
-              <div className={styles.confirmBody}>
-                <div className={styles.confirmWarning}>
-                  <div className={styles.confirmBadge}>Tidak Bisa Dibatalkan</div>
-                  <div className={styles.confirmText}>
-                    Catatan: tindakan ini tidak bisa dibatalkan. Pastikan kamu benar-benar yakin sebelum lanjut.
-                  </div>
-                </div>
-              </div>
-
-              <div className={`${styles.modalFooter} ${styles.confirmFooter}`}>
-                <button
-                  type="button"
-                  className={`${baseStyles.btn} ${styles.confirmCancelBtn}`}
-                  onClick={() => setDeleteOneConfirmOpen(false)}
-                  disabled={deleteOneBusy}
-                >
-                  Batal
-                </button>
-
-                <button
-                  type="button"
-                  className={`${baseStyles.btn} ${styles.confirmDangerBtn}`}
-                  onClick={doDeleteOneCategory}
-                  disabled={deleteOneBusy}
-                >
-                  {deleteOneBusy ? "Menghapus..." : "Ya, Hapus"}
-                </button>
               </div>
             </div>
-          </div>
-        )}
 
-        {dropAllConfirmOpen && (
-          <div className={`${styles.modalOverlay} ${styles.confirmOverlay}`}>
-            <div className={`${styles.modal} ${styles.confirmModal}`} role="dialog" aria-modal="true">
-              <div className={`${styles.modalHeader} ${styles.confirmHeader}`}>
-                <div>
-                  <div className={styles.confirmTitle}>Hapus Semua Kategori</div>
-                  <div className={styles.confirmSubtitle}>
-                    Kamu akan menghapus <b>{dropAllConfirmCount}</b> kategori sekaligus.
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  className={styles.confirmClose}
-                  onClick={() => !dropAllConfirmBusy && setDropAllConfirmOpen(false)}
-                  disabled={dropAllConfirmBusy}
-                  aria-label="Tutup"
-                  title="Tutup"
-                >
-                  ✕
-                </button>
-              </div>
+            <div className={`${styles.modalFooter} ${styles.confirmFooter}`}>
+              <button
+                type="button"
+                className={`${baseStyles.btn} ${styles.confirmCancelBtn}`}
+                onClick={() => setDeleteOneConfirmOpen(false)}
+                disabled={deleteOneBusy}
+              >
+                Batal
+              </button>
 
-              {dropAllConfirmBusy && (
-                <div className={styles.confirmProgressWrap} aria-label="Menghapus">
-                  <div className={styles.confirmProgressBar} />
-                </div>
-              )}
-
-              <div className={styles.confirmBody}>
-                <div className={styles.confirmWarning}>
-                  <div className={styles.confirmBadge}>Tidak Bisa Dibatalkan</div>
-                  <div className={styles.confirmText}>
-                    Catatan: tindakan ini tidak bisa dibatalkan. Pastikan kamu benar-benar yakin sebelum lanjut.
-                  </div>
-                </div>
-
-                {dropAllProgress ? (
-                  <div className={styles.confirmStatus}>{dropAllProgress}</div>
-                ) : (
-                  <div className={styles.confirmHint}>
-                    Tips: kalau kategori sudah banyak dan kamu cuma ingin reset, ini cara tercepat.
-                  </div>
-                )}
-              </div>
-
-              <div className={`${styles.modalFooter} ${styles.confirmFooter}`}>
-                <button
-                  type="button"
-                  className={`${baseStyles.btn} ${styles.confirmCancelBtn}`}
-                  onClick={() => setDropAllConfirmOpen(false)}
-                  disabled={dropAllConfirmBusy}
-                >
-                  Batal
-                </button>
-
-                <button
-                  type="button"
-                  className={`${baseStyles.btn} ${styles.confirmDangerBtn}`}
-                  onClick={doDropAllCategories}
-                  disabled={dropAllConfirmBusy}
-                >
-                  {dropAllConfirmBusy ? "Menghapus..." : "Ya, Hapus Semua"}
-                </button>
-              </div>
+              <button
+                type="button"
+                className={`${baseStyles.btn} ${styles.confirmDangerBtn}`}
+                onClick={doDeleteOneCategory}
+                disabled={deleteOneBusy}
+              >
+                {deleteOneBusy ? "Menghapus..." : "Ya, Hapus"}
+              </button>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-      </main>
+      {dropAllConfirmOpen && (
+        <div className={`${styles.modalOverlay} ${styles.confirmOverlay}`}>
+          <div className={`${styles.modal} ${styles.confirmModal}`} role="dialog" aria-modal="true">
+            <div className={`${styles.modalHeader} ${styles.confirmHeader}`}>
+              <div>
+                <div className={styles.confirmTitle}>Hapus Semua Kategori</div>
+                <div className={styles.confirmSubtitle}>
+                  Kamu akan menghapus <b>{dropAllConfirmCount}</b> kategori sekaligus.
+                </div>
+              </div>
+              <button
+                type="button"
+                className={styles.confirmClose}
+                onClick={() => !dropAllConfirmBusy && setDropAllConfirmOpen(false)}
+                disabled={dropAllConfirmBusy}
+                aria-label="Tutup"
+                title="Tutup"
+              >
+                ✕
+              </button>
+            </div>
+
+            {dropAllConfirmBusy && (
+              <div className={styles.confirmProgressWrap} aria-label="Menghapus">
+                <div className={styles.confirmProgressBar} />
+              </div>
+            )}
+
+            <div className={styles.confirmBody}>
+              <div className={styles.confirmWarning}>
+                <div className={styles.confirmBadge}>Tidak Bisa Dibatalkan</div>
+                <div className={styles.confirmText}>
+                  Catatan: tindakan ini tidak bisa dibatalkan. Pastikan kamu benar-benar yakin sebelum lanjut.
+                </div>
+              </div>
+
+              {dropAllProgress ? (
+                <div className={styles.confirmStatus}>{dropAllProgress}</div>
+              ) : (
+                <div className={styles.confirmHint}>
+                  Tips: kalau kategori sudah banyak dan kamu cuma ingin reset, ini cara tercepat.
+                </div>
+              )}
+            </div>
+
+            <div className={`${styles.modalFooter} ${styles.confirmFooter}`}>
+              <button
+                type="button"
+                className={`${baseStyles.btn} ${styles.confirmCancelBtn}`}
+                onClick={() => setDropAllConfirmOpen(false)}
+                disabled={dropAllConfirmBusy}
+              >
+                Batal
+              </button>
+
+              <button
+                type="button"
+                className={`${baseStyles.btn} ${styles.confirmDangerBtn}`}
+                onClick={doDropAllCategories}
+                disabled={dropAllConfirmBusy}
+              >
+                {dropAllConfirmBusy ? "Menghapus..." : "Ya, Hapus Semua"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+
     </div>
   );
 }
