@@ -167,7 +167,11 @@ async function fetchThemeData(themeKey: string, isPublished: boolean) {
     if (s.type === "CONTACT") {
       const cfg = s.config as any;
       if (Array.isArray(cfg.hubungiIds)) cfg.hubungiIds.forEach((id: any) => hubungiIds.push(Number(id)));
-      if (cfg.imageId) imageIds.push(Number(cfg.imageId));
+      const showImage = Boolean(cfg.showImage);
+      const imageId = Number(cfg.imageId);
+      if (showImage && Number.isFinite(imageId) && imageId > 0) {
+        imageIds.push(imageId);
+      }
     }
 
     if (s.type === "SOCIAL") {
