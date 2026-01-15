@@ -222,8 +222,9 @@ function scoreImageMatch(categoryName: string, img: GalleryImage): number {
 function pickBestImage(categoryName: string, images: GalleryImage[], used: Set<number>) {
   let best: { id: number; score: number } | null = null;
   for (const img of images) {
-    const urlOk = isPngUrl(img.url);
-    if (!urlOk) continue;
+    // Relaxed: allow any image
+    //const urlOk = isPngUrl(img.url);
+    if (!img.url) continue;
     if (used.has(Number(img.id))) continue;
     const score = scoreImageMatch(categoryName, img);
     if (score < 12) continue;
@@ -363,7 +364,7 @@ function SortRow({
               // eslint-disable-next-line @next/next/no-img-element
               <img src={imageUrl} alt="" />
             ) : (
-              <div className={ui.iconPlaceholder}>PNG</div>
+              <div className={ui.iconPlaceholder}>IMG</div>
             )}
           </div>
           {item.type === "category" ? (
@@ -521,18 +522,22 @@ export default function CategoryCommerceGridEditor({
     () => new Set(items.filter((it) => it.type === "category").map((it) => Number(it.kategoriId))),
     [items],
   );
+  /*
   const pngImages = React.useMemo(() => {
     return (images || []).filter((img) => isPngUrl(img.url));
   }, [images]);
+  */
+  // Use all images
+  const allImages = React.useMemo(() => images || [], [images]);
 
   const imageById = React.useMemo(() => {
     const m = new Map<number, GalleryImage>();
-    for (const img of pngImages || []) {
+    for (const img of allImages || []) {
       const id = Number(img.id);
       if (Number.isFinite(id)) m.set(id, img);
     }
     return m;
-  }, [pngImages]);
+  }, [allImages]);
 
   const filteredCategories = React.useMemo(() => {
     const qq = q.trim().toLowerCase();
@@ -596,9 +601,8 @@ export default function CategoryCommerceGridEditor({
             .replace("{scope}", scopeWord);
           const nextLabel = limitWords(ensureScopeLabel(templated.trim(), scopeWord), 6);
           const currentImg = it.imageId ? imageById.get(Number(it.imageId)) : null;
-          const currentScore =
-            currentImg && isPngUrl(currentImg.url) ? scoreImageMatch(nextLabel, currentImg) : 0;
-          const pickedId = pickBestImage(nextLabel, pngImages || [], usedImageIds);
+          const currentScore = currentImg ? scoreImageMatch(nextLabel, currentImg) : 0;
+          const pickedId = pickBestImage(nextLabel, allImages || [], usedImageIds);
           const finalImageId = currentScore >= 12 ? it.imageId : pickedId ?? null;
           if (finalImageId) usedImageIds.add(Number(finalImageId));
           const nextImageUrl = finalImageId ? imageById.get(Number(finalImageId))?.url ?? "" : it.imageUrl ?? "";
@@ -618,8 +622,8 @@ export default function CategoryCommerceGridEditor({
         const nextLabel = limitWords(ensureScopeLabel(templated.trim(), scopeWord), 6);
         const currentImg = it.imageId ? imageById.get(Number(it.imageId)) : null;
         const currentScore =
-          currentImg && isPngUrl(currentImg.url) ? scoreImageMatch(baseRaw, currentImg) : 0;
-        const pickedId = pickBestImage(baseRaw, pngImages || [], usedImageIds);
+          currentImg ? scoreImageMatch(baseRaw, currentImg) : 0;
+        const pickedId = pickBestImage(baseRaw, allImages || [], usedImageIds);
         const finalImageId = currentScore >= 12 ? it.imageId : pickedId ?? null;
         if (finalImageId) usedImageIds.add(Number(finalImageId));
 
