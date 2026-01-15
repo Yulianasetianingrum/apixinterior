@@ -10,9 +10,17 @@ import { useCart } from "@/app/context/CartContext";
 // Helper to ensure image URL is correct
 const ensureImageUrl = (url: string | null | undefined) => {
     if (!url) return null;
-    let cleanUrl = url.replace(/^\/?public\//, "");
-    if (cleanUrl.startsWith("http") || cleanUrl.startsWith("/")) return cleanUrl;
-    return `/${cleanUrl}`;
+    let clean = url;
+
+    // If it is an external/absolute URL, trust it (don't strip domain)
+    if (clean.startsWith("http")) return clean;
+
+    // Strip common local prefixes
+    clean = clean.replace(/^public\//, "");
+    clean = clean.replace(/^\/?public\//, "");
+
+    if (clean.startsWith("/")) return clean;
+    return `/${clean}`;
 };
 
 export default function WishlistPageClient() {
@@ -20,6 +28,7 @@ export default function WishlistPageClient() {
     const { addToCart } = useCart();
 
     if (items.length === 0) {
+        // ... (truncated for brevity, ensure this matches existing code structure or use larger context if needed)
         return (
             <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
                 <div className="text-6xl mb-4 text-[#ef4444]">❤</div>
@@ -43,21 +52,20 @@ export default function WishlistPageClient() {
                 {items.map((item) => (
                     <div key={item.id} className="flex gap-4 md:gap-6 p-4 border border-slate-200 rounded-xl bg-white shadow-sm items-center">
                         {/* Image */}
-                        <div className="relative w-20 h-20 flex-shrink-0 bg-slate-100 rounded-lg overflow-hidden">
+                        <div className="relative w-24 h-24 flex-shrink-0 bg-slate-100 rounded-lg overflow-hidden group">
                             {ensureImageUrl(item.image) ? (
                                 /* eslint-disable-next-line @next/next/no-img-element */
                                 <img
                                     src={ensureImageUrl(item.image)!}
                                     alt={item.name}
-                                    className="w-full h-full object-cover"
+                                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                                    onError={(e) => {
+                                        (e.target as HTMLImageElement).src = "https://placehold.co/100x100?text=Error";
+                                    }}
                                 />
                             ) : (
                                 <div className="flex items-center justify-center h-full text-slate-400 text-xs">No Img</div>
                             )}
-                            {/* DEBUG URL */}
-                            <div className="absolute bottom-0 left-0 bg-black/50 text-white text-[8px] p-1 w-full truncate">
-                                {item.image || "NULL"}
-                            </div>
                         </div>
 
                         {/* Details */}

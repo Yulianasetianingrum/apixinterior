@@ -13,13 +13,21 @@ interface CartPageClientProps {
 }
 
 // Helper to ensure image URL is correct
+// Helper to ensure image URL is correct
 const ensureImageUrl = (url: string | null | undefined) => {
     if (!url) return null;
-    // Strip 'public/' or '/public/' if present, as it's not needed in the URL
-    let cleanUrl = url.replace(/^\/?public\//, "");
+    let clean = url;
 
-    if (cleanUrl.startsWith("http") || cleanUrl.startsWith("/")) return cleanUrl;
-    return `/${cleanUrl}`;
+    // If it is an external/absolute URL, trust it
+    if (clean.startsWith("http")) return clean;
+
+    // Strip common local prefixes
+    clean = clean.replace(/^public\//, "");
+    clean = clean.replace(/^\/?public\//, "");
+    // REMOVED: stripping domain here, as it might be risky if inconsistent
+
+    if (clean.startsWith("/")) return clean;
+    return `/${clean}`;
 };
 
 export default function CartPageClient({ waNumber }: CartPageClientProps) {
@@ -82,12 +90,13 @@ export default function CartPageClient({ waNumber }: CartPageClientProps) {
                                                 src={ensureImageUrl(item.image)!}
                                                 alt={item.name}
                                                 style={{ width: 50, height: 50, objectFit: "cover", borderRadius: 8 }}
+                                                onError={(e) => {
+                                                    (e.target as HTMLImageElement).src = "https://placehold.co/50x50?text=Err";
+                                                }}
                                             />
                                         ) : (
                                             <div className={styles.noImage}>No Image</div>
                                         )}
-                                        {/* DEBUG */}
-                                        <div style={{ fontSize: 8, color: 'red', maxWidth: 50, overflow: 'hidden' }}>{item.image}</div>
                                     </div>
 
                                     <div className={styles.details}>
