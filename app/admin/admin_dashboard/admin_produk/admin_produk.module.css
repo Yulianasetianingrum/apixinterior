@@ -1,3 +1,5 @@
+/* SHARED ADMIN PRODUK STYLES */
+
 .pageWrapper {
   min-height: 100vh;
   background: #f4f6fb;
@@ -5,6 +7,16 @@
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
   padding: 24px 18px 32px;
+  position: relative;
+  /* for absolute positioning inside if needed */
+}
+
+/* DARK MODE WRAPPER */
+.pageWrapperDark {
+  background: #0f172a;
+  /* Slate 900 */
+  color: #f8fafc;
+  /* Slate 50 */
 }
 
 @media (min-width: 768px) {
@@ -21,12 +33,15 @@
   margin: 0 0 4px;
   font-size: 24px;
   font-weight: 700;
+  color: inherit;
+  /* inherit from wrapper */
 }
 
 .subtitle {
   margin: 0;
   font-size: 14px;
   opacity: 0.8;
+  color: inherit;
 }
 
 /* GRID CARD SUBMENU */
@@ -51,7 +66,7 @@
   box-shadow: 0 10px 25px rgba(9, 20, 64, 0.08);
   border: 1px solid rgba(11, 21, 49, 0.06);
   text-decoration: none;
-  color: inherit;
+  color: #0b1531;
   transition:
     background 0.2s ease,
     color 0.2s ease,
@@ -59,6 +74,14 @@
     box-shadow 0.2s ease,
     border-color 0.2s ease;
   cursor: pointer;
+}
+
+.cardDark {
+  background: #1e293b;
+  /* Slate 800 */
+  border: 1px solid #334155;
+  color: #f1f5f9;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
 }
 
 .cardHeader {
@@ -98,9 +121,21 @@
   outline: none;
 }
 
-.card:hover .cardArrow,
-.card:focus-visible .cardArrow,
-.card:active .cardArrow {
-  opacity: 1;
+/* Ensure Hover works in dark mode too */
+.cardDark:hover,
+.cardDark:focus-visible,
+.cardDark:active {
+  background: #f5c542;
+  /* Gold stays same/similar */
+  color: #111;
+  /* Text black on gold for contrast, or keep white? User likes gold/white mostly but check contrast */
+  border-color: #f5c542;
 }
 
+/* User specifically hated "yellow flashbang" in previous task, might prefer a different hover for dark mode?
+   Actually, the previous complaint was about cards *staying* yellow or losing text.
+   safest is to keep text readable.
+   Yellow background #f5c542 with White text is ok-ish but Black text #000 is better contrast.
+   However, consistency with light mode (white text) might be requested?
+   Light mode CSS says `color: #ffffff` on hover. I will stick to that to start.
+*/

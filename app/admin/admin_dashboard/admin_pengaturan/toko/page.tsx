@@ -3666,7 +3666,7 @@ export default async function TokoPengaturanPage({
                           <button type="submit" className={styles.secondaryButton}>Simpan</button>
                           <a
                             className={styles.primaryButton}
-                            href={`/admin/admin_dashboard/admin_pengaturan/toko/preview?theme=${encodeURIComponent(activeThemeKey)}&focus=HIGHLIGHT_COLLECTION&sectionId=${section.id}`}
+                            href={`/admin/preview?theme=${encodeURIComponent(activeThemeKey)}&focus=HIGHLIGHT_COLLECTION&sectionId=${section.id}`}
                           >
                             Preview
                           </a>
@@ -3698,7 +3698,7 @@ export default async function TokoPengaturanPage({
       {activeThemeKey ? (
         <FloatingPreviewActions
           themeKey={activeThemeKey}
-          previewHref={`${ADMIN_TOKO_PATH}/preview?theme=${encodeURIComponent(activeThemeKey)}`}
+          previewHref={`/admin/preview?theme=${encodeURIComponent(activeThemeKey)}`}
           resetAction={resetTheme}
           autoGenerateAction={autoGenerateThemeContent}
           previewClassName={styles.secondaryButton}

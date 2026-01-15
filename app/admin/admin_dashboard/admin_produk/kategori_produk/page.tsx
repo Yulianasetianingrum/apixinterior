@@ -1194,7 +1194,7 @@ export default function KategoriProdukPage() {
                           className={`${baseStyles.item} ${isDark ? baseStyles.itemDark : ""}`}
                         >
                           <div
-                            className={styles.categoryCard}
+                            className={`${styles.categoryCard} ${isDark ? styles.categoryCardDark : ""}`}
                             style={
                               cat.isPromo
                                 ? {

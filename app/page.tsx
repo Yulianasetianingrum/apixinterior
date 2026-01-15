@@ -84,6 +84,7 @@ async function fetchThemeData(themeKey: string, isPublished: boolean) {
   const categoryGridById = new Map<number, { items: CategoryGridItem[]; columns: number; maxItems?: number }>();
   const categoryCommerceById = new Map<number, { items: CategoryCommerceItem[]; columns: number; maxItems?: number }>();
 
+  // Synced from admin/preview/page.tsx to ensure consistency
   for (const s of sections) {
     if (s.type === "CATEGORY_GRID") {
       const cfg = s.config as any;
@@ -103,11 +104,14 @@ async function fetchThemeData(themeKey: string, isPublished: boolean) {
         }
       }
     }
+
     if (s.type === "CATEGORY_GRID_COMMERCE") {
       const cfg = s.config as any;
       const items: CategoryCommerceItem[] = Array.isArray(cfg.items) ? cfg.items : [];
       categoryCommerceById.set(s.id, { items, columns: Number(cfg.layout?.columns ?? 4), maxItems: cfg.layout?.maxItems });
+
       for (const it of items) {
+        // Handle both 'custom' (explicit image) and 'category' types
         if (it.type === "custom") {
           const iid = Number(it.imageId);
           if (Number.isFinite(iid) && iid > 0) imageIds.push(iid);
@@ -122,35 +126,55 @@ async function fetchThemeData(themeKey: string, isPublished: boolean) {
         }
       }
     }
-    if (s.type === "PRODUCT_CAROUSEL" || s.type === "PRODUCT_LISTING" || s.type === "HIGHLIGHT_COLLECTION") {
+
+    if (s.type === "PRODUCT_CAROUSEL") {
       const cfg = s.config as any;
       if (Array.isArray(cfg.productIds)) {
         cfg.productIds.forEach((id: any) => produkIds.push(Number(id)));
       }
-      if (s.type === "PRODUCT_LISTING") needsProductListing = true;
-      if (s.type === "HIGHLIGHT_COLLECTION") {
-        const hid = Number(cfg.heroImageId);
-        if (Number.isFinite(hid) && hid > 0) imageIds.push(hid);
+    }
+
+    if (s.type === "PRODUCT_LISTING") {
+      const cfg = s.config as any;
+      if (Array.isArray(cfg.productIds)) {
+        cfg.productIds.forEach((id: any) => produkIds.push(Number(id)));
+      }
+      needsProductListing = true;
+    }
+
+    if (s.type === "HIGHLIGHT_COLLECTION") {
+      const cfg = s.config as any;
+      const heroImageId = Number(cfg.heroImageId);
+      if (Number.isFinite(heroImageId) && heroImageId > 0) {
+        imageIds.push(heroImageId);
+      }
+      if (Array.isArray(cfg.productIds)) {
+        cfg.productIds.forEach((id: any) => produkIds.push(Number(id)));
       }
     }
+
     if (s.type === "HERO") {
       const cfg = s.config as any;
       const iid = Number(cfg.imageId);
       if (Number.isFinite(iid) && iid > 0) imageIds.push(iid);
     }
+
     if (s.type === "BRANCHES") {
       const cfg = s.config as any;
       if (Array.isArray(cfg.branchIds)) cfg.branchIds.forEach((id: any) => branchIds.push(Number(id)));
     }
+
     if (s.type === "CONTACT") {
       const cfg = s.config as any;
       if (Array.isArray(cfg.hubungiIds)) cfg.hubungiIds.forEach((id: any) => hubungiIds.push(Number(id)));
       if (cfg.imageId) imageIds.push(Number(cfg.imageId));
     }
+
     if (s.type === "SOCIAL") {
       const cfg = s.config as any;
       if (Array.isArray(cfg.iconKeys)) mediaIconKeys.push(...cfg.iconKeys);
     }
+
     if (s.type === "CUSTOM_PROMO") {
       const cfg = s.config as any;
       if (Array.isArray(cfg.voucherImageIds)) cfg.voucherImageIds.forEach((id: any) => imageIds.push(Number(id)));
@@ -163,6 +187,7 @@ async function fetchThemeData(themeKey: string, isPublished: boolean) {
         });
       }
     }
+
     if (s.type === "ROOM_CATEGORY") {
       const cfg = s.config as any;
       if (Array.isArray(cfg.cards)) {
@@ -170,8 +195,12 @@ async function fetchThemeData(themeKey: string, isPublished: boolean) {
           if (c.kategoriId) {
             kategoriIds.push(Number(c.kategoriId));
             if (!c.imageId) autoCoverKategoriIds.push(Number(c.kategoriId));
+            // FIXED: Also check imageId for Room Category when kategoriId is present but user overrode the image
+            if (c.imageId) imageIds.push(Number(c.imageId));
+          } else if (c.imageId) {
+            // Case: No category, just image
+            imageIds.push(Number(c.imageId));
           }
-          if (c.imageId) imageIds.push(Number(c.imageId));
         });
       }
     }

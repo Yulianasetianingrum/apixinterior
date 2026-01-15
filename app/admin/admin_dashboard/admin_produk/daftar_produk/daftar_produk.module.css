@@ -395,6 +395,13 @@
   border-radius: 18px;
   padding: 12px 16px;
   border: 1px solid #e5e7eb;
+  color: #0b1531;
+}
+
+.itemDark {
+  background: #1e293b;
+  border-color: #334155;
+  color: #f1f5f9;
 }
 
 .itemDragging {

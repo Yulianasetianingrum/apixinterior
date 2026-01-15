@@ -132,14 +132,6 @@ export default function AdminDashboardClient() {
             <li>
               <button
                 className={styles.cardLink}
-                onClick={() => goToSubPage("/admin/admin_dashboard/admin_pengaturan/promo")}
-              >
-                Pengaturan Promo
-              </button>
-            </li>
-            <li>
-              <button
-                className={styles.cardLink}
                 onClick={() => goToSubPage("/admin/admin_dashboard/admin_pengaturan/faq")}
               >
                 Menu FAQ & DLL
