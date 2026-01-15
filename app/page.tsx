@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 
 import Navbar from "./navbar/Navbar";
 import styles from "./page.module.css";
+import SecureImage from "@/app/components/SecureImage";
 import { CategoryGridPreview } from "./admin/admin_dashboard/admin_pengaturan/toko/preview/CategoryGridPreview";
 import CategoryCommerceColumns from "./components/homepage/CategoryCommerceColumns.client";
 import { SocialIcon } from "@/app/components/homepage/social-icons";
@@ -1047,19 +1048,10 @@ export default async function HomePage({
 
             const renderItem = (item: any) => {
               const innerContent = (
-                <img
+                <SecureImage
                   src={item.url}
                   alt="Promo"
                   className={styles.promoImg}
-                  onError={(e) => {
-                    const target = e.currentTarget;
-                    if (!target.src.includes("/api/img_proxy")) {
-                      const filename = item.url.split("/").pop();
-                      if (filename) {
-                        target.src = `/api/img_proxy?file=${filename}&t=${Date.now()}`;
-                      }
-                    }
-                  }}
                 />
               );
 
@@ -1098,20 +1090,13 @@ export default async function HomePage({
                     </div>
                   ) : layout === "hero" ? (
                     <div className={styles.promoHero}>
-                      <img
-                        src={items[0].url}
-                        alt=""
-                        className={styles.promoHeroImg}
-                        onError={(e) => {
-                          const target = e.currentTarget;
-                          if (!target.src.includes("/api/img_proxy")) {
-                            const filename = items[0].url.split("/").pop();
-                            if (filename) {
-                              target.src = `/api/img_proxy?file=${filename}&t=${Date.now()}`;
-                            }
-                          }
-                        }}
-                      />
+                      <div className={styles.promoHero}>
+                        <SecureImage
+                          src={items[0].url}
+                          alt=""
+                          className={styles.promoHeroImg}
+                        />
+                      </div>
                     </div>
                   ) : (
                     <div className={styles.promoCarousel}>{items.map(renderItem)}</div>
@@ -1253,7 +1238,7 @@ export default async function HomePage({
                     return (
                       <Link key={idx} href={href} className={styles.roomCardLink}>
                         <div className={`${styles.roomCard} ${isImageOnly ? styles.roomCardImageOnly : ""}`} style={{ borderColor: rcAccent, ["--rc-bg" as any]: imgUrl ? `url("${imgUrl}")` : undefined }}>
-                          <div className={styles.roomMedia}>{imgUrl ? <img className={styles.roomImg} src={imgUrl} alt={card.title || "Kategori"} onError={(e) => { const t = e.currentTarget; if (!t.src.includes("/api/img_proxy")) { const f = imgUrl.split("/").pop(); if (f) t.src = `/api/img_proxy?file=${f}&t=${Date.now()}`; } }} /> : <div className={styles.roomMediaPlaceholder} />}</div>
+                          <div className={styles.roomMedia}>{imgUrl ? <SecureImage className={styles.roomImg} src={imgUrl} alt={card.title || "Kategori"} /> : <div className={styles.roomMediaPlaceholder} />}</div>
                           {!isImageOnly ? <div className={styles.roomBody} style={{ background: rcLabelBg }}><div className={styles.roomTopRow}><div className={styles.roomTitle} style={{ color: rcAccent }}>{card.title}</div>{card.badge ? <span className={styles.roomBadge} style={{ borderColor: rcAccent, color: rcAccent }}>{card.badge}</span> : null}</div></div> : null}
                         </div>
                       </Link>

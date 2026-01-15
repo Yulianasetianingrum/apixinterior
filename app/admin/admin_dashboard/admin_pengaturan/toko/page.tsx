@@ -13,6 +13,7 @@ import FooterEditorWrapper from "./FooterEditorWrapper";
 import { headers } from "next/headers";
 import styles from "./toko.module.css";
 import TokoClient from "./toko-client";
+import SecureImage from "@/app/components/SecureImage";
 
 import ProductCarouselPicker from "./ProductCarouselPicker";
 import VoucherLinkEditor from "./VoucherLinkEditor";
@@ -2437,19 +2438,9 @@ export default async function TokoPengaturanPage({
                                           <div style={{ padding: "0 10px 10px" }}>
                                             {url ? (
                                               // eslint-disable-next-line @next/next/no-img-element
-                                              <img
+                                              <SecureImage
                                                 src={url}
                                                 alt={`Voucher ${imgId}`}
-                                                onError={(e) => {
-                                                  // Fallback to proxy if static file fails
-                                                  const target = e.currentTarget;
-                                                  if (!target.src.includes("/api/img_proxy")) {
-                                                    const filename = url.split("/").pop();
-                                                    if (filename) {
-                                                      target.src = `/api/img_proxy?file=${filename}&t=${Date.now()}`;
-                                                    }
-                                                  }
-                                                }}
                                                 style={{
                                                   width: "100%",
                                                   height: 140,
