@@ -452,8 +452,85 @@ export default function KolaseFotoPage() {
     setPreviewMeta({ loading: false });
   }
 
+  // Drag & Drop State
+  const [isDragging, setIsDragging] = useState(false);
+  const dragCounter = useRef(0);
+
+  // Drag Handlers
+  function handleDragEnter(e: React.DragEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    dragCounter.current++;
+    if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
+      setIsDragging(true);
+    }
+  }
+
+  function handleDragLeave(e: React.DragEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    dragCounter.current--;
+    if (dragCounter.current === 0) {
+      setIsDragging(false);
+    }
+  }
+
+  function handleDragOver(e: React.DragEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
+  function handleDrop(e: React.DragEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    dragCounter.current = 0;
+
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const files = e.dataTransfer.files;
+
+      // Filter images only (optional but good UX)
+      // For now just taking them all, backend validates too.
+
+      setFormFiles(files);
+      setFormTitle('');
+      setFormCategory('');
+      setFormSubcategory('');
+      setFormTags([]);
+      setFormTagInput('');
+
+      if (files.length === 1) {
+        handleAutoGenerate(files[0]);
+      } else {
+        // Maybe auto-generate from first file? Or leave blank?
+        // Reuse handleAutoGenerate logic partially or just title from first?
+        // Let's just use first file to guess category/tags if multiple, 
+        // but blank title.
+        handleAutoGenerate(files[0]); // This sets title too, might want to clear title if >1
+        if (files.length > 1) setFormTitle('');
+      }
+
+      setAddOpen(true);
+      e.dataTransfer.clearData();
+    }
+  }
+
   return (
-    <div className={layoutStyles.dashboard}>
+    <div
+      className={layoutStyles.dashboard}
+      onDragEnter={handleDragEnter}
+      onDragLeave={handleDragLeave}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+    >
+      {/* DRAG OVERLAY */}
+      {isDragging && (
+        <div className={styles.dragOverlay}>
+          <div className={styles.dragOverlayIcon}>📂</div>
+          <div>Lepaskan file di sini untuk upload</div>
+        </div>
+      )}
+
       {/* TOP BAR HP/TABLET */}
       <div className={layoutStyles.mobileTopBar}>
         <button
