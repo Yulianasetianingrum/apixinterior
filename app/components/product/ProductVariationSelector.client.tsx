@@ -388,11 +388,6 @@ export default function ProductVariationSelector({ product, onImageChange, baseW
 
             {/* CTA BUTTON */}
             <div style={{ marginTop: 10 }}>
-                {/* Notice for details */}
-                <div style={{ marginBottom: 8, fontSize: 13, color: "#64748b", fontStyle: "italic", textAlign: "center" }}>
-                    Mohon baca deskripsi untuk detail lengkapnya
-                </div>
-
                 <button
                     onClick={handlePesan}
                     disabled={!baseWaNumber}
@@ -419,6 +414,12 @@ export default function ProductVariationSelector({ product, onImageChange, baseW
                     )}
                     <span>Hubungi via WhatsApp</span>
                 </button>
+
+                {/* Notice for details */}
+                <div style={{ marginTop: 8, fontSize: 13, color: "#64748b", fontStyle: "italic", textAlign: "left" }}>
+                    Mohon baca deskripsi untuk detail lengkapnya
+                </div>
+
                 {!baseWaNumber && (
                     <div style={{ marginTop: 8, fontSize: 12, color: "#ef4444" }}>
                         Nomor WhatsApp belum diatur oleh Admin.

@@ -125,6 +125,10 @@ export default function ProductDetailClient({ product, waNumber }: WrapperProps)
                     {product.nama}
                 </h1>
 
+                <div style={{ marginBottom: 16, fontSize: 15, lineHeight: 1.6, color: "#475569" }}>
+                    {product.deskripsiSingkat}
+                </div>
+
                 {/* SELECTOR handles Price & CTA */}
                 <div style={{ marginBlock: 10 }}>
                     <ProductVariationSelector
@@ -132,10 +136,6 @@ export default function ProductDetailClient({ product, waNumber }: WrapperProps)
                         onImageChange={(url) => setActiveImage(normalizePublicUrl(url))}
                         baseWaNumber={waNumber}
                     />
-                </div>
-
-                <div style={{ marginTop: 24, fontSize: 15, lineHeight: 1.6, color: "#475569" }}>
-                    {product.deskripsiSingkat}
                 </div>
 
                 {/* Specs Mini */}
