@@ -4927,8 +4927,23 @@ article[data-hc-nohero="1"] .hcCta {
   flex-direction: row !important;
   align-items: center !important;
   gap: 12px !important;
-  flex-wrap: wrap !important;
+  flex-wrap: nowrap !important;
+  /* Forces single line */
+  overflow-x: auto !important;
+  /* Enables horizontal scroll */
+  scrollbar-width: none;
+  /* Hide scrollbar */
+  -webkit-overflow-scrolling: touch;
   width: 100%;
+  padding-bottom: 4px;
+  /* Space for potential scrollbar interaction */
+  margin-bottom: 12px !important;
+}
+
+/* Ensure badges don't get squashed */
+.heroBadge {
+  flex: 0 0 auto !important;
+  white-space: nowrap !important;
 }
 
 /* Ensure Eyebrow doesn't force a new line */
@@ -4947,10 +4962,13 @@ article[data-hc-nohero="1"] .hcCta {
 @media (max-width: 640px) {
 
   /* Keep row even on mobile to satisfy "dilarang eyebrow di atas badges" */
+  /* Keep row even on mobile to satisfy "dilarang eyebrow di atas badges" */
   .heroTopRow {
     flex-direction: row !important;
     align-items: center !important;
     gap: 10px !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
   }
 }
 
