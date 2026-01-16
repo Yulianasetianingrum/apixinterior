@@ -9,6 +9,7 @@
   /* ===== Theme tokens (set by navbar/CMS via themeKey) ===== */
   --navy: #0b1d3a;
   --gold: #d4af37;
+  --gold-bold: #8c6c18;
   --white: #ffffff;
   --ink: #0f172a;
 
@@ -61,17 +62,17 @@
 .pageBg[data-theme="white_gold"],
 .pageBg[data-theme="WHITE_GOLD"] {
   --t-bg: var(--white);
-  --t-element: var(--gold);
-  --t-card: #f6f7fb;
-  --t-card-fg: var(--ink);
-  --t-card-border: rgba(2, 6, 23, 0.10);
+  --t-element: var(--gold-bold);
+  --t-card: #fdfaf3;
+  --t-card-fg: var(--gold-bold);
+  --t-card-border: rgba(140, 108, 24, 0.15);
 
-  --t-cta-bg: var(--gold);
-  --t-cta-fg: var(--navy);
-  --t-cta-hover-bg: var(--navy);
-  --t-cta-hover-fg: var(--gold);
-  --t-cta-border: rgba(212, 175, 55, 0.60);
-  --t-divider: rgba(2, 6, 23, 0.08);
+  --t-cta-bg: var(--gold-bold);
+  --t-cta-fg: var(--white);
+  --t-cta-hover-bg: #6d5412;
+  --t-cta-hover-fg: var(--white);
+  --t-cta-border: rgba(140, 108, 24, 0.60);
+  --t-divider: rgba(140, 108, 24, 0.12);
 }
 
 /* 3) Navy + White */
@@ -2138,17 +2139,17 @@
 .themeScope[data-theme="theme_2"],
 .themeScope[data-theme="THEME_2"] {
   --t-bg: var(--white);
-  --t-element: var(--gold);
-  --t-card: var(--white);
-  --t-card-fg: var(--gold);
-  --t-card-border: rgba(11, 29, 58, 0.12);
+  --t-element: var(--gold-bold);
+  --t-card: #fdfaf3;
+  --t-card-fg: var(--gold-bold);
+  --t-card-border: rgba(140, 108, 24, 0.15);
 
-  --t-cta-bg: var(--gold);
-  --t-cta-fg: var(--navy);
-  --t-cta-hover-bg: var(--navy);
-  --t-cta-hover-fg: var(--gold);
-  --t-cta-border: rgba(212, 175, 55, 0.60);
-  --t-divider: rgba(2, 6, 23, 0.08);
+  --t-cta-bg: var(--gold-bold);
+  --t-cta-fg: var(--white);
+  --t-cta-hover-bg: #6d5412;
+  --t-cta-hover-fg: var(--white);
+  --t-cta-border: rgba(140, 108, 24, 0.60);
+  --t-divider: rgba(140, 108, 24, 0.12);
 }
 
 .themeScope[data-theme="NAVY_WHITE"],

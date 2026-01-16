@@ -80,9 +80,9 @@
 
 .textSubtitle {
   font-size: clamp(16px, 2.2vw, 20px);
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.4;
-  opacity: 0.85;
+  opacity: 0.9;
   color: var(--ts-accent, var(--ts-text));
 }
 
@@ -94,9 +94,9 @@
 
 .textCaption {
   font-size: clamp(12px, 1.4vw, 13px);
-  font-weight: 400;
+  font-weight: 600;
   line-height: 1.5;
-  opacity: 0.8;
+  opacity: 0.9;
   color: var(--ts-accent, var(--ts-text));
 }
 
@@ -229,6 +229,7 @@
   /* ===== Theme tokens (set by navbar/CMS via themeKey) ===== */
   --navy: #0b1d3a;
   --gold: #d4af37;
+  --gold-bold: #8c6c18;
   --white: #ffffff;
   --ink: #0f172a;
 
@@ -276,15 +277,15 @@
 }
 
 /* 2) White + Gold */
-.pageBg[data-theme="theme_2"],
-.pageBg[data-theme="white-gold"],
+.pageBg[data-theme="WHITE_GOLD"],
 .pageBg[data-theme="white_gold"],
-.pageBg[data-theme="WHITE_GOLD"] {
+.pageBg[data-theme="white-gold"],
+.pageBg[data-theme="theme_2"] {
   --t-bg: var(--white);
-  --t-element: var(--gold);
-  --t-card: #f6f7fb;
-  --t-card-fg: var(--ink);
-  --t-card-border: rgba(15, 23, 42, 0.10);
+  --t-element: var(--gold-bold);
+  --t-card: #fdfaf3;
+  --t-card-fg: var(--gold-bold);
+  --t-card-border: rgba(140, 108, 24, 0.15);
 
   --t-cta-bg: var(--gold);
   --t-cta-fg: var(--ink);
@@ -430,10 +431,10 @@
 .hcSection[data-theme="white_gold"],
 .hcSection[data-theme="WHITE_GOLD"] {
   --t-bg: var(--white);
-  --t-element: var(--gold);
+  --t-element: var(--gold-bold);
   --t-card: var(--white);
-  --t-card-fg: var(--t-element);
-  --t-card-border: rgba(15, 23, 42, 0.10);
+  --t-card-fg: var(--gold-bold);
+  --t-card-border: rgba(140, 108, 24, 0.15);
 
   --t-cta-bg: var(--gold);
   --t-cta-fg: var(--ink);
@@ -2498,9 +2499,9 @@
 
 .textSubtitle {
   font-size: clamp(16px, 2.2vw, 20px);
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.4;
-  opacity: 0.85;
+  opacity: 0.9;
   color: var(--ts-accent, var(--ts-text));
 }
 
@@ -2512,9 +2513,9 @@
 
 .textCaption {
   font-size: clamp(12px, 1.4vw, 13px);
-  font-weight: 400;
+  font-weight: 600;
   line-height: 1.5;
-  opacity: 0.8;
+  opacity: 0.9;
   color: var(--ts-accent, var(--ts-text));
 }
 
@@ -4276,11 +4277,11 @@ article[data-hc-nohero="1"] .hcCta {
 
 .heroThemeWhiteGold {
   --hb-bg: #ffffff;
-  --hb-bg2: #f8fafc;
-  --hb-text: #0f172a;
-  --hb-accent: #d4af37;
-  --hb-chipBg: rgba(15, 23, 42, 0.08);
-  --hb-chipBorder: rgba(15, 23, 42, 0.12);
+  --hb-bg2: #fcf9f0;
+  --hb-text: #8c6c18;
+  --hb-accent: #8c6c18;
+  --hb-chipBg: rgba(140, 108, 24, 0.08);
+  --hb-chipBorder: rgba(140, 108, 24, 0.12);
 }
 
 .heroThemeNavyWhite {
@@ -4624,9 +4625,9 @@ article[data-hc-nohero="1"] .hcCta {
 
 .textSubtitle {
   font-size: clamp(16px, 2.2vw, 20px);
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.4;
-  opacity: 0.85;
+  opacity: 0.9;
   color: var(--ts-accent, var(--ts-text));
 }
 
@@ -4638,9 +4639,9 @@ article[data-hc-nohero="1"] .hcCta {
 
 .textCaption {
   font-size: clamp(12px, 1.4vw, 13px);
-  font-weight: 400;
+  font-weight: 600;
   line-height: 1.5;
-  opacity: 0.8;
+  opacity: 0.9;
   color: var(--ts-accent, var(--ts-text));
 }
 
@@ -4817,11 +4818,11 @@ article[data-hc-nohero="1"] .hcCta {
 .previewSectionTheme[data-theme="white_gold"],
 .previewSectionTheme[data-theme="white-gold"] {
   --t-card: #ffffff;
-  --t-card-border: rgba(11, 29, 58, 0.08);
-  --t-text: #d4af37;
-  --t-sub: rgba(212, 175, 55, 0.85);
-  --t-cta-bg: #d4af37;
-  --t-cta-fg: #0b1d3a;
+  --t-card-border: rgba(140, 108, 24, 0.12);
+  --t-text: #8c6c18;
+  --t-sub: rgba(140, 108, 24, 0.85);
+  --t-cta-bg: #8c6c18;
+  --t-cta-fg: #ffffff;
 }
 
 .previewSectionTheme[data-theme="theme_3"],

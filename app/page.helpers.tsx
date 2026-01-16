@@ -80,6 +80,7 @@ export function resolveEffectiveTheme(raw: any, navbarTheme: string): string {
 export function getHeroThemeTokens(theme: string) {
     const navy = "#0b1d3a";
     const gold = "#d4af37";
+    const goldBold = "#8c6c18";
     const white = "#ffffff";
     const ink = "#0f172a";
 
@@ -91,8 +92,8 @@ export function getHeroThemeTokens(theme: string) {
             return { bg: navy, element: gold, card: navy, cardFg: gold, cardBorder: "rgba(255,255,255,0.22)", ctaBg: gold, ctaFg: navy, ctaHoverBg: navy, ctaHoverFg: gold, divider: "rgba(255,255,255,0.16)" };
         case "WHITE_GOLD":
         case "theme_2":
-            // IMPROVED CONTRAST: Use neutral dark text on White background
-            return { bg: white, element: gold, card: white, cardFg: ink, ctaBg: gold, ctaFg: ink, ctaHoverBg: ink, ctaHoverFg: gold, divider: "rgba(2,6,23,0.08)" };
+            // IMPROVED CONTRAST: Use unified BOLD GOLD for White background
+            return { bg: white, element: goldBold, card: white, cardFg: goldBold, ctaBg: goldBold, ctaFg: white, ctaHoverBg: "#6d5412", ctaHoverFg: white, divider: "rgba(140,108,24,0.12)" };
         case "NAVY_WHITE":
         case "theme_3":
             return { bg: navy, element: white, card: navy, cardFg: white, cardBorder: "rgba(255,255,255,0.22)", ctaBg: white, ctaFg: navy, ctaHoverBg: navy, ctaHoverFg: white, divider: "rgba(255,255,255,0.16)" };
@@ -143,8 +144,8 @@ export function resolveCustomPromoPalette(rawBg: any, navbarTheme: string) {
     const palette: Record<string, { bg: string; fg: string; border: string }> = {
         NAVY: { bg: "rgba(11, 29, 58, 0.96)", fg: "#f4f7fb", border: "rgba(255,255,255,0.18)" },
         WHITE: { bg: "#ffffff", fg: "#0f172a", border: "rgba(15,23,42,0.12)" },
-        GOLD: { bg: "#d4af37", fg: "#0f172a", border: "rgba(11,29,58,0.18)" },
-        SOFT_GOLD: { bg: "#FAF8F0", fg: "#0f172a", border: "rgba(15,23,42,0.08)" },
+        GOLD: { bg: "#8c6c18", fg: "#ffffff", border: "rgba(255,255,255,0.18)" },
+        SOFT_GOLD: { bg: "#FAF8F0", fg: "#8c6c18", border: "rgba(140,108,24,0.08)" },
         SOFT_NAVY: { bg: "#EEF2F6", fg: "#0f172a", border: "rgba(15,23,42,0.08)" },
     };
     const picked = palette[token] || palette.NAVY;
@@ -175,7 +176,8 @@ export function getFooterIconPath(iconType: FooterIconType, themeElementColor: s
 export type ThemeToken = "NAVY" | "GOLD" | "WHITE";
 export function colorForToken(t: ThemeToken): string {
     if (t === "NAVY") return "rgba(11, 29, 58, 0.96)";
-    if (t === "GOLD") return "rgba(212, 175, 55, 0.96)";
+    // PREMIUM BOLD GOLD (Darker & Higher Contrast)
+    if (t === "GOLD") return "rgba(140, 108, 24, 0.99)";
     return "rgba(255, 255, 255, 0.98)";
 }
 
@@ -190,13 +192,13 @@ export function parseThemePair(themeKey: string): { a: ThemeToken; b: ThemeToken
 
 export function categoryGridVarsFromTheme(resolvedTheme: string) {
     const NAVY = "#0b1d3a";
-    const GOLD = "#d4af37";
+    const GOLD = "#8c6c18";
     const WHITE = "#ffffff";
     switch (resolvedTheme) {
         case "NAVY_GOLD": return { cardBg: NAVY, insideText: GOLD, outsideText: NAVY, border: "rgba(255,255,255,0.22)" };
-        case "WHITE_GOLD": return { cardBg: WHITE, insideText: GOLD, outsideText: GOLD, border: "rgba(11,29,58,0.18)" };
+        case "WHITE_GOLD": return { cardBg: WHITE, insideText: GOLD, outsideText: GOLD, border: "rgba(140,108,24,0.15)" };
         case "NAVY_WHITE": return { cardBg: NAVY, insideText: WHITE, outsideText: NAVY, border: "rgba(255,255,255,0.22)" };
-        case "GOLD_NAVY": return { cardBg: GOLD, insideText: NAVY, outsideText: GOLD, border: "rgba(11,29,58,0.20)" };
+        case "GOLD_NAVY": return { cardBg: GOLD, insideText: NAVY, outsideText: GOLD, border: "rgba(140,108,24,0.20)" };
         case "GOLD_WHITE": return { cardBg: GOLD, insideText: WHITE, outsideText: GOLD, border: "rgba(255,255,255,0.22)" };
         case "WHITE_NAVY": return { cardBg: WHITE, insideText: NAVY, outsideText: NAVY, border: "rgba(11,29,58,0.18)" };
         default: return { cardBg: WHITE, insideText: NAVY, outsideText: NAVY, border: "rgba(11,29,58,0.18)" };
