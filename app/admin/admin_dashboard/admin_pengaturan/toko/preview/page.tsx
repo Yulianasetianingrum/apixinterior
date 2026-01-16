@@ -1571,9 +1571,16 @@ export default async function TokoPreviewDraftPage({
                   // - grid: responsive grid (best when cards are few)
                   // Rule in preview: if admin chooses carousel BUT branches <= 5, render as grid so it doesn't look "kosong".
                   const layoutRequested = String(cfg.layout ?? "carousel") === "grid" ? "grid" : "carousel";
+
+                  // Card theme - controls the card appearance
                   const sectionThemeResolved = resolveEffectiveTheme(cfg.sectionTheme ?? "FOLLOW_NAVBAR", navbarTheme);
                   const cardThemeClass = sectionThemeResolved ? `theme-${String(sectionThemeResolved).toLowerCase()}` : "";
                   const colors = getHeroThemeTokens(sectionThemeResolved);
+
+                  // Section background theme - separate from card theme
+                  const sectionBgRaw = cfg.sectionBgTheme;
+                  const sectionBg = parseCustomPromoBgTheme(sectionBgRaw);
+                  const bgPalette = resolveCustomPromoPalette(sectionBg, navbarTheme);
 
                   const selectedIds: number[] = Array.isArray(cfg.branchIds) ? cfg.branchIds : [];
                   const branches = selectedIds
@@ -1666,7 +1673,21 @@ export default async function TokoPreviewDraftPage({
                             return "";
                           };
 
+                          // Convert embed URL to viewing URL (remove output=embed)
+                          const resolveViewUrl = (embedUrl: string) => {
+                            if (!embedUrl) return "";
+                            try {
+                              const u = new URL(embedUrl);
+                              // Remove output=embed to get the regular viewing URL
+                              u.searchParams.delete("output");
+                              return u.toString();
+                            } catch {
+                              return embedUrl;
+                            }
+                          };
+
                           const embedSrc = resolveEmbed();
+                          const viewUrl = resolveViewUrl(embedSrc);
 
                           return (
                             <div
@@ -1724,19 +1745,70 @@ export default async function TokoPreviewDraftPage({
                           <div className={ui.pcMeta}>{meta}</div>
 
                           <div className={ui.pcCtaWrap}>
-                            {mapsUrl ? (
-                              <a
-                                className={ui.pcCta}
-                                href={mapsUrl}
-                                target="_blank"
-                                rel="noreferrer"
-                                style={{ background: colors.ctaBg, color: colors.ctaFg, border: `1px solid ${colors.ctaBg}` }}
-                              >
-                                Buka Maps
-                              </a>
-                            ) : (
-                              <div className={ui.pcCtaPlaceholder} />
-                            )}
+                            {(() => {
+                              // Recalculate viewUrl for the button (same logic as iframe)
+                              const resolveEmbed = () => {
+                                if (!mapsUrl) return "";
+                                if (mapsUrl.includes("<iframe")) {
+                                  const match = mapsUrl.match(/src=["']([^"']+)["']/i);
+                                  if (match && match[1]) return match[1];
+                                }
+                                try {
+                                  const u = new URL(mapsUrl);
+                                  const host = u.host.toLowerCase();
+                                  const isGoogle = host.includes("google.") || host.includes("maps.");
+                                  const isEmbedPath = u.pathname.includes("/maps/embed");
+                                  const pb = u.searchParams.get("pb");
+                                  const output = u.searchParams.get("output");
+
+                                  if (isEmbedPath && pb && pb.length > 20) return mapsUrl;
+                                  if (isEmbedPath && output === "embed") return mapsUrl;
+                                  if (output === "embed") return mapsUrl;
+
+                                  if (isGoogle) {
+                                    const q =
+                                      u.searchParams.get("q") ||
+                                      u.searchParams.get("query") ||
+                                      u.searchParams.get("search") ||
+                                      "";
+                                    const query = q || name;
+                                    if (!query) return "";
+                                    return `https://maps.google.com/maps?q=${encodeURIComponent(query)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+                                  }
+                                } catch {
+                                  // ignore
+                                }
+                                return "";
+                              };
+
+                              const resolveViewUrl = (embedUrl: string) => {
+                                if (!embedUrl) return "";
+                                try {
+                                  const u = new URL(embedUrl);
+                                  u.searchParams.delete("output");
+                                  return u.toString();
+                                } catch {
+                                  return embedUrl;
+                                }
+                              };
+
+                              const embedSrc = resolveEmbed();
+                              const viewUrl = resolveViewUrl(embedSrc);
+
+                              return viewUrl ? (
+                                <a
+                                  className={ui.pcCta}
+                                  href={viewUrl}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  style={{ background: colors.ctaBg, color: colors.ctaFg, border: `1px solid ${colors.ctaBg}` }}
+                                >
+                                  Buka Maps
+                                </a>
+                              ) : (
+                                <div className={ui.pcCtaPlaceholder} />
+                              );
+                            })()}
                           </div>
                         </div>
                       </article>
@@ -1749,8 +1821,8 @@ export default async function TokoPreviewDraftPage({
                       className={`${ui.previewSection} ${ui.previewSectionTheme}`}
                       data-theme={sectionThemeResolved}
                       style={{
-                        backgroundColor: colors.bg,
-                        color: colors.element,
+                        backgroundColor: bgPalette ? bgPalette.bg : colors.bg,
+                        color: bgPalette ? bgPalette.fg : colors.element,
                       }}
                     >
                       {sectionTitle ? <h2 className={ui.sectionTitle}>{sectionTitle}</h2> : null}
