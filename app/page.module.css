@@ -4592,28 +4592,40 @@ article[data-hc-nohero="1"] .hcCta {
     display: none !important;
   }
 
-  /* Mobile-specific: Smaller Trust Chips */
+  /* Mobile-specific: SUPER SMALL Trust Chips */
   .heroTrustChip {
-    padding: 6px 8px;
-    font-size: 10px;
+    padding: 3px 6px;
+    font-size: 8px;
     font-weight: 700;
   }
 
-  /* Mobile-specific: Smaller Mini Info Cards */
+  .heroTrustRow {
+    margin-top: 6px;
+    gap: 5px;
+  }
+
+  /* Mobile-specific: SUPER SMALL Mini Info Cards */
   .heroMiniInfoCard {
-    padding: 8px 10px;
-    min-width: 110px;
-    font-size: 11px;
+    padding: 5px 7px;
+    min-width: 80px;
+    font-size: 9px;
+  }
+
+  .heroMiniInfoRow {
+    margin-top: 8px;
+    gap: 5px;
   }
 
   .heroMiniInfoTitle {
-    font-size: 13px;
+    font-size: 10px;
     font-weight: 800;
+    margin-bottom: 1px;
   }
 
   .heroMiniInfoDesc {
-    font-size: 10px;
-    margin-top: 2px;
+    font-size: 8px;
+    margin-top: 0;
+    opacity: 0.85;
   }
 }
 
