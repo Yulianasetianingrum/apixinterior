@@ -4043,11 +4043,14 @@ async function uploadImageToGalleryAndAttach(formData: FormData): Promise<{ ok: 
     } else if (attach === "CUSTOM_PROMO:append" || attach === "CUSTOM_PROMO:imageId") {
       // enforce rules: ratio + width + hero single image
       const meta = await metaFromDisk(Number(imageIdToUse));
+
+      // Declare layout variables outside metadata check so they're accessible later
+      const layoutRaw = (layoutOverride || String((cfg as any)?.layout ?? "carousel")).toLowerCase();
+      const isHero = layoutRaw === "hero";
+      const nextLayout = isHero ? "hero" : layoutRaw === "grid" ? "grid" : "carousel";
+
       if (meta?.width && meta?.height) {
         // Only validate if metadata is available
-        const layoutRaw = (layoutOverride || String((cfg as any)?.layout ?? "carousel")).toLowerCase();
-        const isHero = layoutRaw === "hero";
-        const nextLayout = isHero ? "hero" : layoutRaw === "grid" ? "grid" : "carousel";
         if (isHero) {
           if (meta.width !== 3000 || meta.height !== 1000) {
             throw new Error("Hero wajib ukuran 3000x1000 (tidak bisa selain itu).");
