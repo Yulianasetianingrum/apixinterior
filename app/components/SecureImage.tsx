@@ -30,8 +30,15 @@ export default function SecureImage({ src, alt, fallbackToProxy = true, ...props
                 if (!hasErrored && fallbackToProxy) {
                     const urlStr = String(imgSrc);
                     if (urlStr && !urlStr.includes("/api/img_proxy")) {
-                        const filename = urlStr.split("/").pop();
-                        if (filename) {
+                        let filename = "";
+                        try {
+                            const urlObj = new URL(urlStr, window.location.origin);
+                            filename = urlObj.searchParams.get("f") || urlObj.pathname.split("/").pop() || "";
+                        } catch {
+                            filename = urlStr.split("/").pop() || "";
+                        }
+
+                        if (filename && filename.includes(".")) {
                             setHasErrored(true);
                             setImgSrc(`/api/img_proxy?file=${filename}&t=${Date.now()}`);
                             return;

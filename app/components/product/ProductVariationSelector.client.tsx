@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect } from "react";
 import { formatIDR, computeHargaSetelahPromo } from "@/lib/product-utils";
 import { useCart } from "@/app/context/CartContext";
 import { useWishlist } from "@/app/context/WishlistContext";
+import SecureImage from "@/app/components/SecureImage";
 
 type Product = {
     id: number;
@@ -385,7 +386,7 @@ export default function ProductVariationSelector({ product, onImageChange, baseW
                                 >
                                     {thumb && (
                                         // eslint-disable-next-line @next/next/no-img-element
-                                        <img src={thumb} alt="" style={{ width: 20, height: 20, borderRadius: 4, objectFit: "cover" }} />
+                                        <SecureImage src={thumb} alt="" style={{ width: 20, height: 20, borderRadius: 4, objectFit: "cover" }} />
                                     )}
                                     {label}
                                 </button>
@@ -435,7 +436,7 @@ export default function ProductVariationSelector({ product, onImageChange, baseW
                                     >
                                         {c.imageUrl && (
                                             // eslint-disable-next-line @next/next/no-img-element
-                                            <img src={c.imageUrl} alt="" style={{ width: 20, height: 20, borderRadius: 4, objectFit: "cover" }} />
+                                            <SecureImage src={c.imageUrl} alt="" style={{ width: 20, height: 20, borderRadius: 4, objectFit: "cover" }} />
                                         )}
                                         {cleanLabel(c.nilai)}
                                     </button>
@@ -530,7 +531,7 @@ export default function ProductVariationSelector({ product, onImageChange, baseW
                 >
                     {baseWaNumber && (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img
+                        <SecureImage
                             src="/uploads/WA_navy.png"
                             alt=""
                             style={{ flexShrink: 0, width: 20, height: 20, objectFit: "contain" }}

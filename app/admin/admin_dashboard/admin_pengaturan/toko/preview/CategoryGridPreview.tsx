@@ -1,4 +1,5 @@
 import Link from "next/link";
+import SecureImage from "@/app/components/SecureImage";
 import ui from "./CategoryGridPreview.module.css";
 
 export type CategoryGridPreviewItem = {
@@ -41,7 +42,7 @@ export function CategoryGridPreview({ data }: { data: CategoryGridPreviewData })
             <div className={ui.media}>
               {it.imageUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img className={ui.img} src={it.imageUrl} alt={it.title} />
+                <SecureImage className={ui.img} src={it.imageUrl} alt={it.title} />
               ) : (
                 <div className={ui.imgPlaceholder} />
               )}

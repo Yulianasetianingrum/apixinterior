@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FaTrash, FaCartShopping } from "react-icons/fa6";
 import { useCart } from "@/app/context/CartContext";
+import SecureImage from "@/app/components/SecureImage";
 
 // Helper to ensure image URL is correct
 const ensureImageUrl = (url: string | null | undefined) => {
@@ -55,13 +56,10 @@ export default function WishlistPageClient() {
                         <div className="relative w-24 h-24 flex-shrink-0 bg-slate-100 rounded-lg overflow-hidden group">
                             {ensureImageUrl(item.image) ? (
                                 /* eslint-disable-next-line @next/next/no-img-element */
-                                <img
+                                <SecureImage
                                     src={ensureImageUrl(item.image)!}
                                     alt={item.name}
                                     style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                                    onError={(e) => {
-                                        (e.target as HTMLImageElement).src = "https://placehold.co/100x100?text=Error";
-                                    }}
                                 />
                             ) : (
                                 <div className="flex items-center justify-center h-full text-slate-400 text-xs">No Img</div>

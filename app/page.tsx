@@ -741,7 +741,7 @@ export default async function HomePage({
                   <div className={styles.heroMedia}>
                     <div className={styles.heroMediaBg} aria-hidden="true" />
                     {imgUrl ? (
-                      <img className={styles.heroImage} src={imgUrl} alt={cfg.headline || "Hero Image"} />
+                      <SecureImage className={styles.heroImage} src={imgUrl} alt={cfg.headline || "Hero Image"} />
                     ) : <div className={styles.heroMediaPlaceholder} aria-hidden="true" />}
                     <div className={styles.heroFloatingCards} aria-hidden="true">
                       {hasFloat1 ? (
@@ -790,7 +790,7 @@ export default async function HomePage({
                       const priceNode = cfg.showPrice ? (pr.isPromo ? <div style={{ display: "flex", flexDirection: "column", gap: 4 }}><div style={{ display: "flex", gap: 8 }}><span style={{ fontWeight: 800 }}>{formatRupiah(pr.hargaFinal)}</span></div><div style={{ display: "flex", gap: 8 }}><span style={{ textDecoration: "line-through", opacity: 0.6 }}>{formatRupiah(pr.hargaAsli)}</span><span style={{ fontWeight: 800, color: themeTokens.element }}>{pr.promoLabel}</span></div></div> : <>{formatRupiah(p.harga)}</>) : null;
                       return (
                         <article key={Number(p.id)} className={styles.pcCard} style={{ background: themeTokens.card, border: `1px solid ${themeTokens.cardBorder}`, color: themeTokens.cardFg }}>
-                          {imgUrl ? <div className={styles.pcMedia}><div className={styles.pcMediaBlur} style={{ backgroundImage: `url(${imgUrl})` }} /><img className={styles.pcMediaImg} src={imgUrl} alt={String(p.nama)} /></div> : <div className={styles.pcMediaPlaceholder} />}
+                          {imgUrl ? <div className={styles.pcMedia}><div className={styles.pcMediaBlur} style={{ backgroundImage: `url(${imgUrl})` }} /><SecureImage className={styles.pcMediaImg} src={imgUrl} alt={String(p.nama)} /></div> : <div className={styles.pcMediaPlaceholder} />}
                           <div className={styles.pcBody}><div className={styles.pcTitle} style={{ color: themeTokens.cardFg }}>{String(p.nama)}</div>{cfg.showPrice ? <div className={styles.pcPrice} style={{ color: themeTokens.cardFg }}>{priceNode}</div> : null}
                             <div className={styles.pcCtaWrap}>{cfg.showCta ? <a className={styles.pcCta} href={href} style={{ background: themeTokens.ctaBg, color: themeTokens.ctaFg, border: `1px solid ${themeTokens.ctaBg}` }}>Lihat Produk</a> : null}</div></div>
                         </article>
@@ -848,7 +848,7 @@ export default async function HomePage({
                     return (
                       <article key={Number(p.id)} className={styles.productListingItem}>
                         <a href={href} className={styles.pcCard} style={{ background: themeTokens.card, border: `1px solid ${themeTokens.cardBorder}`, color: themeTokens.cardFg, textDecoration: "none", width: "100%", height: "100%" }}>
-                          {imgUrl ? <div className={styles.pcMedia}><div className={styles.pcMediaBlur} style={{ backgroundImage: `url(${imgUrl})` }} /><img className={styles.pcMediaImg} src={imgUrl} alt={String(p.nama)} /></div> : <div className={styles.pcMediaPlaceholder} />}
+                          {imgUrl ? <div className={styles.pcMedia}><div className={styles.pcMediaBlur} style={{ backgroundImage: `url(${imgUrl})` }} /><SecureImage className={styles.pcMediaImg} src={imgUrl} alt={String(p.nama)} /></div> : <div className={styles.pcMediaPlaceholder} />}
                           <div className={styles.pcBody}>
                             <div className={styles.pcTitle} style={{ color: themeTokens.cardFg }}>{String(p.nama || "Nama Produk")}</div>
                             <div className={styles.pcPrice} style={{ color: themeTokens.cardFg }}>
@@ -907,7 +907,7 @@ export default async function HomePage({
                         const href = p.slug ? `/produk/${p.slug}` : "#";
                         const pr = computeHargaSetelahPromo(p);
                         return (
-                          <a key={Number(p.id)} href={href} className={styles.hcItem}>{imgUrl ? <div className={styles.hcItemMedia}><div className={styles.hcItemMediaBlur} style={{ backgroundImage: `url(${imgUrl})` }} /><img className={styles.hcItemMediaImg} src={imgUrl} alt={String(p.nama)} /></div> : <div className={styles.hcItemEmptyMedia} />}<div className={styles.hcItemBody}><div className={styles.hcItemTitle}>{String(p.nama)}</div><div className={styles.hcItemPrice}>{pr.isPromo ? <div style={{ display: "flex", flexDirection: "column", gap: 4 }}><div style={{ display: "flex", gap: 8 }}><span style={{ fontWeight: 800 }}>{formatRupiah(pr.hargaFinal)}</span></div><div style={{ display: "flex", gap: 8 }}><span style={{ textDecoration: "line-through", opacity: 0.6 }}>{formatRupiah(pr.hargaAsli)}</span><span style={{ fontWeight: 800 }}>{pr.promoLabel}</span></div></div> : <>{formatRupiah(p.harga)}</>}</div></div></a>
+                          <a key={Number(p.id)} href={href} className={styles.hcItem}>{imgUrl ? <div className={styles.hcItemMedia}><div className={styles.hcItemMediaBlur} style={{ backgroundImage: `url(${imgUrl})` }} /><SecureImage className={styles.hcItemMediaImg} src={imgUrl} alt={String(p.nama)} /></div> : <div className={styles.hcItemEmptyMedia} />}<div className={styles.hcItemBody}><div className={styles.hcItemTitle}>{String(p.nama)}</div><div className={styles.hcItemPrice}>{pr.isPromo ? <div style={{ display: "flex", flexDirection: "column", gap: 4 }}><div style={{ display: "flex", gap: 8 }}><span style={{ fontWeight: 800 }}>{formatRupiah(pr.hargaFinal)}</span></div><div style={{ display: "flex", gap: 8 }}><span style={{ textDecoration: "line-through", opacity: 0.6 }}>{formatRupiah(pr.hargaAsli)}</span><span style={{ fontWeight: 800 }}>{pr.promoLabel}</span></div></div> : <>{formatRupiah(p.harga)}</>}</div></div></a>
                         );
                       }) : null}</div>
                     </div>
@@ -1181,7 +1181,7 @@ export default async function HomePage({
               return (
                 <article className={styles.contactSplit}>
                   <div className={styles.contactMediaCard}>
-                    {hasImg ? (<img src={imgUrl} alt="Hubungi Kami" className={styles.contactCoverImg} />) : (<div className={styles.contactMediaPlaceholder}>🖼️</div>)}
+                    {hasImg ? (<SecureImage src={imgUrl} alt="Hubungi Kami" className={styles.contactCoverImg} />) : (<div className={styles.contactMediaPlaceholder}>🖼️</div>)}
                   </div>
                   <div className={styles.contactSplitRight}>
                     <div className={styles.contactTextStack}>

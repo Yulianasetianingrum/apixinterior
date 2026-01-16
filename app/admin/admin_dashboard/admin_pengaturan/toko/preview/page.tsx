@@ -1179,7 +1179,7 @@ export default async function TokoPreviewDraftPage({
                         <div className={ui.heroMedia}>
                           <div className={ui.heroMediaBg} aria-hidden="true" />
                           {imgUrl ? (
-                            <img className={ui.heroImage} src={imgUrl} alt={headline} />
+                            <SecureImage className={ui.heroImage} src={imgUrl} alt={headline || "Hero Image"} />
                           ) : (
                             <div className={ui.heroMediaPlaceholder} aria-hidden="true" />
                           )}
@@ -1222,7 +1222,7 @@ export default async function TokoPreviewDraftPage({
                   const bgThemeRaw = (cfg as any).sectionBgTheme;
                   const palette = resolveCustomPromoPalette(bgThemeRaw, navbarTheme);
                   const hasBgOverride = bgThemeRaw && bgThemeRaw !== "FOLLOW_NAVBAR";
-                  const bgStyle = hasBgOverride ? { backgroundColor: palette.bg, color: palette.fg } : {};
+                  const bgStyle = hasBgOverride ? { backgroundColor: palette.bg, color: palette.fg, ["--t-element" as any]: palette.fg } : {};
 
                   const ids = Array.isArray(cfg.productIds) ? cfg.productIds : [];
                   const products = ids.map((id: any) => produkMap.get(Number(id))).filter(Boolean) as any[];
@@ -1285,7 +1285,7 @@ export default async function TokoPreviewDraftPage({
                                   {imgUrl ? (
                                     <div className={ui.pcMedia}>
                                       <div className={ui.pcMediaBlur} style={{ backgroundImage: `url(${imgUrl})` }} />
-                                      <img className={ui.pcMediaImg} src={imgUrl} alt={String(p.nama ?? "Produk")} />
+                                      <SecureImage className={ui.pcMediaImg} src={imgUrl} alt={String(p.nama ?? "Produk")} />
                                     </div>
                                   ) : (
                                     <div className={ui.pcMediaPlaceholder} />
@@ -1330,7 +1330,7 @@ export default async function TokoPreviewDraftPage({
                   const bgThemeRaw = (cfg as any).sectionBgTheme;
                   const palette = resolveCustomPromoPalette(bgThemeRaw, navbarTheme);
                   const hasBgOverride = bgThemeRaw && bgThemeRaw !== "FOLLOW_NAVBAR";
-                  const bgStyle = hasBgOverride ? { backgroundColor: palette.bg, color: palette.fg } : {};
+                  const bgStyle = hasBgOverride ? { backgroundColor: palette.bg, color: palette.fg, ["--t-element" as any]: palette.fg } : {};
 
                   const productIds = Array.isArray(cfg.productIds) ? cfg.productIds : [];
                   let products: any[] = [];
@@ -1388,7 +1388,7 @@ export default async function TokoPreviewDraftPage({
                                   {imgUrl ? (
                                     <div className={ui.pcMedia}>
                                       <div className={ui.pcMediaBlur} style={{ backgroundImage: `url(${imgUrl})` }} />
-                                      <img className={ui.pcMediaImg} src={imgUrl} alt={String(p.nama ?? "Produk")} />
+                                      <SecureImage className={ui.pcMediaImg} src={imgUrl} alt={String(p.nama ?? "Produk")} />
                                     </div>
                                   ) : (
                                     <div className={ui.pcMediaPlaceholder} />
@@ -1536,7 +1536,7 @@ export default async function TokoPreviewDraftPage({
                                       {imgUrl ? (
                                         <div className={ui.hcItemMedia}>
                                           <div className={ui.hcItemMediaBlur} style={{ backgroundImage: `url(${imgUrl})` }} />
-                                          <img className={ui.hcItemMediaImg} src={imgUrl} alt={String(p.nama ?? "Produk")} />
+                                          <SecureImage className={ui.hcItemMediaImg} src={imgUrl} alt={String(p.nama ?? "Produk")} />
                                         </div>
                                       ) : (
                                         <div className={ui.hcItemEmptyMedia} />
@@ -1762,6 +1762,7 @@ export default async function TokoPreviewDraftPage({
                       style={{
                         backgroundColor: bgPalette ? bgPalette.bg : colors.bg,
                         color: bgPalette ? bgPalette.fg : colors.element,
+                        ["--t-element" as any]: bgPalette ? bgPalette.fg : colors.element,
                       }}
                     >
                       {sectionTitle ? <h2 className={ui.sectionTitle}>{sectionTitle}</h2> : null}
@@ -1935,6 +1936,7 @@ export default async function TokoPreviewDraftPage({
                           background: palette.bg,
                           color: palette.fg,
                           borderColor: palette.border,
+                          ["--t-element" as any]: palette.fg,
                         }}
                       >
                         {hasItems ? (
@@ -1955,7 +1957,7 @@ export default async function TokoPreviewDraftPage({
                                   >
                                     {item.url ? (
                                       // eslint-disable-next-line @next/next/no-img-element
-                                      <img src={item.url} alt="" className={ui.promoImg} />
+                                      <SecureImage src={item.url} alt="" className={ui.promoImg} />
                                     ) : (
                                       <div className={ui.promoPlaceholder}>Voucher #{item.id} tidak ditemukan.</div>
                                     )}
@@ -1964,7 +1966,7 @@ export default async function TokoPreviewDraftPage({
                                   <article key={item.id} className={ui.promoCard} style={{ borderColor: palette.border }}>
                                     {item.url ? (
                                       // eslint-disable-next-line @next/next/no-img-element
-                                      <img src={item.url} alt="" className={ui.promoImg} />
+                                      <SecureImage src={item.url} alt="" className={ui.promoImg} />
                                     ) : (
                                       <div className={ui.promoPlaceholder}>Voucher #{item.id} tidak ditemukan.</div>
                                     )}
@@ -1977,15 +1979,13 @@ export default async function TokoPreviewDraftPage({
                               {items[0]?.href ? (
                                 <a href={items[0].href} className={ui.promoLink} target="_blank" rel="noreferrer">
                                   {items[0]?.url ? (
-                                    // eslint-disable-next-line @next/next/no-img-element
-                                    <img src={items[0].url} alt="" className={ui.promoHeroImg} />
+                                    <SecureImage src={items[0].url} alt="" className={ui.promoHeroImg} />
                                   ) : (
                                     <div className={ui.promoPlaceholder}>Voucher #{items[0]?.id ?? ""} tidak ditemukan.</div>
                                   )}
                                 </a>
                               ) : items[0]?.url ? (
-                                // eslint-disable-next-line @next/next/no-img-element
-                                <img src={items[0].url} alt="" className={ui.promoHeroImg} />
+                                <SecureImage src={items[0].url} alt="" className={ui.promoHeroImg} />
                               ) : (
                                 <div className={ui.promoPlaceholder}>Voucher #{items[0]?.id ?? ""} tidak ditemukan.</div>
                               )}
@@ -2004,7 +2004,7 @@ export default async function TokoPreviewDraftPage({
                                   >
                                     {item.url ? (
                                       // eslint-disable-next-line @next/next/no-img-element
-                                      <img src={item.url} alt="" className={ui.promoImg} />
+                                      <SecureImage src={item.url} alt="" className={ui.promoImg} />
                                     ) : (
                                       <div className={ui.promoPlaceholder}>Voucher #{item.id} tidak ditemukan.</div>
                                     )}
@@ -2013,7 +2013,7 @@ export default async function TokoPreviewDraftPage({
                                   <article key={item.id} className={ui.promoCard} style={{ borderColor: palette.border }}>
                                     {item.url ? (
                                       // eslint-disable-next-line @next/next/no-img-element
-                                      <img src={item.url} alt="" className={ui.promoImg} />
+                                      <SecureImage src={item.url} alt="" className={ui.promoImg} />
                                     ) : (
                                       <div className={ui.promoPlaceholder}>Voucher #{item.id} tidak ditemukan.</div>
                                     )}
@@ -2217,7 +2217,7 @@ export default async function TokoPreviewDraftPage({
                       <article className={ui.contactSplit}>
                         <div className={ui.contactMediaCard}>
                           {hasImg ? (
-                            <img src={imgUrl} alt="Hubungi Kami" className={ui.contactCoverImg} />
+                            <SecureImage src={imgUrl} alt="Hubungi Kami" className={ui.contactCoverImg} />
                           ) : (
                             <div className={ui.contactMediaPlaceholder}>
                               🖼️
@@ -2262,7 +2262,7 @@ export default async function TokoPreviewDraftPage({
                         <div className={ui.contactMinimalRow}>
                           <div className={ui.contactAvatar}>
                             {hasThumb ? (
-                              <img src={imgUrl} alt="Hubungi Kami" className={ui.contactCoverImg} />
+                              <SecureImage src={imgUrl} alt="Hubungi Kami" className={ui.contactCoverImg} />
                             ) : (
                               <div className={ui.contactAvatarPlaceholder}>
                                 ☎️
@@ -2370,7 +2370,7 @@ export default async function TokoPreviewDraftPage({
                                 >
                                   <div className={ui.roomMedia}>
                                     {imgUrl ? (
-                                      <img className={ui.roomImg} src={imgUrl} alt={title || "Kategori Ruangan"} />
+                                      <SecureImage className={ui.roomImg} src={imgUrl} alt={title || "Kategori Ruangan"} />
                                     ) : (
                                       <div className={ui.roomMediaPlaceholder} aria-hidden="true" />
                                     )}

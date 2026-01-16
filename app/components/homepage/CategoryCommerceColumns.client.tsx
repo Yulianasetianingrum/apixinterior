@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import SecureImage from "@/app/components/SecureImage";
 import ui from "./CategoryCommerceColumns.module.css";
 
 type CommerceItem = {
@@ -111,13 +112,10 @@ export default function CategoryCommerceColumns({
                     <span className={isCommerce ? `${ui.icon} ${ui.iconCommerce}` : ui.icon}>
                       {iconUrl ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img
+                        <SecureImage
                           src={iconUrl}
                           alt={`Kategori Interior ${c.name}`}
                           className={isCommerce ? `${ui.iconImg} ${ui.iconImgCommerce}` : ui.iconImg}
-                          onError={(e) => {
-                            e.currentTarget.style.opacity = "0";
-                          }}
                         />
                       ) : null}
                     </span>

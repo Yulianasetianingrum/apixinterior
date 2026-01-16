@@ -7,6 +7,7 @@ import Link from "next/link";
 import { FaTrash, FaMinus, FaPlus, FaWhatsapp } from "react-icons/fa6";
 import { useState, useEffect } from "react";
 import styles from "./keranjang.module.css";
+import SecureImage from "@/app/components/SecureImage";
 
 interface CartPageClientProps {
     waNumber: string;
@@ -86,13 +87,10 @@ export default function CartPageClient({ waNumber }: CartPageClientProps) {
                                     <div className={styles.imageWrapper}>
                                         {ensureImageUrl(item.image) ? (
                                             /* eslint-disable-next-line @next/next/no-img-element */
-                                            <img
+                                            <SecureImage
                                                 src={ensureImageUrl(item.image)!}
                                                 alt={item.name}
                                                 style={{ width: 50, height: 50, objectFit: "cover", borderRadius: 8 }}
-                                                onError={(e) => {
-                                                    (e.target as HTMLImageElement).src = "https://placehold.co/50x50?text=Err";
-                                                }}
                                             />
                                         ) : (
                                             <div className={styles.noImage}>No Image</div>

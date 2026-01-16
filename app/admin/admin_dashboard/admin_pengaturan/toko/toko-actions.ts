@@ -1604,9 +1604,11 @@ export async function uploadImageToGalleryAndAttach(formData: FormData): Promise
             const items = Array.isArray(cfg?.items) ? [...cfg.items] : [];
             const i = items.findIndex((it: any) => Number(it?.kategoriId) === kid);
             if (i < 0) {
-                throw new Error("Pilih kategori dulu sebelum upload icon.");
+                // Auto-add if not exists instead of throwing error
+                items.push({ type: "category", kategoriId: kid, imageId: imageIdToUse });
+            } else {
+                items[i] = { ...items[i], imageId: imageIdToUse };
             }
-            items[i] = { ...items[i], imageId: imageIdToUse };
             const layout = cfg?.layout ?? { columns: 4, tabletColumns: 3, mobileColumns: 2, maxItems: 16 };
             cfg = { ...(cfg ?? {}), layout, items };
         } else if (attach.startsWith("CATEGORY_GRID_COMMERCE:custom:")) {
@@ -1617,9 +1619,11 @@ export async function uploadImageToGalleryAndAttach(formData: FormData): Promise
             const items = Array.isArray(cfg?.items) ? [...cfg.items] : [];
             const i = items.findIndex((it: any) => String(it?.key ?? "") === String(key));
             if (i < 0) {
-                throw new Error("Item custom tidak ditemukan.");
+                // Auto-add if not exists
+                items.push({ type: "custom", key, label: "Custom Item", href: "#", imageId: imageIdToUse });
+            } else {
+                items[i] = { ...items[i], imageId: imageIdToUse };
             }
-            items[i] = { ...items[i], imageId: imageIdToUse };
             const layout = cfg?.layout ?? { columns: 4, tabletColumns: 3, mobileColumns: 2, maxItems: 16 };
             cfg = { ...(cfg ?? {}), layout, items };
 

@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import layoutStyles from '../../admin_dashboard.module.css';
 import styles from './kolase_foto.module.css';
 import { useAdminTheme } from "../../AdminThemeContext";
+import SecureImage from "@/app/components/SecureImage";
 
 type Gambar = {
   id: number;
@@ -678,15 +679,11 @@ export default function KolaseFotoPage() {
                   </button>
 
                   <div className={styles.imageWrapper}>
-                    <img
+                    <SecureImage
                       src={g.url}
                       alt={g.title ?? ''}
                       className={styles.galleryImage}
                       onClick={() => openPreview(g)}
-                      onError={(e) => {
-                        e.currentTarget.src = "https://placehold.co/400x300?text=No+Image";
-                        e.currentTarget.onerror = null;
-                      }}
                       loading="lazy"
                     />
                   </div>

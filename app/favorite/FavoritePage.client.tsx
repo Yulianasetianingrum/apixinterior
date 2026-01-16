@@ -9,6 +9,7 @@ import { FaHeart, FaCartShopping } from "react-icons/fa6";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./favorite.module.css";
+import SecureImage from "@/app/components/SecureImage";
 
 // Helper to ensure image URL is correct
 const ensureImageUrl = (url: string | null | undefined) => {
@@ -102,14 +103,11 @@ export default function FavoritePageClient() {
                                 <div className={styles.imageWrapper}>
                                     {ensureImageUrl(item.image) ? (
                                         /* eslint-disable-next-line @next/next/no-img-element */
-                                        <img
+                                        <SecureImage
                                             src={ensureImageUrl(item.image)!}
                                             alt={item.name}
                                             className="favorite-product-image"
                                             style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                                            onError={(e) => {
-                                                (e.target as HTMLImageElement).src = "https://placehold.co/100x100?text=Error";
-                                            }}
                                         />
                                     ) : (
                                         <div className={styles.noImage}>No Image</div>
