@@ -4575,6 +4575,19 @@ article[data-hc-nohero="1"] .hcCta {
   background: var(--hb-accent);
 }
 
+/* DESKTOP ONLY: Larger Hero Image, Shifted Left */
+@media (min-width: 1024px) {
+  .heroMedia {
+    flex: 1.8 1 650px;
+    margin-left: -12px;
+  }
+
+  .heroText {
+    flex: 0.9 1 420px;
+    margin-left: 8px;
+  }
+}
+
 @media (max-width: 640px) {
   .heroFloatingCards {
     display: none;
