@@ -1398,7 +1398,8 @@
   margin: 0;
   font-size: clamp(14px, 1.2vw, 18px);
   line-height: 1.55;
-  color: var(--hb-muted);
+  color: var(--hb-text) !important;
+  /* Forces same color as Title */
   max-width: 66ch;
 
   display: -webkit-box;
@@ -4927,34 +4928,49 @@ article[data-hc-nohero="1"] .hcCta {
   display: flex !important;
   flex-direction: row !important;
   align-items: center !important;
-  justify-content: flex-start !important;
-  /* Prevent left clipping */
-  gap: 12px !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  /* Tighter gap */
   flex-wrap: nowrap !important;
-  /* Forces single line */
-  overflow-x: auto !important;
-  /* Enables horizontal scroll */
-  scrollbar-width: none;
-  /* Hide scrollbar */
-  -webkit-overflow-scrolling: touch;
+  /* Single line */
+  overflow-x: hidden !important;
+  /* Shrink to fit, no scroll */
   width: 100%;
-  padding-bottom: 4px;
-  /* Space for potential scrollbar interaction */
   margin-bottom: 12px !important;
 }
 
 /* Ensure badges don't get squashed */
+/* Shrink to fit logic */
 .heroBadge {
-  flex: 0 0 auto !important;
+  flex: 0 1 auto !important;
+  /* Allow shrinking */
   white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  min-width: 0 !important;
 }
 
 /* Ensure Eyebrow doesn't force a new line */
 .heroEyebrow {
   margin: 0 !important;
-  width: auto !important;
-  flex: 0 0 auto !important;
-  display: inline-block;
+  flex: 0 1 auto !important;
+  /* Allow shrinking */
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  white-space: nowrap !important;
+  min-width: 0 !important;
+
+  /* BUBBLE STYLE SPECIAL (Istimewakan) */
+  padding: 7px 12px !important;
+  border-radius: 999px !important;
+  background: var(--hb-text) !important;
+  /* Solid High Contrast */
+  color: var(--hb-bg) !important;
+  /* Inverse Text */
+  border: 1px solid var(--hb-text) !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
 }
 
 /* Ensure Badges sit next to Eyebrow */
@@ -4969,14 +4985,13 @@ article[data-hc-nohero="1"] .hcCta {
   .heroTopRow {
     flex-direction: row !important;
     align-items: center !important;
-    justify-content: flex-start !important;
-    /* Forces left align on mobile to prevent clipping */
-    gap: 10px !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    /* Even tighter on mobile */
     flex-wrap: nowrap !important;
-    overflow-x: auto !important;
+    overflow-x: hidden !important;
     width: 100%;
-    padding-inline: 4px;
-    /* Tiny padding */
+    padding-inline: 0;
   }
 }
 
