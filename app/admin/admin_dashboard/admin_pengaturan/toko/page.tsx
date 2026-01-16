@@ -3872,6 +3872,7 @@ async function uploadImageToGalleryAndAttach(formData: FormData): Promise<{ ok: 
         targetWidth = metaWidth > 0 ? Math.min(512, metaWidth) : 512;
       }
       if (sectionType === "CUSTOM_PROMO") {
+        const promoCfg = normalizeCustomPromoConfig(sectionCfg);
         const layoutRaw = layoutOverride || String(promoCfg.layout ?? "carousel").toLowerCase();
         const isHero = layoutRaw === "hero";
         const minWidthCp = isHero ? 3000 : 2300;
