@@ -4222,6 +4222,7 @@ export default async function TokoPengaturanPage({
   const hubungiItems = (hubungiItemsRaw ?? []) as any[];
   const cabangItems = (cabangItemsRaw ?? []) as any[];
   const gambarItems = (gambarItemsRaw ?? []) as any[];
+  const bannerPromoItems = (bannerPromoItemsRaw ?? []) as any[];
 
   // Collect used product IDs to ensure they are fetched
   const usedProductIds = new Set<number>();
