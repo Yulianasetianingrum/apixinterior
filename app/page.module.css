@@ -75,29 +75,28 @@
   font-size: clamp(20px, 3.2vw, 32px);
   font-weight: 700;
   line-height: 1.2;
-  color: var(--ts-accent, var(--ts-text));
+  color: var(--ts-text);
 }
 
 .textSubtitle {
   font-size: clamp(16px, 2.2vw, 20px);
   font-weight: 700;
   line-height: 1.4;
-  opacity: 0.9;
-  color: var(--ts-accent, var(--ts-text));
+  color: var(--ts-text);
 }
 
 .textBody {
   font-size: clamp(14px, 1.6vw, 16px);
   font-weight: 400;
   line-height: 1.65;
+  color: var(--ts-text);
 }
 
 .textCaption {
   font-size: clamp(12px, 1.4vw, 13px);
   font-weight: 600;
   line-height: 1.5;
-  opacity: 0.9;
-  color: var(--ts-accent, var(--ts-text));
+  color: var(--ts-text);
 }
 
 /* =========================
@@ -2494,29 +2493,28 @@
   font-size: clamp(20px, 3.2vw, 32px);
   font-weight: 700;
   line-height: 1.2;
-  color: var(--ts-accent, var(--ts-text));
+  color: var(--ts-text);
 }
 
 .textSubtitle {
   font-size: clamp(16px, 2.2vw, 20px);
   font-weight: 700;
   line-height: 1.4;
-  opacity: 0.9;
-  color: var(--ts-accent, var(--ts-text));
+  color: var(--ts-text);
 }
 
 .textBody {
   font-size: clamp(14px, 1.6vw, 16px);
   font-weight: 400;
   line-height: 1.65;
+  color: var(--ts-text);
 }
 
 .textCaption {
   font-size: clamp(12px, 1.4vw, 13px);
   font-weight: 600;
   line-height: 1.5;
-  opacity: 0.9;
-  color: var(--ts-accent, var(--ts-text));
+  color: var(--ts-text);
 }
 
 .header {
@@ -4620,29 +4618,28 @@ article[data-hc-nohero="1"] .hcCta {
   font-size: clamp(20px, 3.2vw, 32px);
   font-weight: 700;
   line-height: 1.2;
-  color: var(--ts-accent, var(--ts-text));
+  color: var(--ts-text);
 }
 
 .textSubtitle {
   font-size: clamp(16px, 2.2vw, 20px);
   font-weight: 700;
   line-height: 1.4;
-  opacity: 0.9;
-  color: var(--ts-accent, var(--ts-text));
+  color: var(--ts-text);
 }
 
 .textBody {
   font-size: clamp(14px, 1.6vw, 16px);
   font-weight: 400;
   line-height: 1.65;
+  color: var(--ts-text);
 }
 
 .textCaption {
   font-size: clamp(12px, 1.4vw, 13px);
   font-weight: 600;
   line-height: 1.5;
-  opacity: 0.9;
-  color: var(--ts-accent, var(--ts-text));
+  color: var(--ts-text);
 }
 
 /* =========================
