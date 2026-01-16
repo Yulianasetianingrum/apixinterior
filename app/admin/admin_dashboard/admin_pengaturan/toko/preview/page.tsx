@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import Navbar from "@/app/navbar/Navbar";
 import homeStyles from "@/app/page.module.css";
+import SecureImage from "@/app/components/SecureImage";
 import ui from "./preview.module.css";
 
 import { CategoryGridPreview } from "./CategoryGridPreview";
@@ -774,111 +775,64 @@ export default async function TokoPreviewDraftPage({
                 // HERO / Banner Utama
                 if (t === "HERO") {
                   const cfg = normalizeConfig(t, section.config) as any;
+                  const heroThemeClass = heroThemeClassFromConfig(String(cfg.sectionTheme ?? cfg.heroTheme ?? "FOLLOW_NAVBAR"), navbarTheme);
+                  const imageId = Number(cfg.imageId);
+                  // Use standard image map
+                  const imgUrl = Number.isFinite(imageId) && imageId > 0 ? imageMap.get(imageId)?.url ?? null : null;
 
-                  // Parse hero theme
-                  const heroThemeRaw = String(cfg.heroTheme ?? "FOLLOW_NAVBAR").trim();
-                  const heroTheme = resolveEffectiveTheme(heroThemeRaw, navbarTheme);
-                  const themeTokens = getHeroThemeTokens(heroTheme);
+                  // Reuse reuse logic for badges/highlights
+                  const finalBadges = Array.isArray(cfg.badges) ? cfg.badges : [];
+                  const finalHighlights = Array.isArray(cfg.highlights) ? cfg.highlights : [];
+                  const finalTrust = Array.isArray(cfg.trustChips) ? cfg.trustChips : [];
+                  const mini = Array.isArray(cfg.miniInfo) ? cfg.miniInfo : [];
 
-                  // Override colors for specific themes to ensure correct rendering
-                  let heroBg = themeTokens.bg;
-                  let heroText = themeTokens.element;
-                  let heroCtaBg = themeTokens.ctaBg;
-                  let heroCtaFg = themeTokens.ctaFg;
+                  // Strict content check helper
+                  const hasText = (s: any) => String(s || "").trim().length > 0;
 
-                  const themePair = parseThemePair(heroTheme);
-                  if (themePair.a === "NAVY" && themePair.b === "GOLD") {
-                    // NAVY + GOLD: Navy background, white/gold text, gold button
-                    heroBg = "#0b1d3a";
-                    heroText = "#f4f7fb";
-                    heroCtaBg = "#d4af37";
-                    heroCtaFg = "#0b1d3a";
-                  } else if (themePair.a === "GOLD" && themePair.b === "NAVY") {
-                    // GOLD + NAVY: Gold background, navy text, navy button
-                    heroBg = "#d4af37";
-                    heroText = "#0b1d3a";
-                    heroCtaBg = "#0b1d3a";
-                    heroCtaFg = "#ffffff";
-                  } else if (themePair.a === "WHITE" && themePair.b === "GOLD") {
-                    // WHITE + GOLD: White background, navy text, gold button
-                    heroBg = "#ffffff";
-                    heroText = "#0b1d3a";
-                    heroCtaBg = "#d4af37";
-                    heroCtaFg = "#0b1d3a";
-                  } else if (themePair.a === "NAVY" && themePair.b === "WHITE") {
-                    // NAVY + WHITE: Navy background, white text, white button
-                    heroBg = "#0b1d3a";
-                    heroText = "#f4f7fb";
-                    heroCtaBg = "#ffffff";
-                    heroCtaFg = "#0b1d3a";
+                  const hasHeadline = hasText(cfg.headline);
+                  const hasSubheadline = hasText(cfg.subheadline);
+                  // Hide eyebrow if it looks like a generic theme name
+                  const isGenericEyebrow = /^(theme[\s_-]*\d+|untitled|draft)/i.test(cfg.eyebrow || "");
+                  const hasEyebrow = hasText(cfg.eyebrow) && !isGenericEyebrow;
+                  const hasFloat1 = hasText(cfg.floatLookbookTitle) || hasText(cfg.floatLookbookSubtitle);
+                  const hasFloat2 = hasText(cfg.floatPromoTitle) || hasText(cfg.floatPromoText);
+
+                  // If no content at all, show notice in preview (unlike live site which might hide)
+                  const hasContent = Boolean(imgUrl || hasHeadline || hasSubheadline || hasEyebrow || finalBadges.length || finalHighlights.length || finalTrust.length || mini.length || hasFloat1 || hasFloat2);
+
+                  if (!hasContent) {
+                    return <div className={ui.notice}>Hero belum dikonfigurasi (kosong)</div>;
                   }
 
-                  // Parse content
-                  const headline = String(cfg.headline ?? "").trim();
-                  const subheadline = String(cfg.subheadline ?? "").trim();
-                  const ctaLabel = String(cfg.ctaLabel ?? "").trim();
-                  const ctaHref = String(cfg.ctaHref ?? "").trim();
-                  const imageId = cfg.imageId ? Number(cfg.imageId) : null;
-                  const imageUrl = imageId ? imageMap.get(imageId)?.url : null;
-
                   return (
-                    <section
-                      key={section.id}
-                      className={ui.heroSection}
-                      style={{
-                        backgroundColor: heroBg,
-                        color: heroText,
-                        padding: "60px 20px",
-                        minHeight: "500px",
-                        display: "flex",
-                        alignItems: "center",
-                      }}
-                    >
-                      <div style={{ maxWidth: "1200px", margin: "0 auto", width: "100%", display: "grid", gridTemplateColumns: imageUrl ? "1fr 1fr" : "1fr", gap: "40px", alignItems: "center" }}>
-                        <div>
-                          {headline ? (
-                            <h1 style={{ fontSize: "48px", fontWeight: 700, marginBottom: "16px", color: heroText }}>
-                              {headline}
-                            </h1>
-                          ) : (
-                            <div className={ui.notice}>Headline belum diisi</div>
-                          )}
-
-                          {subheadline ? (
-                            <p style={{ fontSize: "18px", marginBottom: "24px", opacity: 0.9 }}>
-                              {subheadline}
-                            </p>
-                          ) : null}
-
-                          {ctaLabel ? (
-                            <a
-                              href={ctaHref || "#"}
-                              style={{
-                                display: "inline-block",
-                                padding: "14px 32px",
-                                backgroundColor: heroCtaBg,
-                                color: heroCtaFg,
-                                borderRadius: "8px",
-                                fontWeight: 600,
-                                textDecoration: "none",
-                              }}
-                            >
-                              {ctaLabel}
-                            </a>
-                          ) : null}
-                        </div>
-
-                        {imageUrl ? (
-                          <div style={{ borderRadius: "12px", overflow: "hidden" }}>
-                            <img
-                              src={imageUrl}
-                              alt={headline || "Hero"}
-                              style={{ width: "100%", height: "auto", display: "block" }}
-                            />
+                    <section key={section.id} className={`${homeStyles.hero} ${homeStyles.heroV1} ${heroThemeClass}`}>
+                      <div className={homeStyles.heroInner}>
+                        <div className={homeStyles.heroText}>
+                          <div className={homeStyles.heroTopRow}>
+                            {hasEyebrow ? <div className={homeStyles.heroEyebrow}>{cfg.eyebrow}</div> : null}
+                            <div className={homeStyles.heroTopBadges}>{finalBadges.map((b: any, idx: number) => <span key={idx} className={homeStyles.heroBadge}>{b}</span>)}</div>
                           </div>
-                        ) : (
-                          <div className={ui.notice}>Hero image belum dipilih</div>
-                        )}
+                          {hasHeadline ? <h1 className={homeStyles.heroTitle}>{cfg.headline}</h1> : null}
+                          {hasSubheadline ? <p className={homeStyles.heroDescription}>{cfg.subheadline}</p> : null}
+                          {hasText(cfg.ctaLabel) ? <div className={homeStyles.heroActions}><a className={`${homeStyles.heroCta} ${homeStyles.heroCtaPrimary}`} href={cfg.ctaHref || "#"}>{cfg.ctaLabel}</a></div> : null}
+                          <ul className={homeStyles.heroHighlights}>{finalHighlights.map((text: any, idx: number) => <li key={idx} className={homeStyles.heroHighlightItem}><span className={homeStyles.heroHighlightIcon}>✓</span><span className={homeStyles.heroHighlightText}>{text}</span></li>)}</ul>
+                          <div className={homeStyles.heroTrustRow}>{finalTrust.map((text: any, idx: number) => <span key={idx} className={homeStyles.heroTrustChip}>{text}</span>)}</div>
+                          <div className={homeStyles.heroMiniInfoRow}>{mini.map((m: any, idx: number) => <div key={idx} className={homeStyles.heroMiniInfoCard}><div className={homeStyles.heroMiniInfoTitle}>{m.title}</div><div className={homeStyles.heroMiniInfoDesc}>{m.desc}</div></div>)}</div>
+                        </div>
+                        <div className={homeStyles.heroMedia}>
+                          <div className={homeStyles.heroMediaBg} aria-hidden="true" />
+                          {imgUrl ? (
+                            <SecureImage className={homeStyles.heroImage} src={imgUrl} alt={cfg.headline || "Hero Image"} />
+                          ) : <div className={homeStyles.heroMediaPlaceholder} aria-hidden="true" />}
+                          <div className={homeStyles.heroFloatingCards} aria-hidden="true">
+                            {hasFloat1 ? (
+                              <div className={`${homeStyles.heroFloatCard} ${homeStyles.heroFloatCardRight}`}><div className={homeStyles.heroFloatLabel}>{cfg.floatLookbookTitle}</div><div className={homeStyles.heroFloatMeta}><span className={homeStyles.heroFloatDot} /> {cfg.floatLookbookSubtitle}</div></div>
+                            ) : null}
+                            {hasFloat2 ? (
+                              <div className={`${homeStyles.heroFloatCard} ${homeStyles.heroFloatCardWide}`}><div className={homeStyles.heroFloatLabel}>{cfg.floatPromoTitle}</div><div className={homeStyles.heroFloatRow}><span className={homeStyles.heroFloatDot} /><span className={homeStyles.heroFloatRowText}>{cfg.floatPromoText}</span></div></div>
+                            ) : null}
+                          </div>
+                        </div>
                       </div>
                     </section>
                   );
@@ -1742,8 +1696,18 @@ export default async function TokoPreviewDraftPage({
 
                   const renderCard = (b: any) => {
                     const name = String(b?.namaCabang ?? `Cabang #${b?.id ?? ""}`).trim();
-                    const mapsUrl = String(b?.mapsUrl ?? "").trim();
-                    const meta = mapsUrl ? "Google Maps" : "Link maps belum diisi";
+                    const rawMapsUrl = String(b?.mapsUrl ?? "").trim();
+
+                    // Sanitize URL: Extract src if input is an <iframe> tag
+                    let cleanMapsUrl = rawMapsUrl;
+                    if (rawMapsUrl.includes("<iframe") || rawMapsUrl.includes("&lt;iframe")) {
+                      const match = rawMapsUrl.match(/src=["']([^"']+)["']/i);
+                      if (match && match[1]) {
+                        cleanMapsUrl = match[1];
+                      }
+                    }
+
+                    const meta = cleanMapsUrl ? "Google Maps" : "Link maps belum diisi";
 
                     return (
                       <article
@@ -1761,22 +1725,19 @@ export default async function TokoPreviewDraftPage({
                       >
                         {(() => {
                           const resolveEmbed = () => {
-                            if (!mapsUrl) return "";
-                            if (mapsUrl.includes("<iframe")) {
-                              const match = mapsUrl.match(/src=["']([^"']+)["']/i);
-                              if (match && match[1]) return match[1];
+                            if (!cleanMapsUrl) return "";
+                            // If we already extracted from iframe, verify it's an embed or convert
+                            const uStr = cleanMapsUrl;
+
+                            // If it's already an embed URL, use it
+                            if (uStr.includes("/maps/embed") || uStr.includes("output=embed")) {
+                              return uStr;
                             }
+
                             try {
-                              const u = new URL(mapsUrl);
+                              const u = new URL(uStr);
                               const host = u.host.toLowerCase();
                               const isGoogle = host.includes("google.") || host.includes("maps.");
-                              const isEmbedPath = u.pathname.includes("/maps/embed");
-                              const pb = u.searchParams.get("pb");
-                              const output = u.searchParams.get("output");
-
-                              if (isEmbedPath && pb && pb.length > 20) return mapsUrl;
-                              if (isEmbedPath && output === "embed") return mapsUrl;
-                              if (output === "embed") return mapsUrl;
 
                               if (isGoogle) {
                                 const q =
@@ -1786,7 +1747,7 @@ export default async function TokoPreviewDraftPage({
                                   "";
                                 const query = q || name;
                                 if (!query) return "";
-                                // Use maps.google.com generic embed which is more reliable than www.google.com with output=embed
+                                // Use maps.google.com generic embed
                                 return `https://maps.google.com/maps?q=${encodeURIComponent(query)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
                               }
                             } catch {
@@ -1837,7 +1798,7 @@ export default async function TokoPreviewDraftPage({
                                         padding: "0 10px",
                                       }}
                                     >
-                                      {mapsUrl
+                                      {cleanMapsUrl
                                         ? "Preview peta butuh link Embed (bukan shortlink)."
                                         : "Link maps belum diisi"}
                                     </div>
@@ -1854,16 +1815,16 @@ export default async function TokoPreviewDraftPage({
 
 
                           <div className={ui.pcCtaWrap}>
-                            {mapsUrl ? (
+                            {cleanMapsUrl ? (
                               <a
                                 className={ui.pcCta}
                                 href={(() => {
                                   // Convert embed URL to viewable Google Maps URL
                                   try {
-                                    const url = new URL(mapsUrl);
+                                    const url = new URL(cleanMapsUrl);
                                     const isEmbedUrl = url.pathname.includes('/maps/embed') ||
                                       url.searchParams.has('pb') ||
-                                      mapsUrl.includes('output=embed');
+                                      cleanMapsUrl.includes('output=embed');
 
                                     if (isEmbedUrl) {
                                       // Extract place ID or coordinates from embed URL
@@ -1878,7 +1839,7 @@ export default async function TokoPreviewDraftPage({
                                   } catch (e) {
                                     // If URL parsing fails, return original
                                   }
-                                  return mapsUrl;
+                                  return cleanMapsUrl;
                                 })()}
                                 target="_blank"
                                 rel="noreferrer"
