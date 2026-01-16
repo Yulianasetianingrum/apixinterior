@@ -4926,9 +4926,7 @@ article[data-hc-nohero="1"] .hcCta {
 /* HERO ALIGNMENT FIX & UNLOCK WIDTH */
 .heroText {
   flex: 1 1 auto !important;
-  /* Grow to fill space */
-  width: 100% !important;
-  /* Force width */
+  /* Grow to fill space naturally */
   max-width: 100% !important;
   /* Unlock constraint */
   min-width: 0 !important;
@@ -4985,7 +4983,8 @@ article[data-hc-nohero="1"] .hcCta {
   /* BUBBLE STYLE SPECIAL (Istimewakan) */
   font-size: clamp(9px, 1.2vw, 12px) !important;
   /* Scale it */
-  padding: 5px 10px !important;
+  padding: 7px 16px !important;
+  /* Increased padding ("text mepet banget") */
   /* Scale padding */
   border-radius: 999px !important;
   background: var(--hb-text) !important;
