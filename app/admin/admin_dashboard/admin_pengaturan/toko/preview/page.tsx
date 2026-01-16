@@ -877,7 +877,7 @@ export default async function TokoPreviewDraftPage({
                     const useSectionTheme = sectionBg === "FOLLOW_NAVBAR";
                     // Use section theme tokens if standard theme is rendering (i.e. not using a custom bg override)
                     const finalBg = useSectionTheme ? themeTokens.bg : customPalette.bg;
-                    const finalTextColor = useSectionTheme ? themeTokens.element : (customPalette.fg ?? customPalette.text ?? themeTokens.element);
+                    const finalTextColor = useSectionTheme ? themeTokens.element : (customPalette.fg ?? themeTokens.element);
 
                     return (
                       <div
