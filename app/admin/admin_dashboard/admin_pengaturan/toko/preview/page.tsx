@@ -1663,9 +1663,17 @@ export default async function TokoPreviewDraftPage({
                   let ctaBg = "#d4af37";
                   let ctaFg = "#0b1d3a";
 
+                  // Normalize theme string: convert "NAVY + WHITE" or "NAVY WHITE" to "NAVY_WHITE"
+                  const normalizedTheme = String(sectionThemeResolved || "")
+                    .toUpperCase()
+                    .trim()
+                    .replace(/\s*\+\s*/g, "_")  // "NAVY + WHITE" -> "NAVY_WHITE"
+                    .replace(/\s+/g, "_")        // "NAVY WHITE" -> "NAVY_WHITE"
+                    .replace(/-/g, "_");         // "NAVY-WHITE" -> "NAVY_WHITE"
+
                   // Apply theme colors for ALL combinations
-                  const themePair = parseThemePair(sectionThemeResolved);
-                  const themeStr = String(sectionThemeResolved || "").toUpperCase().replace(/[-_\s+]/g, "");
+                  const themePair = parseThemePair(normalizedTheme);
+                  const themeStr = normalizedTheme.replace(/_/g, ""); // "NAVY_WHITE" -> "NAVYWHITE"
 
                   // Match theme by parsed pair OR raw string (for flexibility)
                   if ((themePair.a === "WHITE" && themePair.b === "GOLD") || themeStr === "WHITEGOLD") {
