@@ -4591,6 +4591,30 @@ article[data-hc-nohero="1"] .hcCta {
   .heroV1 .heroTopBadges {
     display: none !important;
   }
+
+  /* Mobile-specific: Smaller Trust Chips */
+  .heroTrustChip {
+    padding: 6px 8px;
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+  /* Mobile-specific: Smaller Mini Info Cards */
+  .heroMiniInfoCard {
+    padding: 8px 10px;
+    min-width: 110px;
+    font-size: 11px;
+  }
+
+  .heroMiniInfoTitle {
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  .heroMiniInfoDesc {
+    font-size: 10px;
+    margin-top: 2px;
+  }
 }
 
 /* TEXT_SECTION */
