@@ -4414,7 +4414,11 @@ export default async function TokoPengaturanPage({
       if (produkIds.length) {
         const prods = await prisma.produk.findMany({
           where: { id: { in: produkIds } },
-          select: { id: true, mainImageId: true, galleryImageIds: true },
+          select: {
+            id: true,
+            mainImageId: true,
+            galeri: { select: { gambarId: true }, orderBy: { urutan: "asc" }, take: 1 },
+          },
         });
 
         const prodById = new Map<number, any>(prods.map((p: any) => [Number(p.id), p]));
@@ -4425,8 +4429,7 @@ export default async function TokoPengaturanPage({
           let imageId: number | null = Number.isFinite(mainId) && mainId > 0 ? mainId : null;
 
           if (!imageId) {
-            const gal = Array.isArray((p as any)?.galleryImageIds) ? ((p as any).galleryImageIds as any[]) : [];
-            const firstGal = Number(gal[0]);
+            const firstGal = Number((p as any)?.galeri?.[0]?.gambarId);
             if (Number.isFinite(firstGal) && firstGal > 0) imageId = firstGal;
           }
 
