@@ -1285,7 +1285,7 @@ export default async function TokoPreviewDraftPage({
 
                                     <div className={ui.pcCtaWrap}>
                                       {showCta ? (
-                                        <a className={ui.pcCta} href={href} style={{ background: themeTokens.ctaBg, color: themeTokens.ctaFg, border: `1px solid ${themeTokens.ctaBorder ?? themeTokens.ctaBg}` }}>
+                                        <a className={ui.pcCta} href={href} style={{ background: themeTokens.ctaBg, color: themeTokens.ctaFg, border: `1px solid ${themeTokens.ctaBg}` }}>
                                           Lihat Produk
                                         </a>
                                       ) : (
