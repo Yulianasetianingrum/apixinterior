@@ -3,7 +3,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 
-import Navbar from "@/app/navbar/page";
+import Navbar from "@/app/navbar/Navbar";
 import homeStyles from "@/app/page.module.css";
 import ui from "./preview.module.css";
 
