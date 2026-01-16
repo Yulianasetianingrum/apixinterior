@@ -6438,6 +6438,20 @@ export default async function TokoPengaturanPage({
                       </div>
 
                       <div className={styles.fieldGroup}>
+                        <label className={styles.label}>Background Branch</label>
+                        <select
+                          name="sectionBgTheme"
+                          defaultValue={String((cfg as any).sectionBgTheme ?? "FOLLOW_NAVBAR")}
+                          className={styles.select}
+                        >
+                          <option value="FOLLOW_NAVBAR">Ikuti tema Navbar (default)</option>
+                          <option value="NAVY">Navy</option>
+                          <option value="WHITE">White</option>
+                          <option value="GOLD">Golden</option>
+                        </select>
+                      </div>
+
+                      <div className={styles.fieldGroup}>
                         <label className={styles.label}>Layout</label>
                         <select name="layout" defaultValue={String(cfg.layout ?? "carousel")} className={styles.select}>
                           <option value="carousel">Carousel</option>

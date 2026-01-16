@@ -1561,6 +1561,45 @@ export default async function TokoPreviewDraftPage({
                   const cardThemeClass = sectionThemeResolved ? `theme-${String(sectionThemeResolved).toLowerCase()}` : "";
                   const colors = getHeroThemeTokens(sectionThemeResolved);
 
+                  // Background Branch theme support
+                  const sectionBgRaw = (cfg as any).sectionBgTheme;
+                  const sectionBg = parseCustomPromoBgTheme(sectionBgRaw);
+                  const customPalette = resolveCustomPromoPalette(sectionBg, navbarTheme);
+
+                  // Determine if we use custom background or follow section theme
+                  const useSectionTheme = sectionBg === "FOLLOW_NAVBAR";
+                  const finalBg = useSectionTheme ? colors.bg : customPalette.bg;
+                  const finalTextColor = useSectionTheme ? colors.element : customPalette.fg;
+
+                  // Card and button colors based on background
+                  let cardBg = colors.card;
+                  let cardFg = colors.cardFg;
+                  let ctaBg = colors.ctaBg;
+                  let ctaFg = colors.ctaFg;
+
+                  if (!useSectionTheme) {
+                    // Custom background: adjust card and button colors
+                    if (customPalette.token === "NAVY") {
+                      // Navy background: cards stay navy, buttons gold
+                      cardBg = "rgba(11, 29, 58, 0.96)";
+                      cardFg = "#f4f7fb";
+                      ctaBg = "#d4af37";
+                      ctaFg = "#0b1d3a";
+                    } else if (customPalette.token === "WHITE") {
+                      // White background: cards white, buttons navy
+                      cardBg = "#ffffff";
+                      cardFg = "#0b1d3a";
+                      ctaBg = "#0b1d3a";
+                      ctaFg = "#ffffff";
+                    } else if (customPalette.token === "GOLD") {
+                      // Golden background: cards gold, buttons navy
+                      cardBg = "#d4af37";
+                      cardFg = "#0b1d3a";
+                      ctaBg = "#0b1d3a";
+                      ctaFg = "#ffffff";
+                    }
+                  }
+
                   const selectedIds: number[] = Array.isArray(cfg.branchIds) ? cfg.branchIds : [];
                   const branches = selectedIds
                     .map((id: any) => cabangMap.get(Number(id)))
@@ -1612,8 +1651,8 @@ export default async function TokoPreviewDraftPage({
                             : layoutEffective === "carousel"
                               ? cardStyleCarousel
                               : cardStyleGrid),
-                          backgroundColor: colors.card,
-                          color: colors.cardFg,
+                          backgroundColor: cardBg,
+                          color: cardFg,
                         }}
                       >
                         {(() => {
@@ -1716,7 +1755,7 @@ export default async function TokoPreviewDraftPage({
                                 href={mapsUrl}
                                 target="_blank"
                                 rel="noreferrer"
-                                style={{ background: colors.ctaBg, color: colors.ctaFg, border: `1px solid ${colors.ctaBg}` }}
+                                style={{ background: ctaBg, color: ctaFg, border: `1px solid ${ctaBg}` }}
                               >
                                 Buka Maps
                               </a>
@@ -1735,8 +1774,8 @@ export default async function TokoPreviewDraftPage({
                       className={`${ui.previewSection} ${ui.previewSectionTheme}`}
                       data-theme={sectionThemeResolved}
                       style={{
-                        backgroundColor: colors.bg,
-                        color: colors.element,
+                        backgroundColor: finalBg,
+                        color: finalTextColor,
                       }}
                     >
                       {sectionTitle ? <h2 className={ui.sectionTitle}>{sectionTitle}</h2> : null}
