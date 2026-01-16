@@ -3628,7 +3628,7 @@ export default async function TokoPengaturanPage({
                                 return (
                                   <>
                                     {heroUrl ? (
-                                      <img
+                                      <SecureImage
                                         id={`img-preview-highlight-${section.id}`}
                                         src={String(heroUrl)}
                                         alt="Preview"

@@ -664,7 +664,7 @@ async function fetchPreviewTheme(themeKey: string) {
   const themeName =
     typeof themeMetaCfg?.themeName === "string" ? String(themeMetaCfg.themeName).trim() : "";
 
-  return { draftSections, categoryGridById, categoryCommerceById, kategoriMap, imageMap, autoCoverUrlByKategori, produkMap: produkById, productListingItems, cabangMap, hubungiById, mediaSosialByKey, backgroundTheme, themeName, navbarTheme };
+  return { draftSections, categoryGridById, categoryCommerceById, kategoriMap, imageMap, autoCoverUrlByKategori, produkMap: produkById, productListingItems, cabangMap, hubungiById, mediaSosialByKey, backgroundTheme, themeName, navbarTheme, informasiToko };
 }
 
 
