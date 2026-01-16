@@ -1410,7 +1410,7 @@ export default async function TokoPreviewDraftPage({
 
                         {showMore ? (
                           <div className={ui.productListingFooter}>
-                            <a className={ui.productListingMore} href="/produk" style={{ background: themeTokens.ctaBg, color: themeTokens.ctaFg, border: `1px solid ${themeTokens.ctaBorder ?? themeTokens.ctaBg}` }}>
+                            <a className={ui.productListingMore} href="/produk" style={{ background: themeTokens.ctaBg, color: themeTokens.ctaFg, border: `1px solid ${themeTokens.ctaBg}` }}>
                               Tampilkan Semua
                             </a>
                           </div>
