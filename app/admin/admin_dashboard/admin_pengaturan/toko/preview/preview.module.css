@@ -952,12 +952,14 @@
 .pcCard:has(iframe) .pcCtaWrap {
   gap: 10px;
   flex-wrap: wrap;
+  justify-content: center;
 }
 
 .pcCard:has(iframe) .pcCta {
   width: auto;
-  flex: 1 1 160px;
+  flex: 0 1 280px;
   min-width: 140px;
+  margin: 0 auto;
 }
 
 @media (max-width: 520px) {

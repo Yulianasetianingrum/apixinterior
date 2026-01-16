@@ -641,6 +641,10 @@ async function fetchPreviewTheme(themeKey: string) {
     }
   }
 
+  // ===== Prefetch store info (namaToko) for better map search =====
+  const informasiToko = await prisma.informasiToko.findFirst({
+    select: { namaToko: true },
+  });
 
   // Theme meta (e.g. backgroundTheme) for this themeKey
   const themeMetaRow = (allDrafts as any[]).find(
@@ -717,8 +721,8 @@ export default async function TokoPreviewDraftPage({
   // STRICT ISOLATION: DRAFT CONFIG ONLY.
   // We do NOT fallback to global NavbarSetting to prevent "theme leak" (cross-talk between drafts).
   // If a draft has no setting, it defaults to "NAVY_GOLD". The user must explicitly SAVE the theme to "lock" it.
-  const { draftSections, categoryGridById, categoryCommerceById, kategoriMap, imageMap, autoCoverUrlByKategori, produkMap, productListingItems, cabangMap, hubungiById, mediaSosialByKey, backgroundTheme, themeName, navbarTheme: rawNavbarTheme } =
-    await fetchPreviewThemeOptimized(themeKey);
+  const { draftSections, categoryGridById, categoryCommerceById, kategoriMap, imageMap, autoCoverUrlByKategori, produkMap, productListingItems, cabangMap, hubungiById, mediaSosialByKey, backgroundTheme, themeName, navbarTheme: rawNavbarTheme, informasiToko } =
+    await fetchPreviewTheme(themeKey);
 
   const navbarTheme = normalizeThemeAttr(rawNavbarTheme || "NAVY_GOLD") || "NAVY_GOLD";
 
@@ -1620,6 +1624,7 @@ export default async function TokoPreviewDraftPage({
 
                   const renderCard = (b: any) => {
                     const name = String(b?.namaCabang ?? `Cabang #${b?.id ?? ""}`).trim();
+                    const shopName = String(informasiToko?.namaToko ?? "Apix Interior").trim();
                     const mapsUrl = String(b?.mapsUrl ?? "").trim();
                     const meta = mapsUrl ? "Google Maps" : "Link maps belum diisi";
 
@@ -1644,8 +1649,14 @@ export default async function TokoPreviewDraftPage({
 
                         if (isGoogle) {
                           const q = u.searchParams.get("q") || u.searchParams.get("query") || u.searchParams.get("search") || "";
-                          const query = q || name;
+                          const query = q || `${shopName} ${name}`;
                           if (!query) return "";
+                          return `https://maps.google.com/maps?q=${encodeURIComponent(query)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+                        }
+
+                        // Support for google shortlinks (goo.gl) - they don't have q, so fallback to search by name immediately
+                        if (host.includes("goo.gl")) {
+                          const query = `${shopName} ${name}`;
                           return `https://maps.google.com/maps?q=${encodeURIComponent(query)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
                         }
                       } catch { /* ignore */ }
@@ -1681,8 +1692,8 @@ export default async function TokoPreviewDraftPage({
                         } catch { /* fallback to search by name below */ }
                       }
 
-                      // 3. Absolute fallback: Google Search by Name
-                      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name)}`;
+                      // 3. Absolute fallback: Google Search by Name + Shop Name
+                      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${shopName} ${name}`)}`;
                     })();
 
                     return (

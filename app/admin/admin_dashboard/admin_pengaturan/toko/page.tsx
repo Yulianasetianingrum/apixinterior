@@ -622,6 +622,55 @@ export default async function TokoPengaturanPage({
     }
   }
 
+  // FORCE FETCH HERO IMAGES
+  const heroSectionIdsNeeded = new Set<number>();
+  for (const row of draftSectionsForTheme) {
+    const t = String((row as any).type ?? "").trim().toUpperCase();
+    if (t !== "HERO") continue;
+    const heroImgId = Number((((row as any).config ?? {}) as any)?.imageId);
+    if (Number.isFinite(heroImgId) && heroImgId > 0) heroSectionIdsNeeded.add(heroImgId);
+  }
+  const missingHeroSectionIds = Array.from(heroSectionIdsNeeded).filter((id) => !gambarById.has(id));
+  if (missingHeroSectionIds.length) {
+    const extra = await prisma.gambarUpload.findMany({
+      where: { id: { in: missingHeroSectionIds } },
+      select: { id: true, url: true, title: true },
+    });
+    for (const g of extra as any[]) {
+      gambarById.set(Number(g.id), g);
+    }
+  }
+
+  // FORCE FETCH CATEGORY GRID IMAGES (Standard & Commerce)
+  const catGridIdsNeeded = new Set<number>();
+  for (const row of draftSectionsForTheme) {
+    const t = String((row as any).type ?? "").trim().toUpperCase();
+    if (t === "CATEGORY_GRID") {
+      const items = ((row as any).config as any)?.items || [];
+      for (const it of items) {
+        const cover = Number(it?.coverImageId);
+        if (Number.isFinite(cover) && cover > 0) catGridIdsNeeded.add(cover);
+      }
+    }
+    if (t === "CATEGORY_GRID_COMMERCE") {
+      const items = ((row as any).config as any)?.items || [];
+      for (const it of items) {
+        const img = Number(it?.imageId);
+        if (Number.isFinite(img) && img > 0) catGridIdsNeeded.add(img);
+      }
+    }
+  }
+  const missingCatGridIds = Array.from(catGridIdsNeeded).filter((id) => !gambarById.has(id));
+  if (missingCatGridIds.length) {
+    const extra = await prisma.gambarUpload.findMany({
+      where: { id: { in: missingCatGridIds } },
+      select: { id: true, url: true, title: true },
+    });
+    for (const g of extra as any[]) {
+      gambarById.set(Number(g.id), g);
+    }
+  }
+
   // Pastikan image ROOM_CATEGORY juga bisa dipreview walau bukan "latest N"
   const roomImageIdsNeeded = new Set<number>();
   for (const row of draftSectionsForTheme) {
@@ -1447,9 +1496,31 @@ export default async function TokoPengaturanPage({
 
                             {/* HERO MEDIA: hanya picker (hapus upload + dropdown gambar_upload) */}
                             <div className={styles.innerCard}>
-                              <div style={{ fontWeight: 800, color: "rgba(17,17,17,0.9)" }}>
-                                Pilih gambar dari galeri
+                              <div style={{ fontWeight: 800, color: "rgba(17,17,17,0.9)", marginBottom: 12 }}>
+                                Media & Background
                               </div>
+
+                              {/* VISUAL PREVIEW HERO */}
+                              {(() => {
+                                const heroId = Number((cfg as any).imageId);
+                                const heroImg = Number.isFinite(heroId) ? gambarById.get(heroId) : null;
+                                if (heroImg?.url) {
+                                  return (
+                                    <div style={{ marginBottom: 12, borderRadius: 8, overflow: "hidden", border: "1px solid #eee", background: "#f9f9f9" }}>
+                                      <SecureImage
+                                        src={heroImg.url}
+                                        alt="Hero Preview"
+                                        style={{ width: "100%", height: "auto", maxHeight: 300, objectFit: "cover", display: "block" }}
+                                      />
+                                      <div style={{ fontSize: 11, padding: "4px 8px", color: "#666", textAlign: "center", borderTop: "1px solid #eee" }}>
+                                        Current Image ID: {heroId}
+                                      </div>
+                                    </div>
+                                  );
+                                }
+                                return null;
+                              })()}
+
                               <div style={{ color: "rgba(17,17,17,0.7)", fontSize: 12, marginTop: 6 }}>
                                 Klik tombol untuk buka picker, cari (id/title/tags), lalu pilih thumbnail.
                               </div>
@@ -1496,28 +1567,30 @@ export default async function TokoPengaturanPage({
                                   </form>
                                 </div>
                               </div>
-                            </div>
+                            </div >
 
                             {/* Tombol aksi HERO: kanan bawah section */}
-                            <div className={styles.highlightFooterActions}>
+                            < div className={styles.highlightFooterActions} >
                               <button type="submit" form={`heroForm-${section.id}`} className={styles.secondaryButton}>
                                 Simpan
                               </button>
 
-                              {activeThemeKey ? (
-                                <a
-                                  className={styles.primaryButton}
-                                  href={`/admin/admin_dashboard/admin_pengaturan/toko/preview?theme=${encodeURIComponent(
-                                    activeThemeKey
-                                  )}&focus=HERO&sectionId=${section.id}`}
-                                >
-                                  Preview
-                                </a>
-                              ) : (
-                                <span className={styles.primaryButton} style={{ opacity: 0.5, cursor: "not-allowed" }}>
-                                  Preview
-                                </span>
-                              )}
+                              {
+                                activeThemeKey ? (
+                                  <a
+                                    className={styles.primaryButton}
+                                    href={`/admin/admin_dashboard/admin_pengaturan/toko/preview?theme=${encodeURIComponent(
+                                      activeThemeKey
+                                    )}&focus=HERO&sectionId=${section.id}`}
+                                  >
+                                    Preview
+                                  </a>
+                                ) : (
+                                  <span className={styles.primaryButton} style={{ opacity: 0.5, cursor: "not-allowed" }}>
+                                    Preview
+                                  </span>
+                                )
+                              }
 
                               <form action={toggleDraft} style={{ display: "inline" }}>
                                 <input type="hidden" name="id" value={section.id.toString()} />
@@ -1921,7 +1994,7 @@ export default async function TokoPengaturanPage({
 
                         <CategoryCommerceGridEditorNoSSR
                           categories={categoryItems}
-                          images={(gambarItems as any[]).map((g: any) => ({
+                          images={Array.from(gambarById.values()).map((g: any) => ({
                             id: Number(g.id),
                             url: String(g.url ?? ""),
                             title: String(g.title ?? ""),
@@ -3705,27 +3778,29 @@ export default async function TokoPengaturanPage({
             })
           )}
         </div>
-      </section>
+      </section >
 
-      {activeThemeKey ? (
-        <FloatingPreviewActions
-          themeKey={activeThemeKey}
-          previewHref={`/admin/admin_dashboard/admin_pengaturan/toko/preview?theme=${encodeURIComponent(activeThemeKey)}`}
-          resetAction={resetTheme}
-          autoGenerateAction={autoGenerateThemeContent}
-          previewClassName={styles.secondaryButton}
-          saveClassName={styles.primaryButton}
-          dangerClassName={styles.dangerButton}
-          autoGenerateClassName={styles.secondaryButton}
-        />
-      ) : null}
+      {
+        activeThemeKey ? (
+          <FloatingPreviewActions
+            themeKey={activeThemeKey}
+            previewHref={`/admin/admin_dashboard/admin_pengaturan/toko/preview?theme=${encodeURIComponent(activeThemeKey)}`}
+            resetAction={resetTheme}
+            autoGenerateAction={autoGenerateThemeContent}
+            previewClassName={styles.secondaryButton}
+            saveClassName={styles.primaryButton}
+            dangerClassName={styles.dangerButton}
+            autoGenerateClassName={styles.secondaryButton}
+          />
+        ) : null
+      }
 
       {/* Script drag & drop urutan section + ordered picker (vanilla JS) */}
       <TokoClient />
       <script dangerouslySetInnerHTML={{ __html: voucherLinkScript }} />
       <script dangerouslySetInnerHTML={{ __html: scrollRestoreScript }} />
       <script dangerouslySetInnerHTML={{ __html: formFocusScript }} />
-    </div>
+    </div >
   );
 }
 
