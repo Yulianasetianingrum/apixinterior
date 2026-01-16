@@ -4976,13 +4976,13 @@ article[data-hc-nohero="1"] .hcCta {
 }
 
 .heroThemeGoldWhite .heroCtaPrimary {
-  color: #ffffff !important;
-  -webkit-text-fill-color: #ffffff !important;
+  color: #071026 !important;
+  -webkit-text-fill-color: #071026 !important;
 }
 
 .heroThemeWhiteNavy .heroCtaPrimary {
-  color: #071026 !important;
-  -webkit-text-fill-color: #071026 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
 }
 
 /* Also ensure hover states maintain interaction feedback */
@@ -5007,11 +5007,11 @@ article[data-hc-nohero="1"] .hcCta {
 }
 
 .heroThemeGoldWhite .heroCtaPrimary:hover {
-  color: #ffffff !important;
-  -webkit-text-fill-color: #ffffff !important;
+  color: #071026 !important;
+  -webkit-text-fill-color: #071026 !important;
 }
 
 .heroThemeWhiteNavy .heroCtaPrimary:hover {
-  color: #ffc800 !important;
-  -webkit-text-fill-color: #ffc800 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
 }
