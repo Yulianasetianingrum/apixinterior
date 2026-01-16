@@ -190,36 +190,7 @@ async function redirectBack(params: {
 
 
 
-async function updateDraftConfigPreserveTheme(
-  id: number,
-  newConfig: any,
-  meta?: { title?: string; slug?: string | null },
-) {
-  const existing = await prisma.homepageSectionDraft.findUnique({ where: { id } });
-  const themeKey = getThemeKeyFromRow(existing);
 
-  const finalConfig = withThemeKey(newConfig ?? {}, themeKey);
-
-  const data: any = { config: finalConfig };
-
-  if (meta) {
-    if (meta.title !== undefined) {
-      data.title = meta.title.trim();
-      // Sync to config for backward compatibility
-      data.config.title = data.title;
-    }
-    if (meta.slug !== undefined) {
-      data.slug = meta.slug ? slugify(meta.slug) : null;
-      // Sync to config for backward compatibility
-      data.config.slug = data.slug;
-    }
-  }
-
-  await prisma.homepageSectionDraft.update({
-    where: { id },
-    data,
-  });
-}
 
 // ========================
 // NAVBAR THEME SETUP (biarkan seperti versi kamu)
