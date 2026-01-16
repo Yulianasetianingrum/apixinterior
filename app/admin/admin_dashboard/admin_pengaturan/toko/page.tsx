@@ -3292,6 +3292,9 @@ async function autoGenerateContactCopy(formData: FormData) {
 async function saveGalleryConfig(formData: FormData) {
   "use server";
 
+  const id = Number(formData.get("id"));
+  if (!id || Number.isNaN(id)) return;
+
   const title = (formData.get("title") as string | null)?.trim() ?? "";
   const slugRaw = (formData.get("slug") as string | null)?.trim() ?? "";
   const slug = slugRaw ? slugify(slugRaw) : null;
