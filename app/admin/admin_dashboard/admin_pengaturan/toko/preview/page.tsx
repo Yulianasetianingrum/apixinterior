@@ -27,6 +27,7 @@ import {
   formatRupiah,
   computeHargaSetelahPromo,
   resolveGoogleMapsEmbed,
+  resolveGoogleMapsNavigation,
   normalizeExternalUrl,
   normalizeThemeAttr, // Needed if used elsewhere
   buildCategoryCommerceGridProps,
@@ -1738,39 +1739,7 @@ export default async function TokoPreviewDraftPage({
                         }}
                       >
                         {(() => {
-                          const resolveEmbed = () => {
-                            if (!cleanMapsUrl) return "";
-                            // If we already extracted from iframe, verify it's an embed or convert
-                            const uStr = cleanMapsUrl;
-
-                            // If it's already an embed URL, use it
-                            if (uStr.includes("/maps/embed") || uStr.includes("output=embed")) {
-                              return uStr;
-                            }
-
-                            try {
-                              const u = new URL(uStr);
-                              const host = u.host.toLowerCase();
-                              const isGoogle = host.includes("google.") || host.includes("maps.");
-
-                              if (isGoogle) {
-                                const q =
-                                  u.searchParams.get("q") ||
-                                  u.searchParams.get("query") ||
-                                  u.searchParams.get("search") ||
-                                  "";
-                                const query = q || name;
-                                if (!query) return "";
-                                // Use maps.google.com generic embed
-                                return `https://maps.google.com/maps?q=${encodeURIComponent(query)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
-                              }
-                            } catch {
-                              // ignore invalid URLs
-                            }
-                            return "";
-                          };
-
-                          const embedSrc = resolveEmbed();
+                          const embedSrc = resolveGoogleMapsEmbed(rawMapsUrl, name);
 
                           return (
                             <div
@@ -1832,7 +1801,7 @@ export default async function TokoPreviewDraftPage({
                             {cleanMapsUrl ? (
                               <a
                                 className={ui.pcCta}
-                                href={cleanMapsUrl}
+                                href={resolveGoogleMapsNavigation(rawMapsUrl, name)}
                                 target="_blank"
                                 rel="noreferrer"
                                 style={{ background: ctaBg, color: ctaFg, border: `1px solid ${ctaBg}` }}

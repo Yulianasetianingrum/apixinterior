@@ -62,12 +62,12 @@
 .pageBg[data-theme="white_gold"],
 .pageBg[data-theme="WHITE_GOLD"] {
   --t-bg: var(--white);
-  --t-element: var(--gold-bold);
+  --t-element: var(--gold);
   --t-card: #fdfaf3;
   --t-card-fg: var(--gold-bold);
   --t-card-border: rgba(140, 108, 24, 0.15);
 
-  --t-cta-bg: var(--gold-bold);
+  --t-cta-bg: var(--gold);
   --t-cta-fg: var(--white);
   --t-cta-hover-bg: #6d5412;
   --t-cta-hover-fg: var(--white);
@@ -2139,12 +2139,12 @@
 .themeScope[data-theme="theme_2"],
 .themeScope[data-theme="THEME_2"] {
   --t-bg: var(--white);
-  --t-element: var(--gold-bold);
+  --t-element: var(--gold);
   --t-card: #fdfaf3;
   --t-card-fg: var(--gold-bold);
   --t-card-border: rgba(140, 108, 24, 0.15);
 
-  --t-cta-bg: var(--gold-bold);
+  --t-cta-bg: var(--gold);
   --t-cta-fg: var(--white);
   --t-cta-hover-bg: #6d5412;
   --t-cta-hover-fg: var(--white);

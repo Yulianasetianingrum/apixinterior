@@ -15,7 +15,7 @@ import {
   categoryGridVarsFromTheme, parseThemePair, colorForToken,
   resolveCustomPromoPalette, parseCustomPromoBgTheme, getFooterIconPath,
   pickFirstGalleryImageId, formatRupiah, computeHargaSetelahPromo,
-  normalizeExternalUrl, resolveGoogleMapsEmbed,
+  normalizeExternalUrl, resolveGoogleMapsEmbed, resolveGoogleMapsNavigation,
   MAX_CUSTOM_PROMO_VOUCHERS, FALLBACK_CATEGORY_IMAGE_URL,
   type SectionRow, type CategoryGridItem, type CategoryCommerceItem
 } from "./page.helpers";
@@ -955,7 +955,7 @@ export default async function HomePage({
                       <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center" }}>📍</div>
                     )}
                   </div>
-                  <div className={styles.pcBody}><div className={styles.pcTitle}>{name}</div><div className={styles.pcMeta}>{meta}</div><div className={styles.pcCtaWrap}>{mapsUrl ? <a className={styles.pcCta} href={mapsUrl} target="_blank" rel="noreferrer" style={{ background: colors.ctaBg, color: colors.ctaFg }}>Buka Maps</a> : <div className={styles.pcCtaPlaceholder} />}</div></div>
+                  <div className={styles.pcBody}><div className={styles.pcTitle}>{name}</div><div className={styles.pcMeta}>{meta}</div><div className={styles.pcCtaWrap}>{mapsUrl ? <a className={styles.pcCta} href={resolveGoogleMapsNavigation(mapsUrl, name)} target="_blank" rel="noreferrer" style={{ background: colors.ctaBg, color: colors.ctaFg }}>Buka Maps</a> : <div className={styles.pcCtaPlaceholder} />}</div></div>
                 </article>
               );
             };

@@ -92,8 +92,18 @@ export function getHeroThemeTokens(theme: string) {
             return { bg: navy, element: gold, card: navy, cardFg: gold, cardBorder: "rgba(255,255,255,0.22)", ctaBg: gold, ctaFg: navy, ctaHoverBg: navy, ctaHoverFg: gold, divider: "rgba(255,255,255,0.16)" };
         case "WHITE_GOLD":
         case "theme_2":
-            // IMPROVED CONTRAST: Use unified BOLD GOLD for White background
-            return { bg: white, element: goldBold, card: white, cardFg: goldBold, ctaBg: goldBold, ctaFg: white, ctaHoverBg: "#6d5412", ctaHoverFg: white, divider: "rgba(140,108,24,0.12)" };
+            // Bold Gold for text, Bright Gold for UI elements
+            return {
+                bg: white,
+                element: gold, // Icons/Decor remain bright
+                card: white,
+                cardFg: goldBold, // Text is bold
+                ctaBg: gold, // Button is bright
+                ctaFg: white,
+                ctaHoverBg: "#6d5412",
+                ctaHoverFg: white,
+                divider: "rgba(140,108,24,0.12)"
+            };
         case "NAVY_WHITE":
         case "theme_3":
             return { bg: navy, element: white, card: navy, cardFg: white, cardBorder: "rgba(255,255,255,0.22)", ctaBg: white, ctaFg: navy, ctaHoverBg: navy, ctaHoverFg: white, divider: "rgba(255,255,255,0.16)" };
@@ -144,7 +154,7 @@ export function resolveCustomPromoPalette(rawBg: any, navbarTheme: string) {
     const palette: Record<string, { bg: string; fg: string; border: string }> = {
         NAVY: { bg: "rgba(11, 29, 58, 0.96)", fg: "#f4f7fb", border: "rgba(255,255,255,0.18)" },
         WHITE: { bg: "#ffffff", fg: "#0f172a", border: "rgba(15,23,42,0.12)" },
-        GOLD: { bg: "#8c6c18", fg: "#ffffff", border: "rgba(255,255,255,0.18)" },
+        GOLD: { bg: "#d4af37", fg: "#ffffff", border: "rgba(255,255,255,0.18)" },
         SOFT_GOLD: { bg: "#FAF8F0", fg: "#8c6c18", border: "rgba(140,108,24,0.08)" },
         SOFT_NAVY: { bg: "#EEF2F6", fg: "#0f172a", border: "rgba(15,23,42,0.08)" },
     };
@@ -192,12 +202,13 @@ export function parseThemePair(themeKey: string): { a: ThemeToken; b: ThemeToken
 
 export function categoryGridVarsFromTheme(resolvedTheme: string) {
     const NAVY = "#0b1d3a";
-    const GOLD = "#8c6c18";
+    const GOLD = "#d4af37";
+    const GOLD_BOLD = "#8c6c18";
     const WHITE = "#ffffff";
     switch (resolvedTheme) {
         case "NAVY_GOLD": return { cardBg: NAVY, insideText: GOLD, outsideText: NAVY, border: "rgba(255,255,255,0.22)" };
-        case "WHITE_GOLD": return { cardBg: WHITE, insideText: GOLD, outsideText: GOLD, border: "rgba(140,108,24,0.15)" };
-        case "NAVY_WHITE": return { cardBg: NAVY, insideText: WHITE, outsideText: NAVY, border: "rgba(255,255,255,0.22)" };
+        case "WHITE_GOLD": return { cardBg: WHITE, insideText: GOLD_BOLD, outsideText: GOLD_BOLD, border: "rgba(140,108,24,0.15)" };
+        case "NAVY_WHITE": return { cardBg: navy, insideText: WHITE, outsideText: navy, border: "rgba(255,255,255,0.22)" };
         case "GOLD_NAVY": return { cardBg: GOLD, insideText: NAVY, outsideText: GOLD, border: "rgba(140,108,24,0.20)" };
         case "GOLD_WHITE": return { cardBg: GOLD, insideText: WHITE, outsideText: GOLD, border: "rgba(255,255,255,0.22)" };
         case "WHITE_NAVY": return { cardBg: WHITE, insideText: NAVY, outsideText: NAVY, border: "rgba(11,29,58,0.18)" };
@@ -607,7 +618,45 @@ export function resolveGoogleMapsEmbed(mapsUrl: string, name: string): string {
             return `https://maps.google.com/maps?q=${encodeURIComponent(query)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
         }
     } catch { }
+    // Fallback search if it's not a URL but looks like a place
+    if (mapsUrl.length > 3 && !mapsUrl.includes("/")) {
+        return `https://maps.google.com/maps?q=${encodeURIComponent(mapsUrl)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+    }
     return "";
+}
+
+/**
+ * Ensures a URL is safe for browser navigation (not trapped in an embed iframe error)
+ */
+export function resolveGoogleMapsNavigation(mapsUrl: string, name: string): string {
+    const s = String(mapsUrl || "").trim();
+    if (!s || s === "#") return "#";
+
+    // If it's an iframe, extract the src first
+    let target = s;
+    if (s.includes("<iframe")) {
+        const match = s.match(/src=["']([^"']+)["']/i);
+        if (match && match[1]) target = match[1];
+    }
+
+    try {
+        const u = new URL(target);
+        const isEmbed = u.pathname.includes("/maps/embed") || u.searchParams.get("output") === "embed";
+
+        // If it's an embed URL, WE MUST NOT NAVIGATE TO IT. 
+        // Redirect to a clean search instead using the query or name
+        if (isEmbed) {
+            const q = u.searchParams.get("q") || u.searchParams.get("query") || u.searchParams.get("search") || "";
+            const query = q || name;
+            return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+        }
+
+        // Otherwise return the URL as is (or normalized)
+        return target;
+    } catch {
+        // If not a URL, treat as search query
+        return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s || name || "Google Maps")}`;
+    }
 }
 
 export function heroThemeClassFromConfig(heroThemeRaw: string, navbarThemeRaw: string) {
