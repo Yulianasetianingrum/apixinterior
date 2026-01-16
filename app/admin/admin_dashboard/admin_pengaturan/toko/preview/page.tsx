@@ -1630,15 +1630,13 @@ export default async function TokoPreviewDraftPage({
                   const cardThemeClass = sectionThemeResolved ? `theme-${String(sectionThemeResolved).toLowerCase()}` : "";
                   const themeColors = getHeroThemeTokens(sectionThemeResolved);
 
-                  // Background Branch: ONLY affects section background
-                  const sectionBgRaw = (cfg as any).sectionBgTheme;
-                  const sectionBg = parseCustomPromoBgTheme(sectionBgRaw);
-                  const bgPalette = resolveCustomPromoPalette(sectionBg, navbarTheme);
+                  // Independent Background Logic (Match Live Site)
+                  const bgPair = parseThemePair(sectionThemeResolved);
+                  const savedBg = (cfg as any).sectionBgTheme;
+                  const effectiveBgToken = savedBg && ["NAVY", "GOLD", "WHITE"].includes(savedBg) ? savedBg : bgPair.a;
 
-                  // Section background: ONLY from Background Branch dropdown
-                  const useCustomBg = sectionBg !== "FOLLOW_NAVBAR";
-                  const finalBg = useCustomBg ? bgPalette.bg : "#f8f9fa"; // Default light gray if no custom bg
-                  const finalTextColor = useCustomBg ? bgPalette.fg : "#0b1d3a";
+                  const finalBg = effectiveBgToken === "WHITE" ? "#FFFFFF" : effectiveBgToken === "GOLD" ? "#D4AF37" : "#0B1D3A";
+                  const finalTextColor = effectiveBgToken === "WHITE" || effectiveBgToken === "GOLD" ? "#0B1D3A" : "#FFFFFF";
 
                   // Card and button colors: ONLY from Tema Section dropdown
                   let cardBg = themeColors.card;
@@ -1818,29 +1816,7 @@ export default async function TokoPreviewDraftPage({
                             {cleanMapsUrl ? (
                               <a
                                 className={ui.pcCta}
-                                href={(() => {
-                                  // Convert embed URL to viewable Google Maps URL
-                                  try {
-                                    const url = new URL(cleanMapsUrl);
-                                    const isEmbedUrl = url.pathname.includes('/maps/embed') ||
-                                      url.searchParams.has('pb') ||
-                                      cleanMapsUrl.includes('output=embed');
-
-                                    if (isEmbedUrl) {
-                                      // Extract place ID or coordinates from embed URL
-                                      const pbParam = url.searchParams.get('pb');
-
-                                      // Try to extract place name or use branch name
-                                      const query = encodeURIComponent(name);
-
-                                      // Return a proper Google Maps search URL
-                                      return `https://www.google.com/maps/search/?api=1&query=${query}`;
-                                    }
-                                  } catch (e) {
-                                    // If URL parsing fails, return original
-                                  }
-                                  return cleanMapsUrl;
-                                })()}
+                                href={cleanMapsUrl}
                                 target="_blank"
                                 rel="noreferrer"
                                 style={{ background: ctaBg, color: ctaFg, border: `1px solid ${ctaBg}` }}
@@ -2390,7 +2366,7 @@ export default async function TokoPreviewDraftPage({
                   const body = <SplitImageStack />;
 
                   return (
-                    <section key={section.id} className={`${ui.previewSection} ${ui.previewSectionTheme}`} data-theme={sectionThemeResolved}>
+                    <section key={section.id} className={`${ui.previewSection} ${homeStyles.previewSectionTheme}`} data-theme={sectionThemeResolved}>
                       <div className={ui.contactStage}>
                         {section.title ? <h2 className={ui.sectionTitle}>{section.title}</h2> : null}
                         <div className={ui.contactStageBody}>{body}</div>
