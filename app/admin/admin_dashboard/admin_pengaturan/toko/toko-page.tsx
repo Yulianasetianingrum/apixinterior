@@ -2916,15 +2916,7 @@ export default async function TokoPengaturanPage({
                       </div>
                     )}
 
-                    {/* Legacy banner_promo list (read-only info) */}
-                    {section.type === "CUSTOM_PROMO" && legacyBannerPromoId ? (
-                      <div className={styles.helperText} style={{ marginTop: 8 }}>
-                        Info legacy: <code>banner_promo</code> #{String(legacyBannerPromoId)}{" "}
-                        {bannerPromoItems.find((b) => Number(b.id) === Number(legacyBannerPromoId))
-                          ? "(ditemukan)"
-                          : "(tidak ditemukan)"}
-                      </div>
-                    ) : null}
+
                   </article>
                 );
               })
