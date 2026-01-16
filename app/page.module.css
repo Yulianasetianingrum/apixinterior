@@ -4924,6 +4924,7 @@ article[data-hc-nohero="1"] .hcCta {
 }
 
 /* HERO ALIGNMENT FIX & UNLOCK WIDTH */
+/* HERO ALIGNMENT FIX & UNLOCK WIDTH */
 .heroText {
   flex: 1 1 auto !important;
   /* Grow to fill space naturally */
@@ -4942,9 +4943,13 @@ article[data-hc-nohero="1"] .hcCta {
   /* Matches Title Left Align */
   gap: 12px !important;
   flex-wrap: nowrap !important;
-  overflow-x: hidden !important;
+  /* overflow-x: hidden !important; REMOVED TO PREVENT CLIP */
   width: 100%;
   margin-bottom: 12px !important;
+  margin-left: 0 !important;
+  /* SAFETY */
+  padding-left: 0 !important;
+  /* SAFETY */
 }
 
 /* Ensure badges don't get squashed */
