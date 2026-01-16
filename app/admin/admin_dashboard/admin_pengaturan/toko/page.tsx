@@ -2598,7 +2598,7 @@ async function saveCustomPromoConfig(formData: FormData) {
   );
 
   if (isAutosave) {
-    return { ok: true };
+    return;
   }
 
   revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko");
