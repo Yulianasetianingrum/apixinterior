@@ -4480,7 +4480,19 @@ article[data-hc-nohero="1"] .hcCta {
   margin-top: 12px;
   display: flex;
   gap: 8px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.heroTrustRow::-webkit-scrollbar {
+  display: none;
+}
+
+.heroTrustChip:nth-child(n+9) {
+  display: none;
 }
 
 .heroTrustChip {
@@ -4491,13 +4503,22 @@ article[data-hc-nohero="1"] .hcCta {
   background: var(--hb-chipBg);
   border: 1px solid var(--hb-chipBorder);
   color: var(--hb-text);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .heroMiniInfoRow {
   margin-top: 14px;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
   gap: 10px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.heroMiniInfoRow::-webkit-scrollbar {
+  display: none;
 }
 
 .heroMiniInfoCard {
@@ -4505,6 +4526,8 @@ article[data-hc-nohero="1"] .hcCta {
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.18);
+  flex-shrink: 0;
+  min-width: 140px;
 }
 
 .heroFloatingCards {
