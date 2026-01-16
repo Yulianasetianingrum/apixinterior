@@ -4923,18 +4923,23 @@ article[data-hc-nohero="1"] .hcCta {
   }
 }
 
-/* HERO ALIGNMENT FIX */
+/* HERO ALIGNMENT FIX & UNLOCK WIDTH */
+.heroText {
+  max-width: 100% !important;
+  /* Unlock width to use available space */
+  align-items: flex-start !important;
+  /* Force Left Align structure */
+}
+
 .heroTopRow {
   display: flex !important;
   flex-direction: row !important;
   align-items: center !important;
-  justify-content: center !important;
-  gap: 6px !important;
-  /* Tighter gap */
+  justify-content: flex-start !important;
+  /* Matches Title Left Align */
+  gap: 12px !important;
   flex-wrap: nowrap !important;
-  /* Single line */
   overflow-x: hidden !important;
-  /* Shrink to fit, no scroll */
   width: 100%;
   margin-bottom: 12px !important;
 }
@@ -4945,11 +4950,19 @@ article[data-hc-nohero="1"] .hcCta {
   flex: 0 1 auto !important;
   /* Allow shrinking */
   white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
   min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: clip !important;
+  /* User hates dots, prefer clip if force-fail, but clamp should save it */
+
+  /* SCALING LOGIC: "Textnya mengecil" */
+  font-size: clamp(8px, 1.2vw, 11px) !important;
+  letter-spacing: -0.01em !important;
+  padding: 4px 8px !important;
+  /* Tighter padding */
 }
 
+/* Ensure Eyebrow doesn't force a new line */
 /* Ensure Eyebrow doesn't force a new line */
 .heroEyebrow {
   margin: 0 !important;
@@ -4960,9 +4973,14 @@ article[data-hc-nohero="1"] .hcCta {
   justify-content: center !important;
   white-space: nowrap !important;
   min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: clip !important;
 
   /* BUBBLE STYLE SPECIAL (Istimewakan) */
-  padding: 7px 12px !important;
+  font-size: clamp(9px, 1.2vw, 12px) !important;
+  /* Scale it */
+  padding: 5px 10px !important;
+  /* Scale padding */
   border-radius: 999px !important;
   background: var(--hb-text) !important;
   /* Solid High Contrast */
@@ -4981,21 +4999,33 @@ article[data-hc-nohero="1"] .hcCta {
 @media (max-width: 640px) {
 
   /* Keep row even on mobile to satisfy "dilarang eyebrow di atas badges" */
-  /* Keep row even on mobile to satisfy "dilarang eyebrow di atas badges" */
   .heroTopRow {
     flex-direction: row !important;
     align-items: center !important;
-    justify-content: center !important;
+    justify-content: flex-start !important;
+    /* Mobile: Mepet Kiri */
     gap: 4px !important;
-    /* Even tighter on mobile */
     flex-wrap: nowrap !important;
     overflow-x: hidden !important;
     width: 100%;
     padding-inline: 0;
   }
+
+  /* Mobile: Show ONLY Eyebrow ("muncul eyebrownya saja") */
+  .heroBadge {
+    display: none !important;
+  }
 }
 
-/* HERO CTA CONTRAST ENFORCEMENT (SUPER ROBUST) */
+/* Tablet Logic (max-width: 1024px) - Eyebrow + 2 Badges */
+@media (max-width: 1024px) {
+  .heroBadge:nth-of-type(n+3) {
+    display: none !important;
+    /* Hide 3rd badge onwards */
+  }
+}
+
+/* HERO CTA CONTRAST ENFORCEMENT (SUPER ROBUST & STATIC) */
 
 /* GOLD + WHITE (Theme 5) */
 html .heroThemeGoldWhite .heroCtaPrimary {
@@ -5005,9 +5035,11 @@ html .heroThemeGoldWhite .heroCtaPrimary {
 }
 
 html .heroThemeGoldWhite .heroCtaPrimary:hover {
-  background-color: #071026 !important;
-  color: #ffffff !important;
-  -webkit-text-fill-color: #ffffff !important;
+  background-color: #ffffff !important;
+  /* NO CHANGE ON HOVER */
+  color: #071026 !important;
+  /* NO CHANGE ON HOVER */
+  -webkit-text-fill-color: #071026 !important;
 }
 
 /* WHITE + NAVY (Theme 6) */
@@ -5018,13 +5050,14 @@ html .heroThemeWhiteNavy .heroCtaPrimary {
 }
 
 html .heroThemeWhiteNavy .heroCtaPrimary:hover {
-  background-color: #ffffff !important;
-  /* Force swap on hover */
-  color: #071026 !important;
-  -webkit-text-fill-color: #071026 !important;
+  background-color: #071026 !important;
+  /* NO CHANGE ON HOVER */
+  color: #ffffff !important;
+  /* NO CHANGE ON HOVER */
+  -webkit-text-fill-color: #ffffff !important;
 }
 
-/* OTHER THEMES (Regular Enforcement) */
+/* OTHER THEMES (Regular Enforcement - STATIC) */
 .heroThemeNavyGold .heroCtaPrimary {
   color: #071026 !important;
   -webkit-text-fill-color: #071026 !important;
