@@ -1117,8 +1117,13 @@ export async function saveHighlightCollectionConfig(formData: FormData) {
     const heroImageId = Number.isFinite(heroImageIdNum) && heroImageIdNum > 0 ? heroImageIdNum : undefined;
 
     const existingHeroNum = Number((existingConfigForMerge as any)?.heroImageId);
+    const existingImageIdNum = Number((existingConfigForMerge as any)?.imageId);
     const existingHeroImageId: number | null =
-        Number.isFinite(existingHeroNum) && existingHeroNum > 0 ? existingHeroNum : null;
+        Number.isFinite(existingHeroNum) && existingHeroNum > 0
+            ? existingHeroNum
+            : Number.isFinite(existingImageIdNum) && existingImageIdNum > 0
+                ? existingImageIdNum
+                : null;
 
     const nextHeroImageId: number | null = clearHero ? null : heroImageId !== undefined ? heroImageId : existingHeroImageId;
 
