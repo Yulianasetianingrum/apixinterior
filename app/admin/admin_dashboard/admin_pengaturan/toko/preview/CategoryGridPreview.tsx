@@ -55,8 +55,7 @@ export function CategoryGridPreview({ data }: { data: any }) {
                                         <SecureImage
                                             src={item.imageUrl}
                                             alt={item.title || "Category"}
-                                            fill
-                                            style={{ objectFit: 'cover' }}
+                                            style={{ objectFit: 'cover', width: '100%', height: '100%', position: 'absolute', top: 0, left: 0 }}
                                         />
                                     ) : (
                                         <div style={{
