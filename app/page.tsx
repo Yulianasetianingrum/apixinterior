@@ -932,7 +932,7 @@ export default async function HomePage({
             const effectiveBgToken = savedBg && ["NAVY", "GOLD", "WHITE"].includes(savedBg) ? savedBg : pair.a;
 
             const sectionBgColor = effectiveBgToken === "WHITE" ? "#FFFFFF" : effectiveBgToken === "GOLD" ? "#D4AF37" : "#0B1D3A";
-            const sectionTextColor = effectiveBgToken === "WHITE" || effectiveBgToken === "GOLD" ? "#0B1D3A" : "#FFFFFF";
+            const sectionTextColor = effectiveBgToken === "WHITE" || effectiveBgToken === "GOLD" ? "#0f172a" : "#FFFFFF";
 
             const selectedIds: number[] = Array.isArray(cfg.branchIds) ? cfg.branchIds : [];
             const branches = selectedIds.map((id: any) => cabangMap.get(Number(id))).filter(Boolean);

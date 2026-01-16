@@ -91,8 +91,8 @@ export function getHeroThemeTokens(theme: string) {
             return { bg: navy, element: gold, card: navy, cardFg: gold, cardBorder: "rgba(255,255,255,0.22)", ctaBg: gold, ctaFg: navy, ctaHoverBg: navy, ctaHoverFg: gold, divider: "rgba(255,255,255,0.16)" };
         case "WHITE_GOLD":
         case "theme_2":
-            // IMPROVED CONTRAST: Use Navy text on White card instead of Gold text
-            return { bg: white, element: gold, card: white, cardFg: navy, cardBorder: "rgba(11,29,58,0.12)", ctaBg: gold, ctaFg: navy, ctaHoverBg: navy, ctaHoverFg: gold, divider: "rgba(2,6,23,0.08)" };
+            // IMPROVED CONTRAST: Use neutral dark text on White background
+            return { bg: white, element: gold, card: white, cardFg: ink, ctaBg: gold, ctaFg: ink, ctaHoverBg: ink, ctaHoverFg: gold, divider: "rgba(2,6,23,0.08)" };
         case "NAVY_WHITE":
         case "theme_3":
             return { bg: navy, element: white, card: navy, cardFg: white, cardBorder: "rgba(255,255,255,0.22)", ctaBg: white, ctaFg: navy, ctaHoverBg: navy, ctaHoverFg: white, divider: "rgba(255,255,255,0.16)" };
@@ -142,10 +142,10 @@ export function resolveCustomPromoPalette(rawBg: any, navbarTheme: string) {
     const token = parsed === "FOLLOW_NAVBAR" ? navbarBgToken(navbarTheme) : parsed;
     const palette: Record<string, { bg: string; fg: string; border: string }> = {
         NAVY: { bg: "rgba(11, 29, 58, 0.96)", fg: "#f4f7fb", border: "rgba(255,255,255,0.18)" },
-        WHITE: { bg: "#ffffff", fg: "#0b1d3a", border: "rgba(11,29,58,0.12)" },
-        GOLD: { bg: "#d4af37", fg: "#0b1d3a", border: "rgba(11,29,58,0.18)" },
-        SOFT_GOLD: { bg: "#FAF8F0", fg: "#0b1d3a", border: "rgba(11,29,58,0.08)" },
-        SOFT_NAVY: { bg: "#EEF2F6", fg: "#0b1d3a", border: "rgba(11,29,58,0.08)" },
+        WHITE: { bg: "#ffffff", fg: "#0f172a", border: "rgba(15,23,42,0.12)" },
+        GOLD: { bg: "#d4af37", fg: "#0f172a", border: "rgba(11,29,58,0.18)" },
+        SOFT_GOLD: { bg: "#FAF8F0", fg: "#0f172a", border: "rgba(15,23,42,0.08)" },
+        SOFT_NAVY: { bg: "#EEF2F6", fg: "#0f172a", border: "rgba(15,23,42,0.08)" },
     };
     const picked = palette[token] || palette.NAVY;
     return { token, ...picked };

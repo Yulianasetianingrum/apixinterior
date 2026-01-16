@@ -1652,7 +1652,7 @@ export default async function TokoPreviewDraftPage({
                   const effectiveBgToken = savedBg && ["NAVY", "GOLD", "WHITE"].includes(savedBg) ? savedBg : bgPair.a;
 
                   const finalBg = effectiveBgToken === "WHITE" ? "#FFFFFF" : effectiveBgToken === "GOLD" ? "#D4AF37" : "#0B1D3A";
-                  const finalTextColor = effectiveBgToken === "WHITE" || effectiveBgToken === "GOLD" ? "#0B1D3A" : "#FFFFFF";
+                  const finalTextColor = effectiveBgToken === "WHITE" || effectiveBgToken === "GOLD" ? "#0f172a" : "#FFFFFF";
 
                   // Card and button colors: ONLY from Tema Section dropdown
                   let cardBg = themeColors.card;

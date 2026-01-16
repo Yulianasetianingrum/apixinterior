@@ -281,14 +281,14 @@
   --t-element: var(--gold);
   --t-card: #f6f7fb;
   --t-card-fg: var(--ink);
-  --t-card-border: rgba(2, 6, 23, 0.10);
+  --t-card-border: rgba(15, 23, 42, 0.10);
 
   --t-cta-bg: var(--gold);
-  --t-cta-fg: var(--navy);
-  --t-cta-hover-bg: var(--navy);
+  --t-cta-fg: var(--ink);
+  --t-cta-hover-bg: var(--ink);
   --t-cta-hover-fg: var(--gold);
   --t-cta-border: rgba(212, 175, 55, 0.60);
-  --t-divider: rgba(2, 6, 23, 0.08);
+  --t-divider: rgba(15, 23, 42, 0.08);
 }
 
 /* 3) Navy + White */
@@ -430,14 +430,14 @@
   --t-element: var(--gold);
   --t-card: var(--white);
   --t-card-fg: var(--t-element);
-  --t-card-border: rgba(2, 6, 23, 0.10);
+  --t-card-border: rgba(15, 23, 42, 0.10);
 
   --t-cta-bg: var(--gold);
-  --t-cta-fg: var(--navy);
-  --t-cta-hover-bg: var(--navy);
+  --t-cta-fg: var(--ink);
+  --t-cta-hover-bg: var(--ink);
   --t-cta-hover-fg: var(--gold);
   --t-cta-border: rgba(212, 175, 55, 0.60);
-  --t-divider: rgba(2, 6, 23, 0.08);
+  --t-divider: rgba(15, 23, 42, 0.08);
 }
 
 /* 3) Navy + White */
@@ -4248,9 +4248,9 @@ article[data-hc-nohero="1"] .hcCta {
 
 /* ========================= HERO SECTION ========================= */
 .hero {
-  max-width: 1400px;
-  margin: 0 auto 28px;
-  padding: 0 16px 24px;
+  max-width: 1550px;
+  margin: 0 auto 32px;
+  padding: 0 20px 24px;
   --hb-bg: #071026;
   --hb-text: rgba(255, 255, 255, 0.96);
   --hb-accent: #ffe893;
@@ -4271,10 +4271,10 @@ article[data-hc-nohero="1"] .hcCta {
 .heroThemeWhiteGold {
   --hb-bg: #ffffff;
   --hb-bg2: #f8fafc;
-  --hb-text: #0b1d3a;
+  --hb-text: #0f172a;
   --hb-accent: #d4af37;
-  --hb-chipBg: rgba(11, 29, 58, 0.08);
-  --hb-chipBorder: rgba(11, 29, 58, 0.12);
+  --hb-chipBg: rgba(15, 23, 42, 0.08);
+  --hb-chipBorder: rgba(15, 23, 42, 0.12);
 }
 
 .heroThemeNavyWhite {
@@ -4316,9 +4316,9 @@ article[data-hc-nohero="1"] .hcCta {
 .heroInner {
   position: relative;
   display: flex;
-  gap: clamp(14px, 2.2vw, 28px);
+  gap: clamp(12px, 2.5vw, 24px);
   align-items: center;
-  padding: clamp(16px, 2.6vw, 30px);
+  padding: clamp(24px, 4vw, 50px) clamp(24px, 5vw, 80px);
   border-radius: 26px;
   overflow: hidden;
   background: linear-gradient(180deg, var(--hb-bg), var(--hb-bg2, #050a14));
@@ -4327,11 +4327,11 @@ article[data-hc-nohero="1"] .hcCta {
 }
 
 .heroText {
-  flex: 1 1 560px;
+  flex: 1.1 1 640px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  max-width: 720px;
+  gap: 12px;
+  max-width: 820px;
 }
 
 .heroTopRow {
@@ -4389,10 +4389,10 @@ article[data-hc-nohero="1"] .hcCta {
 }
 
 .heroMedia {
-  flex: 1 1 440px;
+  flex: 1.3 1 520px;
   position: relative;
   border-radius: 24px;
-  height: clamp(320px, 36vw, 540px);
+  height: clamp(340px, 40vw, 580px);
   overflow: hidden;
 }
 
