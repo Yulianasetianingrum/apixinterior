@@ -1663,7 +1663,13 @@ export default async function TokoPreviewDraftPage({
 
                   // Fix button colors for specific themes
                   const themePair = parseThemePair(sectionThemeResolved);
-                  if (themePair.a === "NAVY" && themePair.b === "WHITE") {
+                  if (themePair.a === "WHITE" && themePair.b === "GOLD") {
+                    // WHITE + GOLD: Card = White, Button = Gold with Navy text
+                    cardBg = "#ffffff";
+                    cardFg = "#0f172a";
+                    ctaBg = "#d4af37";
+                    ctaFg = "#0b1d3a";
+                  } else if (themePair.a === "NAVY" && themePair.b === "WHITE") {
                     // NAVY + WHITE: Card = Navy, Button = White
                     ctaBg = "#ffffff";
                     ctaFg = "#0b1d3a";

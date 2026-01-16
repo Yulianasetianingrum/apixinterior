@@ -4043,21 +4043,23 @@ async function uploadImageToGalleryAndAttach(formData: FormData): Promise<{ ok: 
     } else if (attach === "CUSTOM_PROMO:append" || attach === "CUSTOM_PROMO:imageId") {
       // enforce rules: ratio + width + hero single image
       const meta = await metaFromDisk(Number(imageIdToUse));
-      if (!meta?.width || !meta?.height) {
-        throw new Error("Metadata gambar tidak bisa dibaca untuk Custom Promo.");
-      }
-      const layoutRaw = (layoutOverride || String((cfg as any)?.layout ?? "carousel")).toLowerCase();
-      const isHero = layoutRaw === "hero";
-      const nextLayout = isHero ? "hero" : layoutRaw === "grid" ? "grid" : "carousel";
-      if (isHero) {
-        if (meta.width !== 3000 || meta.height !== 1000) {
-          throw new Error("Hero wajib ukuran 3000x1000 (tidak bisa selain itu).");
+      if (meta?.width && meta?.height) {
+        // Only validate if metadata is available
+        const layoutRaw = (layoutOverride || String((cfg as any)?.layout ?? "carousel")).toLowerCase();
+        const isHero = layoutRaw === "hero";
+        const nextLayout = isHero ? "hero" : layoutRaw === "grid" ? "grid" : "carousel";
+        if (isHero) {
+          if (meta.width !== 3000 || meta.height !== 1000) {
+            throw new Error("Hero wajib ukuran 3000x1000 (tidak bisa selain itu).");
+          }
+        } else {
+          if (meta.width < 2300 || meta.width > 4000 || meta.height < 1000 || meta.height > 1500) {
+            throw new Error("Carousel/Grid wajib lebar 2300-4000 dan tinggi 1000-1500.");
+          }
         }
-      } else {
-        if (meta.width < 2300 || meta.width > 4000 || meta.height < 1000 || meta.height > 1500) {
-          throw new Error("Carousel/Grid wajib lebar 2300-4000 dan tinggi 1000-1500.");
-        }
       }
+      // If metadata not available, skip validation and proceed
+
 
       const vouchers = normalizeVoucherImageIds(cfg?.voucherImageIds);
       const already = vouchers.includes(Number(imageIdToUse));
