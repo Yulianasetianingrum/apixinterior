@@ -1556,15 +1556,20 @@
 }
 
 /* Media column */
+/* Media column */
 .heroMedia {
   flex: 1 1 440px;
-  min-width: 0;
+  min-width: 280px !important;
+  /* Safety minimum */
   position: relative;
   overflow: hidden;
   border-radius: 24px;
   background: rgba(7, 12, 24, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.14);
-  height: clamp(320px, 36vw, 540px);
+  height: auto !important;
+  /* Let aspect ratio drive height */
+  aspect-ratio: 1 / 1 !important;
+  /* FORCED SQUARE ("1:1") */
 }
 
 .heroMediaBg {
@@ -4948,8 +4953,8 @@ article[data-hc-nohero="1"] .hcCta {
   margin-bottom: 12px !important;
   margin-left: 0 !important;
   /* SAFETY */
-  padding-left: 0 !important;
-  /* SAFETY */
+  padding-left: 4px !important;
+  /* SAFETY BUFFER against left clipping */
 }
 
 /* Ensure badges don't get squashed */
@@ -4975,13 +4980,15 @@ article[data-hc-nohero="1"] .hcCta {
 /* Ensure Eyebrow doesn't force a new line */
 .heroEyebrow {
   margin: 0 !important;
-  flex: 0 1 auto !important;
-  /* Allow shrinking */
-  display: inline-flex !important;
+  flex: 0 0 auto !important;
+  /* NO SHRINK */
+  display: flex !important;
+  /* SWITCH TO FLEX */
   align-items: center !important;
   justify-content: center !important;
   white-space: nowrap !important;
-  min-width: 0 !important;
+  min-width: fit-content !important;
+  /* FORCE FULL WIDTH ("tulisannya harus ful") */
   overflow: hidden !important;
   text-overflow: clip !important;
 
