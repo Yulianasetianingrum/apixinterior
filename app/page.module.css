@@ -4925,8 +4925,13 @@ article[data-hc-nohero="1"] .hcCta {
 
 /* HERO ALIGNMENT FIX & UNLOCK WIDTH */
 .heroText {
+  flex: 1 1 auto !important;
+  /* Grow to fill space */
+  width: 100% !important;
+  /* Force width */
   max-width: 100% !important;
-  /* Unlock width to use available space */
+  /* Unlock constraint */
+  min-width: 0 !important;
   align-items: flex-start !important;
   /* Force Left Align structure */
 }
@@ -4945,15 +4950,16 @@ article[data-hc-nohero="1"] .hcCta {
 }
 
 /* Ensure badges don't get squashed */
+/* Ensure badges don't get squashed */
 /* Shrink to fit logic */
 .heroBadge {
-  flex: 0 1 auto !important;
-  /* Allow shrinking */
+  flex: 0 0 auto !important;
+  /* NO SHRINK on Desktop ("Space ada banyak") */
   white-space: nowrap !important;
   min-width: 0 !important;
   overflow: hidden !important;
   text-overflow: clip !important;
-  /* User hates dots, prefer clip if force-fail, but clamp should save it */
+  /* Prevent dots */
 
   /* SCALING LOGIC: "Textnya mengecil" */
   font-size: clamp(8px, 1.2vw, 11px) !important;
