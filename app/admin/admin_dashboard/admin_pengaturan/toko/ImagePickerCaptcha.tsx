@@ -649,9 +649,16 @@ export default function ImagePickerCaptcha({
                           // Fallback to proxy if static file fails (404 or not served yet)
                           const target = e.currentTarget;
                           if (!target.src.includes("/api/img_proxy")) {
-                            // Extract filename from URL
-                            const filename = it.url.split("/").pop();
-                            if (filename) {
+                            // Link can be /api/img?f=filename.webp OR /uploads/filename.webp
+                            let filename = "";
+                            try {
+                              const urlObj = new URL(target.src, window.location.origin);
+                              filename = urlObj.searchParams.get("f") || urlObj.pathname.split("/").pop() || "";
+                            } catch {
+                              filename = target.src.split("/").pop() || "";
+                            }
+
+                            if (filename && filename.includes(".")) {
                               target.src = `/api/img_proxy?file=${filename}&t=${Date.now()}`;
                             }
                           }

@@ -13,7 +13,15 @@ export async function GET(request: Request) {
 
     // Security: Prevent directory traversal
     const safeFile = path.basename(file);
-    const filePath = path.join(process.cwd(), 'public', 'uploads', 'gambar_upload', safeFile);
+    const rootUploads = path.join(process.cwd(), 'public', 'uploads');
+
+    // Priority 1: public/uploads (new location)
+    let filePath = path.join(rootUploads, safeFile);
+
+    // Priority 2: public/uploads/gambar_upload (old location)
+    if (!fs.existsSync(filePath)) {
+        filePath = path.join(rootUploads, 'gambar_upload', safeFile);
+    }
 
     if (!fs.existsSync(filePath)) {
         return new NextResponse('File not found', { status: 404 });

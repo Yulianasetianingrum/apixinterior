@@ -1623,6 +1623,68 @@ export default async function TokoPreviewDraftPage({
                     const mapsUrl = String(b?.mapsUrl ?? "").trim();
                     const meta = mapsUrl ? "Google Maps" : "Link maps belum diisi";
 
+                    // Pre-calculate URLs for both preview and button
+                    const embedSrc = (() => {
+                      if (!mapsUrl) return "";
+                      if (mapsUrl.includes("<iframe")) {
+                        const match = mapsUrl.match(/src=["']([^"']+)["']/i);
+                        if (match && match[1]) return match[1];
+                      }
+                      try {
+                        const u = new URL(mapsUrl);
+                        const host = u.host.toLowerCase();
+                        const isGoogle = host.includes("google.") || host.includes("maps.");
+                        const isEmbedPath = u.pathname.includes("/maps/embed");
+                        const pb = u.searchParams.get("pb");
+                        const output = u.searchParams.get("output");
+
+                        if (isEmbedPath && pb && pb.length > 20) return mapsUrl;
+                        if (isEmbedPath && output === "embed") return mapsUrl;
+                        if (output === "embed") return mapsUrl;
+
+                        if (isGoogle) {
+                          const q = u.searchParams.get("q") || u.searchParams.get("query") || u.searchParams.get("search") || "";
+                          const query = q || name;
+                          if (!query) return "";
+                          return `https://maps.google.com/maps?q=${encodeURIComponent(query)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+                        }
+                      } catch { /* ignore */ }
+                      return "";
+                    })();
+
+                    const viewUrl = (() => {
+                      // 1. If mapsUrl is a valid URL (not iframe), use it directly if it's not an embed path
+                      if (mapsUrl && !mapsUrl.includes("<") && !mapsUrl.includes(">")) {
+                        try {
+                          const u = new URL(mapsUrl);
+                          if (!u.pathname.includes("/maps/embed")) return mapsUrl;
+                        } catch { /* ignore */ }
+                      }
+
+                      // 2. If it's an iframe or embed link, derive a Search API link (very reliable)
+                      if (embedSrc) {
+                        try {
+                          const u = new URL(embedSrc);
+                          // Extract 'q' if present
+                          const q = u.searchParams.get("q") || u.searchParams.get("query");
+                          if (q) return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`;
+
+                          // If it's a complex embed (/maps/embed), fallback to search by name
+                          if (u.pathname.includes("/maps/embed")) {
+                            return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name)}`;
+                          }
+
+                          // Fallback: clean the embedSrc
+                          const cleanU = new URL(embedSrc);
+                          cleanU.searchParams.delete("output");
+                          return cleanU.toString();
+                        } catch { /* fallback to search by name below */ }
+                      }
+
+                      // 3. Absolute fallback: Google Search by Name
+                      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name)}`;
+                    })();
+
                     return (
                       <article
                         key={Number(b?.id)}
@@ -1637,178 +1699,55 @@ export default async function TokoPreviewDraftPage({
                           color: colors.cardFg,
                         }}
                       >
-                        {(() => {
-                          const resolveEmbed = () => {
-                            if (!mapsUrl) return "";
-                            if (mapsUrl.includes("<iframe")) {
-                              const match = mapsUrl.match(/src=["']([^"']+)["']/i);
-                              if (match && match[1]) return match[1];
-                            }
-                            try {
-                              const u = new URL(mapsUrl);
-                              const host = u.host.toLowerCase();
-                              const isGoogle = host.includes("google.") || host.includes("maps.");
-                              const isEmbedPath = u.pathname.includes("/maps/embed");
-                              const pb = u.searchParams.get("pb");
-                              const output = u.searchParams.get("output");
-
-                              if (isEmbedPath && pb && pb.length > 20) return mapsUrl;
-                              if (isEmbedPath && output === "embed") return mapsUrl;
-                              if (output === "embed") return mapsUrl;
-
-                              if (isGoogle) {
-                                const q =
-                                  u.searchParams.get("q") ||
-                                  u.searchParams.get("query") ||
-                                  u.searchParams.get("search") ||
-                                  "";
-                                const query = q || name;
-                                if (!query) return "";
-                                // Use maps.google.com generic embed which is more reliable than www.google.com with output=embed
-                                return `https://maps.google.com/maps?q=${encodeURIComponent(query)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
-                              }
-                            } catch {
-                              // ignore invalid URLs
-                            }
-                            return "";
-                          };
-
-                          // Convert embed URL to viewing URL (remove output=embed)
-                          const resolveViewUrl = (embedUrl: string) => {
-                            if (!embedUrl) return "";
-                            try {
-                              const u = new URL(embedUrl);
-                              // Remove output=embed to get the regular viewing URL
-                              u.searchParams.delete("output");
-                              return u.toString();
-                            } catch {
-                              return embedUrl;
-                            }
-                          };
-
-                          const embedSrc = resolveEmbed();
-                          const viewUrl = resolveViewUrl(embedSrc);
-
-                          return (
-                            <div
-                              className={ui.pcMediaPlaceholder}
-                              style={{
-                                position: "relative",
-                                display: "block",
-                                aspectRatio: "16 / 9",
-                                maxHeight: isSingle ? 360 : 240,
-                                borderBottom: "1px solid var(--t-card-border)",
-                                background:
-                                  "linear-gradient(135deg, rgba(255,255,255,0.06), rgba(0,0,0,0.14))",
-                              }}
-                            >
-                              {embedSrc ? (
-                                <iframe
-                                  src={embedSrc}
-                                  title={`Map - ${name}`}
-                                  loading="lazy"
-                                  referrerPolicy="no-referrer-when-downgrade"
-                                  style={{ border: 0, width: "100%", height: "100%" }}
-                                />
-                              ) : (
-                                <div
-                                  style={{
-                                    position: "absolute",
-                                    inset: 0,
-                                    display: "grid",
-                                    placeItems: "center",
-                                  }}
-                                >
-                                  <div style={{ display: "grid", gap: 6, placeItems: "center" }}>
-                                    <div style={{ fontSize: 32, lineHeight: 1 }}>📍</div>
-                                    <div
-                                      style={{
-                                        fontSize: 12,
-                                        opacity: 0.85,
-                                        textAlign: "center",
-                                        padding: "0 10px",
-                                      }}
-                                    >
-                                      {mapsUrl
-                                        ? "Preview peta butuh link Embed (bukan shortlink)."
-                                        : "Link maps belum diisi"}
-                                    </div>
-                                  </div>
+                        <div
+                          className={ui.pcMediaPlaceholder}
+                          style={{
+                            position: "relative",
+                            display: "block",
+                            aspectRatio: "16 / 9",
+                            maxHeight: isSingle ? 360 : 240,
+                            borderBottom: "1px solid var(--t-card-border)",
+                            background: "linear-gradient(135deg, rgba(255,255,255,0.06), rgba(0,0,0,0.14))",
+                          }}
+                        >
+                          {embedSrc ? (
+                            <iframe
+                              src={embedSrc}
+                              title={`Map - ${name}`}
+                              loading="lazy"
+                              referrerPolicy="no-referrer-when-downgrade"
+                              style={{ border: 0, width: "100%", height: "100%" }}
+                            />
+                          ) : (
+                            <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center" }}>
+                              <div style={{ display: "grid", gap: 6, placeItems: "center" }}>
+                                <div style={{ fontSize: 32, lineHeight: 1 }}>📍</div>
+                                <div style={{ fontSize: 12, opacity: 0.85, textAlign: "center", padding: "0 10px" }}>
+                                  {mapsUrl ? "Preview peta butuh link Embed (bukan shortlink)." : "Link maps belum diisi"}
                                 </div>
-                              )}
+                              </div>
                             </div>
-                          );
-                        })()}
+                          )}
+                        </div>
 
                         <div className={ui.pcBody}>
                           <div className={ui.pcTitle}>{name}</div>
                           <div className={ui.pcMeta}>{meta}</div>
 
                           <div className={ui.pcCtaWrap}>
-                            {(() => {
-                              // Recalculate viewUrl for the button (same logic as iframe)
-                              const resolveEmbed = () => {
-                                if (!mapsUrl) return "";
-                                if (mapsUrl.includes("<iframe")) {
-                                  const match = mapsUrl.match(/src=["']([^"']+)["']/i);
-                                  if (match && match[1]) return match[1];
-                                }
-                                try {
-                                  const u = new URL(mapsUrl);
-                                  const host = u.host.toLowerCase();
-                                  const isGoogle = host.includes("google.") || host.includes("maps.");
-                                  const isEmbedPath = u.pathname.includes("/maps/embed");
-                                  const pb = u.searchParams.get("pb");
-                                  const output = u.searchParams.get("output");
-
-                                  if (isEmbedPath && pb && pb.length > 20) return mapsUrl;
-                                  if (isEmbedPath && output === "embed") return mapsUrl;
-                                  if (output === "embed") return mapsUrl;
-
-                                  if (isGoogle) {
-                                    const q =
-                                      u.searchParams.get("q") ||
-                                      u.searchParams.get("query") ||
-                                      u.searchParams.get("search") ||
-                                      "";
-                                    const query = q || name;
-                                    if (!query) return "";
-                                    return `https://maps.google.com/maps?q=${encodeURIComponent(query)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
-                                  }
-                                } catch {
-                                  // ignore
-                                }
-                                return "";
-                              };
-
-                              const resolveViewUrl = (embedUrl: string) => {
-                                if (!embedUrl) return "";
-                                try {
-                                  const u = new URL(embedUrl);
-                                  u.searchParams.delete("output");
-                                  return u.toString();
-                                } catch {
-                                  return embedUrl;
-                                }
-                              };
-
-                              const embedSrc = resolveEmbed();
-                              const viewUrl = resolveViewUrl(embedSrc);
-
-                              return viewUrl ? (
-                                <a
-                                  className={ui.pcCta}
-                                  href={viewUrl}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  style={{ background: colors.ctaBg, color: colors.ctaFg, border: `1px solid ${colors.ctaBg}` }}
-                                >
-                                  Buka Maps
-                                </a>
-                              ) : (
-                                <div className={ui.pcCtaPlaceholder} />
-                              );
-                            })()}
+                            {viewUrl ? (
+                              <a
+                                className={ui.pcCta}
+                                href={viewUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                style={{ background: colors.ctaBg, color: colors.ctaFg, border: `1px solid ${colors.ctaBg}` }}
+                              >
+                                Buka Maps
+                              </a>
+                            ) : (
+                              <div className={ui.pcCtaPlaceholder} />
+                            )}
                           </div>
                         </div>
                       </article>

@@ -464,7 +464,13 @@ export function normalizeConfig(sectionType: string, raw: any): JsonObject {
         const layoutRaw = String((cfg as any).layout ?? "carousel").toLowerCase();
         const layout = layoutRaw === "grid" ? "grid" : "carousel";
         const branchIds = Array.isArray((cfg as any).branchIds) ? (cfg as any).branchIds.map((v: any) => Number(v)).filter((n: any) => Number.isFinite(n) && n > 0) : [];
-        return { layout, branchIds, sectionTheme: parseSectionTheme((cfg as any).sectionTheme ?? null), __themeKey: getThemeKeyFromConfig(cfg) };
+        return {
+            layout,
+            branchIds,
+            sectionTheme: parseSectionTheme((cfg as any).sectionTheme ?? null),
+            sectionBgTheme: parseCustomPromoBgTheme((cfg as any).sectionBgTheme ?? null),
+            __themeKey: getThemeKeyFromConfig(cfg)
+        };
     }
 
     // SOCIAL, CONTACT, CUSTOM_PROMO, ROOM_CATEGORY, FOOTER
