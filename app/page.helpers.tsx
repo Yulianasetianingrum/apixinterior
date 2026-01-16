@@ -208,7 +208,7 @@ export function categoryGridVarsFromTheme(resolvedTheme: string) {
     switch (resolvedTheme) {
         case "NAVY_GOLD": return { cardBg: NAVY, insideText: GOLD, outsideText: NAVY, border: "rgba(255,255,255,0.22)" };
         case "WHITE_GOLD": return { cardBg: WHITE, insideText: GOLD_BOLD, outsideText: GOLD_BOLD, border: "rgba(140,108,24,0.15)" };
-        case "NAVY_WHITE": return { cardBg: navy, insideText: WHITE, outsideText: navy, border: "rgba(255,255,255,0.22)" };
+        case "NAVY_WHITE": return { cardBg: NAVY, insideText: WHITE, outsideText: NAVY, border: "rgba(255,255,255,0.22)" };
         case "GOLD_NAVY": return { cardBg: GOLD, insideText: NAVY, outsideText: GOLD, border: "rgba(140,108,24,0.20)" };
         case "GOLD_WHITE": return { cardBg: GOLD, insideText: WHITE, outsideText: GOLD, border: "rgba(255,255,255,0.22)" };
         case "WHITE_NAVY": return { cardBg: WHITE, insideText: NAVY, outsideText: NAVY, border: "rgba(11,29,58,0.18)" };
