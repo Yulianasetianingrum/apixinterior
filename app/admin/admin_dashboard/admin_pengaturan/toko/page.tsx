@@ -1406,7 +1406,7 @@ async function resetTheme(formData: FormData) {
   return redirectBack({ notice: encodeURIComponent("Theme berhasil di-reset (kosong).") });
 }
 
-async function saveBranchesConfig(formData: FormData) {
+async function saveBranchesDraftConfig(formData: FormData) {
   "use server";
 
   const id = parseNum(formData.get("id"));
@@ -6453,7 +6453,7 @@ export default async function TokoPengaturanPage({
 
                   {/* BRANCHES */}
                   {section.type === "BRANCHES" && (
-                    <form action={saveBranchesConfig} className={styles.sectionEditForm} data-section-form="1">
+                    <form action={saveBranchesDraftConfig} className={styles.sectionEditForm} data-section-form="1">
                       <input type="hidden" name="id" value={section.id.toString()} />
                       <input type="hidden" name="currentEnabled" value={section.enabled ? "true" : "false"} />
 
