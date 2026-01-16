@@ -4578,13 +4578,13 @@ article[data-hc-nohero="1"] .hcCta {
 /* DESKTOP ONLY: Larger Hero Image, Shifted Left */
 @media (min-width: 1024px) {
   .heroMedia {
-    flex: 1.8 1 650px;
-    margin-left: -12px;
+    flex: 2.5 1 750px;
+    margin-left: -28px;
   }
 
   .heroText {
-    flex: 0.9 1 420px;
-    margin-left: 8px;
+    flex: 0.65 1 380px;
+    margin-left: 16px;
   }
 }
 
