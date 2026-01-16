@@ -1406,6 +1406,52 @@ async function resetTheme(formData: FormData) {
   return redirectBack({ notice: encodeURIComponent("Theme berhasil di-reset (kosong).") });
 }
 
+async function saveBranchesConfig(formData: FormData) {
+  "use server";
+
+  const id = parseNum(formData.get("id"));
+  if (!id) return redirectBack({ error: encodeURIComponent("ID section tidak valid.") });
+
+  const existing = await prisma.homepageSectionDraft.findUnique({ where: { id } });
+  if (!existing || existing.type !== "BRANCHES") {
+    return redirectBack({ error: encodeURIComponent("Section BRANCHES tidak ditemukan.") });
+  }
+
+  const themeKey = getThemeKeyFromRow(existing);
+
+  // Parse form data
+  const title = (formData.get("title") as string | null)?.trim() ?? "";
+  const sectionTheme = (formData.get("sectionTheme") as string | null)?.trim() ?? "FOLLOW_NAVBAR";
+  const sectionBgTheme = (formData.get("sectionBgTheme") as string | null)?.trim() ?? "FOLLOW_NAVBAR";
+  const layout = (formData.get("layout") as string | null)?.trim() === "grid" ? "grid" : "carousel";
+
+  // Parse branch IDs from checkboxes
+  const branchIdsRaw = formData.getAll("branchIds");
+  const branchIds = parseNumArray(branchIdsRaw as string[]);
+
+  // Build new config
+  const newConfig = {
+    __themeKey: themeKey,
+    sectionTheme,
+    sectionBgTheme,
+    layout,
+    branchIds,
+  };
+
+  // Update database
+  await prisma.homepageSectionDraft.update({
+    where: { id },
+    data: {
+      title,
+      config: newConfig,
+    },
+  });
+
+  revalidatePath(ADMIN_TOKO_PATH);
+  revalidatePath(`${ADMIN_TOKO_PATH}/preview`);
+  return redirectBack({ notice: encodeURIComponent("Konfigurasi BRANCHES berhasil disimpan.") });
+}
+
 async function autoGenerateThemeContent(formData: FormData) {
   "use server";
 
