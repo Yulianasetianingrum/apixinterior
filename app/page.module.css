@@ -4926,6 +4926,8 @@ article[data-hc-nohero="1"] .hcCta {
   display: flex !important;
   flex-direction: row !important;
   align-items: center !important;
+  justify-content: flex-start !important;
+  /* Prevent left clipping */
   gap: 12px !important;
   flex-wrap: nowrap !important;
   /* Forces single line */
@@ -5025,11 +5027,11 @@ article[data-hc-nohero="1"] .hcCta {
 }
 
 .heroThemeGoldWhite .heroCtaPrimary:hover {
-  color: #071026 !important;
-  -webkit-text-fill-color: #071026 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
 }
 
 .heroThemeWhiteNavy .heroCtaPrimary:hover {
-  color: #ffffff !important;
-  -webkit-text-fill-color: #ffffff !important;
+  color: #071026 !important;
+  -webkit-text-fill-color: #071026 !important;
 }
