@@ -4941,14 +4941,7 @@ article[data-hc-nohero="1"] .hcCta {
 
 /* Ensure Badges sit next to Eyebrow */
 .heroTopBadges {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  gap: 8px !important;
-  flex-wrap: wrap !important;
-  margin: 0 !important;
-  width: auto !important;
-  flex: 0 1 auto !important;
+  display: contents !important;
 }
 
 @media (max-width: 640px) {
@@ -4959,4 +4952,66 @@ article[data-hc-nohero="1"] .hcCta {
     align-items: center !important;
     gap: 10px !important;
   }
+}
+
+/* HERO CTA CONTRAST ENFORCEMENT (BRUTE FORCE) */
+.heroThemeNavyGold .heroCtaPrimary {
+  color: #071026 !important;
+  -webkit-text-fill-color: #071026 !important;
+}
+
+.heroThemeWhiteGold .heroCtaPrimary {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+.heroThemeNavyWhite .heroCtaPrimary {
+  color: #071026 !important;
+  -webkit-text-fill-color: #071026 !important;
+}
+
+.heroThemeGoldNavy .heroCtaPrimary {
+  color: #ffc800 !important;
+  -webkit-text-fill-color: #ffc800 !important;
+}
+
+.heroThemeGoldWhite .heroCtaPrimary {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+.heroThemeWhiteNavy .heroCtaPrimary {
+  color: #071026 !important;
+  -webkit-text-fill-color: #071026 !important;
+}
+
+/* Also ensure hover states maintain interaction feedback */
+.heroThemeNavyGold .heroCtaPrimary:hover {
+  color: #071026 !important;
+  -webkit-text-fill-color: #071026 !important;
+}
+
+.heroThemeWhiteGold .heroCtaPrimary:hover {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+.heroThemeNavyWhite .heroCtaPrimary:hover {
+  color: #071026 !important;
+  -webkit-text-fill-color: #071026 !important;
+}
+
+.heroThemeGoldNavy .heroCtaPrimary:hover {
+  color: #ffc800 !important;
+  -webkit-text-fill-color: #ffc800 !important;
+}
+
+.heroThemeGoldWhite .heroCtaPrimary:hover {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+.heroThemeWhiteNavy .heroCtaPrimary:hover {
+  color: #ffc800 !important;
+  -webkit-text-fill-color: #ffc800 !important;
 }
