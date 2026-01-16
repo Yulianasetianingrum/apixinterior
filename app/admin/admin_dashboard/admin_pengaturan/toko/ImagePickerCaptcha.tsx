@@ -213,16 +213,44 @@ export default function ImagePickerCaptcha({
     setUploadErr(null);
     setUploadOk(null);
     startTransition(async () => {
-      const fd = new FormData();
-      fd.set("sectionId", sectionId);
-      fd.set("attach", attach);
-      fd.set("file", uploadFile);
-      const layoutSel = document.getElementById(`cp-layout-${sectionId}`) as HTMLSelectElement | null;
-      if (layoutSel?.value) fd.set("layout", layoutSel.value);
-      if (uploadTitle.trim()) fd.set("title", uploadTitle.trim());
-      if (uploadTags.trim()) fd.set("tags", uploadTags.trim());
-
       try {
+        // 1. Upload ke Gallery Endpoint via Client Fetch
+        // Gunakan endpoint yang sama persis dengan `admin_galeri/kolase_foto`
+        const uploadEndpoint = "/api/admin/admin_dashboard/admin_galeri/upload_foto";
+
+        const fdUpload = new FormData();
+        fdUpload.append("foto", uploadFile);
+        if (uploadTitle.trim()) fdUpload.append("title", uploadTitle.trim());
+        if (uploadTags.trim()) fdUpload.append("tags", uploadTags.trim());
+
+        const resUpload = await fetch(uploadEndpoint, {
+          method: "POST",
+          body: fdUpload,
+        });
+
+        if (!resUpload.ok) {
+          throw new Error("Gagal upload ke server (Fetch Error).");
+        }
+
+        const jsonUpload = await resUpload.json();
+        // Fallback: jika API tidak return data array (meski harusnya iya), kita tidak bisa pakai.
+        if (!jsonUpload.success || !jsonUpload.data?.[0]?.id) {
+          throw new Error(jsonUpload.error || "Gagal upload: tidak ada ID yang dikembalikan.");
+        }
+
+        const newImageId = jsonUpload.data[0].id;
+
+        // 2. Panggil Action dengan imageId yang baru
+        const fd = new FormData();
+        fd.set("sectionId", sectionId);
+        fd.set("attach", attach);
+        fd.set("imageId", String(newImageId)); // Kirim ID saja
+
+        const layoutSel = document.getElementById(`cp-layout-${sectionId}`) as HTMLSelectElement | null;
+        if (layoutSel?.value) fd.set("layout", layoutSel.value);
+        if (uploadTitle.trim()) fd.set("title", uploadTitle.trim());
+        if (uploadTags.trim()) fd.set("tags", uploadTags.trim());
+
         const res: any = await action(fd);
         if (res && res.ok === false) {
           const msg = res.error || "Upload berhasil, tapi gagal dipakai.";
@@ -239,7 +267,9 @@ export default function ImagePickerCaptcha({
         setUploadTags("");
         if (uploadFileRef.current) uploadFileRef.current.value = "";
 
-        if (res?.imageId && onAppliedImageId) onAppliedImageId(Number(res.imageId));
+        // Trigger callback with new ID
+        if (newImageId && onAppliedImageId) onAppliedImageId(Number(newImageId));
+
         if (skipRefresh) return;
         if (attach && attach.startsWith("CUSTOM_PROMO")) {
           const u = new URL(window.location.href);
@@ -247,8 +277,10 @@ export default function ImagePickerCaptcha({
           window.location.href = u.toString();
           return;
         }
-        // FIXED: Use hard reload to ensure fresh data loads
-        window.location.reload();
+
+        // Use router.refresh() for smoother UX (Server Component Re-render)
+        router.refresh();
+
       } catch (e: any) {
         const msg = e?.message || "Upload gagal (exception).";
         setUploadErr(msg);
