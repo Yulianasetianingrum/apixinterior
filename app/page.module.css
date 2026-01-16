@@ -1763,6 +1763,9 @@
 /* =========================
    HERO theme palette (same intent as navbar)
    ========================= */
+/* =========================
+   HERO theme palette (Contrast Fixed)
+   ========================= */
 .heroThemeNavyGold {
   --hb-bg: #071026;
   --hb-bg2: #050a14;
@@ -1782,6 +1785,7 @@
 
   --hb-ctaBg: #ffc800;
   --hb-ctaText: #071026;
+  /* Gold Button -> Navy Text */
   --hb-ctaBorder: rgba(0, 0, 0, .14);
   --hb-ctaBgHover: #ffe48a;
   --hb-ctaTextHover: #071026;
@@ -1815,8 +1819,8 @@
   --hb-chipBorder: rgba(0, 0, 0, .10);
 
   --hb-ctaBg: #071026;
-
   --hb-ctaText: #ffffff;
+  /* Navy Button -> White Text (Fixed) */
   --hb-ctaBorder: rgba(0, 0, 0, .12);
   --hb-ctaBgHover: #0f2a5a;
   --hb-ctaTextHover: #ffffff;
@@ -1851,6 +1855,7 @@
 
   --hb-ctaBg: #ffc800;
   --hb-ctaText: #071026;
+  /* Gold Button -> Navy Text */
   --hb-ctaBorder: rgba(0, 0, 0, .14);
   --hb-ctaBgHover: #ffffff;
   --hb-ctaTextHover: #071026;
@@ -1885,6 +1890,7 @@
 
   --hb-ctaBg: #071026;
   --hb-ctaText: #ffc800;
+  /* Navy Button -> Gold Text (Contrast Safe) */
   --hb-ctaBorder: rgba(0, 0, 0, .14);
   --hb-ctaBgHover: #040a18;
   --hb-ctaTextHover: #ffc800;
@@ -1919,6 +1925,7 @@
 
   --hb-ctaBg: #071026;
   --hb-ctaText: #ffffff;
+  /* Navy Button -> White Text */
   --hb-ctaBorder: rgba(0, 0, 0, .14);
   --hb-ctaBgHover: #040a18;
   --hb-ctaTextHover: #ffffff;
@@ -1953,6 +1960,7 @@
 
   --hb-ctaBg: #ffc800;
   --hb-ctaText: #071026;
+  /* Gold Button -> Navy Text */
   --hb-ctaBorder: rgba(0, 0, 0, .14);
   --hb-ctaBgHover: #071026;
   --hb-ctaTextHover: #ffc800;
@@ -4917,28 +4925,38 @@ article[data-hc-nohero="1"] .hcCta {
 .heroTopRow {
   display: flex !important;
   flex-direction: row !important;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
+  align-items: center !important;
+  gap: 12px !important;
+  flex-wrap: wrap !important;
+  width: 100%;
+}
+
+/* Ensure Eyebrow doesn't force a new line */
+.heroEyebrow {
+  margin: 0 !important;
+  width: auto !important;
+  flex: 0 0 auto !important;
+  display: inline-block;
+}
+
+/* Ensure Badges sit next to Eyebrow */
+.heroTopBadges {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 8px !important;
+  flex-wrap: wrap !important;
+  margin: 0 !important;
+  width: auto !important;
+  flex: 0 1 auto !important;
 }
 
 @media (max-width: 640px) {
+
+  /* Keep row even on mobile to satisfy "dilarang eyebrow di atas badges" */
   .heroTopRow {
-    flex-direction: column !important;
-    align-items: flex-start;
-    gap: 8px;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 10px !important;
   }
-}
-
-.heroEyebrow {
-  margin-bottom: 0 !important;
-}
-
-.heroTopBadges {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-top: 0 !important;
 }
