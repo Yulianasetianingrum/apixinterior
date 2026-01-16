@@ -1647,34 +1647,59 @@ export default async function TokoPreviewDraftPage({
                   const cardThemeClass = sectionThemeResolved ? `theme-${String(sectionThemeResolved).toLowerCase()}` : "";
                   const themeColors = getHeroThemeTokens(sectionThemeResolved);
 
-                  // Independent Background Logic (Match Live Site)
-                  const bgPair = parseThemePair(sectionThemeResolved);
+                  // Independent Background Logic: ONLY from Background Branch dropdown
+                  // Do NOT use Tema Section for background - that's only for card/button colors
                   const savedBg = (cfg as any).sectionBgTheme;
-                  const effectiveBgToken = savedBg && ["NAVY", "GOLD", "WHITE"].includes(savedBg) ? savedBg : bgPair.a;
+                  const effectiveBgToken = savedBg && ["NAVY", "GOLD", "WHITE"].includes(savedBg) ? savedBg : "NAVY";
 
                   const finalBg = effectiveBgToken === "WHITE" ? "#FFFFFF" : effectiveBgToken === "GOLD" ? "#D4AF37" : "#0B1D3A";
                   const finalTextColor = effectiveBgToken === "WHITE" || effectiveBgToken === "GOLD" ? "#0f172a" : "#FFFFFF";
 
                   // Card and button colors: ONLY from Tema Section dropdown
-                  let cardBg = themeColors.card;
-                  let cardFg = themeColors.cardFg;
-                  let ctaBg = themeColors.ctaBg;
-                  let ctaFg = themeColors.ctaFg;
+                  // Warna 1 = Card BACKGROUND color (warna cat card)
+                  // Warna 2 = Button BACKGROUND color (warna cat tombol)
+                  let cardBg = "#ffffff";
+                  let cardFg = "#0f172a";
+                  let ctaBg = "#d4af37";
+                  let ctaFg = "#0b1d3a";
 
-                  // Fix button colors for specific themes
+                  // Apply theme colors for ALL combinations
                   const themePair = parseThemePair(sectionThemeResolved);
+
                   if (themePair.a === "WHITE" && themePair.b === "GOLD") {
-                    // WHITE + GOLD: Card = White, Button = Gold with Navy text
+                    // WHITE + GOLD: Card bg = White, Button bg = Gold
                     cardBg = "#ffffff";
                     cardFg = "#0f172a";
                     ctaBg = "#d4af37";
                     ctaFg = "#0b1d3a";
+                  } else if (themePair.a === "NAVY" && themePair.b === "GOLD") {
+                    // NAVY + GOLD: Card bg = Navy, Button bg = Gold
+                    cardBg = "#0b1d3a";
+                    cardFg = "#ffffff";
+                    ctaBg = "#d4af37";
+                    ctaFg = "#0b1d3a";
                   } else if (themePair.a === "NAVY" && themePair.b === "WHITE") {
-                    // NAVY + WHITE: Card = Navy, Button = White
+                    // NAVY + WHITE: Card bg = Navy, Button bg = White
+                    cardBg = "#0b1d3a";
+                    cardFg = "#ffffff";
                     ctaBg = "#ffffff";
                     ctaFg = "#0b1d3a";
                   } else if (themePair.a === "GOLD" && themePair.b === "NAVY") {
-                    // GOLD + NAVY: Card = Gold, Button = Navy
+                    // GOLD + NAVY: Card bg = Gold, Button bg = Navy
+                    cardBg = "#d4af37";
+                    cardFg = "#0b1d3a";
+                    ctaBg = "#0b1d3a";
+                    ctaFg = "#ffffff";
+                  } else if (themePair.a === "GOLD" && themePair.b === "WHITE") {
+                    // GOLD + WHITE: Card bg = Gold, Button bg = White
+                    cardBg = "#d4af37";
+                    cardFg = "#0b1d3a";
+                    ctaBg = "#ffffff";
+                    ctaFg = "#0b1d3a";
+                  } else if (themePair.a === "WHITE" && themePair.b === "NAVY") {
+                    // WHITE + NAVY: Card bg = White, Button bg = Navy
+                    cardBg = "#ffffff";
+                    cardFg = "#0f172a";
                     ctaBg = "#0b1d3a";
                     ctaFg = "#ffffff";
                   }
