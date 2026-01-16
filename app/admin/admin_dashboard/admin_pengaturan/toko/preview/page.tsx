@@ -1557,48 +1557,27 @@ export default async function TokoPreviewDraftPage({
                   // - grid: responsive grid (best when cards are few)
                   // Rule in preview: if admin chooses carousel BUT branches <= 5, render as grid so it doesn't look "kosong".
                   const layoutRequested = String(cfg.layout ?? "carousel") === "grid" ? "grid" : "carousel";
+
+                  // Tema Section: ONLY affects card and button colors, NOT section background
                   const sectionThemeResolved = resolveEffectiveTheme(cfg.sectionTheme ?? "FOLLOW_NAVBAR", navbarTheme);
                   const cardThemeClass = sectionThemeResolved ? `theme-${String(sectionThemeResolved).toLowerCase()}` : "";
-                  const colors = getHeroThemeTokens(sectionThemeResolved);
+                  const themeColors = getHeroThemeTokens(sectionThemeResolved);
 
-                  // Background Branch theme support
+                  // Background Branch: ONLY affects section background
                   const sectionBgRaw = (cfg as any).sectionBgTheme;
                   const sectionBg = parseCustomPromoBgTheme(sectionBgRaw);
-                  const customPalette = resolveCustomPromoPalette(sectionBg, navbarTheme);
+                  const bgPalette = resolveCustomPromoPalette(sectionBg, navbarTheme);
 
-                  // Determine if we use custom background or follow section theme
-                  const useSectionTheme = sectionBg === "FOLLOW_NAVBAR";
-                  const finalBg = useSectionTheme ? colors.bg : customPalette.bg;
-                  const finalTextColor = useSectionTheme ? colors.element : customPalette.fg;
+                  // Section background: ONLY from Background Branch dropdown
+                  const useCustomBg = sectionBg !== "FOLLOW_NAVBAR";
+                  const finalBg = useCustomBg ? bgPalette.bg : "#f8f9fa"; // Default light gray if no custom bg
+                  const finalTextColor = useCustomBg ? bgPalette.fg : "#0b1d3a";
 
-                  // Card and button colors based on background
-                  let cardBg = colors.card;
-                  let cardFg = colors.cardFg;
-                  let ctaBg = colors.ctaBg;
-                  let ctaFg = colors.ctaFg;
-
-                  if (!useSectionTheme) {
-                    // Custom background: adjust card and button colors
-                    if (customPalette.token === "NAVY") {
-                      // Navy background: cards stay navy, buttons gold
-                      cardBg = "rgba(11, 29, 58, 0.96)";
-                      cardFg = "#f4f7fb";
-                      ctaBg = "#d4af37";
-                      ctaFg = "#0b1d3a";
-                    } else if (customPalette.token === "WHITE") {
-                      // White background: cards white, buttons navy
-                      cardBg = "#ffffff";
-                      cardFg = "#0b1d3a";
-                      ctaBg = "#0b1d3a";
-                      ctaFg = "#ffffff";
-                    } else if (customPalette.token === "GOLD") {
-                      // Golden background: cards gold, buttons navy
-                      cardBg = "#d4af37";
-                      cardFg = "#0b1d3a";
-                      ctaBg = "#0b1d3a";
-                      ctaFg = "#ffffff";
-                    }
-                  }
+                  // Card and button colors: ONLY from Tema Section dropdown
+                  const cardBg = themeColors.card;
+                  const cardFg = themeColors.cardFg;
+                  const ctaBg = themeColors.ctaBg;
+                  const ctaFg = themeColors.ctaFg;
 
                   const selectedIds: number[] = Array.isArray(cfg.branchIds) ? cfg.branchIds : [];
                   const branches = selectedIds
@@ -1748,11 +1727,34 @@ export default async function TokoPreviewDraftPage({
                           <div className={ui.pcTitle}>{name}</div>
                           <div className={ui.pcMeta}>{meta}</div>
 
+
                           <div className={ui.pcCtaWrap}>
                             {mapsUrl ? (
                               <a
                                 className={ui.pcCta}
-                                href={mapsUrl}
+                                href={(() => {
+                                  // Convert embed URL to viewable Google Maps URL
+                                  try {
+                                    const url = new URL(mapsUrl);
+                                    const isEmbedUrl = url.pathname.includes('/maps/embed') ||
+                                      url.searchParams.has('pb') ||
+                                      mapsUrl.includes('output=embed');
+
+                                    if (isEmbedUrl) {
+                                      // Extract place ID or coordinates from embed URL
+                                      const pbParam = url.searchParams.get('pb');
+
+                                      // Try to extract place name or use branch name
+                                      const query = encodeURIComponent(name);
+
+                                      // Return a proper Google Maps search URL
+                                      return `https://www.google.com/maps/search/?api=1&query=${query}`;
+                                    }
+                                  } catch (e) {
+                                    // If URL parsing fails, return original
+                                  }
+                                  return mapsUrl;
+                                })()}
                                 target="_blank"
                                 rel="noreferrer"
                                 style={{ background: ctaBg, color: ctaFg, border: `1px solid ${ctaBg}` }}

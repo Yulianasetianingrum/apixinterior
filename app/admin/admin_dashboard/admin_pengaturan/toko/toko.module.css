@@ -5,6 +5,12 @@
    Replace this whole file.
 */
 
+/* Reset body margins to remove gaps */
+:global(body) {
+  margin: 0;
+  padding: 0;
+}
+
 .page {
   /* palette */
   --white: #ffffff;
