@@ -1303,9 +1303,11 @@
 .heroInner {
   position: relative;
   display: flex;
-  gap: clamp(14px, 2.2vw, 28px);
+  gap: 24px !important;
+  /* Close the gap */
   align-items: center;
-  justify-content: space-between;
+  justify-content: center !important;
+  /* No more Natural Distancing */
 
   padding: clamp(16px, 2.6vw, 30px);
   border-radius: 26px;
