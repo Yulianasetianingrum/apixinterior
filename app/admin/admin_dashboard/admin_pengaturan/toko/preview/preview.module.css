@@ -1,0 +1,4060 @@
+/* app/admin/admin_dashboard/admin_pengaturan/toko/preview/preview.module.css
+   UI khusus admin preview (floating bar + notice + section renderers).
+   CSS Module: aman tidak mengganggu homepage utama. */
+
+/* =========================
+   Page background helpers
+   ========================= */
+.pageBg {
+  /* ===== Theme tokens (set by navbar/CMS via themeKey) ===== */
+  --navy: #0b1d3a;
+  --gold: #d4af37;
+  --white: #ffffff;
+  --ink: #0f172a;
+
+  /* Defaults (fallback) */
+  --t-bg: var(--white);
+  --t-element: var(--ink);
+  --t-card: #f6f7fb;
+  /* cannot equal white bg */
+  --t-card-fg: var(--ink);
+  --t-card-border: rgba(2, 6, 23, 0.10);
+
+  --t-cta-bg: var(--ink);
+  --t-cta-fg: var(--white);
+  --t-cta-hover-bg: var(--white);
+  --t-cta-hover-fg: var(--ink);
+  --t-cta-border: rgba(2, 6, 23, 0.18);
+  --t-divider: rgba(255, 255, 255, 0.14);
+  min-height: 100vh;
+  padding-top: calc(4.5rem + 12px);
+  background: var(--t-bg);
+}
+
+/* ===== Theme mappings (6 themes from navbar) =====
+   You can align themeKey values to these.
+   Supports: theme_1..theme_6 AND slug-style keys (navy-gold, white-gold, etc).
+*/
+
+/* 1) Navy + Gold */
+.pageBg[data-theme="theme_1"],
+.pageBg[data-theme="navy-gold"],
+.pageBg[data-theme="navy_gold"],
+.pageBg[data-theme="NAVY_GOLD"] {
+  --t-bg: var(--navy);
+  --t-element: var(--gold);
+  --t-card: var(--white);
+  --t-card-fg: var(--ink);
+  --t-card-border: rgba(255, 255, 255, 0.22);
+
+  --t-cta-bg: var(--gold);
+  --t-cta-fg: var(--navy);
+  --t-cta-hover-bg: var(--navy);
+  --t-cta-hover-fg: var(--gold);
+  --t-cta-border: rgba(212, 175, 55, 0.55);
+  --t-divider: rgba(255, 255, 255, 0.16);
+}
+
+/* 2) White + Gold */
+.pageBg[data-theme="theme_2"],
+.pageBg[data-theme="white-gold"],
+.pageBg[data-theme="white_gold"],
+.pageBg[data-theme="WHITE_GOLD"] {
+  --t-bg: var(--white);
+  --t-element: var(--gold);
+  --t-card: #f6f7fb;
+  --t-card-fg: var(--ink);
+  --t-card-border: rgba(2, 6, 23, 0.10);
+
+  --t-cta-bg: var(--gold);
+  --t-cta-fg: var(--navy);
+  --t-cta-hover-bg: var(--navy);
+  --t-cta-hover-fg: var(--gold);
+  --t-cta-border: rgba(212, 175, 55, 0.60);
+  --t-divider: rgba(2, 6, 23, 0.08);
+}
+
+/* 3) Navy + White */
+.pageBg[data-theme="theme_3"],
+.pageBg[data-theme="navy-white"],
+.pageBg[data-theme="navy_white"],
+.pageBg[data-theme="NAVY_WHITE"] {
+  --t-bg: var(--navy);
+  --t-element: var(--white);
+  --t-card: #ffffff;
+  --t-card-fg: var(--ink);
+  --t-card-border: rgba(255, 255, 255, 0.22);
+
+  /* CTA: putih (elemen) tapi card bukan CTA (button punya border + hover invert) */
+  --t-cta-bg: var(--white);
+  --t-cta-fg: var(--navy);
+  --t-cta-hover-bg: var(--navy);
+  --t-cta-hover-fg: var(--white);
+  --t-cta-border: rgba(255, 255, 255, 0.65);
+  --t-divider: rgba(255, 255, 255, 0.16);
+}
+
+/* 4) Gold + Navy */
+.pageBg[data-theme="theme_4"],
+.pageBg[data-theme="gold-navy"],
+.pageBg[data-theme="gold_navy"],
+.pageBg[data-theme="GOLD_NAVY"] {
+  --t-bg: var(--gold);
+  --t-element: var(--navy);
+  --t-card: var(--white);
+  --t-card-fg: var(--ink);
+  --t-card-border: rgba(11, 29, 58, 0.20);
+
+  --t-cta-bg: var(--navy);
+  --t-cta-fg: var(--white);
+  --t-cta-hover-bg: var(--white);
+  --t-cta-hover-fg: var(--navy);
+  --t-cta-border: rgba(11, 29, 58, 0.55);
+  --t-divider: rgba(11, 29, 58, 0.14);
+}
+
+/* 5) Gold + White */
+.pageBg[data-theme="theme_5"],
+.pageBg[data-theme="gold-white"],
+.pageBg[data-theme="gold_white"],
+.pageBg[data-theme="GOLD_WHITE"] {
+  --t-bg: var(--gold);
+  --t-element: var(--white);
+  --t-card: #ffffff;
+  --t-card-fg: var(--ink);
+  --t-card-border: rgba(255, 255, 255, 0.28);
+
+  /* CTA: putih (elemen) dengan teks ink biar kebaca, hover jadi ink */
+  --t-cta-bg: var(--white);
+  --t-cta-fg: var(--ink);
+  --t-cta-hover-bg: var(--ink);
+  --t-cta-hover-fg: var(--white);
+  --t-cta-border: rgba(255, 255, 255, 0.75);
+  --t-divider: rgba(255, 255, 255, 0.18);
+}
+
+/* 6) White + Navy */
+.pageBg[data-theme="theme_6"],
+.pageBg[data-theme="white-navy"],
+.pageBg[data-theme="white_navy"],
+.pageBg[data-theme="WHITE_NAVY"] {
+  --t-bg: var(--white);
+  --t-element: var(--navy);
+  --t-card: #f6f7fb;
+  --t-card-fg: var(--ink);
+  --t-card-border: rgba(2, 6, 23, 0.10);
+
+  /* Footer SEO Grid */
+  .responsiveFooterGrid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px 24px;
+  }
+
+  @media (max-width: 768px) {
+    .responsiveFooterGrid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  --t-cta-bg: var(--navy);
+  --t-cta-fg: var(--white);
+  --t-cta-hover-bg: var(--white);
+  --t-cta-hover-fg: var(--navy);
+  --t-cta-border: rgba(11, 29, 58, 0.55);
+  --t-divider: rgba(2, 6, 23, 0.08);
+}
+
+
+.bgWhite {
+  background: #ffffff;
+}
+
+.bgNavy {
+  background: #08101f;
+}
+
+.bgGold {
+  background: #f3c64b;
+}
+
+.bgCustom {
+  background: var(--customBg, #ffffff);
+}
+
+
+
+/* ===== Highlight Collection per-section theme override ===== */
+/* 1) Navy + Gold */
+.hcSection[data-theme="theme_1"],
+.hcSection[data-theme="navy-gold"],
+.hcSection[data-theme="navy_gold"],
+.hcSection[data-theme="NAVY_GOLD"] {
+  --t-bg: var(--navy);
+  --t-element: var(--gold);
+  --t-card: rgba(255, 255, 255, 0.08);
+  --t-card-fg: var(--t-element);
+  --t-card-border: rgba(255, 255, 255, 0.22);
+
+  --t-cta-bg: var(--gold);
+  --t-cta-fg: var(--navy);
+  --t-cta-hover-bg: var(--navy);
+  --t-cta-hover-fg: var(--gold);
+  --t-cta-border: rgba(212, 175, 55, 0.55);
+  --t-divider: rgba(255, 255, 255, 0.16);
+}
+
+/* 2) White + Gold */
+.hcSection[data-theme="theme_2"],
+.hcSection[data-theme="white-gold"],
+.hcSection[data-theme="white_gold"],
+.hcSection[data-theme="WHITE_GOLD"] {
+  --t-bg: var(--white);
+  --t-element: var(--gold);
+  --t-card: var(--white);
+  --t-card-fg: var(--t-element);
+  --t-card-border: rgba(2, 6, 23, 0.10);
+
+  --t-cta-bg: var(--gold);
+  --t-cta-fg: var(--navy);
+  --t-cta-hover-bg: var(--navy);
+  --t-cta-hover-fg: var(--gold);
+  --t-cta-border: rgba(212, 175, 55, 0.60);
+  --t-divider: rgba(2, 6, 23, 0.08);
+}
+
+/* 3) Navy + White */
+.hcSection[data-theme="theme_3"],
+.hcSection[data-theme="navy-white"],
+.hcSection[data-theme="navy_white"],
+.hcSection[data-theme="NAVY_WHITE"] {
+  --t-bg: var(--navy);
+  --t-element: var(--white);
+  --t-card: rgba(255, 255, 255, 0.08);
+  --t-card-fg: var(--t-element);
+  --t-card-border: rgba(255, 255, 255, 0.22);
+
+  /* CTA: putih (elemen) tapi card bukan CTA (button punya border + hover invert) */
+  --t-cta-bg: var(--white);
+  --t-cta-fg: var(--navy);
+  --t-cta-hover-bg: var(--navy);
+  --t-cta-hover-fg: var(--white);
+  --t-cta-border: rgba(255, 255, 255, 0.65);
+  --t-divider: rgba(255, 255, 255, 0.16);
+}
+
+/* 4) Gold + Navy */
+.hcSection[data-theme="theme_4"],
+.hcSection[data-theme="gold-navy"],
+.hcSection[data-theme="gold_navy"],
+.hcSection[data-theme="GOLD_NAVY"] {
+  --t-bg: var(--gold);
+  --t-element: var(--navy);
+  --t-card: rgba(255, 255, 255, 0.35);
+  --t-card-fg: var(--t-element);
+  --t-card-border: rgba(11, 29, 58, 0.20);
+
+  --t-cta-bg: var(--navy);
+  --t-cta-fg: var(--white);
+  --t-cta-hover-bg: var(--white);
+  --t-cta-hover-fg: var(--navy);
+  --t-cta-border: rgba(11, 29, 58, 0.55);
+  --t-divider: rgba(11, 29, 58, 0.14);
+}
+
+/* 5) Gold + White */
+.hcSection[data-theme="theme_5"],
+.hcSection[data-theme="gold-white"],
+.hcSection[data-theme="gold_white"],
+.hcSection[data-theme="GOLD_WHITE"] {
+  --t-bg: var(--gold);
+  --t-element: var(--white);
+  --t-card: #b8921a;
+  --t-card-fg: var(--t-element);
+  --t-card-border: rgba(255, 255, 255, 0.28);
+
+  /* CTA: putih (elemen) dengan teks ink biar kebaca, hover jadi ink */
+  --t-cta-bg: var(--white);
+  --t-cta-fg: var(--ink);
+  --t-cta-hover-bg: var(--ink);
+  --t-cta-hover-fg: var(--white);
+  --t-cta-border: rgba(255, 255, 255, 0.75);
+  --t-divider: rgba(255, 255, 255, 0.18);
+}
+
+/* 6) White + Navy */
+.hcSection[data-theme="theme_6"],
+.hcSection[data-theme="white-navy"],
+.hcSection[data-theme="white_navy"],
+.hcSection[data-theme="WHITE_NAVY"] {
+  --t-bg: var(--white);
+  --t-element: var(--navy);
+  --t-card: var(--white);
+  --t-card-fg: var(--t-element);
+  --t-card-border: rgba(2, 6, 23, 0.10);
+
+  --t-cta-bg: var(--navy);
+  --t-cta-fg: var(--white);
+  --t-cta-hover-bg: var(--white);
+  --t-cta-hover-fg: var(--navy);
+  --t-cta-border: rgba(11, 29, 58, 0.55);
+  --t-divider: rgba(2, 6, 23, 0.08);
+}
+
+
+.bgWhite {
+  background: #ffffff;
+}
+
+.bgNavy {
+  background: #08101f;
+}
+
+.bgGold {
+  background: #f3c64b;
+}
+
+.bgCustom {
+  background: var(--customBg, #ffffff);
+}
+
+
+/* =========================
+   Notice / Error
+   ========================= */
+.noticeWrap {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 16px 10px;
+}
+
+.notice {
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(0, 128, 0, 0.10);
+  border: 1px solid rgba(0, 128, 0, 0.22);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.error {
+  margin-top: 8px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(255, 0, 0, 0.08);
+  border: 1px solid rgba(255, 0, 0, 0.22);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+/* Biar konten paling bawah nggak ketutup floating bar */
+.floatingSpacer {
+  height: 120px;
+}
+
+/* =========================
+   Floating bar (admin controls)
+   ========================= */
+.floatingBar {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  transform: translateX(-50%);
+  width: min(980px, calc(100% - 32px));
+  padding: 10px 12px;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+
+  border-radius: 16px;
+  background: rgba(7, 12, 24, 0.78);
+  border: 1px solid rgba(255, 200, 0, 0.28);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.42);
+
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  z-index: 9999;
+}
+
+.floatingLink {
+  text-decoration: none;
+  font-weight: 950;
+  padding: 8px 12px;
+  border-radius: 12px;
+
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  color: #0b0f1a;
+}
+
+.floatingLink:hover {
+  filter: brightness(0.98);
+}
+
+.floatingMeta {
+  font-size: 12px;
+  opacity: 0.92;
+  color: white;
+}
+
+.floatingRight {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.publishBtn {
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 200, 0, 0.30);
+
+  background: rgba(0, 0, 0, 0.75);
+  color: white;
+  font-weight: 950;
+  cursor: pointer;
+}
+
+.publishBtn:hover {
+  filter: brightness(1.08);
+}
+
+.dangerBtn {
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 0, 0, 0.40);
+
+  background: rgba(139, 0, 0, 0.85);
+  color: white;
+  font-weight: 950;
+  cursor: pointer;
+}
+
+.dangerBtn:hover {
+  filter: brightness(1.12);
+}
+
+@media (max-width: 520px) {
+  .floatingBar {
+    bottom: 18px;
+    width: calc(100% - 20px);
+  }
+
+  .floatingRight {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
+/* =========================
+   Generic preview section wrapper
+   ========================= */
+.previewSection {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2% 16px;
+  background: transparent;
+  border: none;
+}
+
+.previewSectionFull {
+  max-width: none;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+/* =========================
+   Focus preview stage
+   - When using ?focus=SECTION, center the single rendered section
+   ========================= */
+.focusStage {
+  min-height: calc(100vh - 220px);
+  display: grid;
+  place-items: center;
+  padding: 24px 12px;
+}
+
+.focusStageInner {
+  width: 100%;
+}
+
+/* Helper to keep wrappers from affecting layout when not in focus mode */
+.contents {
+  display: contents;
+}
+
+/* CONTACT layout helpers (avoid inline <style> in page.tsx) */
+.contactGrid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 980px) {
+  .contactGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .contactGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.contactSplit {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: 5fr 7fr;
+  align-items: stretch;
+}
+
+@media (max-width: 900px) {
+  .contactSplit {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sectionTitle {
+  color: var(--t-element);
+  margin: 0 0 10px;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+/* =========================
+   CATEGORY GRID (Preview Draft)
+   - Desktop: kolom mengikuti --cols (default 3)
+   - Tablet: 3 kolom
+   - HP: 2 kolom
+   ========================= */
+/* Themed CATEGORY_GRID heading + content colors */
+.themeScope .sectionTitle {
+  color: var(--t-element);
+}
+
+.categoryGrid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr));
+}
+
+.categoryCard {
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--t-card);
+  border: 1px solid var(--t-card-border);
+  box-shadow: 0 16px 44px rgba(2, 6, 23, 0.08);
+  text-align: left;
+  text-decoration: none;
+  color: var(--t-card-fg);
+
+  transition: transform 140ms ease, box-shadow 140ms ease, filter 140ms ease;
+}
+
+.categoryCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 58px rgba(2, 6, 23, 0.12);
+  filter: saturate(1.02);
+}
+
+/* image: dibuat "marketplace card" (cover) */
+.categoryImage {
+  width: 100%;
+  height: clamp(150px, 18vw, 220px);
+  object-fit: cover;
+  display: block;
+  background: rgba(2, 6, 23, 0.04);
+}
+
+@media (max-width: 1024px) {
+  .categoryGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+  }
+}
+
+@media (max-width: 640px) {
+
+  /* navbar offset: keep hero clear of fixed navbar */
+  .pageBg {
+    padding-top: calc(4.25rem + 10px);
+  }
+
+  .categoryGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+}
+
+/* =========================
+   Product Carousel Preview (E-commerce scroll cards)
+   Goal: urutan kartu kecil + horizontal scroll + scroll-snap (marketplace feel)
+   ========================= */
+.pcRow {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding: 4px 0 14px;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+  scroll-padding-inline: 16px;
+}
+
+.pcRow::-webkit-scrollbar {
+  display: none;
+}
+
+/* =========================
+   PRODUCT_LISTING (Grid)
+   ========================= */
+.productListingGrid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.productListingItem {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.productListingItem:nth-child(n+31) {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .productListingGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .productListingItem:nth-child(n+19) {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .productListingGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .productListingItem:nth-child(n+11) {
+    display: none;
+  }
+}
+
+.productListingFooter {
+  display: flex;
+  justify-content: center;
+  margin-top: 14px;
+}
+
+.productListingMore {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--t-cta-border, rgba(212, 175, 55, 0.6));
+  background: var(--t-cta-bg, #d4af37);
+  color: var(--t-cta-fg, #0b1d3a);
+  text-decoration: none;
+  font-weight: 800;
+}
+
+/* “padding” kiri/kanan yang ikut terscroll */
+.pcRow::before,
+.pcRow::after {
+  content: "";
+  flex: 0 0 16px;
+}
+
+.pcCard {
+  flex: 0 0 auto;
+  width: clamp(160px, 22vw, 220px);
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--t-card);
+  border: 1px solid var(--t-card-border);
+  box-shadow: 0 10px 28px rgba(2, 6, 23, 0.08);
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  transition: transform 140ms ease, box-shadow 140ms ease;
+  color: var(--t-text, var(--t-card-fg, inherit));
+}
+
+.pcCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 40px rgba(2, 6, 23, 0.12);
+}
+
+/* Theme variants for PRODUCT_CAROUSEL cards (data-theme / class theme-*) */
+.previewSectionTheme[data-theme="theme_1"],
+.previewSectionTheme[data-theme="THEME_1"],
+.previewSectionTheme[data-theme="NAVY_GOLD"],
+.previewSectionTheme[data-theme="navy_gold"],
+.previewSectionTheme[data-theme="navy-gold"],
+[data-theme="theme_1"] .pcCard,
+[data-theme="THEME_1"] .pcCard,
+[data-theme="NAVY_GOLD"] .pcCard,
+[data-theme="navy_gold"] .pcCard,
+[data-theme="navy-gold"] .pcCard,
+.pcCard:global(.theme-theme_1),
+.pcCard:global(.theme-theme-1),
+.pcCard:global(.theme-navy_gold),
+.pcCard:global(.theme-navy-gold),
+:global(.theme-theme_1) .pcCard,
+:global(.theme-theme-1) .pcCard,
+:global(.theme-navy_gold) .pcCard,
+:global(.theme-navy-gold) .pcCard {
+  --t-card: #0b1d3a;
+  --t-card-border: rgba(255, 255, 255, 0.12);
+  --t-text: #f5c042;
+  --t-sub: rgba(245, 192, 66, 0.9);
+  --t-cta-bg: #f5c042;
+  --t-cta-fg: #0b1d3a;
+  --t-cta-hover-bg: #0b1d3a;
+  --t-cta-hover-fg: #f5c042;
+  --t-cta-border: rgba(245, 192, 66, 0.70);
+}
+
+.previewSectionTheme[data-theme="theme_2"],
+.previewSectionTheme[data-theme="THEME_2"],
+.previewSectionTheme[data-theme="WHITE_GOLD"],
+.previewSectionTheme[data-theme="white_gold"],
+.previewSectionTheme[data-theme="white-gold"],
+[data-theme="theme_2"] .pcCard,
+[data-theme="THEME_2"] .pcCard,
+[data-theme="WHITE_GOLD"] .pcCard,
+[data-theme="white_gold"] .pcCard,
+[data-theme="white-gold"] .pcCard,
+.pcCard:global(.theme-theme_2),
+.pcCard:global(.theme-theme-2),
+.pcCard:global(.theme-white_gold),
+.pcCard:global(.theme-white-gold),
+:global(.theme-theme_2) .pcCard,
+:global(.theme-theme-2) .pcCard,
+:global(.theme-white_gold) .pcCard,
+:global(.theme-white-gold) .pcCard {
+  --t-card: #ffffff !important;
+  --t-card-border: rgba(11, 29, 58, 0.08);
+  --t-text: #d4af37;
+  --t-sub: rgba(212, 175, 55, 0.85);
+  --t-cta-bg: #d4af37;
+  --t-cta-fg: #0b1d3a;
+  --t-cta-hover-bg: #0b1d3a;
+  --t-cta-hover-fg: #d4af37;
+  --t-cta-border: rgba(212, 175, 55, 0.55);
+  background: var(--t-card) !important;
+  color: var(--t-text) !important;
+}
+
+.previewSectionTheme[data-theme="theme_3"],
+.previewSectionTheme[data-theme="THEME_3"],
+.previewSectionTheme[data-theme="NAVY_WHITE"],
+.previewSectionTheme[data-theme="navy_white"],
+.previewSectionTheme[data-theme="navy-white"],
+[data-theme="theme_3"] .pcCard,
+[data-theme="THEME_3"] .pcCard,
+[data-theme="NAVY_WHITE"] .pcCard,
+[data-theme="navy_white"] .pcCard,
+[data-theme="navy-white"] .pcCard,
+.pcCard:global(.theme-theme_3),
+.pcCard:global(.theme-theme-3),
+.pcCard:global(.theme-navy_white),
+.pcCard:global(.theme-navy-white),
+:global(.theme-theme_3) .pcCard,
+:global(.theme-theme-3) .pcCard,
+:global(.theme-navy_white) .pcCard,
+:global(.theme-navy-white) .pcCard {
+  --t-card: #0b1d3a;
+  --t-card-border: rgba(255, 255, 255, 0.12);
+  --t-text: #ffffff;
+  --t-sub: rgba(255, 255, 255, 0.85);
+  --t-cta-bg: #ffffff;
+  --t-cta-fg: #0b1d3a;
+  --t-cta-hover-bg: #0b1d3a;
+  --t-cta-hover-fg: #ffffff;
+  --t-cta-border: rgba(255, 255, 255, 0.65);
+}
+
+.previewSectionTheme[data-theme="theme_4"],
+.previewSectionTheme[data-theme="THEME_4"],
+.previewSectionTheme[data-theme="GOLD_NAVY"],
+.previewSectionTheme[data-theme="gold_navy"],
+.previewSectionTheme[data-theme="gold-navy"],
+[data-theme="theme_4"] .pcCard,
+[data-theme="THEME_4"] .pcCard,
+[data-theme="GOLD_NAVY"] .pcCard,
+[data-theme="gold_navy"] .pcCard,
+[data-theme="gold-navy"] .pcCard,
+.pcCard:global(.theme-theme_4),
+.pcCard:global(.theme-theme-4),
+.pcCard:global(.theme-gold_navy),
+.pcCard:global(.theme-gold-navy),
+:global(.theme-theme_4) .pcCard,
+:global(.theme-theme-4) .pcCard,
+:global(.theme-gold_navy) .pcCard,
+:global(.theme-gold-navy) .pcCard {
+  --t-card: #d4af37;
+  --t-card-border: rgba(11, 29, 58, 0.18);
+  --t-text: #0b1d3a;
+  --t-sub: rgba(11, 29, 58, 0.8);
+  --t-cta-bg: #0b1d3a;
+  --t-cta-fg: #ffffff;
+  --t-cta-hover-bg: #ffffff;
+  --t-cta-hover-fg: #0b1d3a;
+  --t-cta-border: rgba(11, 29, 58, 0.55);
+}
+
+.previewSectionTheme[data-theme="theme_5"],
+.previewSectionTheme[data-theme="THEME_5"],
+.previewSectionTheme[data-theme="GOLD_WHITE"],
+.previewSectionTheme[data-theme="gold_white"],
+.previewSectionTheme[data-theme="gold-white"],
+[data-theme="theme_5"] .pcCard,
+[data-theme="THEME_5"] .pcCard,
+[data-theme="GOLD_WHITE"] .pcCard,
+[data-theme="gold_white"] .pcCard,
+[data-theme="gold-white"] .pcCard,
+.pcCard:global(.theme-theme_5),
+.pcCard:global(.theme-theme-5),
+.pcCard:global(.theme-gold_white),
+.pcCard:global(.theme-gold-white),
+:global(.theme-theme_5) .pcCard,
+:global(.theme-theme-5) .pcCard,
+:global(.theme-gold_white) .pcCard,
+:global(.theme-gold-white) .pcCard {
+  --t-card: #d4af37;
+  --t-card-border: rgba(11, 29, 58, 0.18);
+  --t-text: #ffffff;
+  --t-sub: rgba(255, 255, 255, 0.85);
+  --t-cta-bg: #ffffff;
+  --t-cta-fg: #0b1d3a;
+  --t-cta-hover-bg: #0b1d3a;
+  --t-cta-hover-fg: #ffffff;
+  --t-cta-border: rgba(255, 255, 255, 0.75);
+}
+
+.previewSectionTheme[data-theme="theme_6"],
+.previewSectionTheme[data-theme="THEME_6"],
+.previewSectionTheme[data-theme="WHITE_NAVY"],
+.previewSectionTheme[data-theme="white_navy"],
+.previewSectionTheme[data-theme="white-navy"],
+[data-theme="theme_6"] .pcCard,
+[data-theme="THEME_6"] .pcCard,
+[data-theme="WHITE_NAVY"] .pcCard,
+[data-theme="white_navy"] .pcCard,
+[data-theme="white-navy"] .pcCard,
+.pcCard:global(.theme-theme_6),
+.pcCard:global(.theme-theme-6),
+.pcCard:global(.theme-white_navy),
+.pcCard:global(.theme-white-navy),
+:global(.theme-theme_6) .pcCard,
+:global(.theme-theme-6) .pcCard,
+:global(.theme-white_navy) .pcCard,
+:global(.theme-white-navy) .pcCard {
+  --t-card: #ffffff;
+  --t-card-border: rgba(11, 29, 58, 0.08);
+  --t-text: #0b1d3a;
+  --t-sub: rgba(11, 29, 58, 0.72);
+  --t-cta-bg: #0b1d3a;
+  --t-cta-fg: #ffffff;
+  --t-cta-hover-bg: #ffffff;
+  --t-cta-hover-fg: #0b1d3a;
+  --t-cta-border: rgba(11, 29, 58, 0.55);
+}
+
+/* Kartu produk marketplace: image area kotak */
+.pcMedia,
+.pcMediaPlaceholder {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  height: auto;
+  /* override clamp tinggi lama */
+  background: rgba(2, 6, 23, 0.04);
+  position: relative;
+  overflow: hidden;
+}
+
+
+
+/* =========================
+   BRANCHES / CABANG TOKO (Map cards)
+   - If card contains an iframe (Google Maps embed), treat it as a store-locator card,
+     not an ecommerce square poster.
+   Notes:
+   - Uses :has() to scope only map cards so product cards stay square.
+   ========================= */
+
+/* Make the map media widescreen (instead of square) */
+.pcMedia:has(iframe) {
+  aspect-ratio: 16 / 9;
+  background: rgba(2, 6, 23, 0.06);
+}
+
+/* Ensure iframe fills the media box */
+.pcMedia iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* When a section contains map cards, render as a responsive grid */
+.previewSection:has(.pcCard:has(iframe)) .pcRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  overflow: visible;
+  padding-bottom: 0;
+}
+
+/* Map card sizing */
+.previewSection:has(.pcCard:has(iframe)) .pcCard:has(iframe) {
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+/* Slightly bigger, more readable text for branches */
+.pcCard:has(iframe) .pcBody {
+  padding: 12px 12px 14px;
+  gap: 8px;
+}
+
+.pcCard:has(iframe) .pcTitle {
+  min-height: 0;
+  font-size: 15px;
+  line-height: 1.2;
+}
+
+.pcCard:has(iframe) .pcMeta {
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  opacity: 0.86;
+}
+
+/* Action buttons: allow multiple CTAs (WA / Telp / Maps) to wrap nicely */
+.pcCard:has(iframe) .pcCtaWrap {
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.pcCard:has(iframe) .pcCta {
+  width: auto;
+  flex: 1 1 160px;
+  min-width: 140px;
+}
+
+@media (max-width: 520px) {
+  .previewSection:has(.pcCard:has(iframe)) .pcRow {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+/* Poster blur bikin keliatan "preview"; untuk ecommerce biasanya dimatiin */
+.pcMediaBlur {
+  display: none;
+}
+
+.pcMediaImg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* ecommerce look */
+  object-position: center;
+  display: block;
+  filter: none;
+  /* override drop-shadow lama */
+}
+
+.pcBody {
+  padding: 10px 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  color: var(--t-text, var(--t-card-fg, inherit));
+}
+
+.pcTitle {
+  font-weight: 800;
+  font-size: 13px;
+  line-height: 1.25;
+  margin: 0;
+  min-height: 34px;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  color: var(--t-text, var(--t-card-fg, inherit));
+}
+
+.pcPrice {
+  font-weight: 900;
+  font-size: 14px;
+  line-height: 1.2;
+  min-height: 0;
+  opacity: 0.98;
+  color: var(--t-text, var(--t-card-fg, inherit));
+}
+
+.pcMeta {
+  font-size: 12px;
+  line-height: 1.25;
+  opacity: 0.82;
+  color: var(--t-sub, rgba(15, 23, 42, 0.72));
+  min-height: 0;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Marketplace biasanya klik kartu, bukan tombol besar di tiap card */
+.pcCtaWrap {
+  margin-top: auto;
+  display: flex;
+}
+
+.pcCtaPlaceholder {
+  display: block;
+}
+
+@media (max-width: 640px) {
+  .pcCard {
+    width: clamp(150px, 60vw, 190px);
+  }
+}
+
+/* =========================
+   HERO (Preview Draft)
+   Target markup (page.tsx):
+   <section className={`${homeStyles.hero} ${ui.hero} ${ui.heroV1} ${ui.heroTheme...}`}>
+     <div className={ui.heroInner}>
+       <div className={ui.heroText}>...</div>
+       <div className={ui.heroMedia}>...</div>
+     </div>
+   </section>
+   ========================= */
+
+/* Wrapper: keep aligned with homepage container */
+.hero {
+  max-width: 1400px;
+  margin: 0 auto 28px;
+  padding: 0 16px 24px;
+
+  /* Default tokens (override by heroTheme*) */
+  --hb-bg: #071026;
+  --hb-bg2: #050a14;
+  --hb-text: rgba(255, 255, 255, 0.96);
+  --hb-muted: rgba(255, 255, 255, 0.78);
+  --hb-accent: #ffe893;
+
+  --hb-cardBg: rgba(255, 255, 255, 0.10);
+  --hb-cardBorder: rgba(255, 255, 255, 0.18);
+  --hb-cardText: rgba(255, 255, 255, 0.96);
+
+  --hb-glassBg: rgba(255, 255, 255, 0.16);
+  --hb-glassBorder: rgba(255, 255, 255, 0.24);
+  --hb-glassShadow: 0 18px 52px rgba(0, 0, 0, 0.28);
+
+  --hb-chipBg: rgba(255, 255, 255, 0.10);
+  --hb-chipBorder: rgba(255, 255, 255, 0.18);
+
+  --hb-ctaBg: var(--hb-accent);
+  --hb-ctaText: #071026;
+  --hb-ctaBorder: rgba(0, 0, 0, 0.14);
+  --hb-ctaBgHover: #ffd84d;
+  --hb-ctaTextHover: #071026;
+
+  --hb-cta2Bg: rgba(255, 255, 255, 0.10);
+  --hb-cta2Border: rgba(255, 255, 255, 0.22);
+  --hb-cta2Text: rgba(255, 255, 255, 0.96);
+  --hb-cta2BgHover: rgba(255, 255, 255, 0.14);
+  --hb-cta2TextHover: rgba(255, 255, 255, 0.98);
+
+  --hb-floatBg: rgba(255, 255, 255, 0.92);
+  --hb-floatBorder: rgba(0, 0, 0, 0.14);
+  --hb-floatText: rgba(0, 0, 0, 0.88);
+}
+
+/* Inner: commerce gradient + warm interior accent */
+.heroInner {
+  position: relative;
+  display: flex;
+  gap: clamp(14px, 2.2vw, 28px);
+  align-items: center;
+  justify-content: space-between;
+
+  padding: clamp(16px, 2.6vw, 30px);
+  border-radius: 26px;
+  overflow: hidden;
+
+  background:
+    radial-gradient(120% 120% at 14% 18%, rgba(255, 200, 0, 0.14), transparent 56%),
+    radial-gradient(120% 120% at 86% 22%, rgba(255, 245, 230, 0.14), transparent 60%),
+    linear-gradient(180deg, var(--hb-bg), var(--hb-bg2));
+
+  border: 1px solid rgba(0, 0, 0, 0.10);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.10);
+}
+
+.heroText {
+  flex: 1 1 560px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  max-width: 720px;
+}
+
+.heroTopRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.heroEyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  width: fit-content;
+  max-width: 100%;
+
+  padding: 8px 12px;
+  border-radius: 999px;
+
+  font-weight: 850;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+
+  background: rgba(255, 200, 0, 0.10);
+  border: 1px solid rgba(255, 200, 0, 0.22);
+  color: var(--hb-text);
+
+  backdrop-filter: blur(10px);
+}
+
+.heroTopBadges {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-left: auto;
+}
+
+.heroBadge {
+  padding: 7px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0.2px;
+
+  background: var(--hb-chipBg);
+  border: 1px solid var(--hb-chipBorder);
+  color: var(--hb-text);
+
+  backdrop-filter: blur(10px);
+}
+
+.heroTitle {
+  margin: 0;
+  font-weight: 950;
+  letter-spacing: -0.03em;
+  font-size: clamp(30px, 3.6vw, 54px);
+  line-height: 1.06;
+  color: var(--hb-text);
+  text-wrap: balance;
+
+  /* interior editorial */
+  font-family: ui-serif, Georgia, "Times New Roman", serif;
+}
+
+.heroDescription {
+  margin: 0;
+  font-size: clamp(14px, 1.2vw, 18px);
+  line-height: 1.55;
+  color: var(--hb-muted);
+  max-width: 66ch;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.heroActions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.heroCta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+
+  padding: 12px 16px;
+  border-radius: 18px;
+  min-height: 48px;
+
+  font-weight: 950;
+  letter-spacing: -0.01em;
+
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+
+  transition: transform 140ms ease, filter 140ms ease, background 140ms ease, color 140ms ease, border-color 140ms ease;
+}
+
+.heroCtaPrimary {
+  background: var(--hb-ctaBg, #ffc800) !important;
+  color: var(--hb-ctaText, #071026) !important;
+  -webkit-text-fill-color: var(--hb-ctaText, #071026) !important;
+  border: 1px solid var(--hb-ctaBorder, rgba(0, 0, 0, 0.14)) !important;
+}
+
+.heroCtaPrimary:hover {
+  background: var(--hb-ctaBgHover, rgba(255, 200, 0, 0.86)) !important;
+  color: var(--hb-ctaTextHover, #071026) !important;
+  -webkit-text-fill-color: var(--hb-ctaTextHover, #071026) !important;
+  transform: translateY(-1px);
+  filter: brightness(0.99);
+}
+
+.heroCtaSecondary {
+  background: var(--hb-cta2Bg, rgba(255, 255, 255, 0.10)) !important;
+  color: var(--hb-cta2Text, rgba(255, 255, 255, 0.96)) !important;
+  -webkit-text-fill-color: var(--hb-cta2Text, rgba(255, 255, 255, 0.96)) !important;
+  border: 1px solid var(--hb-cta2Border, rgba(255, 255, 255, 0.22)) !important;
+}
+
+.heroCtaSecondary:hover {
+  background: var(--hb-cta2BgHover, rgba(255, 255, 255, 0.16)) !important;
+  color: var(--hb-cta2TextHover, rgba(255, 255, 255, 0.98)) !important;
+  -webkit-text-fill-color: var(--hb-cta2TextHover, rgba(255, 255, 255, 0.98)) !important;
+  transform: translateY(-1px);
+}
+
+.heroHighlights {
+  margin: 7px 0 0;
+  padding: 0;
+  list-style: none;
+
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.heroHighlightItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+
+  padding: 10px 12px;
+  border-radius: 16px;
+
+  background: var(--hb-cardBg);
+  border: 1px solid var(--hb-cardBorder);
+  color: var(--hb-cardText);
+}
+
+.heroHighlightIcon {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+
+  color: var(--hb-accent);
+  background: rgba(255, 200, 0, 0.14);
+  border: 1px solid rgba(255, 200, 0, 0.22);
+  border-radius: 999px;
+}
+
+.heroHighlightText {
+  line-height: 1.35;
+  font-weight: 850;
+}
+
+.heroTrustRow {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.heroTrustChip {
+  padding: 8px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0.2px;
+
+  background: var(--hb-chipBg);
+  border: 1px solid var(--hb-chipBorder);
+  color: var(--hb-text);
+  backdrop-filter: blur(10px);
+}
+
+.heroMiniInfoRow {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.heroMiniInfoCard {
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: var(--hb-cardBg);
+  border: 1px solid var(--hb-cardBorder);
+  color: var(--hb-cardText);
+}
+
+.heroMiniInfoTitle {
+  font-weight: 950;
+  font-size: 13px;
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+
+.heroMiniInfoDesc {
+  font-size: 12px;
+  line-height: 1.35;
+  opacity: 0.88;
+  font-weight: 750;
+}
+
+/* Media column */
+.heroMedia {
+  flex: 1 1 440px;
+  min-width: 0;
+  position: relative;
+  overflow: hidden;
+  border-radius: 24px;
+  background: rgba(7, 12, 24, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  height: clamp(320px, 36vw, 540px);
+}
+
+.heroMediaBg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  background:
+    radial-gradient(120% 120% at 14% 18%, rgba(255, 200, 0, 0.22), transparent 55%),
+    radial-gradient(120% 120% at 86% 24%, rgba(255, 255, 255, 0.18), transparent 60%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.06), rgba(0, 0, 0, 0.22));
+  opacity: 0.14;
+  transition: opacity 220ms ease;
+}
+
+.heroImage {
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  inset: 0;
+  object-fit: cover;
+  object-position: bottom center;
+}
+
+.heroMediaPlaceholder {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(120% 120% at 20% 15%, rgba(255, 200, 0, 0.28), transparent 55%),
+    radial-gradient(120% 120% at 85% 25%, rgba(255, 255, 255, 0.16), transparent 55%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.10), rgba(0, 0, 0, 0.30));
+}
+
+/* V1: Klasik Premium (Full fill) */
+.heroV1 .heroImage {
+  object-fit: cover;
+  padding: 0;
+  filter: drop-shadow(0 18px 26px rgba(0, 0, 0, 0.16));
+}
+
+.heroV1 .heroMediaBg {
+  opacity: 0.10;
+}
+
+/* Floating cards */
+.heroFloatingCards {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.heroFloatCard {
+  position: absolute;
+  padding: 12px 12px 10px;
+  border-radius: 18px;
+
+  background: var(--hb-floatBg);
+  border: 1px solid var(--hb-floatBorder);
+  color: var(--hb-floatText);
+
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
+  backdrop-filter: blur(12px);
+}
+
+.heroFloatLabel {
+  font-size: 12px;
+  font-weight: 950;
+  opacity: 0.72;
+}
+
+.heroFloatMeta {
+  font-size: 12px;
+  font-weight: 850;
+  opacity: 0.72;
+  margin-top: 2px;
+}
+
+.heroFloatCardWide {
+  width: min(320px, 72%);
+}
+
+.heroFloatCardRight {
+  right: clamp(14px, 3vw, 22px);
+  top: clamp(14px, 3vw, 22px);
+}
+
+.heroFloatCardWide {
+  left: clamp(14px, 3vw, 22px);
+  bottom: clamp(14px, 3vw, 22px);
+}
+
+.heroFloatRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+}
+
+.heroFloatDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--hb-accent);
+  box-shadow: 0 0 0 4px rgba(255, 200, 0, 0.20);
+  flex: 0 0 auto;
+}
+
+.heroFloatRowText {
+  font-size: 12px;
+  font-weight: 950;
+  opacity: 0.86;
+}
+
+/* Floating cards disembunyikan di layar kecil biar nggak numpuk */
+@media (max-width: 640px) {
+  .heroFloatingCards {
+    display: none;
+  }
+
+  .heroMiniInfoRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* V1 Responsive:
+   - Tablet/HP: layout jadi stacked + HAPUS GAMBAR (fokus ke teks & CTA) */
+@media (max-width: 640px) {
+  .heroV1 .heroInner {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  /* Hapus area gambar untuk tablet & HP */
+  .heroV1 .heroMedia {
+    display: none !important;
+  }
+
+  .heroV1 .heroText {
+    max-width: none;
+    background: var(--hb-glassBg);
+    border: 1px solid var(--hb-glassBorder);
+    border-radius: 20px;
+    padding: 18px 16px;
+    box-shadow: var(--hb-glassShadow);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .heroV1 .heroTopBadges {
+    display: none !important;
+  }
+
+  .heroV1 .heroHighlights {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .heroV1 .heroMiniInfoRow {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .heroV1 .heroActions {
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 640px) {
+  .heroV1 .heroText {
+    border-radius: 18px;
+    padding: 16px 14px;
+  }
+
+  .heroV1 .heroHighlights {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .heroV1 .heroMiniInfoRow {
+    grid-template-columns: 1fr;
+  }
+
+  .heroV1 .heroActions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .heroV1 .heroCta {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* =========================
+   HERO theme palette (same intent as navbar)
+   ========================= */
+.heroThemeNavyGold {
+  --hb-bg: #071026;
+  --hb-bg2: #050a14;
+  --hb-text: rgba(255, 255, 255, .96);
+  --hb-muted: rgba(255, 255, 255, .78);
+  --hb-accent: #ffc800;
+
+  --hb-cardBg: rgba(255, 255, 255, .10);
+  --hb-cardBorder: rgba(255, 255, 255, .18);
+  --hb-cardText: rgba(255, 255, 255, .96);
+  --hb-glassBg: rgba(255, 255, 255, .18);
+  --hb-glassBorder: rgba(255, 255, 255, .26);
+  --hb-glassShadow: 0 18px 54px rgba(0, 0, 0, .30);
+
+  --hb-chipBg: rgba(255, 255, 255, .10);
+  --hb-chipBorder: rgba(255, 255, 255, .18);
+
+  --hb-ctaBg: #ffc800;
+  --hb-ctaText: #071026;
+  --hb-ctaBorder: rgba(0, 0, 0, .14);
+  --hb-ctaBgHover: #ffe48a;
+  --hb-ctaTextHover: #071026;
+
+  --hb-cta2Bg: rgba(255, 255, 255, .10);
+  --hb-cta2Text: rgba(255, 255, 255, .96);
+  --hb-cta2Border: rgba(255, 255, 255, .22);
+  --hb-cta2BgHover: rgba(255, 255, 255, .16);
+  --hb-cta2TextHover: rgba(255, 255, 255, .98);
+
+  --hb-floatBg: rgba(255, 255, 255, .92);
+  --hb-floatBorder: rgba(0, 0, 0, .14);
+  --hb-floatText: rgba(0, 0, 0, .88);
+}
+
+.heroThemeWhiteGold {
+  --hb-bg: #ffffff;
+  --hb-bg2: #f4f5f8;
+  --hb-text: rgba(11, 15, 26, .96);
+  --hb-muted: rgba(11, 15, 26, .72);
+  --hb-accent: #ffc800;
+
+  --hb-cardBg: rgba(7, 16, 38, .06);
+  --hb-cardBorder: rgba(7, 16, 38, .14);
+  --hb-cardText: rgba(11, 15, 26, .92);
+  --hb-glassBg: rgba(255, 255, 255, .88);
+  --hb-glassBorder: rgba(0, 0, 0, .12);
+  --hb-glassShadow: 0 18px 50px rgba(0, 0, 0, .16);
+
+  --hb-chipBg: rgba(0, 0, 0, .04);
+  --hb-chipBorder: rgba(0, 0, 0, .10);
+
+  --hb-ctaBg: #071026;
+  --hb-ctaText: #ffffff;
+  --hb-ctaBorder: rgba(0, 0, 0, .12);
+  --hb-ctaBgHover: #0f2a5a;
+  --hb-ctaTextHover: #ffffff;
+
+  --hb-cta2Bg: rgba(255, 200, 0, .20);
+  --hb-cta2Text: rgba(7, 16, 38, .94);
+  --hb-cta2Border: rgba(255, 200, 0, .40);
+  --hb-cta2BgHover: rgba(255, 200, 0, .28);
+  --hb-cta2TextHover: rgba(7, 16, 38, .98);
+
+  --hb-floatBg: rgba(255, 255, 255, .92);
+  --hb-floatBorder: rgba(0, 0, 0, .12);
+  --hb-floatText: rgba(0, 0, 0, .88);
+}
+
+.heroThemeNavyWhite {
+  --hb-bg: #071026;
+  --hb-bg2: #050a14;
+  --hb-text: rgba(255, 255, 255, .96);
+  --hb-muted: rgba(255, 255, 255, .78);
+  --hb-accent: #ffffff;
+
+  --hb-cardBg: rgba(255, 255, 255, .10);
+  --hb-cardBorder: rgba(255, 255, 255, .20);
+  --hb-cardText: rgba(255, 255, 255, .96);
+  --hb-glassBg: rgba(255, 255, 255, .18);
+  --hb-glassBorder: rgba(255, 255, 255, .26);
+  --hb-glassShadow: 0 18px 54px rgba(0, 0, 0, .30);
+
+  --hb-chipBg: rgba(255, 255, 255, .10);
+  --hb-chipBorder: rgba(255, 255, 255, .20);
+
+  --hb-ctaBg: #ffc800;
+  --hb-ctaText: #071026;
+  --hb-ctaBorder: rgba(0, 0, 0, .14);
+  --hb-ctaBgHover: #ffffff;
+  --hb-ctaTextHover: #071026;
+
+  --hb-cta2Bg: rgba(255, 255, 255, .10);
+  --hb-cta2Text: rgba(255, 255, 255, .96);
+  --hb-cta2Border: rgba(255, 255, 255, .26);
+  --hb-cta2BgHover: rgba(255, 255, 255, .16);
+  --hb-cta2TextHover: rgba(255, 255, 255, .98);
+
+  --hb-floatBg: rgba(255, 255, 255, .92);
+  --hb-floatBorder: rgba(0, 0, 0, .14);
+  --hb-floatText: rgba(0, 0, 0, .88);
+}
+
+.heroThemeGoldNavy {
+  --hb-bg: #ffc800;
+  --hb-bg2: #f0b800;
+  --hb-text: rgba(7, 16, 38, .96);
+  --hb-muted: rgba(7, 16, 38, .74);
+  --hb-accent: #071026;
+
+  --hb-cardBg: rgba(255, 255, 255, .62);
+  --hb-cardBorder: rgba(7, 16, 38, .14);
+  --hb-cardText: rgba(7, 16, 38, .92);
+  --hb-glassBg: rgba(255, 255, 255, .78);
+  --hb-glassBorder: rgba(7, 16, 38, .16);
+  --hb-glassShadow: 0 18px 50px rgba(0, 0, 0, .18);
+
+  --hb-chipBg: rgba(7, 16, 38, .10);
+  --hb-chipBorder: rgba(7, 16, 38, .18);
+
+  --hb-ctaBg: #071026;
+  --hb-ctaText: #ffc800;
+  --hb-ctaBorder: rgba(0, 0, 0, .14);
+  --hb-ctaBgHover: #040a18;
+  --hb-ctaTextHover: #ffc800;
+
+  --hb-cta2Bg: rgba(255, 255, 255, .40);
+  --hb-cta2Text: rgba(7, 16, 38, .96);
+  --hb-cta2Border: rgba(7, 16, 38, .20);
+  --hb-cta2BgHover: rgba(255, 255, 255, .52);
+  --hb-cta2TextHover: rgba(7, 16, 38, .98);
+
+  --hb-floatBg: rgba(255, 255, 255, .92);
+  --hb-floatBorder: rgba(0, 0, 0, .14);
+  --hb-floatText: rgba(0, 0, 0, .88);
+}
+
+.heroThemeGoldWhite {
+  --hb-bg: #ffc800;
+  --hb-bg2: #e6aa00;
+  --hb-text: rgba(255, 255, 255, .96);
+  --hb-muted: rgba(255, 255, 255, .82);
+  --hb-accent: #ffffff;
+
+  --hb-cardBg: rgba(7, 16, 38, .16);
+  --hb-cardBorder: rgba(7, 16, 38, .22);
+  --hb-cardText: rgba(255, 255, 255, .96);
+  --hb-glassBg: rgba(7, 16, 38, .14);
+  --hb-glassBorder: rgba(7, 16, 38, .22);
+  --hb-glassShadow: 0 18px 50px rgba(0, 0, 0, .18);
+
+  --hb-chipBg: rgba(255, 255, 255, .14);
+  --hb-chipBorder: rgba(255, 255, 255, .22);
+
+  --hb-ctaBg: #071026;
+  --hb-ctaText: #ffffff;
+  --hb-ctaBorder: rgba(0, 0, 0, .14);
+  --hb-ctaBgHover: #040a18;
+  --hb-ctaTextHover: #ffffff;
+
+  --hb-cta2Bg: rgba(255, 255, 255, .12);
+  --hb-cta2Text: rgba(255, 255, 255, .96);
+  --hb-cta2Border: rgba(255, 255, 255, .24);
+  --hb-cta2BgHover: rgba(255, 255, 255, .16);
+  --hb-cta2TextHover: rgba(255, 255, 255, .98);
+
+  --hb-floatBg: rgba(255, 255, 255, .92);
+  --hb-floatBorder: rgba(0, 0, 0, .14);
+  --hb-floatText: rgba(0, 0, 0, .88);
+}
+
+.heroThemeWhiteNavy {
+  --hb-bg: #ffffff;
+  --hb-bg2: #f2f5ff;
+  --hb-text: rgba(7, 16, 38, .96);
+  --hb-muted: rgba(7, 16, 38, .72);
+  --hb-accent: #071026;
+
+  --hb-cardBg: rgba(7, 16, 38, .06);
+  --hb-cardBorder: rgba(7, 16, 38, .14);
+  --hb-cardText: rgba(7, 16, 38, .92);
+  --hb-glassBg: rgba(255, 255, 255, .88);
+  --hb-glassBorder: rgba(0, 0, 0, .12);
+  --hb-glassShadow: 0 18px 50px rgba(0, 0, 0, .16);
+
+  --hb-chipBg: rgba(7, 16, 38, .06);
+  --hb-chipBorder: rgba(7, 16, 38, .14);
+
+  --hb-ctaBg: #ffc800;
+  --hb-ctaText: #071026;
+  --hb-ctaBorder: rgba(0, 0, 0, .14);
+  --hb-ctaBgHover: #071026;
+  --hb-ctaTextHover: #ffc800;
+
+  --hb-cta2Bg: rgba(7, 16, 38, .10);
+  --hb-cta2Text: rgba(7, 16, 38, .96);
+  --hb-cta2Border: rgba(7, 16, 38, .22);
+  --hb-cta2BgHover: rgba(7, 16, 38, .16);
+  --hb-cta2TextHover: rgba(7, 16, 38, .98);
+
+  --hb-floatBg: rgba(255, 255, 255, .92);
+  --hb-floatBorder: rgba(0, 0, 0, .12);
+  --hb-floatText: rgba(0, 0, 0, .88);
+}
+
+/* =========================
+   HIGHLIGHT_COLLECTION (legacy preview styles)
+   Keep classes for compatibility with existing components.
+   ========================= */
+.hcSection {
+  overflow: hidden;
+  border-radius: 26px;
+  background: var(--t-bg);
+  color: var(--t-element);
+  border: 1px solid var(--t-divider);
+  box-shadow: 0 18px 60px rgba(2, 6, 23, 0.08);
+}
+
+.hcInner {
+  padding: 16px;
+}
+
+.hcHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.hcBadge {
+  align-self: flex-start;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 850;
+  font-size: 12px;
+  letter-spacing: 0.2px;
+  background: var(--t-card);
+  border: 1px solid var(--t-card-border);
+  color: var(--t-card-fg);
+}
+
+.hcTitle {
+  color: var(--t-element);
+  font-weight: 950;
+  font-size: 22px;
+  line-height: 1.15;
+}
+
+.hcDesc {
+  color: var(--t-element);
+  opacity: 0.85;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.hcCta {
+  align-self: flex-start;
+  margin-top: 4px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-weight: 950;
+  text-decoration: none;
+  background: var(--t-cta-bg);
+  color: var(--t-cta-fg);
+  border: 1px solid var(--t-cta-border);
+  box-shadow: 0 14px 45px rgba(2, 6, 23, 0.10);
+  transition: transform .12s ease, background-color .12s ease, color .12s ease;
+}
+
+.hcCta:hover {
+  background: var(--t-cta-hover-bg);
+  color: var(--t-cta-hover-fg);
+  transform: translateY(-1px);
+}
+
+.hcGrid {
+  display: grid;
+  gap: 14px;
+}
+
+.hcHero {
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--t-card-border);
+  background: var(--t-card);
+}
+
+.hcHeroMedia {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  /* Standard 16:9 for ALL devices (Mobile/Tablet) */
+}
+
+@media (min-width: 1024px) {
+  .hcHeroMedia {
+    aspect-ratio: 16 / 9;
+    /* Consistent 16:9 on Desktop too */
+  }
+}
+
+.hcHeroMediaBlur {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(14px);
+  transform: scale(1.12);
+  opacity: 0.55;
+}
+
+.hcHeroMediaImg {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  /* Shows full image, no crop */
+  object-position: center;
+  display: block;
+}
+
+
+
+/* Glass overlay content for Highlight hero */
+.hcHeroOverlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(closest-side at 50% 50%, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.40));
+  opacity: 0.65;
+}
+
+.hcHeroOverlayCta:hover {
+  transform: translateY(-1px);
+  background: var(--t-cta-hover-bg);
+  color: var(--t-cta-hover-fg);
+}
+
+.hcHeroEmpty {
+  padding: 18px;
+  font-weight: 850;
+  opacity: 0.7;
+}
+
+.hcItems {
+  display: grid;
+  gap: 12px;
+}
+
+.hcItem {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 12px;
+  padding: 10px;
+  border-radius: 16px;
+  text-decoration: none;
+  border: 1px solid var(--t-card-border);
+  background: var(--t-card);
+  color: var(--t-element);
+  overflow: hidden;
+}
+
+.hcItemMedia {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border: 1px solid rgba(0, 0, 0, 0.10);
+}
+
+.hcItemMediaBlur {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(12px);
+  transform: scale(1.12);
+  opacity: 0.55;
+}
+
+.hcItemMediaImg {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  /* Shows full product, no crop */
+  object-position: center;
+  display: block;
+}
+
+.hcItemEmptyMedia {
+  border-radius: 14px;
+  min-height: 92px;
+  border: 1px solid var(--t-card-border);
+  background: rgba(255, 255, 255, 0.10);
+}
+
+.hcItemBody {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 2px 2px 2px 0;
+}
+
+.hcItemTitle {
+  color: var(--t-element);
+  font-weight: 950;
+  line-height: 1.2;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.hcItemSub {
+  font-size: 13px;
+  opacity: 0.82;
+  line-height: 1.35;
+}
+
+.hcItemPrice {
+  margin-top: auto;
+  font-weight: 950;
+  opacity: 0.92;
+}
+
+/* Tablet */
+@media (min-width: 768px) {
+  .hcTitle {
+    font-size: 26px;
+  }
+
+  .hcItems {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hcItem {
+    grid-template-columns: 1fr;
+    padding: 12px;
+  }
+
+  .hcItemMedia,
+  .hcItemMediaImg,
+  .hcItemEmptyMedia {
+    /* Height handled by aspect-ratio 1/1 */
+  }
+}
+
+
+/* Tablet (fix hero image tidak menyipit / terlalu pendek) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  /* Tablet: hero harus terasa “sampul” (tidak menyipit), tapi tidak terlalu zoom */
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+
+  /* Desktop hero height: feel “cover/sampul” tapi tetap aman dari crop berlebihan */
+  .hcInner {
+    padding: 18px;
+  }
+
+  .hcGrid {
+    grid-template-columns: 5fr 7fr;
+    align-items: start;
+  }
+
+  article[data-hc-layout="FEATURED_TOP"] .hcGrid,
+  article[data-layout="FEATURED_TOP"] .hcGrid,
+  article[data-hc-layout="GRID"] .hcGrid,
+  article[data-layout="GRID"] .hcGrid,
+  article[data-hc-layout="CARDS"] .hcGrid,
+  article[data-layout="CARDS"] .hcGrid,
+  /* Fix desktop kosong di bawah hero: FEATURED_LEFT kita jadikan HERO di atas + produk di bawah */
+  article[data-hc-layout="FEATURED_LEFT"] .hcGrid,
+  article[data-layout="FEATURED_LEFT"] .hcGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .hcItems {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    /* 3 columns = smaller items */
+    align-content: start;
+  }
+
+  article[data-hc-layout="GRID"] .hcItems {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* Mobile swipe row */
+@media (max-width: 767px) {
+
+  .hcHeroMedia,
+  .hcItems {
+    display: flex;
+    overflow-x: auto;
+    gap: 12px;
+    padding-bottom: 6px;
+    scroll-snap-type: x mandatory;
+    object-fit: contain;
+    object-position: center;
+  }
+
+  .hcItem {
+    min-width: 72%;
+    grid-template-columns: 1fr;
+    scroll-snap-align: start;
+  }
+
+  .hcItemMedia,
+  .hcItemMediaImg,
+  .hcItemEmptyMedia {
+    /* Height handled by aspect-ratio 1/1 */
+  }
+}
+
+/* Themed CTA button (used by sections with CTA) */
+.pcCta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 12px;
+  font-weight: 800;
+  font-size: 13px;
+  text-decoration: none;
+  background: var(--t-cta-bg);
+  color: var(--t-cta-fg);
+  border: 1px solid var(--t-cta-border);
+  transition: background 140ms ease, color 140ms ease, transform 140ms ease;
+}
+
+.pcCta:hover {
+  background: var(--t-cta-hover-bg);
+  color: var(--t-cta-hover-fg);
+  transform: translateY(-1px);
+}
+
+.pcCta:focus-visible {
+  outline: 2px solid var(--t-element);
+  outline-offset: 2px;
+}
+
+
+/* Theme scoping helper: apply navbar theme tokens on a per-section basis using data-theme */
+.themeScope {}
+
+/* ===== Per-section theme tokens (same palette as navbar themes) ===== */
+.themeScope[data-theme="NAVY_GOLD"],
+.themeScope[data-theme="navy_gold"],
+.themeScope[data-theme="navy-gold"],
+.themeScope[data-theme="theme_1"],
+.themeScope[data-theme="THEME_1"] {
+  --t-bg: var(--navy);
+  --t-element: var(--gold);
+  --t-card: var(--white);
+  --t-card-fg: var(--navy);
+  --t-card-border: rgba(255, 255, 255, 0.22);
+
+  --t-cta-bg: var(--gold);
+  --t-cta-fg: var(--navy);
+  --t-cta-hover-bg: var(--navy);
+  --t-cta-hover-fg: var(--gold);
+  --t-cta-border: rgba(212, 175, 55, 0.55);
+  --t-divider: rgba(255, 255, 255, 0.16);
+}
+
+.themeScope[data-theme="WHITE_GOLD"],
+.themeScope[data-theme="white_gold"],
+.themeScope[data-theme="white-gold"],
+.themeScope[data-theme="theme_2"],
+.themeScope[data-theme="THEME_2"] {
+  --t-bg: var(--white);
+  --t-element: var(--gold);
+  --t-card: var(--white);
+  --t-card-fg: var(--gold);
+  --t-card-border: rgba(11, 29, 58, 0.12);
+
+  --t-cta-bg: var(--gold);
+  --t-cta-fg: var(--navy);
+  --t-cta-hover-bg: var(--navy);
+  --t-cta-hover-fg: var(--gold);
+  --t-cta-border: rgba(212, 175, 55, 0.60);
+  --t-divider: rgba(2, 6, 23, 0.08);
+}
+
+.themeScope[data-theme="NAVY_WHITE"],
+.themeScope[data-theme="navy_white"],
+.themeScope[data-theme="navy-white"],
+.themeScope[data-theme="theme_3"],
+.themeScope[data-theme="THEME_3"] {
+  --t-bg: var(--navy);
+  --t-element: var(--white);
+  --t-card: var(--white);
+  --t-card-fg: var(--navy);
+  --t-card-border: rgba(255, 255, 255, 0.22);
+
+  /* CTA: putih (elemen) tapi card bukan CTA (button punya border + hover invert) */
+  --t-cta-bg: var(--white);
+  --t-cta-fg: var(--navy);
+  --t-cta-hover-bg: var(--navy);
+  --t-cta-hover-fg: var(--white);
+  --t-cta-border: rgba(255, 255, 255, 0.65);
+  --t-divider: rgba(255, 255, 255, 0.16);
+}
+
+.themeScope[data-theme="GOLD_NAVY"],
+.themeScope[data-theme="gold_navy"],
+.themeScope[data-theme="gold-navy"],
+.themeScope[data-theme="theme_4"],
+.themeScope[data-theme="THEME_4"] {
+  --t-bg: var(--gold);
+  --t-element: var(--navy);
+  --t-card: var(--white);
+  --t-card-fg: var(--navy);
+  --t-card-border: rgba(11, 29, 58, 0.20);
+
+  --t-cta-bg: var(--navy);
+  --t-cta-fg: var(--white);
+  --t-cta-hover-bg: var(--white);
+  --t-cta-hover-fg: var(--navy);
+  --t-cta-border: rgba(11, 29, 58, 0.55);
+  --t-divider: rgba(11, 29, 58, 0.14);
+}
+
+.themeScope[data-theme="GOLD_WHITE"],
+.themeScope[data-theme="gold_white"],
+.themeScope[data-theme="gold-white"],
+.themeScope[data-theme="theme_5"],
+.themeScope[data-theme="THEME_5"] {
+  --t-bg: var(--gold);
+  --t-element: var(--white);
+  --t-card: var(--navy);
+  --t-card-fg: var(--white);
+  --t-card-border: rgba(255, 255, 255, 0.22);
+
+  /* CTA: putih (elemen) dengan teks ink biar kebaca, hover jadi ink */
+  --t-cta-bg: var(--white);
+  --t-cta-fg: var(--ink);
+  --t-cta-hover-bg: var(--ink);
+  --t-cta-hover-fg: var(--white);
+  --t-cta-border: rgba(255, 255, 255, 0.75);
+  --t-divider: rgba(255, 255, 255, 0.18);
+}
+
+.themeScope[data-theme="WHITE_NAVY"],
+.themeScope[data-theme="white_navy"],
+.themeScope[data-theme="white-navy"],
+.themeScope[data-theme="theme_6"],
+.themeScope[data-theme="THEME_6"] {
+  --t-bg: var(--white);
+  --t-element: var(--navy);
+  --t-card: #f5e6b0;
+  --t-card-fg: var(--navy);
+  --t-card-border: rgba(11, 29, 58, 0.18);
+
+  --t-cta-bg: var(--navy);
+  --t-cta-fg: var(--white);
+  --t-cta-hover-bg: var(--white);
+  --t-cta-hover-fg: var(--navy);
+  --t-cta-border: rgba(11, 29, 58, 0.55);
+  --t-divider: rgba(2, 6, 23, 0.08);
+}
+
+.section {
+  max-width: 1400px;
+  margin: 0 auto 28px;
+  padding: 18px 16px;
+}
+
+/* =========================
+   TEXT_SECTION (Preview)
+   ========================= */
+.textSection {
+  width: 100%;
+  margin: 0 auto;
+  padding: 24px 24px;
+  background: var(--ts-bg, transparent);
+}
+
+.textBlock {
+  margin: 0;
+  padding: 0;
+}
+
+.textStack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.textBase {
+  margin: 0;
+  color: var(--ts-text, #111827);
+}
+
+.textAlignLeft {
+  text-align: left;
+  text-align: justify;
+  text-justify: inter-word;
+}
+
+.textAlignCenter {
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.textWidthNormal {
+  max-width: 65ch;
+}
+
+.textWidthWide {
+  max-width: 80ch;
+}
+
+.textHeading {
+  font-size: clamp(20px, 3.2vw, 32px);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.textSubtitle {
+  font-size: clamp(16px, 2.2vw, 20px);
+  font-weight: 600;
+  line-height: 1.4;
+  opacity: 0.7;
+}
+
+.textBody {
+  font-size: clamp(14px, 1.6vw, 16px);
+  font-weight: 400;
+  line-height: 1.65;
+}
+
+.textCaption {
+  font-size: clamp(12px, 1.4vw, 13px);
+  font-weight: 400;
+  line-height: 1.5;
+  opacity: 0.65;
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.title {
+  font-weight: 950;
+  letter-spacing: -0.01em;
+  font-size: 20px;
+  margin: 0;
+  color: var(--cg-title-color, var(--cg-element, inherit));
+
+}
+
+.grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr));
+}
+
+.card {
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid var(--cg-card-border, rgba(0, 0, 0, 0.10));
+  background: var(--cg-card-bg, white);
+  text-decoration: none;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  transition: transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease;
+  color: var(--cg-card-fg, inherit);
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.12);
+  border-color: var(--cg-card-border-hover, rgba(0, 0, 0, 0.16));
+}
+
+.media {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.imgPlaceholder {
+  width: 100%;
+  height: 100%;
+  background:
+    radial-gradient(120% 120% at 20% 20%, rgba(0, 0, 0, 0.08), transparent 55%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.04), rgba(0, 0, 0, 0.08));
+}
+
+.body {
+  padding: 12px 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cardTitle {
+  font-weight: 950;
+  line-height: 1.15;
+  font-size: 15px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-align: center;
+}
+
+.sub {
+  font-size: 12px;
+  opacity: 0.72;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(var(--colsTablet, 3), minmax(0, 1fr));
+  }
+}
+
+/* HP */
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: repeat(var(--colsMobile, 2), minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .body {
+    padding: 10px 10px 12px;
+  }
+
+  .cardTitle {
+    font-size: 14px;
+  }
+}
+
+/* ===== HIGHLIGHT_COLLECTION: FULL GLASS OVERLAY (Hero) v2 =====
+   Goal:
+   - Glass layer covers the ENTIRE hero (blur + tint)
+   - Text stays centered, neat spacing (no ugly justify gaps)
+*/
+
+/* Ensure hero media is the overlay canvas */
+.hcHeroMedia {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Overlay covers the whole hero */
+.hcHeroOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+
+  /* stronger "glass" so it's clearly covering the photo */
+  background: rgba(10, 16, 26, 0.52);
+  backdrop-filter: blur(14px) saturate(1.05);
+  -webkit-backdrop-filter: blur(14px) saturate(1.05);
+
+  display: grid;
+  place-items: center;
+
+  padding: 18px;
+}
+
+/* Extra soft vignette so the overlay feels like a full layer */
+.hcHeroOverlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 45%,
+      rgba(255, 255, 255, 0.08) 0%,
+      rgba(255, 255, 255, 0.04) 35%,
+      rgba(0, 0, 0, 0.18) 100%);
+}
+
+/* Text container (subtle inner glass; not too big, not too small) */
+.hcHeroGlass {
+  position: relative;
+  z-index: 1;
+
+  width: min(720px, 92%);
+  padding: 16px 18px;
+
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.10);
+
+  /* Keep text tidy */
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+.hcHeroOverlayTitle {
+  font-weight: 850;
+  letter-spacing: 0.2px;
+  line-height: 1.12;
+  font-size: clamp(18px, 2.2vw, 32px);
+  margin-bottom: 8px;
+}
+
+/* "justify" look without huge weird gaps:
+   - limit line width (ch)
+   - enable hyphenation
+   - justify only description, but keep last line centered
+*/
+.hcHeroOverlayDesc {
+  opacity: 0.94;
+  line-height: 1.55;
+  font-size: clamp(12px, 1.2vw, 15px);
+
+  max-width: 58ch;
+  margin: 0 auto 14px;
+
+  text-align: justify;
+  text-justify: inter-word;
+  text-align-last: center;
+  hyphens: auto;
+}
+
+.hcHeroOverlayCta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  padding: 10px 14px;
+  border-radius: 999px;
+
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.18);
+
+  text-decoration: none;
+  font-weight: 750;
+}
+
+.hcHeroOverlayCta:hover {
+  background: rgba(255, 255, 255, 0.26);
+}
+
+/* ===== HIGHLIGHT_COLLECTION: HERO SIZING FIX (prevents hero collapse) ===== */
+.hcHeroMedia {
+  width: 100%;
+  /* give the hero a real box height so it never collapses */
+  height: clamp(220px, 34vw, 420px);
+}
+
+@media (min-width: 768px) {
+  .hcHeroMedia {
+    height: clamp(300px, 30vw, 520px);
+  }
+}
+
+@media (min-width: 1024px) {
+  .hcHeroMedia {
+    height: clamp(360px, 24vw, 560px);
+  }
+}
+
+.hcHeroMediaImg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 55%;
+  display: block;
+}
+
+/* keep blur layer behind the main image */
+.hcHeroMediaBlur {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(22px);
+  transform: scale(1.08);
+  opacity: 0.55;
+}
+
+/* ===== HIGHLIGHT_COLLECTION: VISIBILITY TUNE (keep photo visible) =====
+   Problem: hero looked too blurred/grey because:
+   - backdrop-filter on the FULL overlay blurs the entire image
+   - extra .hcHeroMediaBlur layer adds more blur
+   Fix:
+   - remove backdrop-filter from full overlay
+   - hide the extra blur layer
+   - keep the "glass" feel in the INNER text box only
+*/
+
+.hcHeroOverlay {
+  /* keep it as a full cover tint, but DON'T blur the whole photo */
+  background: rgba(10, 16, 26, 0.22);
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.hcHeroMediaBlur {
+  display: none !important;
+}
+
+/* Inner text box stays frosted */
+.hcHeroGlass {
+  background: rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.20);
+}
+
+/* ===== HIGHLIGHT_COLLECTION: FULL GLASS (frosted) v5 =====
+   Full-cover glass MUST be frosted, but photo should stay visible (no "grey blur").
+   - Gentle backdrop blur on the FULL overlay
+   - No extra background blur layer
+   - Add subtle glass highlights
+*/
+
+.hcHeroMediaBlur {
+  display: none !important;
+}
+
+/* Full frosted glass overlay */
+.hcHeroOverlay {
+  background: rgba(10, 16, 26, 0.18) !important;
+  backdrop-filter: blur(6px) saturate(1.12) !important;
+  -webkit-backdrop-filter: blur(6px) saturate(1.12) !important;
+}
+
+/* Glass highlights (streaks) */
+.hcHeroOverlay::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(115deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.06) 18%, rgba(255, 255, 255, 0.00) 45%),
+    linear-gradient(295deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.00) 35%);
+  opacity: 0.75;
+}
+
+/* Ensure hero never collapses */
+.hcHeroMedia {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: clamp(240px, 34vw, 460px);
+}
+
+@media (min-width: 768px) {
+  .hcHeroMedia {
+    height: clamp(320px, 30vw, 560px);
+  }
+}
+
+@media (min-width: 1024px) {
+  .hcHeroMedia {
+    height: clamp(380px, 24vw, 620px);
+  }
+}
+
+.hcHeroMediaImg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 55%;
+  display: block;
+}
+
+/* ===== HIGHLIGHT_COLLECTION: FULL GLASS + COMPACT CENTER CARD v7 =====
+   Fix: the "inner box" (hcHeroGlass) looked like a huge long panel.
+   - Keep FULL frosted glass overlay across the whole hero
+   - Make the center card fit content (not overly wide)
+   - Keep description justified but controlled (no giant gaps)
+*/
+
+.hcHeroMediaBlur {
+  display: none !important;
+}
+
+/* Full frosted layer */
+.hcHeroOverlay {
+  background: rgba(10, 16, 26, 0.20) !important;
+  backdrop-filter: blur(7px) saturate(1.12) !important;
+  -webkit-backdrop-filter: blur(7px) saturate(1.12) !important;
+  padding: 22px !important;
+}
+
+/* Compact card: don't stretch wide */
+.hcHeroGlass {
+  display: inline-flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+
+  width: fit-content !important;
+  max-width: min(620px, 92%) !important;
+
+  padding: 14px 16px !important;
+  border-radius: 16px !important;
+
+  background: rgba(255, 255, 255, 0.10) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.22) !important;
+}
+
+/* Title stays centered */
+.hcHeroOverlayTitle {
+  margin-bottom: 6px !important;
+}
+
+/* Description: center the block, justify the text with safeguards */
+.hcHeroOverlayDesc {
+  max-width: 54ch !important;
+  margin: 0 auto 12px !important;
+
+  text-align: justify !important;
+  text-justify: inter-word !important;
+  text-align-last: center !important;
+
+  hyphens: auto !important;
+  word-spacing: -0.03em;
+  /* reduces ugly gaps a bit */
+}
+
+/* CTA */
+.hcHeroOverlayCta {
+  margin-top: 2px;
+}
+
+/* ===== HIGHLIGHT_COLLECTION: BIGGER TEXT GLASS CARD v8 =====
+   User request: make the glass panel for text BIGGER (wider + more padding),
+   while keeping full-cover frosted overlay.
+*/
+
+.hcHeroGlass {
+  width: min(920px, 94%) !important;
+  max-width: min(920px, 94%) !important;
+  padding: 20px 22px !important;
+  border-radius: 18px !important;
+}
+
+/* Slightly larger typography to match bigger card */
+.hcHeroOverlayTitle {
+  font-size: clamp(22px, 2.6vw, 38px) !important;
+}
+
+.hcHeroOverlayDesc {
+  max-width: 68ch !important;
+  font-size: clamp(13px, 1.35vw, 16px) !important;
+  margin-bottom: 16px !important;
+}
+
+.hcHeroOverlayCta {
+  padding: 11px 16px !important;
+  font-size: 14px !important;
+}
+
+/* ===== HIGHLIGHT_COLLECTION: CLEAN CORNERS / NO BLEED v9 =====
+   Fix: rounded corner looks messy because overlay/image/pseudo-elements
+   don't follow the same border-radius.
+*/
+
+.hcHeroMedia {
+  overflow: hidden !important;
+  /* keep a consistent rounding on hero media */
+  border-radius: 22px !important;
+}
+
+/* Make all layers follow the same rounding */
+.hcHeroMediaImg,
+.hcHeroOverlay {
+  border-radius: inherit !important;
+}
+
+/* Pseudo highlights/vignette must also be clipped */
+.hcHeroOverlay::before,
+.hcHeroOverlay::after {
+  border-radius: inherit !important;
+}
+
+/* If any inner blur layer exists, clip it too */
+.hcHeroMediaBlur {
+  border-radius: inherit !important;
+}
+
+/* ===== HIGHLIGHT_COLLECTION: NO-HERO BEHAVIOR (desktop centering) =====
+   When hero image is removed, don't show any "Hero media belum dipilih."
+   and center the header (title/desc/CTA) nicely on desktop.
+*/
+article[data-hc-nohero="1"] .hcGrid {
+  grid-template-columns: 1fr !important;
+}
+
+article[data-hc-nohero="1"] .hcHeader {
+  max-width: 920px;
+  margin: 0 auto 18px;
+  text-align: center;
+  align-items: center;
+}
+
+article[data-hc-nohero="1"] .hcDesc {
+  max-width: 68ch;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+article[data-hc-nohero="1"] .hcCta {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* =========================================================
+   FINAL OVERRIDE — HIGHLIGHT_COLLECTION (HP + Tablet)
+   Target: <=1023px
+   Goals:
+   - Hero stays (no hiding)
+   - Image stays cover & clean (no weird white streaks)
+   - Full frosted glass overlay covers the hero (but NOT heavy/ugly)
+   - Text glass card fits (CTA NEVER gets cut off)
+   ========================================================= */
+
+@media (max-width: 1023px) {
+
+  /* Clean hero box */
+  .hcHeroMedia {
+    position: relative !important;
+    overflow: hidden !important;
+    border-radius: 22px !important;
+    height: clamp(320px, 72vw, 520px) !important;
+    /* taller so CTA fits */
+  }
+
+  .hcHeroMediaImg {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center 55% !important;
+    display: block !important;
+    border-radius: inherit !important;
+  }
+
+  /* Remove any extra blur/streak layers that make it look dirty */
+  .hcHeroMediaBlur {
+    display: none !important;
+  }
+
+  .hcHeroOverlay::before,
+  .hcHeroOverlay::after {
+    display: none !important;
+  }
+
+  /* FULL glass overlay (gentle) */
+  .hcHeroOverlay {
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: 3 !important;
+
+    border-radius: inherit !important;
+
+    background: rgba(10, 16, 26, 0.18) !important;
+    backdrop-filter: blur(6px) saturate(1.10) !important;
+    -webkit-backdrop-filter: blur(6px) saturate(1.10) !important;
+
+    display: grid !important;
+    place-items: center !important;
+
+    padding: 14px !important;
+  }
+
+  /* Center text card — sized so it never becomes a giant poster,
+     and never gets cut off. */
+  .hcHeroGlass {
+    width: min(640px, 92%) !important;
+    max-height: calc(100% - 28px) !important;
+    /* respect overlay padding */
+    overflow: hidden !important;
+
+    padding: 16px 16px 14px !important;
+    border-radius: 18px !important;
+
+    background: rgba(255, 255, 255, 0.12) !important;
+    border: 1px solid rgba(255, 255, 255, 0.16) !important;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22) !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 10px !important;
+
+    text-align: center !important;
+  }
+
+  .hcHeroOverlayTitle {
+    font-size: 22px !important;
+    line-height: 1.12 !important;
+    margin: 0 !important;
+    letter-spacing: 0.2px !important;
+  }
+
+  /* Keep desc short so CTA doesn't fall */
+  .hcHeroOverlayDesc {
+    font-size: 13px !important;
+    line-height: 1.55 !important;
+    max-width: 52ch !important;
+    margin: 0 !important;
+
+    display: -webkit-box !important;
+    -webkit-box-orient: vertical !important;
+    -webkit-line-clamp: 3 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+
+    text-align: center !important;
+    hyphens: none !important;
+  }
+
+  .hcHeroOverlayCta {
+    margin-top: 2px !important;
+    align-self: center !important;
+    white-space: nowrap !important;
+  }
+}
+
+/* Tablet: allow 4 lines for desc (still safe) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .hcHeroMedia {
+    height: clamp(360px, 48vw, 560px) !important;
+  }
+
+  .hcHeroOverlayDesc {
+    -webkit-line-clamp: 4 !important;
+  }
+}
+
+
+/* =========================
+   ROOM_CATEGORY (Preview) - Grid (Shopee-like)
+   - Mobile: 4 cards per row
+   - >=640px: 6 cards per row
+   - >=1024px: 6 cards per row (desktop tetap 6, 6)
+   - Shape: rectangle with semicircular top
+   ========================= */
+
+.roomGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  align-items: start;
+}
+
+@media (min-width: 640px) {
+  .roomGrid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 12px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .roomGrid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 14px;
+  }
+}
+
+.roomCardLink {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.roomCard {
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+
+  background: var(--t-card);
+  border: 1px solid var(--t-border);
+  box-shadow: 0 10px 22px var(--t-shadow);
+
+  /* Rectangle + semicircular top */
+  border-radius: 999px 999px 16px 16px;
+
+  /* Keep card height consistent */
+  aspect-ratio: 1 / 1.22;
+}
+
+.roomMedia {
+  position: relative;
+  flex: 1 1 auto;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.roomImg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+
+  /* Fill the shape: no gaps. (Will crop as needed.) */
+  object-fit: cover;
+  object-position: center var(--rc-cropY, 50%);
+  transform: scale(var(--rc-zoom, 1));
+  transform-origin: center var(--rc-cropY, 50%);
+}
+
+.roomMediaPlaceholder {
+  width: 100%;
+  height: 100%;
+  opacity: .35;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.10), rgba(0, 0, 0, 0.02));
+}
+
+/* Title area compact (<= ~1/4 card height) */
+.roomBody {
+  flex: 0 0 52px;
+  max-height: 25%;
+  padding: 6px 6px 8px;
+  overflow: hidden;
+}
+
+.roomTopRow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.roomTitle {
+  font-weight: 800;
+  font-size: 12px;
+  line-height: 1.15;
+  color: var(--t-text);
+  text-align: center;
+
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.roomBadge {
+  align-self: center;
+  font-size: 10px;
+  padding: 3px 6px;
+  border-radius: 999px;
+  border: 1px solid var(--t-border);
+  background: rgba(255, 255, 255, 0.14);
+  color: var(--t-text);
+}
+
+/* Image-only cards: no body; image must still fill the shape with no gaps */
+.roomCardImageOnly .roomBody {
+  display: none !important;
+}
+
+/* Keep a soft blurred background layer (uses --rc-bg from inline style if available) */
+.roomCardImageOnly .roomMedia {
+  position: relative;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.roomCardImageOnly .roomMedia::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--rc-bg);
+  background-size: cover;
+  background-position: center var(--rc-cropY, 50%);
+  filter: blur(14px);
+  transform: scale(1.12);
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+/* Foreground image fills the arch (no gaps) */
+.roomCardImageOnly .roomImg {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+
+  object-fit: cover !important;
+  object-position: center var(--rc-cropY, 50%) !important;
+
+  transform: scale(var(--rc-zoom, 1)) !important;
+  transform-origin: center var(--rc-cropY, 50%) !important;
+
+  z-index: 1 !important;
+}
+
+/* =========================
+   ROOM_CATEGORY (Preview) - Responsive title sizing (v3 lebih kecil lagi)
+   Goal: teks dalam card lebih kecil di HP/tablet supaya judul makin lengkap
+   ========================= */
+
+/* Desktop default */
+.roomTitle {
+  font-size: 11px;
+  line-height: 1.10;
+  font-weight: 800;
+  letter-spacing: -0.1px;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* Tablet */
+@media (max-width: 900px) {
+  .roomBody {
+    padding: 5px 5px 6px;
+  }
+
+  .roomTitle {
+    font-size: 9px;
+    line-height: 1.05;
+    letter-spacing: -0.15px;
+    -webkit-line-clamp: 4;
+  }
+}
+
+/* HP */
+@media (max-width: 520px) {
+  .roomBody {
+    padding: 4px 4px 5px;
+  }
+
+  .roomTitle {
+    font-size: 8px;
+    line-height: 1.03;
+    letter-spacing: -0.18px;
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+/* HP kecil banget */
+@media (max-width: 360px) {
+  .roomTitle {
+    font-size: 7.5px;
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+
+
+/* =========================
+   CONTACT (Hubungi Kami) - Preview layout helpers
+   (no inline styles in page.tsx)
+========================= */
+
+.wFull {
+  width: 100%;
+}
+
+.contactStage {
+  min-height: clamp(380px, 60vh, 760px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14px;
+}
+
+.contactStageBody {
+  width: 100%;
+}
+
+.contactPrimaryCtaText {
+  font-weight: 900;
+  display: block;
+  line-height: 1.1;
+}
+
+.contactChipsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.contactChip {
+  width: auto;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.contactHeroCard {
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  background: var(--t-card);
+  color: var(--t-text, var(--t-card-fg));
+}
+
+.contactHeroMedia {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  max-height: 320px;
+  background: rgba(0, 0, 0, 0.06);
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+.contactCoverImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.contactHeroPlaceholder {
+  font-size: 26px;
+  opacity: 0.55;
+}
+
+.contactHeroContent {
+  padding: 16px;
+  display: grid;
+  gap: 10px;
+}
+
+.contactTextStack {
+  color: var(--t-text, inherit);
+  display: grid;
+  gap: 6px;
+}
+
+.contactTitle {
+  font-weight: 900;
+  font-size: 18px;
+  line-height: 1.15;
+}
+
+.contactDesc {
+  opacity: 0.82;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.contactPrimaryBtnWide {
+  width: 100%;
+}
+
+.contactBtn {
+  padding: 10px 12px;
+  font-size: 14px;
+}
+
+.contactThumb16x9 {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.contactAgentCard {
+  border-radius: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: var(--t-card);
+  color: var(--t-card-fg);
+  padding: 14px;
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+
+.contactSmallLabel {
+  font-weight: 900;
+  font-size: 14px;
+}
+
+.contactSmallMeta {
+  opacity: 0.8;
+  font-size: 12px;
+}
+
+.contactTopGap6 {
+  margin-top: 6px;
+}
+
+.contactCarouselScroll {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.contactCarouselCard {
+  min-width: 240px;
+  max-width: 340px;
+  border-radius: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: var(--t-card);
+  color: var(--t-card-fg);
+  padding: 14px;
+  display: grid;
+  gap: 10px;
+  scroll-snap-align: start;
+}
+
+.contactMediaCard {
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  background: rgba(0, 0, 0, 0.06);
+  min-height: 220px;
+}
+
+.contactMediaPlaceholder {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  font-size: 26px;
+  opacity: 0.55;
+}
+
+.contactSplitRight {
+  border-radius: 18px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: var(--t-card);
+  color: var(--t-card-fg);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+}
+
+.contactTextCard {
+  border-radius: 18px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: var(--t-card);
+  color: var(--t-card-fg);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+}
+
+.contactMinimalCard {
+  display: grid;
+  gap: 12px;
+  border-radius: 18px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: var(--t-card);
+  color: var(--t-card-fg);
+  padding: 16px;
+}
+
+.contactMinimalRow {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.contactAvatar {
+  width: 54px;
+  height: 54px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  background: rgba(0, 0, 0, 0.06);
+  flex: 0 0 auto;
+}
+
+.contactAvatarPlaceholder {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  font-size: 20px;
+  opacity: 0.6;
+}
+
+.contactInfoStack {
+  display: grid;
+  gap: 4px;
+}
+
+.contactName {
+  font-weight: 900;
+  font-size: 16px;
+  line-height: 1.15;
+}
+
+.contactMeta {
+  opacity: 0.82;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+/* Admin CONTACT picker helpers */
+/* Dipakai untuk UI checklist nomor + input label tombol (Hubungi Kami) */
+.contactPickRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.contactPickLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 0 0 auto;
+}
+
+.contactPickMeta {
+  opacity: 0.8;
+  font-size: 12px;
+}
+
+.contactPickInput {
+  flex: 1 1 220px;
+  min-width: 180px;
+  padding: 9px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: rgba(255, 255, 255, 0.92);
+  color: #0b0f1a;
+  outline: none;
+}
+
+.contactPickInput::placeholder {
+  opacity: 0.65;
+}
+
+.contactPickInput:focus {
+  border-color: rgba(255, 200, 0, 0.55);
+  box-shadow: 0 0 0 3px rgba(255, 200, 0, 0.20);
+}
+
+.promoStage {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 18px;
+  padding: clamp(16px, 3vw, 22px);
+  box-shadow: 0 12px 28px rgba(2, 6, 23, 0.12);
+  display: grid;
+  gap: 14px;
+}
+
+.promoStageFull {
+  border-radius: 0;
+  border: none;
+  padding: clamp(10px, 2vw, 18px);
+  box-shadow: none;
+}
+
+.promoStage[data-layout="hero"] {
+  padding: 0;
+  overflow: hidden;
+}
+
+.promoGrid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-auto-flow: dense;
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .promoGrid {
+    grid-template-columns: repeat(var(--promoGridDesktopCols, 4), minmax(0, 1fr));
+  }
+}
+
+.promoCarousel {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  position: relative;
+}
+
+.promoCarousel::-webkit-scrollbar {
+  height: 0;
+}
+
+.promoCarousel::-webkit-scrollbar-thumb {
+  background: transparent;
+}
+
+.promoCarousel::before,
+.promoCarousel::after {
+  content: "";
+  position: sticky;
+  top: 0;
+  align-self: center;
+  width: 48px;
+  height: 92px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.32);
+  color: white;
+  font-weight: 900;
+  font-size: 24px;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.promoCarousel::before {
+  left: 6px;
+  margin-right: -38px;
+  content: "<";
+}
+
+.promoCarousel::after {
+  right: 6px;
+  margin-left: -38px;
+  content: ">";
+}
+
+@media (max-width: 640px) {
+
+  .promoCarousel::before,
+  .promoCarousel::after {
+    width: 36px;
+    height: 72px;
+    font-size: 20px;
+  }
+}
+
+.promoCard {
+  position: relative;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 14px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 10px 24px rgba(2, 6, 23, 0.14);
+  scroll-snap-align: start;
+  aspect-ratio: 16 / 7;
+  max-height: clamp(180px, 26vw, 400px);
+}
+
+.promoCarousel .promoCard {
+  width: calc((100% - 12px) / 2);
+  flex: 0 0 calc((100% - 12px) / 2);
+  min-width: 320px;
+  max-width: 620px;
+}
+
+.promoStage[data-layout="carousel"] .promoCard {
+  max-height: none;
+  aspect-ratio: auto;
+}
+
+.promoStage[data-layout="grid"] .promoCard {
+  max-height: clamp(220px, 28vw, 480px);
+}
+
+.promoImg {
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.promoStage[data-layout="carousel"] .promoImg {
+  height: auto;
+  min-height: 0;
+  object-fit: contain;
+}
+
+@media (max-width: 1023px) {
+  .promoCarousel .promoCard {
+    width: 72%;
+    flex: 0 0 72%;
+  }
+}
+
+@media (max-width: 640px) {
+  .promoCarousel .promoCard {
+    width: 92%;
+    flex: 0 0 92%;
+  }
+}
+
+.promoPlaceholder {
+  height: 100%;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.65);
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.promoHero {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 1;
+  overflow: hidden;
+  border-radius: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 12px 28px rgba(2, 6, 23, 0.14);
+}
+
+.promoHeroImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.promoHeroBadge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: rgba(0, 0, 0, 0.65);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  letter-spacing: 0.01em;
+}
+
+.promoLink {
+  display: block;
+  width: 100%;
+  height: 100%;
+  text-decoration: none;
+}
+
+.promoClickable {
+  display: block;
+  height: 100%;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .promoHero {
+    height: clamp(200px, 32vh, 380px);
+    max-height: clamp(200px, 32vh, 380px);
+  }
+}
+
+@media (max-width: 520px) {
+  .contactPickRow {
+    align-items: stretch;
+  }
+
+  .contactPickInput {
+    flex-basis: 100%;
+    min-width: 0;
+  }
+}
+
+/* =========================
+   FOOTER (Preview) - Responsive Layout
+========================= */
+.footerSection {
+  margin-bottom: 40px;
+  padding: 60px 24px 40px;
+  scroll-margin-top: 100px;
+}
+
+.footerLayout {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 40px;
+  align-items: start;
+}
+
+.footerTagsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px 20px;
+}
+
+.footerRightStack {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding-top: 4px;
+}
+
+.footerMenuContactGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 992px) {
+  .footerLayout {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  .footerTagsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* =========================
+   HIGHLIGHT_COLLECTION (Migrated from page.module.css)
+   ========================= */
+.hcSection {
+  overflow: hidden;
+  border-radius: 26px;
+  background: var(--t-bg);
+  color: var(--t-element);
+  border: 1px solid var(--t-divider);
+  box-shadow: 0 18px 60px rgba(2, 6, 23, 0.08);
+}
+
+.hcInner {
+  padding: 16px;
+}
+
+.hcHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.hcBadge {
+  align-self: flex-start;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 850;
+  font-size: 12px;
+  letter-spacing: 0.2px;
+  background: var(--t-card);
+  border: 1px solid var(--t-card-border);
+  color: var(--t-card-fg);
+}
+
+.hcTitle {
+  color: var(--t-element);
+  font-weight: 950;
+  font-size: 22px;
+  line-height: 1.15;
+}
+
+.hcDesc {
+  color: var(--t-element);
+  opacity: 0.85;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.hcCta {
+  align-self: flex-start;
+  margin-top: 4px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-weight: 950;
+  text-decoration: none;
+  background: var(--t-cta-bg);
+  color: var(--t-cta-fg);
+  border: 1px solid var(--t-cta-border);
+  box-shadow: 0 14px 45px rgba(2, 6, 23, 0.10);
+  transition: transform .12s ease, background-color .12s ease, color .12s ease;
+}
+
+.hcCta:hover {
+  background: var(--t-cta-hover-bg);
+  color: var(--t-cta-hover-fg);
+  transform: translateY(-1px);
+}
+
+.hcGrid {
+  display: grid;
+  gap: 14px;
+}
+
+.hcHero {
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--t-card-border);
+  background: var(--t-card);
+}
+
+.hcHeroMediaBlur {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(14px);
+  transform: scale(1.12);
+  opacity: 0.55;
+}
+
+.hcHeroMediaImg {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 55%;
+  display: block;
+}
+
+/* Glass overlay content for Highlight hero */
+.hcHeroOverlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(closest-side at 50% 50%, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.40));
+  opacity: 0.65;
+}
+
+.hcHeroOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: 24px;
+}
+
+.hcHeroGlass {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  max-width: 420px;
+}
+
+.hcHeroOverlayTitle {
+  font-size: 28px;
+  font-weight: 950;
+  line-height: 1.1;
+  color: #fff;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.hcHeroOverlayDesc {
+  font-size: 15px;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.92);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+}
+
+.hcHeroOverlayCta {
+  margin-top: 8px;
+  padding: 10px 16px;
+  border-radius: 99px;
+  background: #fff;
+  color: #000;
+  font-weight: 800;
+  text-decoration: none;
+  font-size: 13px;
+  transition: transform 0.15s ease;
+}
+
+.hcHeroOverlayCta:hover {
+  transform: translateY(-1px);
+  background: var(--t-cta-hover-bg);
+  color: var(--t-cta-hover-fg);
+}
+
+.hcHeroEmpty {
+  padding: 18px;
+  font-weight: 850;
+  opacity: 0.7;
+}
+
+.hcItems {
+  display: grid;
+  gap: 12px;
+}
+
+.hcItem {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 12px;
+  padding: 10px;
+  border-radius: 16px;
+  text-decoration: none;
+  border: 1px solid var(--t-card-border);
+  background: var(--t-card);
+  color: var(--t-element);
+  overflow: hidden;
+}
+
+.hcItemMedia {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  min-height: 92px;
+  border: 1px solid rgba(0, 0, 0, 0.10);
+}
+
+.hcItemMediaBlur {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(12px);
+  transform: scale(1.12);
+  opacity: 0.55;
+}
+
+.hcItemMediaImg {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 92px;
+  object-fit: cover;
+  display: block;
+}
+
+.hcItemEmptyMedia {
+  border-radius: 14px;
+  min-height: 92px;
+  border: 1px solid var(--t-card-border);
+  background: rgba(255, 255, 255, 0.10);
+}
+
+.hcItemBody {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 2px 2px 2px 0;
+}
+
+.hcItemTitle {
+  color: var(--t-element);
+  font-weight: 950;
+  line-height: 1.2;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.hcItemSub {
+  font-size: 13px;
+  opacity: 0.82;
+  line-height: 1.35;
+}
+
+.hcItemPrice {
+  margin-top: auto;
+  font-weight: 950;
+  opacity: 0.92;
+}
+
+/* Tablet */
+@media (min-width: 768px) {
+  .hcTitle {
+    font-size: 26px;
+  }
+
+  .hcItems {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hcItem {
+    grid-template-columns: 1fr;
+    padding: 12px;
+  }
+
+  .hcItemMedia,
+  .hcItemMediaImg,
+  .hcItemEmptyMedia {
+    min-height: 128px;
+    height: clamp(128px, 18vw, 180px);
+  }
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+  .hcInner {
+    padding: 18px;
+  }
+
+  .hcGrid {
+    grid-template-columns: 5fr 7fr;
+    align-items: start;
+  }
+
+  article[data-hc-layout="FEATURED_TOP"] .hcGrid,
+  article[data-layout="FEATURED_TOP"] .hcGrid,
+  article[data-hc-layout="GRID"] .hcGrid,
+  article[data-layout="GRID"] .hcGrid,
+  article[data-hc-layout="CARDS"] .hcGrid,
+  article[data-layout="CARDS"] .hcGrid,
+  article[data-hc-layout="FEATURED_LEFT"] .hcGrid,
+  article[data-layout="FEATURED_LEFT"] .hcGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .hcItems {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-content: start;
+  }
+
+  article[data-hc-layout="GRID"] .hcItems {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* Mobile swipe row */
+@media (max-width: 767px) {
+
+  .hcHeroMedia,
+  .hcItems {
+    display: flex;
+    overflow-x: auto;
+    gap: 12px;
+    padding-bottom: 6px;
+    scroll-snap-type: x mandatory;
+    object-fit: contain;
+    object-position: center;
+  }
+
+  .hcItem {
+    min-width: 72%;
+    grid-template-columns: 1fr;
+    scroll-snap-align: start;
+  }
+
+  .hcItemMedia,
+  .hcItemMediaImg,
+  .hcItemEmptyMedia {
+    min-height: 140px;
+    height: clamp(140px, 46vw, 220px);
+  }
+}
+
+@media (max-width: 640px) {
+  .footerSection {
+    padding: 40px 20px 30px;
+  }
+
+  .footerTagsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .footerMenuContactGrid {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+}
