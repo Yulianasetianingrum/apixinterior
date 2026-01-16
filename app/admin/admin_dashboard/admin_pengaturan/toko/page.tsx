@@ -1957,7 +1957,7 @@ async function saveCategoryGridConfig(formData: FormData) {
       const c = parseNum(formData.get(coverKey));
       cover = c && c > 0 ? c : null;
     } else {
-      const prev = existingCoverByKategori.get(kategoriId);
+      const prev = existingCoverByKategori.get(kategoriId) as number | null | undefined;
       cover = prev && prev > 0 ? prev : null;
     }
 
