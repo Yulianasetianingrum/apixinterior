@@ -1909,8 +1909,9 @@
 .heroThemeGoldWhite {
   --hb-bg: #ffc800;
   --hb-bg2: #e6aa00;
-  --hb-text: rgba(255, 255, 255, .96);
-  --hb-muted: rgba(255, 255, 255, .82);
+  --hb-text: rgba(7, 16, 38, .96);
+  /* Was White -> Now Navy for contrast */
+  --hb-muted: rgba(7, 16, 38, .82);
   --hb-accent: #ffffff;
 
   --hb-cardBg: rgba(7, 16, 38, .16);
@@ -4968,14 +4969,53 @@ article[data-hc-nohero="1"] .hcCta {
   .heroTopRow {
     flex-direction: row !important;
     align-items: center !important;
+    justify-content: flex-start !important;
+    /* Forces left align on mobile to prevent clipping */
     gap: 10px !important;
     flex-wrap: nowrap !important;
     overflow-x: auto !important;
+    width: 100%;
+    padding-inline: 4px;
+    /* Tiny padding */
   }
 }
 
-/* HERO CTA CONTRAST ENFORCEMENT (BRUTE FORCE) */
+/* HERO CTA CONTRAST ENFORCEMENT (SUPER ROBUST) */
+
+/* GOLD + WHITE (Theme 5) */
+html .heroThemeGoldWhite .heroCtaPrimary {
+  background-color: #ffffff !important;
+  color: #071026 !important;
+  -webkit-text-fill-color: #071026 !important;
+}
+
+html .heroThemeGoldWhite .heroCtaPrimary:hover {
+  background-color: #071026 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+/* WHITE + NAVY (Theme 6) */
+html .heroThemeWhiteNavy .heroCtaPrimary {
+  background-color: #071026 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+html .heroThemeWhiteNavy .heroCtaPrimary:hover {
+  background-color: #ffffff !important;
+  /* Force swap on hover */
+  color: #071026 !important;
+  -webkit-text-fill-color: #071026 !important;
+}
+
+/* OTHER THEMES (Regular Enforcement) */
 .heroThemeNavyGold .heroCtaPrimary {
+  color: #071026 !important;
+  -webkit-text-fill-color: #071026 !important;
+}
+
+.heroThemeNavyGold .heroCtaPrimary:hover {
   color: #071026 !important;
   -webkit-text-fill-color: #071026 !important;
 }
@@ -4985,7 +5025,17 @@ article[data-hc-nohero="1"] .hcCta {
   -webkit-text-fill-color: #ffffff !important;
 }
 
+.heroThemeWhiteGold .heroCtaPrimary:hover {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
 .heroThemeNavyWhite .heroCtaPrimary {
+  color: #071026 !important;
+  -webkit-text-fill-color: #071026 !important;
+}
+
+.heroThemeNavyWhite .heroCtaPrimary:hover {
   color: #071026 !important;
   -webkit-text-fill-color: #071026 !important;
 }
@@ -4995,43 +5045,7 @@ article[data-hc-nohero="1"] .hcCta {
   -webkit-text-fill-color: #ffc800 !important;
 }
 
-.heroThemeGoldWhite .heroCtaPrimary {
-  color: #071026 !important;
-  -webkit-text-fill-color: #071026 !important;
-}
-
-.heroThemeWhiteNavy .heroCtaPrimary {
-  color: #ffffff !important;
-  -webkit-text-fill-color: #ffffff !important;
-}
-
-/* Also ensure hover states maintain interaction feedback */
-.heroThemeNavyGold .heroCtaPrimary:hover {
-  color: #071026 !important;
-  -webkit-text-fill-color: #071026 !important;
-}
-
-.heroThemeWhiteGold .heroCtaPrimary:hover {
-  color: #ffffff !important;
-  -webkit-text-fill-color: #ffffff !important;
-}
-
-.heroThemeNavyWhite .heroCtaPrimary:hover {
-  color: #071026 !important;
-  -webkit-text-fill-color: #071026 !important;
-}
-
 .heroThemeGoldNavy .heroCtaPrimary:hover {
   color: #ffc800 !important;
   -webkit-text-fill-color: #ffc800 !important;
-}
-
-.heroThemeGoldWhite .heroCtaPrimary:hover {
-  color: #ffffff !important;
-  -webkit-text-fill-color: #ffffff !important;
-}
-
-.heroThemeWhiteNavy .heroCtaPrimary:hover {
-  color: #071026 !important;
-  -webkit-text-fill-color: #071026 !important;
 }
