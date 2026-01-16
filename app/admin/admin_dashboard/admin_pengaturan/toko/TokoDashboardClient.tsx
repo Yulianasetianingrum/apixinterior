@@ -1,7 +1,7 @@
 ﻿// app/admin/admin_dashboard/admin_pengaturan/toko/TokoDashboardClient.tsx
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, Dispatch, SetStateAction } from "react";
 import { useRouter } from "next/navigation";
 import {
   DragDropContext,
@@ -229,33 +229,30 @@ export function TokoDashboardClient({
           <button
             type="button"
             onClick={() => setTab("sections")}
-            className={`rounded-full px-3 py-1 text-sm ${
-              tab === "sections"
-                ? "bg-black text-white"
-                : "bg-gray-100 text-gray-700"
-            }`}
+            className={`rounded-full px-3 py-1 text-sm ${tab === "sections"
+              ? "bg-black text-white"
+              : "bg-gray-100 text-gray-700"
+              }`}
           >
             Section Homepage
           </button>
           <button
             type="button"
             onClick={() => setTab("navbar")}
-            className={`rounded-full px-3 py-1 text-sm ${
-              tab === "navbar"
-                ? "bg-black text-white"
-                : "bg-gray-100 text-gray-700"
-            }`}
+            className={`rounded-full px-3 py-1 text-sm ${tab === "navbar"
+              ? "bg-black text-white"
+              : "bg-gray-100 text-gray-700"
+              }`}
           >
             Navbar User
           </button>
           <button
             type="button"
             onClick={() => setTab("sidebar")}
-            className={`rounded-full px-3 py-1 text-sm ${
-              tab === "sidebar"
-                ? "bg-black text-white"
-                : "bg-gray-100 text-gray-700"
-            }`}
+            className={`rounded-full px-3 py-1 text-sm ${tab === "sidebar"
+              ? "bg-black text-white"
+              : "bg-gray-100 text-gray-700"
+              }`}
           >
             Menu Admin / Sidebar
           </button>
@@ -301,7 +298,7 @@ function TabSections({
   onCreateSection,
 }: {
   sections: HomepageSectionDTO[];
-  setSections: (s: HomepageSectionDTO[]) => void;
+  setSections: Dispatch<SetStateAction<HomepageSectionDTO[]>>;
   onCreateSection: (fd: FormData) => void;
 }) {
   return (
@@ -321,13 +318,12 @@ function TabSections({
             defaultValue="HERO"
           >
             <option value="HERO">Hero</option>
-            <option value="CATEGORY_GRID">Category Grid</option>
-            <option value="FEATURED_COLLECTIONS">Featured Collections</option>
-            <option value="PRODUCT_LIST">Product List</option>
+            <option value="CATEGORY_GRID_COMMERCE">Category Grid</option>
+            <option value="HIGHLIGHT_COLLECTION">Featured Collections</option>
+            <option value="PRODUCT_LISTING">Product List</option>
             <option value="GALLERY">Gallery</option>
-            <option value="INFO">Info</option>
+            <option value="TEXT_SECTION">Info / Custom Text</option>
             <option value="CONTACT">Contact</option>
-            <option value="CUSTOM_TEXT">Custom Text</option>
           </select>
         </div>
         <div className="min-w-[180px]">
@@ -392,7 +388,7 @@ function SectionCard({
 }: {
   section: HomepageSectionDTO;
   index: number;
-  setSections: (s: HomepageSectionDTO[]) => void;
+  setSections: Dispatch<SetStateAction<HomepageSectionDTO[]>>;
 }) {
   const [isPending, startTransition] = useTransition();
 
@@ -409,9 +405,9 @@ function SectionCard({
       prev.map((s) =>
         s.id === section.id
           ? {
-              ...s,
-              ...patch,
-            }
+            ...s,
+            ...patch,
+          }
           : s
       )
     );
@@ -432,9 +428,9 @@ function SectionCard({
       prev.map((s) =>
         s.id === section.id
           ? {
-              ...s,
-              config: nextConfig,
-            }
+            ...s,
+            config: nextConfig,
+          }
           : s
       )
     );
@@ -458,9 +454,8 @@ function SectionCard({
     <Draggable draggableId={`section-${section.id}`} index={index}>
       {(provided, snapshot) => (
         <div
-          className={`flex flex-col gap-3 rounded-lg border p-3 text-sm ${
-            snapshot.isDragging ? "bg-gray-100" : "bg-white"
-          }`}
+          className={`flex flex-col gap-3 rounded-lg border p-3 text-sm ${snapshot.isDragging ? "bg-gray-100" : "bg-white"
+            }`}
           ref={provided.innerRef}
           {...provided.draggableProps}
         >
@@ -470,7 +465,7 @@ function SectionCard({
                 className="mt-1 cursor-grab text-gray-400"
                 {...provided.dragHandleProps}
               >
-                
+
               </div>
               <div className="flex-1 space-y-1">
                 <div className="flex items-center gap-2">
@@ -547,31 +542,31 @@ function SectionCard({
           </div>
 
           {/* Sedikit behaviour generik */}
-          {(section.type === "PRODUCT_LIST" ||
-            section.type === "CATEGORY_GRID" ||
-            section.type === "FEATURED_COLLECTIONS" ||
+          {(section.type === "PRODUCT_LISTING" ||
+            section.type === "CATEGORY_GRID_COMMERCE" ||
+            section.type === "HIGHLIGHT_COLLECTION" ||
             section.type === "GALLERY") && (
-            <div className="flex items-center gap-2">
-              <label className="text-xs text-gray-600">
-                Max items (opsional):
-              </label>
-              <input
-                type="number"
-                className="w-20 rounded border px-2 py-1 text-xs"
-                value={config.maxItems ?? ""}
-                onChange={(e) =>
-                  handleConfigChange({
-                    maxItems:
-                      e.target.value === ""
-                        ? undefined
-                        : Number(e.target.value),
-                  })
-                }
-              />
-            </div>
-          )}
+              <div className="flex items-center gap-2">
+                <label className="text-xs text-gray-600">
+                  Max items (opsional):
+                </label>
+                <input
+                  type="number"
+                  className="w-20 rounded border px-2 py-1 text-xs"
+                  value={config.maxItems ?? ""}
+                  onChange={(e) =>
+                    handleConfigChange({
+                      maxItems:
+                        e.target.value === ""
+                          ? undefined
+                          : Number(e.target.value),
+                    })
+                  }
+                />
+              </div>
+            )}
 
-          {section.type === "CUSTOM_TEXT" && (
+          {section.type === "TEXT_SECTION" && (
             <p className="text-[11px] text-gray-500">
               Konten lengkap custom text bisa kamu simpan di config nanti
               (misalnya field <code>body</code>). Untuk sekarang fokus dulu ke
@@ -625,7 +620,7 @@ function TabNavbar({
   onCreateNavbarItem,
 }: {
   navbarItems: NavbarItemDTO[];
-  setNavbarItems: (items: NavbarItemDTO[]) => void;
+  setNavbarItems: Dispatch<SetStateAction<NavbarItemDTO[]>>;
   onCreateNavbarItem: (fd: FormData) => void;
 }) {
   const [isPending, startTransition] = useTransition();
@@ -718,8 +713,8 @@ function TabNavbar({
                 {pos === "MAIN"
                   ? "Main (Navbar atas)"
                   : pos === "BOTTOM"
-                  ? "Bottom bar"
-                  : "Footer"}
+                    ? "Bottom bar"
+                    : "Footer"}
               </h3>
 
               <Droppable droppableId={`navbar-${pos}`}>
@@ -739,15 +734,14 @@ function TabNavbar({
                           <div
                             ref={provided2.innerRef}
                             {...provided2.draggableProps}
-                            className={`flex items-center gap-2 rounded border px-2 py-1 text-xs ${
-                              snapshot2.isDragging ? "bg-gray-100" : "bg-white"
-                            }`}
+                            className={`flex items-center gap-2 rounded border px-2 py-1 text-xs ${snapshot2.isDragging ? "bg-gray-100" : "bg-white"
+                              }`}
                           >
                             <div
                               className="cursor-grab text-gray-400"
                               {...provided2.dragHandleProps}
                             >
-                              
+
                             </div>
                             <div className="flex-1 space-y-1">
                               <input
@@ -844,7 +838,7 @@ function TabSidebar({
   onCreateAdminMenuItem,
 }: {
   adminMenuItems: AdminMenuItemDTO[];
-  setAdminMenuItems: (items: AdminMenuItemDTO[]) => void;
+  setAdminMenuItems: Dispatch<SetStateAction<AdminMenuItemDTO[]>>;
   onCreateAdminMenuItem: (fd: FormData) => void;
 }) {
   const [isPending, startTransition] = useTransition();
@@ -950,16 +944,15 @@ function TabSidebar({
                   <div
                     ref={provided2.innerRef}
                     {...provided2.draggableProps}
-                    className={`rounded border p-2 text-xs ${
-                      snapshot2.isDragging ? "bg-gray-100" : "bg-white"
-                    }`}
+                    className={`rounded border p-2 text-xs ${snapshot2.isDragging ? "bg-gray-100" : "bg-white"
+                      }`}
                   >
                     <div className="flex items-center gap-2">
                       <div
                         className="cursor-grab text-gray-400"
                         {...provided2.dragHandleProps}
                       >
-                        
+
                       </div>
                       <input
                         className="flex-1 rounded border px-2 py-1 text-xs"
