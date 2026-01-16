@@ -1044,7 +1044,8 @@ export default async function TokoPreviewDraftPage({
                   const sectionThemeRaw = String(cfg.sectionTheme ?? "FOLLOW_NAVBAR").trim();
                   const sectionThemeResolved = resolveEffectiveTheme(sectionThemeRaw, navbarTheme);
                   const themeTokens = commerceThemeTokens(sectionThemeResolved);
-                  const accent = colorForToken(themeTokens.token);
+                  const pair = parseThemePair(sectionThemeResolved);
+                  const accent = colorForToken(pair.b);
 
                   const modeClass =
                     mode === "heading"

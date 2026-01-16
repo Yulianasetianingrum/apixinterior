@@ -678,7 +678,8 @@ export default async function HomePage({
             const width = String(cfg.width ?? "normal");
             const sectionThemeResolved = resolveEffectiveTheme(cfg.sectionTheme ?? "FOLLOW_NAVBAR", navbarTheme);
             const themeTokens = commerceThemeTokens(sectionThemeResolved);
-            const accent = colorForToken(themeTokens.token);
+            const pair = parseThemePair(sectionThemeResolved);
+            const accent = colorForToken(pair.b);
             const alignClass = align === "center" ? styles.textAlignCenter : styles.textAlignLeft;
             const widthClass = width === "wide" ? styles.textWidthWide : styles.textWidthNormal;
 
