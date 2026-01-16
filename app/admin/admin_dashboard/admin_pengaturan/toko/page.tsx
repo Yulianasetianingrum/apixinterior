@@ -36,6 +36,7 @@ import {
   getThemeKeyFromReferer,
   updateDraftConfigPreserveTheme,
   parseCustomPromoBgTheme,
+  redirectBack,
 } from "./toko-utils";
 
 
@@ -150,42 +151,7 @@ async function updateBackgroundTheme(formData: FormData) {
 
 
 
-function safeDecodeURIComponent(v: string) {
-  try {
-    return decodeURIComponent(v);
-  } catch {
-    return v;
-  }
-}
 
-async function redirectBack(params: {
-  notice?: string;
-  error?: string;
-  forceReload?: boolean;
-  anchor?: string;
-  sectionId?: number | string;
-}) {
-  const u = await getRefererUrl();
-  const base = u ? u : new URL("http://localhost/admin/admin_dashboard/admin_pengaturan/toko");
-  if (params.notice) {
-    base.searchParams.set("notice", safeDecodeURIComponent(params.notice));
-    base.searchParams.delete("error");
-  }
-  if (params.error) {
-    base.searchParams.set("error", safeDecodeURIComponent(params.error));
-    base.searchParams.delete("notice");
-  }
-  if (params.forceReload) {
-    base.searchParams.set("r", String(Date.now()));
-  }
-  if (params.sectionId !== undefined && params.sectionId !== null && params.sectionId !== "") {
-    base.searchParams.set("sectionId", String(params.sectionId));
-  } else {
-    base.searchParams.delete("sectionId");
-  }
-  const anchor = params.anchor ? `#${params.anchor}` : base.hash;
-  redirect(base.pathname + (base.search ? base.search : "") + (anchor || ""));
-}
 
 
 
