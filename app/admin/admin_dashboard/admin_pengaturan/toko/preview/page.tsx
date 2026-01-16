@@ -1665,38 +1665,40 @@ export default async function TokoPreviewDraftPage({
 
                   // Apply theme colors for ALL combinations
                   const themePair = parseThemePair(sectionThemeResolved);
+                  const themeStr = String(sectionThemeResolved || "").toUpperCase().replace(/[-_\s+]/g, "");
 
-                  if (themePair.a === "WHITE" && themePair.b === "GOLD") {
+                  // Match theme by parsed pair OR raw string (for flexibility)
+                  if ((themePair.a === "WHITE" && themePair.b === "GOLD") || themeStr === "WHITEGOLD") {
                     // WHITE + GOLD: Card bg = White, Button bg = Gold
                     cardBg = "#ffffff";
                     cardFg = "#0f172a";
                     ctaBg = "#d4af37";
                     ctaFg = "#0b1d3a";
-                  } else if (themePair.a === "NAVY" && themePair.b === "GOLD") {
+                  } else if ((themePair.a === "NAVY" && themePair.b === "GOLD") || themeStr === "NAVYGOLD") {
                     // NAVY + GOLD: Card bg = Navy, Button bg = Gold
                     cardBg = "#0b1d3a";
                     cardFg = "#ffffff";
                     ctaBg = "#d4af37";
                     ctaFg = "#0b1d3a";
-                  } else if (themePair.a === "NAVY" && themePair.b === "WHITE") {
+                  } else if ((themePair.a === "NAVY" && themePair.b === "WHITE") || themeStr === "NAVYWHITE") {
                     // NAVY + WHITE: Card bg = Navy, Button bg = White
                     cardBg = "#0b1d3a";
                     cardFg = "#ffffff";
                     ctaBg = "#ffffff";
                     ctaFg = "#0b1d3a";
-                  } else if (themePair.a === "GOLD" && themePair.b === "NAVY") {
+                  } else if ((themePair.a === "GOLD" && themePair.b === "NAVY") || themeStr === "GOLDNAVY") {
                     // GOLD + NAVY: Card bg = Gold, Button bg = Navy
                     cardBg = "#d4af37";
                     cardFg = "#0b1d3a";
                     ctaBg = "#0b1d3a";
                     ctaFg = "#ffffff";
-                  } else if (themePair.a === "GOLD" && themePair.b === "WHITE") {
+                  } else if ((themePair.a === "GOLD" && themePair.b === "WHITE") || themeStr === "GOLDWHITE") {
                     // GOLD + WHITE: Card bg = Gold, Button bg = White
                     cardBg = "#d4af37";
                     cardFg = "#0b1d3a";
                     ctaBg = "#ffffff";
                     ctaFg = "#0b1d3a";
-                  } else if (themePair.a === "WHITE" && themePair.b === "NAVY") {
+                  } else if ((themePair.a === "WHITE" && themePair.b === "NAVY") || themeStr === "WHITENAVY") {
                     // WHITE + NAVY: Card bg = White, Button bg = Navy
                     cardBg = "#ffffff";
                     cardFg = "#0f172a";
