@@ -811,7 +811,7 @@ export default async function TokoPreviewDraftPage({
                         className={ui.previewSectionFull}
                         style={{
                           background: customPalette.bg,
-                          color: customPalette.text,
+                          color: customPalette.fg,
                         }}
                       >
                         <div
@@ -820,7 +820,7 @@ export default async function TokoPreviewDraftPage({
                             ["--cg-card-bg" as any]: vars.cardBg,
                             ["--cg-card-fg" as any]: vars.insideText,
                             ["--cg-element" as any]: vars.outsideText,
-                            ["--cg-title-color" as any]: titleTextColor ?? customPalette.text,
+                            ["--cg-title-color" as any]: titleTextColor ?? customPalette.fg,
                             ["--cg-card-border" as any]: vars.border,
                           }}
                         >
