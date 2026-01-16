@@ -1044,43 +1044,45 @@ export default async function TokoPreviewDraftPage({
                   const sectionThemeRaw = String(cfg.sectionTheme ?? "FOLLOW_NAVBAR").trim();
                   const sectionThemeResolved = resolveEffectiveTheme(sectionThemeRaw, navbarTheme);
                   const themeTokens = commerceThemeTokens(sectionThemeResolved);
+                  const accent = colorForToken(themeTokens.token);
 
                   const modeClass =
                     mode === "heading"
-                      ? ui.textHeading
+                      ? homeStyles.textHeading
                       : mode === "subtitle"
-                        ? ui.textSubtitle
+                        ? homeStyles.textSubtitle
                         : mode === "caption"
-                          ? ui.textCaption
-                          : ui.textBody;
-                  const alignClass = align === "center" ? ui.textAlignCenter : ui.textAlignLeft;
-                  const widthClass = width === "wide" ? ui.textWidthWide : ui.textWidthNormal;
+                          ? homeStyles.textCaption
+                          : homeStyles.textBody;
+                  const alignClass = align === "center" ? homeStyles.textAlignCenter : homeStyles.textAlignLeft;
+                  const widthClass = width === "wide" ? homeStyles.textWidthWide : homeStyles.textWidthNormal;
 
                   return (
                     <section
                       key={section.id}
-                      className={ui.textSection}
+                      className={homeStyles.textSection}
                       style={{
                         ["--ts-text" as any]: themeTokens.cardFg,
                         ["--ts-bg" as any]: themeTokens.bg,
+                        ["--ts-accent" as any]: accent,
                       }}
                     >
-                      <div className={`${ui.textBlock} ${alignClass} ${widthClass}`}>
-                        <div className={ui.textStack}>
+                      <div className={`${homeStyles.textBlock} ${alignClass} ${widthClass}`}>
+                        <div className={homeStyles.textStack}>
                           {blockItems.map((b: any, idx: number) => {
                             const m = String(b?.mode ?? mode);
                             const text = String(b?.text ?? "").trim();
                             if (!text) return null;
                             const cls =
                               m === "heading"
-                                ? ui.textHeading
+                                ? homeStyles.textHeading
                                 : m === "subtitle"
-                                  ? ui.textSubtitle
+                                  ? homeStyles.textSubtitle
                                   : m === "caption"
-                                    ? ui.textCaption
-                                    : ui.textBody;
+                                    ? homeStyles.textCaption
+                                    : homeStyles.textBody;
                             return (
-                              <p key={idx} className={`${ui.textBase} ${cls}`}>
+                              <p key={idx} className={`${homeStyles.textBase} ${cls}`}>
                                 {text}
                               </p>
                             );

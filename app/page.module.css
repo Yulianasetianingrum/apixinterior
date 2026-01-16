@@ -4596,6 +4596,7 @@ article[data-hc-nohero="1"] .hcCta {
   font-size: clamp(20px, 3.2vw, 32px);
   font-weight: 700;
   line-height: 1.2;
+  color: var(--ts-accent, var(--ts-text));
 }
 
 .textSubtitle {
@@ -4909,6 +4910,35 @@ article[data-hc-nohero="1"] .hcCta {
 @media (max-width: 520px) {
   .previewSection:has(.pcCard:has(iframe)) .pcRow {
     grid-template-columns: 1fr;
-    gap: 12px;
   }
+}
+
+/* HERO ALIGNMENT FIX */
+.heroTopRow {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 640px) {
+  .heroTopRow {
+    flex-direction: column !important;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
+
+.heroEyebrow {
+  margin-bottom: 0 !important;
+}
+
+.heroTopBadges {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 0 !important;
 }

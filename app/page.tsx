@@ -678,11 +678,12 @@ export default async function HomePage({
             const width = String(cfg.width ?? "normal");
             const sectionThemeResolved = resolveEffectiveTheme(cfg.sectionTheme ?? "FOLLOW_NAVBAR", navbarTheme);
             const themeTokens = commerceThemeTokens(sectionThemeResolved);
+            const accent = colorForToken(themeTokens.token);
             const alignClass = align === "center" ? styles.textAlignCenter : styles.textAlignLeft;
             const widthClass = width === "wide" ? styles.textWidthWide : styles.textWidthNormal;
 
             return (
-              <section key={section.id} className={styles.textSection} style={{ ["--ts-text" as any]: themeTokens.cardFg, ["--ts-bg" as any]: themeTokens.bg }}>
+              <section key={section.id} className={styles.textSection} style={{ ["--ts-text" as any]: themeTokens.cardFg, ["--ts-bg" as any]: themeTokens.bg, ["--ts-accent" as any]: accent }}>
                 <div className={`${styles.textBlock} ${alignClass} ${widthClass}`}>
                   <div className={styles.textStack}>
                     {blockItems.map((b: any, idx: number) => {

@@ -11,19 +11,43 @@ export async function GET(request: Request) {
         return new NextResponse('Missing file param', { status: 400 });
     }
 
-    // Security: Prevent directory traversal
-    const safeFile = path.basename(file);
-    const rootUploads = path.join(process.cwd(), 'public', 'uploads');
+    // Security: Prevent directory traversal (basic)
+    // We allow basic query params in input (e.g. file.png?v=1) but strip them for filesystem
+    const rawFile = file.split('?')[0]; // simple strip query
+    const safeFile = path.basename(rawFile);
 
-    // Priority 1: public/uploads (new location)
-    let filePath = path.join(rootUploads, safeFile);
+    // Define potential roots
+    // 1. Current working directory (standard)
+    // 2. Fallback to source directory (absolute path for this environment)
+    const roots = [
+        path.join(process.cwd(), 'public', 'uploads'),
+        path.resolve('d:\\apix_interior\\public\\uploads')
+    ];
 
-    // Priority 2: public/uploads/gambar_upload (old location)
-    if (!fs.existsSync(filePath)) {
-        filePath = path.join(rootUploads, 'gambar_upload', safeFile);
+    // Define potential subfolders to check
+    // '' = flat in uploads
+    // 'gambar_upload' = standard upload path
+    // 'banners' = banner path
+    const subfolders = ['', 'gambar_upload', 'banners'];
+
+    let filePath = '';
+    let found = false;
+
+    // Search logic
+    for (const root of roots) {
+        for (const sub of subfolders) {
+            const tryPath = path.join(root, sub, safeFile);
+            if (fs.existsSync(tryPath)) {
+                filePath = tryPath;
+                found = true;
+                break;
+            }
+        }
+        if (found) break;
     }
 
-    if (!fs.existsSync(filePath)) {
+    if (!found) {
+        console.error(`[ImgProxy] File not found: ${safeFile}. Searched roots: ${roots.join(', ')}`);
         return new NextResponse('File not found', { status: 404 });
     }
 
@@ -34,11 +58,12 @@ export async function GET(request: Request) {
         if (ext === '.png') contentType = 'image/png';
         else if (ext === '.jpg' || ext === '.jpeg') contentType = 'image/jpeg';
         else if (ext === '.webp') contentType = 'image/webp';
+        else if (ext === '.svg') contentType = 'image/svg+xml';
 
         return new NextResponse(fileBuffer, {
             headers: {
                 'Content-Type': contentType,
-                'Cache-Control': 'no-store, max-age=0',
+                'Cache-Control': 'public, max-age=31536000, immutable',
             },
         });
     } catch (e) {
