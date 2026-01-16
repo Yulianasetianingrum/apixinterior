@@ -1342,6 +1342,7 @@ export default async function TokoPengaturanPage({
                             <form id={`heroForm-${section.id}`} action={saveHeroConfig} className={styles.sectionEditForm} data-section-form="1">
                               <input type="hidden" name="id" value={section.id.toString()} />
                               <input type="hidden" name="currentEnabled" value={section.enabled ? "true" : "false"} />
+                              <input type="hidden" name="heroImageId" value={String(cfg.heroImageId ?? "")} />
 
                               {/* Slug (opsional) */}
                               <div style={{ maxWidth: 520 }}>
@@ -3531,6 +3532,7 @@ export default async function TokoPengaturanPage({
                         <input type="hidden" name="theme" value={activeThemeKey} />
 
                         <input type="hidden" name="currentEnabled" value={section.enabled ? "true" : "false"} />
+                        <input type="hidden" name="heroImageId" value={String(cfg.heroImageId ?? "")} />
 
                         <div className={styles.highlightMetaRow}>
                           <div className={styles.fieldGroup} style={{ flex: 1, minWidth: 220 }}>
