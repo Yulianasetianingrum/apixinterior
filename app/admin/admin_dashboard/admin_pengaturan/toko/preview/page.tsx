@@ -771,6 +771,119 @@ export default async function TokoPreviewDraftPage({
                 const t = upperType(section.type);
                 if (focus && t !== focus) return null;
 
+                // HERO / Banner Utama
+                if (t === "HERO") {
+                  const cfg = normalizeConfig(t, section.config) as any;
+
+                  // Parse hero theme
+                  const heroThemeRaw = String(cfg.heroTheme ?? "FOLLOW_NAVBAR").trim();
+                  const heroTheme = resolveEffectiveTheme(heroThemeRaw, navbarTheme);
+                  const themeTokens = getHeroThemeTokens(heroTheme);
+
+                  // Override colors for specific themes to ensure correct rendering
+                  let heroBg = themeTokens.bg;
+                  let heroText = themeTokens.element;
+                  let heroCtaBg = themeTokens.ctaBg;
+                  let heroCtaFg = themeTokens.ctaFg;
+
+                  const themePair = parseThemePair(heroTheme);
+                  if (themePair.a === "NAVY" && themePair.b === "GOLD") {
+                    // NAVY + GOLD: Navy background, white/gold text, gold button
+                    heroBg = "#0b1d3a";
+                    heroText = "#f4f7fb";
+                    heroCtaBg = "#d4af37";
+                    heroCtaFg = "#0b1d3a";
+                  } else if (themePair.a === "GOLD" && themePair.b === "NAVY") {
+                    // GOLD + NAVY: Gold background, navy text, navy button
+                    heroBg = "#d4af37";
+                    heroText = "#0b1d3a";
+                    heroCtaBg = "#0b1d3a";
+                    heroCtaFg = "#ffffff";
+                  } else if (themePair.a === "WHITE" && themePair.b === "GOLD") {
+                    // WHITE + GOLD: White background, navy text, gold button
+                    heroBg = "#ffffff";
+                    heroText = "#0b1d3a";
+                    heroCtaBg = "#d4af37";
+                    heroCtaFg = "#0b1d3a";
+                  } else if (themePair.a === "NAVY" && themePair.b === "WHITE") {
+                    // NAVY + WHITE: Navy background, white text, white button
+                    heroBg = "#0b1d3a";
+                    heroText = "#f4f7fb";
+                    heroCtaBg = "#ffffff";
+                    heroCtaFg = "#0b1d3a";
+                  }
+
+                  // Parse content
+                  const headline = String(cfg.headline ?? "").trim();
+                  const subheadline = String(cfg.subheadline ?? "").trim();
+                  const ctaLabel = String(cfg.ctaLabel ?? "").trim();
+                  const ctaHref = String(cfg.ctaHref ?? "").trim();
+                  const imageId = cfg.imageId ? Number(cfg.imageId) : null;
+                  const imageUrl = imageId ? imageMap.get(imageId)?.url : null;
+
+                  return (
+                    <section
+                      key={section.id}
+                      className={ui.heroSection}
+                      style={{
+                        backgroundColor: heroBg,
+                        color: heroText,
+                        padding: "60px 20px",
+                        minHeight: "500px",
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                    >
+                      <div style={{ maxWidth: "1200px", margin: "0 auto", width: "100%", display: "grid", gridTemplateColumns: imageUrl ? "1fr 1fr" : "1fr", gap: "40px", alignItems: "center" }}>
+                        <div>
+                          {headline ? (
+                            <h1 style={{ fontSize: "48px", fontWeight: 700, marginBottom: "16px", color: heroText }}>
+                              {headline}
+                            </h1>
+                          ) : (
+                            <div className={ui.notice}>Headline belum diisi</div>
+                          )}
+
+                          {subheadline ? (
+                            <p style={{ fontSize: "18px", marginBottom: "24px", opacity: 0.9 }}>
+                              {subheadline}
+                            </p>
+                          ) : null}
+
+                          {ctaLabel ? (
+                            <a
+                              href={ctaHref || "#"}
+                              style={{
+                                display: "inline-block",
+                                padding: "14px 32px",
+                                backgroundColor: heroCtaBg,
+                                color: heroCtaFg,
+                                borderRadius: "8px",
+                                fontWeight: 600,
+                                textDecoration: "none",
+                              }}
+                            >
+                              {ctaLabel}
+                            </a>
+                          ) : null}
+                        </div>
+
+                        {imageUrl ? (
+                          <div style={{ borderRadius: "12px", overflow: "hidden" }}>
+                            <img
+                              src={imageUrl}
+                              alt={headline || "Hero"}
+                              style={{ width: "100%", height: "auto", display: "block" }}
+                            />
+                          </div>
+                        ) : (
+                          <div className={ui.notice}>Hero image belum dipilih</div>
+                        )}
+                      </div>
+                    </section>
+                  );
+                }
+
                 // CATEGORY GRID
                 if (t === "CATEGORY_GRID") {
                   const data = categoryGridById.get(section.id);
@@ -1574,10 +1687,22 @@ export default async function TokoPreviewDraftPage({
                   const finalTextColor = useCustomBg ? bgPalette.fg : "#0b1d3a";
 
                   // Card and button colors: ONLY from Tema Section dropdown
-                  const cardBg = themeColors.card;
-                  const cardFg = themeColors.cardFg;
-                  const ctaBg = themeColors.ctaBg;
-                  const ctaFg = themeColors.ctaFg;
+                  let cardBg = themeColors.card;
+                  let cardFg = themeColors.cardFg;
+                  let ctaBg = themeColors.ctaBg;
+                  let ctaFg = themeColors.ctaFg;
+
+                  // Fix button colors for specific themes
+                  const themePair = parseThemePair(sectionThemeResolved);
+                  if (themePair.a === "NAVY" && themePair.b === "WHITE") {
+                    // NAVY + WHITE: Card = Navy, Button = White
+                    ctaBg = "#ffffff";
+                    ctaFg = "#0b1d3a";
+                  } else if (themePair.a === "GOLD" && themePair.b === "NAVY") {
+                    // GOLD + NAVY: Card = Gold, Button = Navy
+                    ctaBg = "#0b1d3a";
+                    ctaFg = "#ffffff";
+                  }
 
                   const selectedIds: number[] = Array.isArray(cfg.branchIds) ? cfg.branchIds : [];
                   const branches = selectedIds
