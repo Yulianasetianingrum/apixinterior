@@ -143,9 +143,27 @@ async function updateBackgroundTheme(formData: FormData) {
     data: { config: nextCfg },
   });
 
+  // ALSO update the global navbarSetting table if this matches the currently active site theme
+  // so that other pages (produk, search, etc.) remain in sync.
+  const activeMarker = await prisma.homepageSectionDraft.findFirst({ where: { slug: "__active_theme__" } });
+  const activeMarkerCfg = (activeMarker?.config ?? {}) as any;
+  const currentActiveKey = activeMarkerCfg?.activeThemeKey || "theme_1";
+
+  if (themeKey === currentActiveKey) {
+    await prisma.navbarSetting.upsert({
+      where: { id: 1 },
+      update: { backgroundTheme: picked },
+      create: { id: 1, theme: "NAVY_GOLD", backgroundTheme: picked },
+    });
+  }
+
   revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko");
   revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko/preview");
   revalidatePath("/");
+  revalidatePath("/navbar", "layout");
+  revalidatePath("/(public)", "layout");
+  revalidatePath("/produk", "layout");
+  revalidatePath("/search", "layout");
   return redirectBack({ notice: encodeURIComponent("Tema background berhasil disimpan."), theme: themeKey });
 }
 
@@ -211,38 +229,79 @@ async function updateNavbarTheme(formData: FormData) {
 
   try {
     const theme = formData.get("navbarTheme") as AllowedNavbarTheme | null;
-    if (!theme || !ALLOWED_THEMES.includes(theme)) return;
+    if (!theme) {
+      return redirectBack({ error: encodeURIComponent("Pilih tema navbar terlebih dahulu.") });
+    }
+    if (!ALLOWED_THEMES.includes(theme)) {
+      return redirectBack({ error: encodeURIComponent("Tema yang dipilih tidak valid.") });
+    }
 
     const formDataThemeKey = (formData.get("themeKey") as string | null)?.trim();
     const themeKey = formDataThemeKey ? normalizeThemeKey(formDataThemeKey) : await getThemeKeyFromReferer();
 
-    // Simpan ke Theme Meta (homepageSectionDraft)
+    // Pastikan meta row ada
     await ensureThemeMeta(themeKey);
 
-    const meta = await prisma.homepageSectionDraft.findFirst({ where: { slug: themeMetaSlug(themeKey) } });
-    if (!meta) return redirectBack({ error: encodeURIComponent("Theme meta tidak ditemukan.") });
+    const meta = await prisma.homepageSectionDraft.findFirst({
+      where: { slug: themeMetaSlug(themeKey) }
+    });
+
+    if (!meta) {
+      return redirectBack({
+        error: encodeURIComponent("Gagal: Baris konfigurasi theme tidak ditemukan di database."),
+        theme: themeKey
+      });
+    }
 
     const cfg = (meta.config ?? {}) as any;
-    const nextCfg: any = { ...cfg, __isThemeMeta: true, __themeKey: themeKey };
+    const nextCfg: any = {
+      ...cfg,
+      __isThemeMeta: true,
+      __themeKey: themeKey,
+      navbarTheme: theme
+    };
 
-    // Set navbar theme
-    nextCfg.navbarTheme = theme;
-
-    await prisma.homepageSectionDraft.update({
+    const updated = await prisma.homepageSectionDraft.update({
       where: { id: meta.id },
       data: { config: nextCfg },
     });
 
+    if (!updated) {
+      throw new Error("Database update returned no result.");
+    }
+
+    // ALSO update the global navbarSetting table if this matches the currently active site theme
+    // so that other pages (produk, search, etc.) remain in sync.
+    const activeMarker = await prisma.homepageSectionDraft.findFirst({ where: { slug: "__active_theme__" } });
+    const activeMarkerCfg = (activeMarker?.config ?? {}) as any;
+    const currentActiveKey = activeMarkerCfg?.activeThemeKey || "theme_1";
+
+    if (themeKey === currentActiveKey) {
+      await prisma.navbarSetting.upsert({
+        where: { id: 1 },
+        update: { theme: theme },
+        create: { id: 1, theme: theme },
+      });
+    }
+
     revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko");
     revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko/preview");
     revalidatePath("/");
-    revalidatePath("/navbar");
+    revalidatePath("/navbar", "layout");
+    revalidatePath("/(public)", "layout"); // Try to revalidate layouts if they exist
+    revalidatePath("/produk", "layout");
+    revalidatePath("/search", "layout");
 
-    return redirectBack({ notice: encodeURIComponent("Tema navbar berhasil disimpan ke Draft."), theme: themeKey });
+    return redirectBack({
+      notice: encodeURIComponent(`Tema navbar berhasil diubah menjadi ${theme.replace('_', ' ')}.`),
+      theme: themeKey
+    });
   } catch (err: any) {
     if (String(err).includes("NEXT_REDIRECT")) throw err;
     console.error("updateNavbarTheme error:", err);
-    return redirectBack({ error: encodeURIComponent("Gagal menyimpan tema: " + (err.message || String(err))) });
+    return redirectBack({
+      error: encodeURIComponent("Terjadi kesalahan sistem: " + (err.message || String(err)))
+    });
   }
 }
 
@@ -4241,6 +4300,9 @@ export default async function TokoPengaturanPage({
 
 
 
+  // Ensure meta row exists for the requested theme
+  await ensureThemeMeta(requestedThemeKey);
+
   const [
     navbarSetting,
     draftSectionsRaw,
@@ -4503,7 +4565,8 @@ export default async function TokoPengaturanPage({
    * LOGIC UPDATE: Read Navbar Theme from DRAFT META first.
    * If draft has no specific navbar theme, fallback to global setting or default.
    */
-  const activeMetaRow = draftSections.find((r) => isThemeMetaRow(r) && getThemeKeyFromRow(r) === activeThemeKey);
+  const activeMetaSlug = themeMetaSlug(activeThemeKey);
+  const activeMetaRow = draftSections.find((r) => r.slug === activeMetaSlug);
   const activeMetaConfig = (activeMetaRow?.config ?? {}) as any;
   const draftNavbarTheme = activeMetaConfig.navbarTheme; // "NAVY_GOLD", "WHITE_GOLD", etc.
 
@@ -4652,7 +4715,7 @@ export default async function TokoPengaturanPage({
           <div style={{ marginTop: 14, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
             <div>
               <h3 style={{ margin: "0 0 6px", fontSize: 13, opacity: 0.9 }}>Rename theme</h3>
-              <form action={renameTheme}>
+              <form action={renameTheme} id="form-rename-theme" data-section-form="1">
                 <input type="hidden" name="themeKey" value={activeThemeKey} />
                 <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
                   <input
@@ -4781,7 +4844,7 @@ export default async function TokoPengaturanPage({
           </span>
         </div>
 
-        <form action={updateNavbarTheme} className={styles.fieldGroup}>
+        <form action={updateNavbarTheme} className={styles.fieldGroup} id="form-navbar-theme" data-section-form="1">
           <label htmlFor="navbarTheme" className={styles.label}>
             Pilih tema warna navbar
           </label>
@@ -4812,14 +4875,14 @@ export default async function TokoPengaturanPage({
         </p>
 
 
-        <form action={updateBackgroundTheme} className={styles.newSectionForm}>
+        <form action={updateBackgroundTheme} className={styles.newSectionForm} id="form-background-theme" data-section-form="1">
           <input type="hidden" name="themeKey" value={activeThemeKey ?? ""} />
           <div className={styles.newSectionGrid}>
             <div className={styles.fieldGroup}>
               <label className={styles.label}>Tema Background Utama</label>
               <select
                 name="backgroundTheme"
-                defaultValue={String((((draftSections as any[]).find((r) => isThemeMetaRow(r) && getThemeKeyFromRow(r) === activeThemeKey)?.config as any) ?? {})?.backgroundTheme ?? "FOLLOW_NAVBAR")}
+                defaultValue={String(activeMetaConfig?.backgroundTheme ?? "FOLLOW_NAVBAR")}
                 className={styles.select}
               >
                 <option value="FOLLOW_NAVBAR">Ikuti tema Navbar (default)</option>

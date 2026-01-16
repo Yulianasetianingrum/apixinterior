@@ -51,7 +51,22 @@ export default async function Navbar(props: { themeOverride?: string }) {
     const namaToko = info?.namaToko ?? "Apix Interior";
 
     // Priority: Prop Override -> Global Setting -> Default
-    const navbarTheme: NavbarTheme = (props?.themeOverride as NavbarTheme) || (navbarSetting?.theme as NavbarTheme) || "NAVY_GOLD";
+    let rawTheme = (props?.themeOverride as string) || (navbarSetting?.theme as string) || "NAVY_GOLD";
+
+    // Normalize theme_1...theme_6 to explicit combo names if needed
+    if (rawTheme.startsWith("theme_")) {
+        const themeMap: Record<string, NavbarTheme> = {
+            "theme_1": "NAVY_GOLD",
+            "theme_2": "WHITE_GOLD",
+            "theme_3": "NAVY_WHITE",
+            "theme_4": "GOLD_NAVY",
+            "theme_5": "GOLD_WHITE",
+            "theme_6": "WHITE_NAVY",
+        };
+        rawTheme = themeMap[rawTheme] || "NAVY_GOLD";
+    }
+
+    const navbarTheme = rawTheme as NavbarTheme;
 
     // DEBUG: Log untuk trace masalah
     console.log("🎨 NAVBAR DEBUG:");

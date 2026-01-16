@@ -146,8 +146,17 @@ async function publishTheme(formData: FormData) {
 
   console.log(`   - Found ${drafts.length} sections to publish for ${themeKey}`);
 
+  const navbarTheme = (themeMetaCfg.navbarTheme as any) || "NAVY_GOLD";
+  // backgroundTheme is already defined above, so we don't redefine it.
+  // const backgroundTheme = (themeMetaCfg.backgroundTheme as any) || "FOLLOW_NAVBAR"; // This line is redundant
+
   await prisma.$transaction([
     prisma.homepageSectionPublished.deleteMany({}),
+    prisma.navbarSetting.upsert({
+      where: { id: 1 },
+      update: { theme: navbarTheme, backgroundTheme: backgroundTheme },
+      create: { id: 1, theme: navbarTheme, backgroundTheme: backgroundTheme },
+    }),
     ...drafts.map((d) => {
       console.log(`   - [CREATE PUBLISHED] ID: ${d.id}, Type: ${d.type}`);
       return prisma.homepageSectionPublished.create({
@@ -183,6 +192,10 @@ async function publishTheme(formData: FormData) {
   });
 
   revalidatePath("/");
+  revalidatePath("/navbar", "layout");
+  revalidatePath("/(public)", "layout");
+  revalidatePath("/produk", "layout");
+  revalidatePath("/search", "layout");
   revalidatePath(ADMIN_TOKO_PATH);
 
   redirect(

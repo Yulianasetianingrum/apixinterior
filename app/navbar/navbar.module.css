@@ -65,8 +65,8 @@
 
 /* search */
 .navbarWhiteGold .apixSearchForm {
-  background: rgba(0, 0, 0, 0.05);
-  border-color: rgba(212, 160, 23, 0.3);
+  background: #ffffff;
+  border-color: #d4a017;
 }
 
 .navbarWhiteGold .apixSearchInput {
@@ -74,8 +74,18 @@
 }
 
 .navbarWhiteGold .apixSearchInput::placeholder {
-  color: #f0c75e;
-  /* soft dark gold */
+  color: rgba(212, 160, 23, 0.85);
+  /* Clearer gold */
+}
+
+.navbarWhiteGold .apixSearchForm:focus-within {
+  background: #ffffff;
+  border-color: #d4a017;
+  box-shadow: 0 0 0 2px rgba(212, 160, 23, 0.15);
+}
+
+.navbarWhiteGold .apixSearchIconImg {
+  opacity: 1;
 }
 
 /* tombol "=" */
@@ -225,8 +235,8 @@
 }
 
 .navbarWhiteNavy .apixSearchForm {
-  background: rgba(0, 0, 0, 0.05);
-  border-color: rgba(11, 26, 51, 0.3);
+  background: #ffffff;
+  border-color: var(--apix-navy);
 }
 
 .navbarWhiteNavy .apixSearchInput {
@@ -234,7 +244,18 @@
 }
 
 .navbarWhiteNavy .apixSearchInput::placeholder {
-  color: rgba(11, 26, 51, 0.55);
+  color: rgba(11, 26, 51, 0.7);
+  /* Clearer navy */
+}
+
+.navbarWhiteNavy .apixSearchForm:focus-within {
+  background: #ffffff;
+  border-color: var(--apix-navy);
+  box-shadow: 0 0 0 2px rgba(11, 26, 51, 0.1);
+}
+
+.navbarWhiteNavy .apixSearchIconImg {
+  opacity: 0.95;
 }
 
 .navbarWhiteNavy .apixSidebarButton {
@@ -529,19 +550,7 @@
   border-color: rgba(212, 175, 55, 0.5);
 }
 
-/* Theme overrides inline */
-.navbarWhiteGold .apixSearchForm,
-.navbarWhiteNavy .apixSearchForm {
-  background: #f1f5f9;
-  /* Light grey for white themes */
-  border-color: #e2e8f0;
-}
-
-.navbarWhiteGold .apixSearchForm:focus-within,
-.navbarWhiteNavy .apixSearchForm:focus-within {
-  background: #fff;
-  border-color: #d4a017;
-}
+/* (Overrides handled in specific theme blocks above) */
 
 
 .apixSearchInput {
