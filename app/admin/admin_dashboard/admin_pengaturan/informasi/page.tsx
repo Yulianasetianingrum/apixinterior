@@ -549,6 +549,23 @@ export default function InformasiPage() {
                       </a>
                     </div>
                   </div>
+                  <div className={styles.branchActions}>
+                    <button
+                      type="button"
+                      className={styles.branchEditButton}
+                      onClick={() => handleEditCabang(cabang)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      className={styles.branchDeleteButton}
+                      onClick={() => handleDeleteCabang(cabang.id)}
+                      disabled={savingCabang}
+                    >
+                      Hapus
+                    </button>
+                  </div>
                 </li>
               ))}
             </ul>
