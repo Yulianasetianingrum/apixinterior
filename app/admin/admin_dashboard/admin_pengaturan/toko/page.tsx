@@ -23,6 +23,7 @@ import sharp from "sharp";
 import ImagePickerCaptcha from "./ImagePickerCaptcha";
 import FloatingPreviewActions from "./FloatingPreviewActions.client";
 import TextSectionBlocksEditor from "./TextSectionBlocksEditor.client";
+import TestimonialsEditor from "./TestimonialsEditor.client";
 import CategoryCommerceGridEditorNoSSR from "./CategoryCommerceGridEditorNoSSR.client";
 import AdminNotice from "./AdminNotice.client";
 import DeleteSectionButton from "./DeleteSectionButton.client";
@@ -2718,6 +2719,44 @@ async function saveCustomPromoConfig(formData: FormData) {
   revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko");
   revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko/preview");
   return redirectBack({ notice: encodeURIComponent("Config CUSTOM_PROMO tersimpan."), forceReload: true });
+}
+
+async function saveTestimonialsConfig(formData: FormData) {
+  "use server";
+
+  const id = Number(formData.get("id"));
+  if (!id || Number.isNaN(id)) return;
+
+  const title = (formData.get("title") as string | null)?.trim() ?? "";
+  const subtitle = (formData.get("subtitle") as string | null)?.trim() ?? "";
+  const mapsUrl = (formData.get("mapsUrl") as string | null)?.trim() ?? "";
+
+  const reviewsJson = (formData.get("reviews") as string | null) ?? "[]";
+  let reviews: any[] = [];
+  try {
+    reviews = JSON.parse(reviewsJson);
+  } catch (e) {
+    reviews = [];
+  }
+
+  // Preserve theme
+  const existingRow = await prisma.homepageSectionDraft.findUnique({ where: { id } });
+  const themeKey = getThemeKeyFromRow(existingRow);
+  const existingCfg = (existingRow?.config ?? {}) as any;
+
+  const newConfig = {
+    ...existingCfg,
+    title,
+    subtitle,
+    mapsUrl,
+    reviews
+  };
+
+  await updateDraftConfigPreserveTheme(id, withThemeKey(newConfig, themeKey));
+
+  revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko");
+  revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko/preview");
+  return redirectBack({ notice: encodeURIComponent("Testimoni berhasil disimpan.") });
 }
 
 // Inline helper: enforce voucher link/kategori mutual exclusivity on the client (no hydration needed)
@@ -6451,6 +6490,58 @@ export default async function TokoPengaturanPage({
                           limit={40}
                           buttonLabel="Pilih / Upload Voucher"
                         />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* TESTIMONIALS */}
+                  {section.type === "TESTIMONIALS" && (
+                    <div className={styles.sectionEditForm}>
+                      <form
+                        id={`testimonialsForm-${section.id}`}
+                        action={saveTestimonialsConfig}
+                        className={styles.sectionEditForm}
+                        data-section-form="1"
+                      >
+                        <input type="hidden" name="id" value={section.id.toString()} />
+                        <TestimonialsEditor
+                          config={cfg}
+                          onChange={() => { }}
+                        />
+                      </form>
+
+                      {/* Footer Actions */}
+                      <div className={styles.highlightFooterActions}>
+                        <button type="submit" form={`testimonialsForm-${section.id}`} className={styles.secondaryButton}>
+                          Simpan
+                        </button>
+                        {activeThemeKey ? (
+                          <a
+                            className={styles.primaryButton}
+                            href={`/admin/admin_dashboard/admin_pengaturan/toko/preview?theme=${encodeURIComponent(
+                              activeThemeKey
+                            )}&focus=TESTIMONIALS&sectionId=${section.id}`}
+                          >
+                            Preview
+                          </a>
+                        ) : (
+                          <span className={styles.primaryButton} style={{ opacity: 0.5, cursor: "not-allowed" }}>
+                            Preview
+                          </span>
+                        )}
+                        <form action={toggleDraft} style={{ display: "inline" }}>
+                          <input type="hidden" name="id" value={section.id.toString()} />
+                          <input type="hidden" name="currentEnabled" value={section.enabled ? "true" : "false"} />
+                          <button type="submit" className={styles.secondaryButton}>
+                            {section.enabled ? "Nonaktifkan" : "Aktifkan"}
+                          </button>
+                        </form>
+                        <form action={deleteDraft} style={{ display: "inline" }}>
+                          <input type="hidden" name="id" value={section.id.toString()} />
+                          <button type="submit" className={styles.dangerButton}>
+                            Hapus
+                          </button>
+                        </form>
                       </div>
                     </div>
                   )}

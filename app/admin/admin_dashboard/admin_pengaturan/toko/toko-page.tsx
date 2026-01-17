@@ -173,7 +173,8 @@ type SectionTypeId =
   | "BRANCHES"
   | "CONTACT"
   | "SOCIAL"
-  | "CUSTOM_PROMO";
+  | "CUSTOM_PROMO"
+  | "TESTIMONIALS";
 
 type SectionDef = {
   type: SectionTypeId;
@@ -298,6 +299,18 @@ const SECTION_DEFS: SectionDef[] = [
       buttonLabel: "",
       buttonHref: "",
       imageId: null,
+    },
+  },
+  {
+    type: "TESTIMONIALS",
+    label: "Ulasan / Testimoni",
+    description: "Tampilkan ulasan pelanggan (sumber Google Maps atau manual).",
+    defaultSlug: "testimoni",
+    defaultConfig: {
+      title: "Apa Kata Mereka?",
+      subtitle: "Ulasan dari pelanggan setia kami",
+      mapsUrl: "",
+      reviews: [],
     },
   },
 ];

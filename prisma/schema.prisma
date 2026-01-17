@@ -370,6 +370,7 @@ enum HomepageSectionType {
   SOCIAL // Media Sosial
   CUSTOM_PROMO // Custom / Promo Section
   FOOTER // Footer Section
+  TESTIMONIALS // Ulasan Google Maps
 }
 
 enum HomepageSectionItemType {

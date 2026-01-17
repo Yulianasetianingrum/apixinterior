@@ -106,7 +106,7 @@ export default function FooterEditorWrapper({ config }: { config: any }) {
         })));
 
         // 4. Default Copyright
-        setCopyright(`© ${new Date().getFullYear()} Apix Interior. All rights reserved.`);
+        setCopyright(`© 2020 Apix Interior. All rights reserved.`);
     };
 
     return (

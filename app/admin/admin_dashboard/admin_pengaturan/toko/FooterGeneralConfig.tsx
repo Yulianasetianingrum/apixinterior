@@ -37,7 +37,7 @@ export default function FooterGeneralConfig({
             {/* COPYRIGHT (Top Priority Highlight) */}
             <div className={styles.fieldGroup} style={{ gridColumn: "1 / -1", marginBottom: 20, padding: "20px", background: "#f8fafc", borderRadius: 12, border: "2px solid #3b82f6" }}>
                 <label className={styles.label} style={{ fontSize: "1.1rem", fontWeight: 800, color: "#1e40af", display: "flex", alignItems: "center", gap: 8 }}>
-                    <span>📅</span> Teks Copyright Footer (Tahun)
+                    <span>📅</span> Copyright Profesional (Teks & Tahun)
                 </label>
                 <div style={{ display: "flex", gap: 10, marginTop: 12 }}>
                     <input
@@ -64,11 +64,12 @@ export default function FooterGeneralConfig({
                             boxShadow: "0 4px 10px rgba(30, 64, 175, 0.2)"
                         }}
                     >
-                        Pasang Tahun {new Date().getFullYear()}
+                        Reset ke Tahun {new Date().getFullYear()}
                     </button>
                 </div>
                 <p style={{ fontSize: 13, color: "#475569", marginTop: 10 }}>
-                    <b>PENTING:</b> Teks ini akan muncul di bagian paling bawah website Anda. Klik tombol biru untuk otomatis update ke tahun {new Date().getFullYear()}.
+                    <b>INFO:</b> Anda bebas mengubah tahun atau teks di atas. Teks ini akan muncul di posisi paling bawah footer (tengah).
+                    <br />Contoh Profesional: <code>&copy; 2026 Apix Interior. All rights reserved.</code>
                 </p>
             </div>
 

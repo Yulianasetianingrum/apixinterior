@@ -8,6 +8,7 @@ import SecureImage from "@/app/components/SecureImage";
 import { CategoryGridPreview } from "./admin/admin_dashboard/admin_pengaturan/toko/preview/CategoryGridPreview";
 import CategoryCommerceColumns from "./components/homepage/CategoryCommerceColumns.client";
 import { SocialIcon } from "@/app/components/homepage/social-icons";
+import TestimonialCarousel from "@/app/components/homepage/TestimonialCarousel.client";
 import {
   normalizeConfig, upperType, resolveEffectiveTheme,
   getHeroThemeTokens, commerceThemeTokens, heroThemeClassFromConfig,
@@ -1158,6 +1159,18 @@ export default async function HomePage({
                   )}
                 </div>
               </section>
+            );
+
+
+          }
+
+          // --- TESTIMONIALS ---
+          if (t === "TESTIMONIALS") {
+            const cfg = normalizeConfig(t, section.config) as any;
+            return (
+              <div key={section.id}>
+                <TestimonialCarousel config={cfg} />
+              </div>
             );
           }
 

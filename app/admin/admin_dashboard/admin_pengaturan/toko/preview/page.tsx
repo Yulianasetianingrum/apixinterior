@@ -12,6 +12,7 @@ import ui from "./preview.module.css";
 import { CategoryGridPreview } from "./CategoryGridPreview";
 import CategoryCommerceColumns from "@/app/components/homepage/CategoryCommerceColumns.client";
 import { SocialIcon } from "@/app/components/homepage/social-icons";
+import TestimonialCarousel from "@/app/components/homepage/TestimonialCarousel.client";
 
 const logoBlue = "/logo/logo_apixinterior_biru.png.png";
 const logoGolden = "/logo/logo_apixinterior_golden.png.png";
@@ -2104,6 +2105,18 @@ export default async function TokoPreviewDraftPage({
                 }
 
 
+
+
+
+                // TESTIMONIALS
+                if (t === "TESTIMONIALS") {
+                  const cfg = normalizeConfig(t, section.config) as any;
+                  return (
+                    <div key={section.id}>
+                      <TestimonialCarousel config={cfg} />
+                    </div>
+                  );
+                }
 
                 // CONTACT (Hubungi Kami)
                 if (t === "CONTACT") {

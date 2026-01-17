@@ -13,6 +13,7 @@ export type SectionTypeId =
   | "SOCIAL"
   | "CUSTOM_PROMO"
   | "FOOTER"
+  | "TESTIMONIALS"
   | "THEME_META";
 
 export type SectionDef = {
