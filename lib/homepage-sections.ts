@@ -11,7 +11,8 @@ export type HomepageSectionType =
   | "BRANCHES"
   | "CONTACT"
   | "SOCIAL"
-  | "CUSTOM_PROMO";
+  | "CUSTOM_PROMO"
+  | "FOOTER";
 
 export type SectionRow = {
   id: number;
@@ -80,6 +81,15 @@ export function normalizeConfig(type: HomepageSectionType, rawConfig: unknown): 
         mode,
       },
       tabs: Array.isArray(cfg.tabs) ? cfg.tabs : [],
+    };
+  }
+
+  if (type === "FOOTER") {
+    return {
+      copyright: "",
+      useGlobalContact: true,
+      useGlobalSocial: true,
+      ...(cfg ?? {}),
     };
   }
 

@@ -137,13 +137,31 @@ export default function FooterGeneralConfig({
 
             <div className={styles.fieldGroup} style={{ gridColumn: "1 / -1" }}>
                 <label className={styles.label}>Teks Copyright</label>
-                <input
-                    type="text"
-                    value={copyright}
-                    onChange={(e) => setCopyright(e.target.value)}
-                    className={styles.input}
-                    placeholder={`© ${new Date().getFullYear()} Apix Interior. All rights reserved.`}
-                />
+                <div style={{ display: "flex", gap: 10 }}>
+                    <input
+                        type="text"
+                        value={copyright}
+                        onChange={(e) => setCopyright(e.target.value)}
+                        className={styles.input}
+                        placeholder={`© ${new Date().getFullYear()} Apix Interior. All rights reserved.`}
+                    />
+                    <button
+                        type="button"
+                        onClick={() => setCopyright(`© ${new Date().getFullYear()} Apix Interior. All rights reserved.`)}
+                        style={{
+                            padding: "0 15px",
+                            background: "#0f172a",
+                            color: "white",
+                            border: "none",
+                            borderRadius: 6,
+                            fontSize: 12,
+                            cursor: "pointer",
+                            whiteSpace: "nowrap"
+                        }}
+                    >
+                        Update Tahun ({new Date().getFullYear()})
+                    </button>
+                </div>
                 <p style={{ fontSize: 12, opacity: 0.6, marginTop: 4 }}>Warna teks copyright akan otomatis mengikuti warna teks "Tags".</p>
             </div>
         </div>
