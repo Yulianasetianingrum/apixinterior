@@ -80,7 +80,6 @@ export function computeHargaSetelahPromo(p: {
 }
 
 // Helper to normalize image URLs (handles public/ prefix from uploads)
-// Helper to normalize image URLs (handles public/ prefix from uploads)
 export function normalizePublicUrl(url?: string | null) {
     if (!url) return null;
     let clean = String(url).trim();
@@ -88,14 +87,26 @@ export function normalizePublicUrl(url?: string | null) {
     // Passthrough data/blob
     if (clean.startsWith("data:") || clean.startsWith("blob:")) return clean;
 
+    // Aggressive domain stripping (localhost, 127.0.0.1, etc)
+    // This handles cases where absolute URLs were stored in localStorage on dev machines
+    if (clean.startsWith("http")) {
+        try {
+            const urlObj = new URL(clean);
+            if (urlObj.hostname === "localhost" || urlObj.hostname === "127.0.0.1" || urlObj.hostname.startsWith("192.168.")) {
+                clean = urlObj.pathname + urlObj.search;
+            }
+        } catch {
+            // keep as is if URL is invalid
+        }
+    }
+
     // Robust handling for /uploads/: ALWAYS prefer relative path
-    // This fixes localhost absolute URLs being saved and breaking on other devices
     const uploadIdx = clean.indexOf("/uploads/");
     if (uploadIdx !== -1) {
         return clean.substring(uploadIdx);
     }
 
-    // If it is an external/absolute URL (and NOT /uploads/), trust it
+    // If it is STILL an external/absolute URL (and NOT /uploads/), trust it
     if (clean.startsWith("http")) return clean;
 
     // Strip common local prefixes

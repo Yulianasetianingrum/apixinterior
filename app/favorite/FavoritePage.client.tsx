@@ -10,29 +10,10 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./favorite.module.css";
 import SecureImage from "@/app/components/SecureImage";
+import { formatIDR, normalizePublicUrl } from "@/lib/product-utils";
 
 // Helper to ensure image URL is correct
-const ensureImageUrl = (url: string | null | undefined) => {
-    if (!url) return null;
-    let clean = String(url).trim();
-    if (!clean) return null;
-
-    // Passthrough data/blob
-    if (clean.startsWith("data:") || clean.startsWith("blob:")) return clean;
-
-    // Robust handling for /uploads/ (strip any localhost/domain prefix)
-    const uploadIdx = clean.indexOf("/uploads/");
-    if (uploadIdx !== -1) {
-        return clean.substring(uploadIdx);
-    }
-
-    // Trust other absolute URLs (external CDNs)
-    if (clean.startsWith("http")) return clean;
-
-    // Clean local paths
-    clean = clean.replace(/^public\//, "").replace(/^\/+/, "");
-    return `/${clean}`;
-};
+// Removed local ensureImageUrl in favor of centralized normalizePublicUrl
 
 export default function FavoritePageClient() {
     const { items, removeFromWishlist } = useWishlist();
@@ -117,9 +98,9 @@ export default function FavoritePageClient() {
                         >
                             <div className={styles.productContent}>
                                 <div className={styles.imageWrapper}>
-                                    {ensureImageUrl(item.image) ? (
+                                    {normalizePublicUrl(item.image) ? (
                                         <SecureImage
-                                            src={ensureImageUrl(item.image)!}
+                                            src={normalizePublicUrl(item.image)!}
                                             alt={item.name}
                                             style={{ width: "100%", height: "100%", objectFit: "cover" }}
                                         />

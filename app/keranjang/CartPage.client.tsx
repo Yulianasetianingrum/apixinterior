@@ -9,34 +9,14 @@ import { useState, useEffect } from "react";
 import styles from "./keranjang.module.css";
 import { useRouter } from "next/navigation";
 import SecureImage from "@/app/components/SecureImage";
+import { formatIDR, normalizePublicUrl } from "@/lib/product-utils";
 
 interface CartPageClientProps {
     waNumber: string;
 }
 
 // Helper to ensure image URL is correct
-// Helper to ensure image URL is correct
-const ensureImageUrl = (url: string | null | undefined) => {
-    if (!url) return null;
-    let clean = String(url).trim();
-    if (!clean) return null;
-
-    // Passthrough data/blob
-    if (clean.startsWith("data:") || clean.startsWith("blob:")) return clean;
-
-    // Robust handling for /uploads/ (strip any localhost/domain prefix)
-    const uploadIdx = clean.indexOf("/uploads/");
-    if (uploadIdx !== -1) {
-        return clean.substring(uploadIdx);
-    }
-
-    // Trust other absolute URLs (external CDNs)
-    if (clean.startsWith("http")) return clean;
-
-    // Clean local paths
-    clean = clean.replace(/^public\//, "").replace(/^\/+/, "");
-    return `/${clean}`;
-};
+// Removed local ensureImageUrl in favor of centralized normalizePublicUrl
 
 export default function CartPageClient({ waNumber }: CartPageClientProps) {
     const { items, updateQuantity, removeFromCart, totalPrice, totalItems } = useCart();
@@ -102,10 +82,10 @@ export default function CartPageClient({ waNumber }: CartPageClientProps) {
                             >
                                 <div className={styles.productContent}>
                                     <div className={styles.imageWrapper}>
-                                        {ensureImageUrl(item.image) ? (
+                                        {normalizePublicUrl(item.image) ? (
                                             /* eslint-disable-next-line @next/next/no-img-element */
                                             <SecureImage
-                                                src={ensureImageUrl(item.image)!}
+                                                src={normalizePublicUrl(item.image)!}
                                                 alt={item.name}
                                                 style={{ width: 50, height: 50, objectFit: "cover", borderRadius: 8 }}
                                             />

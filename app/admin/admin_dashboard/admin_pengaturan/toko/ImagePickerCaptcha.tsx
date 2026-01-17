@@ -36,6 +36,7 @@ function normalizeApiResult(json: any): { data: GambarItem[] } {
 const GOLD = "#D4AF37";
 const GOLD_SOFT = "rgba(212, 175, 55, 0.22)";
 const GOLD_SOFT2 = "rgba(212, 175, 55, 0.35)";
+const BORDER = "rgba(0,0,0,0.10)";
 const TEXT = "#111";
 
 export default function ImagePickerCaptcha({
