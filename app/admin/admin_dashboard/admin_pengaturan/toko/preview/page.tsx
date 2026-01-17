@@ -1675,6 +1675,14 @@ export default async function TokoPreviewDraftPage({
                   const themePair = parseThemePair(normalizedTheme);
                   const themeStr = normalizedTheme.replace(/_/g, ""); // "NAVY_WHITE" -> "NAVYWHITE"
 
+                  // DEBUG: Log theme parsing
+                  console.log("🎨 BRANCHES Theme Debug:", {
+                    original: sectionThemeResolved,
+                    normalized: normalizedTheme,
+                    parsed: themePair,
+                    themeStr,
+                  });
+
                   // Match theme by parsed pair OR raw string (for flexibility)
                   if ((themePair.a === "WHITE" && themePair.b === "GOLD") || themeStr === "WHITEGOLD") {
                     // WHITE + GOLD: Card bg = White, Button bg = Gold
@@ -1713,6 +1721,9 @@ export default async function TokoPreviewDraftPage({
                     ctaBg = "#0b1d3a";
                     ctaFg = "#ffffff";
                   }
+
+                  // DEBUG: Log final colors
+                  console.log("🎨 BRANCHES Final Colors:", { cardBg, cardFg, ctaBg, ctaFg });
 
                   const selectedIds: number[] = Array.isArray(cfg.branchIds) ? cfg.branchIds : [];
                   const branches = selectedIds
