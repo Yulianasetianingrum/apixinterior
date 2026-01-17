@@ -508,7 +508,7 @@ const SECTION_DEFS: SectionDef[] = [
   },
   {
     type: "FOOTER",
-    label: "FOOTER (Copyright & Contact)",
+    label: "🚀 FOOTER (Copyright & Contact)",
     description: "Informasi copyright, kontak, alamat, dan social media.",
     defaultSlug: "footer-general",
     defaultConfig: {

@@ -3,6 +3,7 @@
 import { useEffect, useMemo } from "react";
 import Image from "next/image";
 import styles from "./produk-detail.module.css";
+import { useSettings } from "@/app/context/SettingsContext";
 
 type Props = {
   productId: number;
@@ -23,8 +24,8 @@ export default function ProdukDetailClient({
   productSlug,
   compact = false,
 }: Props) {
-  // Set di .env: NEXT_PUBLIC_WA_NUMBER=62812xxxxxxx
-  const waNumber = process.env.NEXT_PUBLIC_WA_NUMBER || "";
+  // Gunakan Global Priority WA dari Context (Admin Panel)
+  const { waNumber } = useSettings();
 
   // Pastikan ikon ini ada di: public/uploads/WA_gold.png
   const waIcon = "/uploads/WA_gold.png";
@@ -40,13 +41,13 @@ export default function ProdukDetailClient({
     try {
       if (sessionStorage.getItem(key)) return;
       sessionStorage.setItem(key, "1");
-    } catch {}
+    } catch { }
 
     fetch("/api/track/produk", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ productId, event: "view" }),
-    }).catch(() => {});
+    }).catch(() => { });
   }, [productId]);
 
   const onPesanSekarang = () => {
@@ -54,10 +55,10 @@ export default function ProdukDetailClient({
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ productId, event: "cta_click" }),
-    }).catch(() => {});
+    }).catch(() => { });
 
     if (!waNumber) {
-      alert("Nomor WhatsApp belum diset. Isi NEXT_PUBLIC_WA_NUMBER di .env");
+      alert("Nomor WhatsApp belum diset. Atur di Admin > Pengaturan > Hubungi (Pilih Prioritas).");
       return;
     }
 

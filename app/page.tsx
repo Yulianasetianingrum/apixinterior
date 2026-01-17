@@ -395,13 +395,10 @@ async function fetchThemeData(themeKey: string, isPublished: boolean) {
   }
 
   const hubungiById = new Map<number, any>();
-  if (uniqHubungiIds.length) {
-    const rows = await prisma.hubungi.findMany({ where: { id: { in: uniqHubungiIds } }, orderBy: { id: "asc" } });
-    rows.forEach((r: any) => hubungiById.set(Number(r.id), r));
-  } else {
-    const rows = await prisma.hubungi.findMany({ orderBy: { id: "asc" } });
-    rows.forEach((r: any) => hubungiById.set(Number(r.id), r));
-  }
+  // Always fetch all Hubungi data to ensure Global Priority detection works
+  // (Table is limited to max 5 records by API, so this is safe/cheap)
+  const hubungiRows = await prisma.hubungi.findMany({ orderBy: { id: "asc" } });
+  hubungiRows.forEach((r: any) => hubungiById.set(Number(r.id), r));
 
   const mediaSosialByKey = new Map<string, any>();
   if (uniqMediaIconKeys.length) {

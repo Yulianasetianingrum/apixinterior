@@ -186,6 +186,21 @@ export const SECTION_DEFS: SectionDef[] = [
             voucherImageIds: [],
         },
     },
+    {
+        type: "FOOTER",
+        label: "🚀 FOOTER (Copyright & Contact)",
+        description: "Informasi copyright, kontak, alamat, dan social media.",
+        defaultSlug: "footer-general",
+        defaultConfig: {
+            copyright: "© 2024 Apix Interior. All Rights Reserved.",
+            sectionTheme: "FOLLOW_NAVBAR",
+            whatsapp: "",
+            email: "",
+            address: "",
+            instagram: "",
+            facebook: "",
+        },
+    },
 ];
 
 export const SECTION_ICON: Record<string, string> = {
