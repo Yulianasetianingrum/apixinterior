@@ -729,10 +729,10 @@ export default function ImagePickerCaptcha({
                 </div>
               </div>
             </div>
-          </div>,
-          document.body
+          </div>
+        </div>,
+        document.body
       ) : null}
-        </div>
-      );
+    </div>
+  );
 }
-      ```
