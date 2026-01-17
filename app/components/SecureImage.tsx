@@ -62,6 +62,9 @@ export default function SecureImage({
     const finalWidth = !fill && !width ? 800 : width;
     const finalHeight = !fill && !height ? 600 : height;
 
+    // For local/internal paths, optimization might fail in restricted prod environments
+    const isInternal = imgSrc.startsWith("/") || imgSrc.includes("localhost") || imgSrc.includes("127.0.0.1");
+
     return (
         <Image
             {...props}
@@ -72,6 +75,7 @@ export default function SecureImage({
             height={fill ? undefined : finalHeight}
             style={style}
             priority={priority}
+            unoptimized={isInternal}
             className={className}
             sizes={sizes || (fill ? "100vw" : undefined)}
             onLoadingComplete={() => {

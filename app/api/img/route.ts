@@ -14,9 +14,28 @@ export async function GET(request: Request) {
 
     // Security: Prevent directory traversal
     const safeFilename = path.basename(filename);
-    const filePath = path.join(process.cwd(), 'public', 'uploads', safeFilename);
 
-    if (!fs.existsSync(filePath)) {
+    const roots = [
+        path.join(process.cwd(), 'public', 'uploads'),
+    ];
+    const subfolders = ['', 'gambar_upload', 'banners'];
+
+    let filePath = '';
+    let found = false;
+
+    for (const root of roots) {
+        for (const sub of subfolders) {
+            const tryPath = path.join(root, sub, safeFilename);
+            if (fs.existsSync(tryPath)) {
+                filePath = tryPath;
+                found = true;
+                break;
+            }
+        }
+        if (found) break;
+    }
+
+    if (!found) {
         return new NextResponse("File not found", { status: 404 });
     }
 
