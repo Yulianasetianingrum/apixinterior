@@ -508,10 +508,11 @@ const SECTION_DEFS: SectionDef[] = [
   },
   {
     type: "FOOTER",
-    label: "Footer Contact",
-    description: "Informasi kontak, alamat, dan social media dengan ikon dinamis.",
-    defaultSlug: "footer-contact",
+    label: "FOOTER (Copyright & Contact)",
+    description: "Informasi copyright, kontak, alamat, dan social media.",
+    defaultSlug: "footer-general",
     defaultConfig: {
+      copyright: "© 2024 Apix Interior. All Rights Reserved.",
       sectionTheme: "FOLLOW_NAVBAR",
       whatsapp: "",
       email: "",
