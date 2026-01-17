@@ -45,8 +45,8 @@ import {
   FaPlus,
   FaGripVertical,
   FaChevronRight,
-  FaCheckCircle,
-  FaMinusCircle
+  FaCircleCheck,
+  FaCircleMinus
 } from "react-icons/fa6";
 
 
