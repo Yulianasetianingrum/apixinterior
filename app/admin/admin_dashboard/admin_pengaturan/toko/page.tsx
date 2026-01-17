@@ -2678,7 +2678,9 @@ async function saveCustomPromoConfig(formData: FormData) {
           }
           return { ok: true };
         } catch {
-          return { ok: false, msg: `Metadata gambar #${imgId} tidak dapat dibaca.` };
+          // Allow save even if metadata fails (e.g. file missing on disk)
+          // This prevents blocking other updates like background theme.
+          return { ok: true };
         }
       }),
     );
