@@ -3915,14 +3915,8 @@ async function uploadImageToGalleryAndAttach(formData: FormData): Promise<{ ok: 
     const layoutOverride = (formData.get("layout") as string | null)?.toLowerCase().trim() || null;
 
     if (hasUploadFile) {
-      if (isCommerceIconAttach || isCommerceCustomAttach) {
-        const mime = String((file as File).type ?? "").toLowerCase();
-        const mimeOk = mime === "image/png";
-        const nameOk = /\.png$/i.test(String((file as File).name ?? ""));
-        if (!mimeOk && !nameOk) {
-          return { ok: false, error: "Icon CATEGORY_GRID_COMMERCE wajib PNG." };
-        }
-      }
+      // Validation block removed for Commerce Icon PNG check.
+      // Now accepting any image format and converting to WebP.
 
       // 1) Save file to /public/uploads/gambar_upload (same as galeri) dengan auto compress -> WebP
       const arrayBuffer = await file.arrayBuffer();
@@ -3938,7 +3932,7 @@ async function uploadImageToGalleryAndAttach(formData: FormData): Promise<{ ok: 
         .slice(0, 60)
         .replace(/\.webp$/i, "");
 
-      const filename = `${Date.now()}-${Math.random().toString(16).slice(2)}-${safeName}.png`;
+      const filename = `${Date.now()}-${Math.random().toString(16).slice(2)}-${safeName}.webp`;
       const filePath = path.join(uploadDir, filename);
       const publicUrl = `/uploads/gambar_upload/${filename}`;
 
@@ -3991,9 +3985,7 @@ async function uploadImageToGalleryAndAttach(formData: FormData): Promise<{ ok: 
       const compressed = await sharpInstance
         .rotate()
         .resize({ width: targetWidth, withoutEnlargement: true })
-      [isCommerceIconAttach || isCommerceCustomAttach ? "png" : "webp"](
-        isCommerceIconAttach || isCommerceCustomAttach ? {} : { quality: 78 },
-      )
+        .webp({ quality: 78 })
         .toBuffer();
 
       await fs.writeFile(filePath, compressed);
@@ -4023,8 +4015,8 @@ async function uploadImageToGalleryAndAttach(formData: FormData): Promise<{ ok: 
 
     if (isCommerceIconAttach || isCommerceCustomAttach) {
       const rec = await prisma.gambarUpload.findUnique({ where: { id: imageIdToUse }, select: { url: true } });
-      if (!rec?.url || !/\.png(\?|#|$)/i.test(String(rec.url))) {
-        return { ok: false, error: "Icon CATEGORY_GRID_COMMERCE wajib PNG." };
+      if (!rec?.url) { // Removed PNG regex check
+        return { ok: false, error: "Gambar tidak valid." };
       }
     }
 

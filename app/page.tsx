@@ -182,7 +182,19 @@ async function fetchThemeData(themeKey: string, isPublished: boolean) {
 
     if (s.type === "CUSTOM_PROMO") {
       const cfg = s.config as any;
-      if (Array.isArray(cfg.voucherImageIds)) cfg.voucherImageIds.forEach((id: any) => imageIds.push(Number(id)));
+      const links = cfg.voucherLinks || {};
+      if (Array.isArray(cfg.voucherImageIds)) {
+        cfg.voucherImageIds.forEach((id: any) => {
+          imageIds.push(Number(id));
+          // Robust collection: Check link for this specific voucher ID
+          const val = links[id];
+          if (typeof val === "string" && val.startsWith("category:")) {
+            const cid = Number(val.split(":")[1]);
+            if (Number.isFinite(cid) && cid > 0) kategoriIds.push(cid);
+          }
+        });
+      }
+      // Also check Object.values just in case there are orphan links we want to preserve or alternate structure
       if (cfg.voucherLinks) {
         Object.values(cfg.voucherLinks).forEach((val: any) => {
           if (typeof val === "string" && val.startsWith("category:")) {
