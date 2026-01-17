@@ -337,6 +337,13 @@ async function fetchPreviewTheme(themeKey: string) {
       }
 
       categoryCommerceById.set(s.id, { items, columns, ...(maxItems ? { maxItems } : {}) });
+
+      // AUTO-FALLBACK: If no items, trigger auto-fetch for top 4 categories
+      if (items.length === 0) {
+        // We will fetch up to 4 popular categories
+        // Mark this section for auto-population later
+        (s as any).__needsAutoCommerce = true;
+      }
     }
 
     if (s.type === "HERO") {
@@ -489,7 +496,50 @@ async function fetchPreviewTheme(themeKey: string) {
 
   // ===== Prefetch categories =====
   const kategoriMap = new Map<number, any>();
-  if (uniqKategoriIds.length) {
+
+  // 1. Collect empty commerce sections & Handle Auto-Fallback
+  const emptyCommerceSections = sections.filter(s => (s as any).__needsAutoCommerce);
+
+  if (emptyCommerceSections.length > 0) {
+    // Fetch top 4 categories for fallback
+    const topCategories = await prisma.kategoriProduk.findMany({
+      take: 4,
+      orderBy: { id: "asc" },
+      select: { id: true, nama: true, slug: true }
+    });
+
+    if (topCategories.length > 0) {
+      // Add to map
+      topCategories.forEach((k: any) => kategoriMap.set(Number(k.id), k));
+
+      // Update each empty section
+      emptyCommerceSections.forEach(s => {
+        const data = categoryCommerceById.get(s.id);
+        if (data) {
+          // Populate synthetic items
+          data.items = topCategories.map((k: any) => ({
+            type: "category",
+            kategoriId: Number(k.id),
+          }));
+        }
+      });
+
+      // Ensure we fetch cover images for these fallback categories
+      // Loop and push to uniqAutoCoverKategoriIds so the next block (Auto cover) picks them up
+      topCategories.forEach((k: any) => {
+        // Avoid duplicates if possible, though Set logic below handles it if we rebuilt the set. 
+        // Here we are pushing to an ARRAY array.from(set).
+        // So we should check includes() to avoid dupes, or just push and let logic handle it.
+        const kid = Number(k.id);
+        if (!uniqAutoCoverKategoriIds.includes(kid)) {
+          uniqAutoCoverKategoriIds.push(kid);
+        }
+      });
+    }
+  }
+
+  // 2. Fetch explicitly configured categories
+  if (uniqKategoriIds.length > 0) {
     const kategoris = await prisma.kategoriProduk.findMany({
       where: { id: { in: uniqKategoriIds } },
       select: { id: true, nama: true, slug: true },
