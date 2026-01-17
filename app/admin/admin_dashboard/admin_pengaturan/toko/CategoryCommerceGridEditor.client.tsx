@@ -255,6 +255,7 @@ function SortRow({
   imageUrl,
   tabs,
   showTabs,
+  onImageApplied,
 }: {
   item: CategoryCommerceItem;
   label: string;

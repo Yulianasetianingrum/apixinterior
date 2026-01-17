@@ -14,16 +14,23 @@ import SecureImage from "@/app/components/SecureImage";
 // Helper to ensure image URL is correct
 const ensureImageUrl = (url: string | null | undefined) => {
     if (!url) return null;
-    let clean = url;
+    let clean = String(url).trim();
+    if (!clean) return null;
 
-    // If it is an external/absolute URL, trust it
+    // Passthrough data/blob
+    if (clean.startsWith("data:") || clean.startsWith("blob:")) return clean;
+
+    // Robust handling for /uploads/ (strip any localhost/domain prefix)
+    const uploadIdx = clean.indexOf("/uploads/");
+    if (uploadIdx !== -1) {
+        return clean.substring(uploadIdx);
+    }
+
+    // Trust other absolute URLs (external CDNs)
     if (clean.startsWith("http")) return clean;
 
-    // Strip common local prefixes
-    clean = clean.replace(/^public\//, "");
-    clean = clean.replace(/^\/?public\//, "");
-
-    if (clean.startsWith("/")) return clean;
+    // Clean local paths
+    clean = clean.replace(/^public\//, "").replace(/^\/+/, "");
     return `/${clean}`;
 };
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { formatIDR, computeHargaSetelahPromo } from "@/lib/product-utils";
+import { formatIDR, computeHargaSetelahPromo, normalizePublicUrl } from "@/lib/product-utils";
 import { useCart } from "@/app/context/CartContext";
 import { useWishlist } from "@/app/context/WishlistContext";
 import SecureImage from "@/app/components/SecureImage";
@@ -255,7 +255,7 @@ export default function ProductVariationSelector({ product, onImageChange, baseW
             slug: product.slug,
             name: product.nama,
             price: finalPriceData.hargaFinal,
-            image: currentVar?.imageUrl || product.mainImage?.url || product.gambar?.url || null,
+            image: normalizePublicUrl(currentVar?.imageUrl || product.mainImage?.url || product.gambar?.url || null),
             variationId: currentVar?.id,
             variationName: getVariationLabel()
         };
@@ -273,7 +273,7 @@ export default function ProductVariationSelector({ product, onImageChange, baseW
             slug: product.slug,
             name: product.nama,
             price: finalPriceData.hargaFinal,
-            image: product.mainImage?.url || null // Usually wishlist is just the product, not specific variation
+            image: normalizePublicUrl(product.mainImage?.url || null) // Usually wishlist is just the product, not specific variation
         });
     };
 

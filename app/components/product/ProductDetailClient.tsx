@@ -4,6 +4,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import ProductVariationSelector from "./ProductVariationSelector.client";
+import { normalizePublicUrl } from "@/lib/product-utils";
 
 type WrapperProps = {
     product: any; // Full prisma object
@@ -181,9 +182,4 @@ export default function ProductDetailClient({ product, waNumber }: WrapperProps)
     );
 }
 
-function normalizePublicUrl(url?: string | null) {
-    if (!url) return null;
-    if (url.startsWith("http")) return url;
-    if (url.startsWith("/")) return url;
-    return `/${url}`;
-}
+
