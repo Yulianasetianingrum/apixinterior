@@ -5,12 +5,21 @@
     min-height: 100vh;
     background: #ffffff !important;
     padding: 8rem 0 3rem 0;
+    width: 100%;
+    overflow-x: hidden;
+    /* Prevent horizontal scroll causing 'leaning' look */
 }
 
 .container {
+    width: 100%;
     max-width: 1280px;
     margin: 0 auto;
     padding: 0 1.5rem;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* Enforce center alignment for children */
 }
 
 /* ========== HEADER ========== */
@@ -57,8 +66,12 @@
     display: grid;
     grid-template-columns: 1fr;
     gap: 1.5rem;
+    width: 100%;
+    /* Ensure full width availability */
     max-width: 700px;
     margin: 0 auto;
+    justify-items: stretch;
+    /* Stretch cards to fill width */
 }
 
 /* ========== PRODUCT CARD ========== */

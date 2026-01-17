@@ -3,7 +3,10 @@ import Navbar from "@/app/navbar/Navbar";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import styles from "./page.module.css";
-import Image from "next/image";
+// Remove next/image import as we will use SecureImage
+// import Image from "next/image"; 
+import SecureImage from "@/app/components/SecureImage";
+import { normalizePublicUrl } from "@/lib/product-utils";
 
 export const dynamic = "force-dynamic";
 
@@ -30,12 +33,13 @@ export default async function KategoriPage() {
     // 2. Map data for display
     const categoryData = categories.map((c: any) => {
         // Try to get image from the first item in the category
-        let imageUrl = c.items?.[0]?.produk?.mainImage?.url;
+        let rawUrl = c.items?.[0]?.produk?.mainImage?.url;
+        let imageUrl = normalizePublicUrl(rawUrl);
 
         return {
             name: c.nama,
             slug: c.slug,
-            image: imageUrl || "/placeholder-image.jpg"
+            image: imageUrl // can be null
         };
     });
 
@@ -55,11 +59,10 @@ export default async function KategoriPage() {
                         >
                             <div className={styles.imageWrapper}>
                                 {cat.image ? (
-                                    <Image
+                                    <SecureImage
                                         src={cat.image}
                                         alt={cat.name}
-                                        fill
-                                        style={{ objectFit: "cover" }}
+                                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
                                     />
                                 ) : (
                                     <div className={styles.placeholder}>No Image</div>

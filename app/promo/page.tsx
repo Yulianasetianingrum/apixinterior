@@ -2,10 +2,11 @@
 import Navbar from "@/app/navbar/Navbar";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import Image from "next/image";
+// import Image from "next/image"; // Replaced by SecureImage
 import styles from "./page.module.css";
-import { computeHargaSetelahPromo } from "@/lib/product-utils";
+import { computeHargaSetelahPromo, normalizePublicUrl } from "@/lib/product-utils";
 import PromoCountdown from "./PromoCountdown";
+import SecureImage from "@/app/components/SecureImage";
 
 export const dynamic = "force-dynamic";
 
@@ -144,25 +145,7 @@ export default async function PromoPage({
 
             <div className={styles.container}>
                 {/* SECTION 2: VOUCHER CLAIM */}
-                {vouchers.length > 0 && !categorySlug && (
-                    <section className={styles.voucherSection}>
-                        <div className={styles.voucherGrid}>
-                            {vouchers.map((v: any, i: number) => (
-                                <div key={i} className={styles.voucherCard}>
-                                    <div className={styles.voucherTop}>
-                                        <div className={styles.voucherValue}>{v.value}</div>
-                                        <div className={styles.voucherLabel}>{v.label}</div>
-                                        <div style={{ fontSize: 11, opacity: 0.7, marginTop: 4 }}>{v.min}</div>
-                                    </div>
-                                    <div className={styles.voucherBottom}>
-                                        <div className={styles.voucherCode}>{v.code}</div>
-                                        <button className={styles.voucherBtn}>Klaim</button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </section>
-                )}
+                {/* Voucher section removed */}
 
                 {/* SECTION 3: PRODUCT GRID */}
                 <section className={styles.productSection}>
@@ -217,12 +200,12 @@ export default async function PromoPage({
                                                 /* Show HOT DEALS if included via Category Promo but no specific discount */
                                                 <div className={styles.prodDiscountBadge} style={{ background: "#ff9800" }}>HOT DEALS</div>
                                             )}
-                                            {p.mainImage ? (
-                                                <Image
-                                                    src={p.mainImage.url}
+                                            {p.mainImage && normalizePublicUrl(p.mainImage.url) ? (
+                                                <SecureImage
+                                                    src={normalizePublicUrl(p.mainImage.url)!}
                                                     alt={p.nama}
-                                                    fill
                                                     className={styles.prodImage}
+                                                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
                                                 />
                                             ) : (
                                                 <div style={{ width: "100%", height: "100%", background: "#f1f5f9" }} />

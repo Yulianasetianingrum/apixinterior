@@ -153,7 +153,64 @@ export default function FavoritePageClient() {
                                 </div>
                             </div>
                         </div>
-                    ))}
+                    {
+                            items.map((item) => (
+                                <div
+                                    key={item.id}
+                                    className={styles.productCard}
+                                    onClick={(e) => {
+                                        // Prevent navigation if clicking action buttons (though stopPropagation handles it, this is extra safety)
+                                        if ((e.target as HTMLElement).closest(`.${styles.actions}`)) return;
+                                        router.push(`/produk/${item.slug}`);
+                                    }}
+                                    style={{ cursor: 'pointer' }}
+                                >
+                                    <div className={styles.productContent}>
+                                        <div className={styles.imageWrapper}>
+                                            {ensureImageUrl(item.image) ? (
+                                                <SecureImage
+                                                    src={ensureImageUrl(item.image)!}
+                                                    alt={item.name}
+                                                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                                                />
+                                            ) : (
+                                                <div className={styles.noImage}>No Img</div>
+                                            )}
+                                        </div>
+                                        <div className={styles.details}>
+                                            <div className={styles.productName}>
+                                                {item.name}
+                                            </div>
+                                            <div className={styles.price}>
+                                                {formatIDR(item.price)}
+                                            </div>
+                                        </div>
+                                        <div className={styles.actions}>
+                                            <button
+                                                className={`${styles.actionBtn} ${styles.cartBtn}`}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleAddToCart(item);
+                                                }}
+                                                title="Tambah ke Keranjang"
+                                            >
+                                                <FaCartShopping />
+                                            </button>
+                                            <button
+                                                className={`${styles.actionBtn} ${styles.deleteBtn}`}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    removeFromWishlist(item.id);
+                                                }}
+                                                title="Hapus"
+                                            >
+                                                <FaTrash />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))
+                        }
                 </div>
             </div>
         </div>

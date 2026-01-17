@@ -88,7 +88,16 @@ export default function CartPageClient({ waNumber }: CartPageClientProps) {
                 <div className={styles.layout}>
                     <div className={styles.productList}>
                         {items.map((item) => (
-                            <div key={`${item.id}-${item.variationId || 'base'}`} className={styles.productCard}>
+                            <div
+                                key={`${item.id}-${item.variationId || 'base'}`}
+                                className={styles.productCard}
+                                onClick={(e) => {
+                                    // Prevent navigation if clicking action buttons
+                                    if ((e.target as HTMLElement).closest(`.${styles.actions}`)) return;
+                                    router.push(`/produk/${item.slug}`);
+                                }}
+                                style={{ cursor: 'pointer' }}
+                            >
                                 <div className={styles.productContent}>
                                     <div className={styles.imageWrapper}>
                                         {ensureImageUrl(item.image) ? (
@@ -104,9 +113,9 @@ export default function CartPageClient({ waNumber }: CartPageClientProps) {
                                     </div>
 
                                     <div className={styles.details}>
-                                        <Link href={`/produk/${item.slug}`} className={styles.productName}>
+                                        <div className={styles.productName}>
                                             {item.name}
-                                        </Link>
+                                        </div>
                                         {item.variationName && (
                                             <div className={styles.variation}>
                                                 <span className={styles.variationDot}></span>
@@ -121,7 +130,10 @@ export default function CartPageClient({ waNumber }: CartPageClientProps) {
                                     <div className={styles.actions}>
                                         <div className={styles.quantityWrapper}>
                                             <button
-                                                onClick={() => updateQuantity(item.id, item.quantity - 1, item.variationId)}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    updateQuantity(item.id, item.quantity - 1, item.variationId);
+                                                }}
                                                 className={styles.quantityBtn}
                                             >
                                                 <FaMinus size={14} />
@@ -130,7 +142,10 @@ export default function CartPageClient({ waNumber }: CartPageClientProps) {
                                                 {item.quantity}
                                             </div>
                                             <button
-                                                onClick={() => updateQuantity(item.id, item.quantity + 1, item.variationId)}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    updateQuantity(item.id, item.quantity + 1, item.variationId);
+                                                }}
                                                 className={styles.quantityBtn}
                                             >
                                                 <FaPlus size={14} />
@@ -138,7 +153,10 @@ export default function CartPageClient({ waNumber }: CartPageClientProps) {
                                         </div>
 
                                         <button
-                                            onClick={() => removeFromCart(item.id, item.variationId)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                removeFromCart(item.id, item.variationId);
+                                            }}
                                             className={styles.deleteBtn}
                                             aria-label="Hapus"
                                         >
