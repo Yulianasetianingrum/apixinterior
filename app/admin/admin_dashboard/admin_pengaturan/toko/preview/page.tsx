@@ -13,9 +13,9 @@ import { CategoryGridPreview } from "./CategoryGridPreview";
 import CategoryCommerceColumns from "@/app/components/homepage/CategoryCommerceColumns.client";
 import { SocialIcon } from "@/app/components/homepage/social-icons";
 
-import logoBlue from "@/app/uploads/logo_apixinterior_biru.png.png";
-import logoGolden from "@/app/uploads/logo_apixinterior_golden.png.png";
-import logoWhite from "@/app/uploads/logo_apixinterior_putih.png.png";
+const logoBlue = "/logo/logo_apixinterior_biru.png.png";
+const logoGolden = "/logo/logo_apixinterior_golden.png.png";
+const logoWhite = "/logo/logo_apixinterior_putih.png.png";
 import { themeMetaSlug, getThemeKeyFromRow, isThemeMetaRow, getThemeKeyFromConfig, normalizeThemeKey, readSp, upperType } from "../toko-utils";
 import {
   normalizeConfig,
@@ -2549,6 +2549,7 @@ export default async function TokoPreviewDraftPage({
                                   alt={namaToko}
                                   fill
                                   sizes="40px"
+                                  unoptimized
                                   style={{ objectFit: "contain" }}
                                 />
                               </div>

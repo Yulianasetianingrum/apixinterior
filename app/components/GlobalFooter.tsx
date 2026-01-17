@@ -5,9 +5,9 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { getHeroThemeTokens, getFooterIconPath, resolveEffectiveTheme } from "@/lib/theme-utils";
 
-import logoBlue from "../uploads/logo_apixinterior_biru.png.png";
-import logoGolden from "../uploads/logo_apixinterior_golden.png.png";
-import logoWhite from "../uploads/logo_apixinterior_putih.png.png";
+const logoBlue = "/logo/logo_apixinterior_biru.png.png";
+const logoGolden = "/logo/logo_apixinterior_golden.png.png";
+const logoWhite = "/logo/logo_apixinterior_putih.png.png";
 
 function normalizeConfig(sectionType: string, raw: unknown) {
     // Minimal normalizer for Footer only
@@ -84,6 +84,7 @@ export default async function GlobalFooter() {
                                     alt={namaToko}
                                     fill
                                     sizes="40px"
+                                    unoptimized
                                     style={{ objectFit: "contain" }}
                                 />
                             </div>

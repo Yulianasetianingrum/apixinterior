@@ -104,6 +104,9 @@ export default function FooterEditorWrapper({ config }: { config: any }) {
             label,
             url: "" // User requested no links, just text for SEO
         })));
+
+        // 4. Default Copyright
+        setCopyright(`© ${new Date().getFullYear()} Apix Interior. All rights reserved.`);
     };
 
     return (
