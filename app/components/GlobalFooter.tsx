@@ -168,7 +168,9 @@ export default async function GlobalFooter() {
 
 
             <div style={{ borderTop: `1px solid ${colors.divider}`, marginTop: 60, paddingTop: 24, textAlign: "center", fontSize: 13, opacity: 0.6 }}>
-                &copy; {new Date().getFullYear()} Apix Interior. All rights reserved.
+                {(cfg as any).copyright ? (cfg as any).copyright : (
+                    <>&copy; {new Date().getFullYear()} Apix Interior. All rights reserved.</>
+                )}
             </div>
         </footer>
     );

@@ -356,6 +356,7 @@ export async function saveFooterConfig(formData: FormData) {
     const address = (formData.get("address") as string | null)?.trim() ?? "";
     const instagram = (formData.get("instagram") as string | null)?.trim() ?? "";
     const facebook = (formData.get("facebook") as string | null)?.trim() ?? "";
+    const copyright = (formData.get("copyright") as string | null)?.trim() ?? "";
 
     const useGlobalContact = (formData.get("useGlobalContact") as string) === "1";
     const useGlobalSocial = (formData.get("useGlobalSocial") as string) === "1";
@@ -380,6 +381,7 @@ export async function saveFooterConfig(formData: FormData) {
             facebook,
             menuLinks,
             footerTags,
+            copyright,
             useGlobalContact,
             useGlobalSocial
         },

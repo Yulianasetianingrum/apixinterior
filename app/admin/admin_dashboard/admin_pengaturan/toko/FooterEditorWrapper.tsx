@@ -15,6 +15,7 @@ export default function FooterEditorWrapper({ config }: { config: any }) {
     const [email, setEmail] = useState(config.email ?? "");
     const [instagram, setInstagram] = useState(config.instagram ?? "");
     const [facebook, setFacebook] = useState(config.facebook ?? "");
+    const [copyright, setCopyright] = useState(config.copyright ?? "");
 
     // JSON fields
     const [menuLinks, setMenuLinks] = useState<any[]>(config.menuLinks || []);
@@ -115,6 +116,7 @@ export default function FooterEditorWrapper({ config }: { config: any }) {
             <input type="hidden" name="email" value={email} />
             <input type="hidden" name="instagram" value={instagram} />
             <input type="hidden" name="facebook" value={facebook} />
+            <input type="hidden" name="copyright" value={copyright} />
             <input type="hidden" name="menuLinks" value={JSON.stringify(menuLinks)} />
             <input type="hidden" name="footerTags" value={JSON.stringify(footerTags)} />
 
@@ -149,6 +151,7 @@ export default function FooterEditorWrapper({ config }: { config: any }) {
                 email={email} setEmail={setEmail}
                 instagram={instagram} setInstagram={setInstagram}
                 facebook={facebook} setFacebook={setFacebook}
+                copyright={copyright} setCopyright={setCopyright}
             />
 
             {/* Menu Links */}

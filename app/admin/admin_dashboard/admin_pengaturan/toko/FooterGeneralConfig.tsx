@@ -17,6 +17,8 @@ type Props = {
     setInstagram: (v: string) => void;
     facebook: string;
     setFacebook: (v: string) => void;
+    copyright: string;
+    setCopyright: (v: string) => void;
 };
 
 export default function FooterGeneralConfig({
@@ -26,7 +28,8 @@ export default function FooterGeneralConfig({
     address, setAddress,
     email, setEmail,
     instagram, setInstagram,
-    facebook, setFacebook
+    facebook, setFacebook,
+    copyright, setCopyright
 }: Props) {
 
     return (
@@ -131,6 +134,18 @@ export default function FooterGeneralConfig({
                     </div>
                 </div>
             )}
+
+            <div className={styles.fieldGroup} style={{ gridColumn: "1 / -1" }}>
+                <label className={styles.label}>Teks Copyright</label>
+                <input
+                    type="text"
+                    value={copyright}
+                    onChange={(e) => setCopyright(e.target.value)}
+                    className={styles.input}
+                    placeholder={`© ${new Date().getFullYear()} Apix Interior. All rights reserved.`}
+                />
+                <p style={{ fontSize: 12, opacity: 0.6, marginTop: 4 }}>Warna teks copyright akan otomatis mengikuti warna teks "Tags".</p>
+            </div>
         </div>
     );
 }
