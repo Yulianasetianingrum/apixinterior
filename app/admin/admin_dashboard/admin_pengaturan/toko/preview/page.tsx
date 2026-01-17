@@ -498,7 +498,8 @@ async function fetchPreviewTheme(themeKey: string) {
   const kategoriMap = new Map<number, any>();
 
   // 1. Collect empty commerce sections & Handle Auto-Fallback
-  const emptyCommerceSections = sections.filter(s => (s as any).__needsAutoCommerce);
+  // Note: loops above iterate `draftSections`. Here we must use `draftSections` too.
+  const emptyCommerceSections = (draftSections as any[]).filter(s => (s as any).__needsAutoCommerce);
 
   if (emptyCommerceSections.length > 0) {
     // Fetch top 4 categories for fallback
@@ -525,11 +526,7 @@ async function fetchPreviewTheme(themeKey: string) {
       });
 
       // Ensure we fetch cover images for these fallback categories
-      // Loop and push to uniqAutoCoverKategoriIds so the next block (Auto cover) picks them up
       topCategories.forEach((k: any) => {
-        // Avoid duplicates if possible, though Set logic below handles it if we rebuilt the set. 
-        // Here we are pushing to an ARRAY array.from(set).
-        // So we should check includes() to avoid dupes, or just push and let logic handle it.
         const kid = Number(k.id);
         if (!uniqAutoCoverKategoriIds.includes(kid)) {
           uniqAutoCoverKategoriIds.push(kid);
