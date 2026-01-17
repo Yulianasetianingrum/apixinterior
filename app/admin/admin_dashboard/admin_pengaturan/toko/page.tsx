@@ -40,7 +40,7 @@ import {
 } from "./toko-utils";
 import {
   FaArrowLeft,
-  FaTimes,
+  FaXmark,
   FaTrash,
   FaPlus,
   FaGripVertical,
@@ -4632,8 +4632,9 @@ export default async function TokoPengaturanPage({
           </div>
 
           <label htmlFor="tokoSidebarToggle" className={styles.sidebarClose} aria-label="Tutup menu">
-            <FaTimes />
+            <FaXmark />
           </label>
+
 
         </div>
 
