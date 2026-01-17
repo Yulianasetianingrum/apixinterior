@@ -1264,7 +1264,7 @@ export default async function HomePage({
             const { a: rcA, b: rcB } = parseThemePair(roomThemeKey);
             const rcLabelBg = colorForToken(rcA);
             // Override Gold to be brighter specifically for Room Category
-            const rcAccent = rcB === "GOLD" ? "#d4af37" : colorForToken(rcB);
+            const rcAccent = rcB === "GOLD" ? "#FFD700" : colorForToken(rcB);
 
             return (
               <section key={section.id} className={styles.previewSection}>

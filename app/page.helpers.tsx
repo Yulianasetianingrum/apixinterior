@@ -113,7 +113,8 @@ export function getHeroThemeTokens(theme: string) {
             return { bg: gold, element: navy, card: gold, cardFg: navy, cardBorder: "rgba(11,29,58,0.20)", ctaBg: navy, ctaFg: white, ctaHoverBg: white, ctaHoverFg: navy, divider: "rgba(11,29,58,0.14)" };
         case "GOLD_WHITE":
         case "theme_5":
-            return { bg: gold, element: white, card: gold, cardFg: white, cardBorder: "rgba(255,255,255,0.22)", ctaBg: white, ctaFg: ink, ctaHoverBg: ink, ctaHoverFg: white, divider: "rgba(255,255,255,0.18)" };
+            // Fix contrast: Gold bg needs dark text (element: navy)
+            return { bg: gold, element: navy, card: gold, cardFg: navy, cardBorder: "rgba(11,29,58,0.20)", ctaBg: white, ctaFg: ink, ctaHoverBg: ink, ctaHoverFg: white, divider: "rgba(11,29,58,0.14)" };
         case "WHITE_NAVY":
         case "WHITE":
         case "LIGHT":

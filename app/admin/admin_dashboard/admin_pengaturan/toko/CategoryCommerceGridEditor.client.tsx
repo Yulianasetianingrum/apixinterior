@@ -101,14 +101,11 @@ function titleBaseName(title: string): string {
 function stripPngSuffix(slug: string): string {
   const s = String(slug || "");
   if (!s) return "";
-  if (s.endsWith("-png")) return s.slice(0, -4);
-  if (s.endsWith("png")) return s.slice(0, -3);
-  return s;
+  // Relaxed: don't strip just png, maybe strip any ext?
+  // ensure we just return the slug without extension if it was part of the file name logic
+  return s.replace(/\.(png|jpg|jpeg|webp|gif|svg)$/i, "");
 }
-
-function isPngUrl(url: string): boolean {
-  return /\.png(\?|#|$)/i.test(String(url || ""));
-}
+// function isPngUrl... removed to allow all formats
 
 const TOKEN_SYNONYMS: Record<string, string[]> = {
   "rak buku": ["book shelf", "bookshelf", "bookcase"],
@@ -274,6 +271,7 @@ function SortRow({
   imageUrl?: string | null;
   tabs: Array<{ id: string; label: string }>;
   showTabs: boolean;
+  onImageApplied?: (img: GalleryImage) => void;
 }) {
   const id = String(item.key);
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
@@ -383,6 +381,7 @@ function SortRow({
               accept="image/*"
               skipRefresh
               onAppliedImageId={(id) => onUpdate(item.key, { imageId: id })}
+              onAppliedImage={onImageApplied}
             />
           ) : (
             <ImagePickerCaptcha
@@ -397,6 +396,7 @@ function SortRow({
               accept="image/*"
               skipRefresh
               onAppliedImageId={(id) => onUpdate(item.key, { imageId: id })}
+              onAppliedImage={onImageApplied}
             />
           )}
           <button type="button" className={ui.removeBtn} onClick={() => onRemove(item.key)}>
@@ -508,6 +508,9 @@ export default function CategoryCommerceGridEditor({
   const genTickRef = React.useRef(0);
   const itemsRef = React.useRef<CategoryCommerceItem[]>(normalizedInitial);
 
+  // NEW: Store newly picked/uploaded images for instant preview
+  const [extraImages, setExtraImages] = React.useState<GalleryImage[]>([]);
+
   React.useEffect(() => {
     setItems(normalizedInitial);
   }, [normalizedInitial]);
@@ -535,8 +538,13 @@ export default function CategoryCommerceGridEditor({
       const id = Number(img.id);
       if (Number.isFinite(id)) m.set(id, img);
     }
+    // Merge extra images
+    for (const img of extraImages) {
+      const id = Number(img.id);
+      if (Number.isFinite(id)) m.set(id, img);
+    }
     return m;
-  }, [availableImages]);
+  }, [availableImages, extraImages]);
 
   const filteredCategories = React.useMemo(() => {
     const qq = q.trim().toLowerCase();
@@ -924,6 +932,7 @@ export default function CategoryCommerceGridEditor({
                         imageUrl={iconUrl}
                         tabs={tabs}
                         showTabs={showTabs}
+                        onImageApplied={(img) => setExtraImages((prev) => [...prev, img])}
                       />
                     );
                   })}

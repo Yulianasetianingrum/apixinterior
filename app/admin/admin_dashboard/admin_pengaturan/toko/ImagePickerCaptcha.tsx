@@ -22,6 +22,7 @@ type Props = {
   accept?: string; // default: image/*
   skipRefresh?: boolean; // default: false
   onAppliedImageId?: (id: number) => void;
+  onAppliedImage?: (img: GambarItem) => void;
   currentImageId?: number; // ID of currently selected image to highlight
 };
 
@@ -48,6 +49,7 @@ export default function ImagePickerCaptcha({
   accept = "image/*",
   skipRefresh = false,
   onAppliedImageId,
+  onAppliedImage,
   currentImageId,
 }: Props) {
   const [open, setOpen] = useState(false);
@@ -177,6 +179,10 @@ export default function ImagePickerCaptcha({
         setUploadErr(null);
         setUploadOk("Berhasil dipakai.");
         if (onAppliedImageId) onAppliedImageId(id);
+        if (onAppliedImage) {
+          const found = items.find((x) => x.id === id);
+          if (found) onAppliedImage(found);
+        }
         if (skipRefresh) return;
         if (attach && attach.startsWith("CUSTOM_PROMO")) {
           const u = new URL(window.location.href);
@@ -269,6 +275,9 @@ export default function ImagePickerCaptcha({
 
         // Trigger callback with new ID
         if (newImageId && onAppliedImageId) onAppliedImageId(Number(newImageId));
+        if (newImageId && onAppliedImage && jsonUpload.data?.[0]) {
+          onAppliedImage(jsonUpload.data[0]);
+        }
 
         if (skipRefresh) return;
         if (attach && attach.startsWith("CUSTOM_PROMO")) {

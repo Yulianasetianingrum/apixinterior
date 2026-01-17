@@ -2287,16 +2287,11 @@ async function saveCategoryGridCommerceConfig(formData: FormData) {
   try {
     await validateExistence({ kategoriIds: items.map((it) => it.kategoriId), imageIds });
     if (imageIds.length) {
-      const rows = await prisma.gambarUpload.findMany({
+      // Validasi keberadaan gambar saja, format bebas (JPG/PNG/WEBP ok)
+      await prisma.gambarUpload.findMany({
         where: { id: { in: imageIds } },
-        select: { id: true, url: true },
+        select: { id: true },
       });
-      const nonPng = rows
-        .filter((r) => !/\.png(\?|#|$)/i.test(String(r.url ?? "")))
-        .map((r) => r.id);
-      if (nonPng.length) {
-        return redirectBack({ error: encodeURIComponent(`Icon harus PNG. Invalid: ${nonPng.join(", ")}`) });
-      }
     }
   } catch (e: any) {
     return redirectBack({ error: encodeURIComponent(e?.message ?? "Validasi gagal.") });

@@ -2332,8 +2332,8 @@ export default async function TokoPreviewDraftPage({
                   const roomThemeKey = resolveEffectiveTheme(String(cfg.sectionTheme ?? "FOLLOW_NAVBAR"), navbarTheme);
                   const { a: rcA, b: rcB } = parseThemePair(roomThemeKey);
                   const rcLabelBg = colorForToken(rcA);
-                  // Override Gold to be brighter specifically for Room Category
-                  const rcAccent = rcB === "GOLD" ? "#d4af37" : colorForToken(rcB);
+                  // Override Gold to be brighter (#FFD700) for Room Category
+                  const rcAccent = rcB === "GOLD" ? "#FFD700" : colorForToken(rcB);
 
                   return (
                     <section key={section.id} className={ui.previewSection}>
