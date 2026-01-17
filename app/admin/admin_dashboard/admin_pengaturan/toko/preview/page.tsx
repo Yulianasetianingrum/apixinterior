@@ -1779,7 +1779,7 @@ export default async function TokoPreviewDraftPage({
                     return (
                       <article
                         key={Number(b?.id)}
-                        className={`${ui.pcCard}`}
+                        className={`${homeStyles.pcCard}`}
                         style={{
                           ...(isSingle
                             ? cardStyleSingle
@@ -1796,15 +1796,13 @@ export default async function TokoPreviewDraftPage({
 
                           return (
                             <div
-                              className={ui.pcMediaPlaceholder}
+                              className={homeStyles.pcMediaPlaceholder}
                               style={{
                                 position: "relative",
-                                display: "block",
-                                aspectRatio: "16 / 9",
+                                aspectRatio: "16/9",
                                 maxHeight: isSingle ? 360 : 240,
                                 borderBottom: "1px solid var(--t-card-border)",
-                                background:
-                                  "linear-gradient(135deg, rgba(255,255,255,0.06), rgba(0,0,0,0.14))",
+                                background: "linear-gradient(135deg, rgba(255,255,255,0.06), rgba(0,0,0,0.14))",
                               }}
                             >
                               {embedSrc ? (
@@ -1816,14 +1814,7 @@ export default async function TokoPreviewDraftPage({
                                   style={{ border: 0, width: "100%", height: "100%" }}
                                 />
                               ) : (
-                                <div
-                                  style={{
-                                    position: "absolute",
-                                    inset: 0,
-                                    display: "grid",
-                                    placeItems: "center",
-                                  }}
-                                >
+                                <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center" }}>
                                   <div style={{ display: "grid", gap: 6, placeItems: "center" }}>
                                     <div style={{ fontSize: 32, lineHeight: 1 }}>📍</div>
                                     <div
@@ -1845,24 +1836,27 @@ export default async function TokoPreviewDraftPage({
                           );
                         })()}
 
-                        <div className={ui.pcBody}>
-                          <div className={ui.pcTitle}>{name}</div>
-                          <div className={ui.pcMeta}>{meta}</div>
 
-
-                          <div className={ui.pcCtaWrap}>
+                        <div className={homeStyles.pcBody}>
+                          <div className={homeStyles.pcTitle}>{name}</div>
+                          <div className={homeStyles.pcMeta}>{meta}</div>
+                          <div className={homeStyles.pcCtaWrap}>
                             {cleanMapsUrl ? (
                               <a
-                                className={ui.pcCta}
+                                className={homeStyles.pcCta}
                                 href={resolveGoogleMapsNavigation(rawMapsUrl, name)}
                                 target="_blank"
                                 rel="noreferrer"
-                                style={{ background: ctaBg, color: ctaFg, border: `1px solid ${ctaBg}` }}
+                                style={{
+                                  background: ctaBg,
+                                  color: ctaFg,
+                                  border: `1px solid ${ctaBg}`,
+                                }}
                               >
                                 Buka Maps
                               </a>
                             ) : (
-                              <div className={ui.pcCtaPlaceholder} />
+                              <div className={homeStyles.pcCtaPlaceholder} />
                             )}
                           </div>
                         </div>

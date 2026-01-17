@@ -1059,9 +1059,9 @@ export default async function HomePage({
 
                   // console.log(`DEBUG_VOUCHER_CAT: CatID=${catId}, Found=${!!k}, Slug=${k?.slug}`);
 
-                  if (k && k.slug) {
-                    // Use dedicated Category route
-                    href = `/kategori/${k.slug}`;
+                  if (k && k.nama) {
+                    // Use Product Link with Category Filter
+                    href = `/produk?cat=${encodeURIComponent(k.nama)}`;
                   } else if (Number.isFinite(catId) && catId > 0) {
                     const fallbackPath = `/cari?kategori=${catId}`;
                     href = fallbackPath;
