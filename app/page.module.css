@@ -1306,8 +1306,7 @@
 .heroInner {
   position: relative;
   display: flex;
-  gap: 24px !important;
-  /* Close the gap */
+  gap: clamp(14px, 2.2vw, 24px) !important;
   align-items: center;
   justify-content: center !important;
   /* No more Natural Distancing */
@@ -1333,6 +1332,8 @@
   justify-content: center;
   gap: 10px;
   max-width: 720px;
+  position: relative;
+  z-index: 10;
 }
 
 .heroTopRow {
@@ -1563,18 +1564,15 @@
 /* Media column */
 /* Media column */
 .heroMedia {
-  flex: 1 1 440px;
+  flex: 1 1 420px;
   min-width: 280px !important;
-  /* Safety minimum */
   position: relative;
   overflow: hidden;
-  border-radius: 24px;
+  border-radius: 20px;
   background: rgba(7, 12, 24, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.14);
-  height: auto !important;
-  /* Let aspect ratio drive height */
-  aspect-ratio: 1 / 1 !important;
-  /* FORCED SQUARE ("1:1") */
+  height: clamp(280px, 32vw, 420px) !important;
+  aspect-ratio: 16 / 11 !important;
 }
 
 .heroMediaBg {
@@ -2180,6 +2178,7 @@
   line-height: 1.2;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -2593,6 +2592,7 @@
   font-size: 15px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-align: center;
@@ -2604,6 +2604,7 @@
   line-height: 1.35;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

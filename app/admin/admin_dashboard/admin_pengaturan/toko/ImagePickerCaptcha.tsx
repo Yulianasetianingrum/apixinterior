@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import React, { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 
 type GambarItem = {
@@ -149,6 +150,13 @@ export default function ImagePickerCaptcha({
       setUploadFile(null);
       setUploadTitle("");
       setUploadTags("");
+    } else {
+      // Handle scroll lock
+      const originalStyle = window.getComputedStyle(document.body).overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = originalStyle;
+      };
     }
   }, [open]);
 
@@ -427,17 +435,20 @@ export default function ImagePickerCaptcha({
         </div>
       ) : null}
 
-      {open ? (
+      {open && typeof document !== "undefined" ? createPortal(
         <div
           role="dialog"
           aria-modal="true"
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(0,0,0,0.55)",
-            zIndex: 9999,
-            padding: 16,
-            overflow: "auto",
+            background: "rgba(0,0,0,0.65)",
+            zIndex: 99999,
+            display: "grid",
+            placeItems: "center",
+            padding: "20px 16px",
+            overflow: "hidden",
+            backdropFilter: "blur(4px)",
           }}
           onClick={(e) => {
             if (e.target === e.currentTarget) setOpen(false);
@@ -445,258 +456,283 @@ export default function ImagePickerCaptcha({
         >
           <div
             style={{
+              width: "100%",
               maxWidth: 980,
-              margin: "0 auto",
+              maxHeight: "90vh",
               background: "white",
-              borderRadius: 18,
+              borderRadius: 24,
               border: `1px solid ${GOLD}`,
-              padding: 14,
+              display: "flex",
+              flexDirection: "column",
+              boxShadow: "0 24px 48px rgba(0,0,0,0.3)",
+              overflow: "hidden",
+              animation: "modalIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
             }}
           >
-            <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center" }}>
-              <div style={{ color: TEXT, fontWeight: 950, fontSize: 16 }}>Pilih gambar dari galeri</div>
+            {/* Modal Header */}
+            <div style={{
+              display: "flex",
+              justifyContent: "space-between",
+              gap: 12,
+              alignItems: "center",
+              padding: "20px 24px",
+              borderBottom: "1px solid rgba(0,0,0,0.08)",
+              background: "#fff"
+            }}>
+              <div style={{ color: TEXT, fontWeight: 950, fontSize: 18 }}>Pilih gambar dari galeri</div>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
                 style={{
-                  padding: "8px 10px",
-                  borderRadius: 10,
-                  border: `1px solid ${GOLD}`,
+                  padding: "10px 18px",
+                  borderRadius: 12,
+                  border: `1px solid ${BORDER}`,
                   background: "white",
                   color: TEXT,
                   cursor: "pointer",
-                  fontWeight: 900,
+                  fontWeight: 800,
+                  fontSize: 14,
                 }}
               >
                 Tutup
               </button>
             </div>
 
-            <div style={{ display: "grid", gap: 10, marginTop: 12 }}>
-              <input
-                value={q}
-                onChange={(e) => setQ(e.target.value)}
-                placeholder="Cari (id / title / tags)"
-                style={{
-                  width: "100%",
-                  padding: "12px 12px",
-                  borderRadius: 12,
-                  border: `1px solid ${GOLD}`,
-                  background: "white",
-                  color: TEXT,
-                  outline: "none",
-                  fontWeight: 800,
-                }}
-              />
+            {/* Scrollable Content */}
+            <div style={{ flex: 1, overflowY: "auto", padding: "24px" }}>
+              <style>{`
+                @keyframes modalIn {
+                  from { opacity: 0; transform: translateY(20px) scale(0.98); }
+                  to { opacity: 1; transform: translateY(0) scale(1); }
+                }
+              `}</style>
 
-              <div style={{ display: "flex", gap: 10, alignItems: "center", justifyContent: "space-between", flexWrap: "wrap" }}>
-                <div style={{ color: "rgba(17,17,17,0.7)", fontSize: 12 }}>
-                  {loading ? "Memuat" : err ? err : `${items.length} hasil`}
-                </div>
+              <div style={{ display: "grid", gap: 10, marginTop: 12 }}>
+                <input
+                  value={q}
+                  onChange={(e) => setQ(e.target.value)}
+                  placeholder="Cari (id / title / tags)"
+                  style={{
+                    width: "100%",
+                    padding: "12px 12px",
+                    borderRadius: 12,
+                    border: `1px solid ${GOLD}`,
+                    background: "white",
+                    color: TEXT,
+                    outline: "none",
+                    fontWeight: 800,
+                  }}
+                />
 
-                {allowUpload ? (
-                  <div
-                    style={{
-                      marginTop: 12,
-                      padding: 12,
-                      borderRadius: 14,
-                      border: "1px dashed rgba(0,0,0,0.25)",
-                      background: "rgba(0,0,0,0.02)",
-                    }}
-                  >
-                    <div style={{ fontWeight: 900, color: TEXT }}>Upload &amp; Pakai</div>
-                    <div style={{ fontSize: 12, color: "rgba(17,17,17,0.7)", marginTop: 6 }}>
-                      Upload gambar baru lalu otomatis dipakai untuk field ini.
-                    </div>
-
-
-                    <div style={{ marginTop: 10, display: "grid", gap: 8 }}>
-                      <input
-                        type="file"
-                        name="file"
-                        accept={accept}
-                        required
-                        ref={uploadFileRef}
-                        onChange={(e) => setUploadFile(e.target.files?.[0] ?? null)}
-                        style={{ fontSize: 12 }}
-                      />
-
-                      <input
-                        value={uploadTitle}
-                        onChange={(e) => setUploadTitle(e.target.value)}
-                        placeholder="Title (opsional)"
-                        style={{
-                          width: "100%",
-                          padding: "10px 12px",
-                          borderRadius: 12,
-                          border: "1px solid rgba(0,0,0,0.14)",
-                        }}
-                      />
-
-                      <input
-                        value={uploadTags}
-                        onChange={(e) => setUploadTags(e.target.value)}
-                        placeholder="Tags (opsional)"
-                        style={{
-                          width: "100%",
-                          padding: "10px 12px",
-                          borderRadius: 12,
-                          border: "1px solid rgba(0,0,0,0.14)",
-                        }}
-                      />
-
-                      {uploadErr ? (
-                        <div style={{ fontSize: 12, fontWeight: 900, color: "crimson" }}>{uploadErr}</div>
-                      ) : null}
-
-                      {uploadOk ? (
-                        <div style={{ fontSize: 12, fontWeight: 900, color: "green" }}>{uploadOk}</div>
-                      ) : null}
-
-                      <button
-                        type="button"
-                        onClick={submitUpload}
-                        disabled={isPending}
-                        style={{
-                          padding: "10px 12px",
-                          borderRadius: 12,
-                          border: `1px solid ${GOLD}`,
-                          background: GOLD,
-                          color: "white",
-                          fontWeight: 900,
-                          cursor: isPending ? "not-allowed" : "pointer",
-                          opacity: isPending ? 0.7 : 1,
-                        }}
-                      >
-                        {isPending ? "Mengunggah" : "Upload & Pakai"}
-                      </button>
-                    </div>
-
+                <div style={{ display: "flex", gap: 10, alignItems: "center", justifyContent: "space-between", flexWrap: "wrap" }}>
+                  <div style={{ color: "rgba(17,17,17,0.7)", fontSize: 12 }}>
+                    {loading ? "Memuat" : err ? err : `${items.length} hasil`}
                   </div>
-                ) : null}
 
-                <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                  <button
-                    type="button"
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    disabled={page <= 1 || loading}
-                    style={{
-                      padding: "8px 10px",
-                      borderRadius: 10,
-                      border: `1px solid ${GOLD}`,
-                      background: "white",
-                      color: TEXT,
-                      cursor: page <= 1 || loading ? "not-allowed" : "pointer",
-                      fontWeight: 900,
-                      opacity: page <= 1 || loading ? 0.5 : 1,
-                    }}
-                  >
-                    Prev
-                  </button>
-                  <div style={{ color: "rgba(17,17,17,0.8)", fontSize: 12, fontWeight: 900 }}>Page {page}</div>
-                  <button
-                    type="button"
-                    onClick={() => setPage((p) => p + 1)}
-                    disabled={loading}
-                    style={{
-                      padding: "8px 10px",
-                      borderRadius: 10,
-                      border: `1px solid ${GOLD}`,
-                      background: "white",
-                      color: TEXT,
-                      cursor: loading ? "not-allowed" : "pointer",
-                      fontWeight: 900,
-                      opacity: loading ? 0.5 : 1,
-                    }}
-                  >
-                    Next
-                  </button>
-                </div>
-              </div>
-
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))",
-                  gap: 10,
-                }}
-              >
-                {items.map((it) => {
-                  const isCurrentlySelected = currentImageId && it.id === currentImageId;
-                  return (
-                    <button
-                      key={it.id}
-                      type="button"
-                      onClick={() => {
-                        setSelected(it);
-                        setOpen(false);
-                        if (autoApplyOnSelect) submitById(it.id);
-                      }}
+                  {allowUpload ? (
+                    <div
                       style={{
-                        position: "relative",
-                        textAlign: "left",
-                        padding: 8,
+                        marginTop: 12,
+                        padding: 12,
                         borderRadius: 14,
-                        border: isCurrentlySelected ? `3px solid ${GOLD}` : "1px solid rgba(0,0,0,0.12)",
-                        background: isCurrentlySelected ? GOLD_SOFT : "white",
-                        cursor: "pointer",
-                        color: TEXT,
+                        border: "1px dashed rgba(0,0,0,0.25)",
+                        background: "rgba(0,0,0,0.02)",
                       }}
-                      title={`${it.title ?? ""} ${it.tags ?? ""}`.trim() || `#${it.id}`}
                     >
-                      {isCurrentlySelected && (
-                        <div
+                      <div style={{ fontWeight: 900, color: TEXT }}>Upload &amp; Pakai</div>
+                      <div style={{ fontSize: 12, color: "rgba(17,17,17,0.7)", marginTop: 6 }}>
+                        Upload gambar baru lalu otomatis dipakai untuk field ini.
+                      </div>
+
+
+                      <div style={{ marginTop: 10, display: "grid", gap: 8 }}>
+                        <input
+                          type="file"
+                          name="file"
+                          accept={accept}
+                          required
+                          ref={uploadFileRef}
+                          onChange={(e) => setUploadFile(e.target.files?.[0] ?? null)}
+                          style={{ fontSize: 12 }}
+                        />
+
+                        <input
+                          value={uploadTitle}
+                          onChange={(e) => setUploadTitle(e.target.value)}
+                          placeholder="Title (opsional)"
                           style={{
-                            position: "absolute",
-                            top: 4,
-                            right: 4,
-                            width: 28,
-                            height: 28,
-                            borderRadius: "50%",
+                            width: "100%",
+                            padding: "10px 12px",
+                            borderRadius: 12,
+                            border: "1px solid rgba(0,0,0,0.14)",
+                          }}
+                        />
+
+                        <input
+                          value={uploadTags}
+                          onChange={(e) => setUploadTags(e.target.value)}
+                          placeholder="Tags (opsional)"
+                          style={{
+                            width: "100%",
+                            padding: "10px 12px",
+                            borderRadius: 12,
+                            border: "1px solid rgba(0,0,0,0.14)",
+                          }}
+                        />
+
+                        {uploadErr ? (
+                          <div style={{ fontSize: 12, fontWeight: 900, color: "crimson" }}>{uploadErr}</div>
+                        ) : null}
+
+                        {uploadOk ? (
+                          <div style={{ fontSize: 12, fontWeight: 900, color: "green" }}>{uploadOk}</div>
+                        ) : null}
+
+                        <button
+                          type="button"
+                          onClick={submitUpload}
+                          disabled={isPending}
+                          style={{
+                            padding: "10px 12px",
+                            borderRadius: 12,
+                            border: `1px solid ${GOLD}`,
                             background: GOLD,
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
                             color: "white",
                             fontWeight: 900,
-                            fontSize: 16,
-                            boxShadow: "0 2px 8px rgba(0,0,0,0.25)",
-                            zIndex: 10,
+                            cursor: isPending ? "not-allowed" : "pointer",
+                            opacity: isPending ? 0.7 : 1,
                           }}
                         >
-                          ✓
-                        </div>
-                      )}
-                      <img
-                        src={it.url}
-                        alt={it.title ?? `Gambar ${it.id}`}
-                        style={{
-                          width: "100%",
-                          height: 110,
-                          objectFit: "cover",
-                          borderRadius: 12,
-                          border: isCurrentlySelected ? `2px solid ${GOLD}` : "1px solid rgba(0,0,0,0.10)",
-                          background: "rgba(0,0,0,0.03)",
-                        }}
-                      />
-                      <div style={{ marginTop: 8, fontSize: 12, fontWeight: 900 }}>#{it.id}</div>
-                      <div style={{ marginTop: 2, fontSize: 11, color: "rgba(17,17,17,0.75)" }}>
-                        {(it.title ?? "").slice(0, 40) || "(tanpa judul)"}
+                          {isPending ? "Mengunggah" : "Upload & Pakai"}
+                        </button>
                       </div>
-                      {it.tags ? (
-                        <div style={{ marginTop: 2, fontSize: 10, color: "rgba(17,17,17,0.55)" }}>
-                          {String(it.tags).slice(0, 60)}
-                        </div>
-                      ) : null}
+
+                    </div>
+                  ) : null}
+
+                  <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                    <button
+                      type="button"
+                      onClick={() => setPage((p) => Math.max(1, p - 1))}
+                      disabled={page <= 1 || loading}
+                      style={{
+                        padding: "8px 10px",
+                        borderRadius: 10,
+                        border: `1px solid ${GOLD}`,
+                        background: "white",
+                        color: TEXT,
+                        cursor: page <= 1 || loading ? "not-allowed" : "pointer",
+                        fontWeight: 900,
+                        opacity: page <= 1 || loading ? 0.5 : 1,
+                      }}
+                    >
+                      Prev
                     </button>
-                  );
-                })}
+                    <div style={{ color: "rgba(17,17,17,0.8)", fontSize: 12, fontWeight: 900 }}>Page {page}</div>
+                    <button
+                      type="button"
+                      onClick={() => setPage((p) => p + 1)}
+                      disabled={loading}
+                      style={{
+                        padding: "8px 10px",
+                        borderRadius: 10,
+                        border: `1px solid ${GOLD}`,
+                        background: "white",
+                        color: TEXT,
+                        cursor: loading ? "not-allowed" : "pointer",
+                        fontWeight: 900,
+                        opacity: loading ? 0.5 : 1,
+                      }}
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
+
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))",
+                    gap: 10,
+                  }}
+                >
+                  {items.map((it) => {
+                    const isCurrentlySelected = currentImageId && it.id === currentImageId;
+                    return (
+                      <button
+                        key={it.id}
+                        type="button"
+                        onClick={() => {
+                          setSelected(it);
+                          setOpen(false);
+                          if (autoApplyOnSelect) submitById(it.id);
+                        }}
+                        style={{
+                          position: "relative",
+                          textAlign: "left",
+                          padding: 8,
+                          borderRadius: 14,
+                          border: isCurrentlySelected ? `3px solid ${GOLD}` : "1px solid rgba(0,0,0,0.12)",
+                          background: isCurrentlySelected ? GOLD_SOFT : "white",
+                          cursor: "pointer",
+                          color: TEXT,
+                        }}
+                        title={`${it.title ?? ""} ${it.tags ?? ""}`.trim() || `#${it.id}`}
+                      >
+                        {isCurrentlySelected && (
+                          <div
+                            style={{
+                              position: "absolute",
+                              top: 4,
+                              right: 4,
+                              width: 28,
+                              height: 28,
+                              borderRadius: "50%",
+                              background: GOLD,
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              color: "white",
+                              fontWeight: 900,
+                              fontSize: 16,
+                              boxShadow: "0 2px 8px rgba(0,0,0,0.25)",
+                              zIndex: 10,
+                            }}
+                          >
+                            ✓
+                          </div>
+                        )}
+                        <img
+                          src={it.url}
+                          alt={it.title ?? `Gambar ${it.id}`}
+                          style={{
+                            width: "100%",
+                            height: 110,
+                            objectFit: "cover",
+                            borderRadius: 12,
+                            border: isCurrentlySelected ? `2px solid ${GOLD}` : "1px solid rgba(0,0,0,0.10)",
+                            background: "rgba(0,0,0,0.03)",
+                          }}
+                        />
+                        <div style={{ marginTop: 8, fontSize: 12, fontWeight: 900 }}>#{it.id}</div>
+                        <div style={{ marginTop: 2, fontSize: 11, color: "rgba(17,17,17,0.75)" }}>
+                          {(it.title ?? "").slice(0, 40) || "(tanpa judul)"}
+                        </div>
+                        {it.tags ? (
+                          <div style={{ marginTop: 2, fontSize: 10, color: "rgba(17,17,17,0.55)" }}>
+                            {String(it.tags).slice(0, 60)}
+                          </div>
+                        ) : null}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             </div>
-          </div>
-        </div>
+          </div>,
+          document.body
       ) : null}
-    </div>
-  );
+        </div>
+      );
 }
-
+      ```

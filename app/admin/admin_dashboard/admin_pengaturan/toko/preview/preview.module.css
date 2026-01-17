@@ -1194,10 +1194,10 @@
 
 .heroDescription {
   margin: 0;
-  font-size: clamp(14px, 1.2vw, 18px);
+  font-size: clamp(14px, 1.2vw, 17px);
   line-height: 1.55;
   color: var(--hb-muted);
-  max-width: 66ch;
+  max-width: 62ch;
 
   display: -webkit-box;
   -webkit-line-clamp: 4;
@@ -1354,14 +1354,14 @@
 
 /* Media column */
 .heroMedia {
-  flex: 1 1 440px;
+  flex: 1 1 420px;
   min-width: 0;
   position: relative;
   overflow: hidden;
-  border-radius: 24px;
+  border-radius: 20px;
   background: rgba(7, 12, 24, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.14);
-  height: clamp(320px, 36vw, 540px);
+  height: clamp(280px, 32vw, 420px);
 }
 
 .heroMediaBg {

@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import React, { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 
 type Product = {
   id: number;
@@ -106,9 +107,24 @@ export default function ProductCarouselPicker({
   const [selectedIds, setSelectedIds] = useState<number[]>(() => [...initial]);
 
   // Sync kalau server render ulang (mis. setelah simpan) membawa initial berbeda
+  // Gunakan JSON.stringify agar tidak loop/reset kalau parent kirim array instance baru tiap render
   useEffect(() => {
-    setSelectedIds([...initial]);
+    setSelectedIds((prev) => {
+      if (JSON.stringify(prev) === JSON.stringify(initial)) return prev;
+      return [...initial];
+    });
   }, [initial]);
+
+  // Handle scroll lock
+  useEffect(() => {
+    if (open) {
+      const originalStyle = window.getComputedStyle(document.body).overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = originalStyle;
+      };
+    }
+  }, [open]);
 
   const imageMap = useMemo(() => {
     const m = new Map<number, ImageItem>();
@@ -242,18 +258,21 @@ export default function ProductCarouselPicker({
         )}
       </div>
 
-      {/* Modal */}
-      {open ? (
+      {/* Modal - Use Portal to escape stacking context */}
+      {open && typeof document !== "undefined" ? createPortal(
         <div
           role="dialog"
           aria-modal="true"
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(0,0,0,0.55)",
-            zIndex: 9999,
-            padding: 16,
-            overflow: "auto",
+            background: "rgba(0,0,0,0.65)",
+            zIndex: 99999,
+            display: "grid",
+            placeItems: "center",
+            padding: "20px 16px",
+            overflow: "hidden",
+            backdropFilter: "blur(4px)",
           }}
           onClick={(e) => {
             if (e.target === e.currentTarget) setOpen(false);
@@ -261,65 +280,216 @@ export default function ProductCarouselPicker({
         >
           <div
             style={{
+              width: "100%",
               maxWidth: 1100,
-              margin: "0 auto",
+              maxHeight: "90vh",
               background: "white",
-              borderRadius: 18,
+              borderRadius: 24,
               border: `1px solid ${GOLD}`,
-              padding: 14,
+              display: "flex",
+              flexDirection: "column",
+              boxShadow: "0 24px 48px rgba(0,0,0,0.3)",
+              overflow: "hidden",
+              animation: "modalIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
             }}
           >
-            <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center" }}>
-              <div style={{ color: TEXT, fontWeight: 950, fontSize: 16 }}>{buttonLabel}</div>
-              <button
-                type="button"
-                onClick={() => setOpen(false)}
-                style={{
-                  padding: "8px 10px",
-                  borderRadius: 10,
-                  border: `1px solid ${GOLD}`,
-                  background: "white",
-                  color: TEXT,
-                  cursor: "pointer",
-                  fontWeight: 900,
-                }}
-              >
-                Tutup
-              </button>
-            </div>
-
-            {/* Selected preview */}
-            <div style={{ display: "grid", gap: 10, marginTop: 12 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "baseline", flexWrap: "wrap" }}>
-                <div style={{ fontWeight: 900, color: TEXT }}>Urutan tampil</div>
-                <div style={{ fontSize: 12, color: "rgba(17,17,17,0.65)" }}>Drag &amp; drop untuk ubah urutan.</div>
+            {/* Modal Header */}
+            <div style={{
+              display: "flex",
+              justifyContent: "space-between",
+              gap: 12,
+              alignItems: "center",
+              padding: "20px 24px",
+              borderBottom: `1px solid ${BORDER}`,
+              background: "#fff"
+            }}>
+              <div>
+                <div style={{ color: TEXT, fontWeight: 950, fontSize: 18 }}>{buttonLabel}</div>
+                <div style={{ fontSize: 12, color: "rgba(17,17,17,0.6)", marginTop: 2 }}>
+                  {selectedIds.length} produk dipilih
+                </div>
               </div>
-
-              {selectedProducts.length === 0 ? (
-                <div
+              <div style={{ display: "flex", gap: 10 }}>
+                <button
+                  type="button"
+                  onClick={() => setOpen(false)}
                   style={{
-                    padding: 12,
+                    padding: "10px 18px",
                     borderRadius: 12,
-                    border: `1px dashed ${BORDER}`,
-                    color: "rgba(17,17,17,0.65)",
-                    fontSize: 13,
+                    border: `1px solid ${BORDER}`,
+                    background: "white",
+                    color: TEXT,
+                    cursor: "pointer",
+                    fontWeight: 800,
+                    fontSize: 14,
                   }}
                 >
-                  Belum ada produk dipilih. Cari &amp; klik <b>Tambah</b> di bawah.
+                  Batal
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setOpen(false)}
+                  style={{
+                    padding: "10px 22px",
+                    borderRadius: 12,
+                    border: `1px solid ${GOLD}`,
+                    background: GOLD,
+                    color: "white",
+                    cursor: "pointer",
+                    fontWeight: 900,
+                    fontSize: 14,
+                    boxShadow: "0 4px 12px rgba(212, 175, 55, 0.3)",
+                  }}
+                >
+                  Simpan &amp; Selesai
+                </button>
+              </div>
+            </div>
+
+            {/* Scrollable Content Container */}
+            <div style={{ flex: 1, overflowY: "auto", padding: "24px" }}>
+              <style>{`
+                @keyframes modalIn {
+                  from { opacity: 0; transform: translateY(20px) scale(0.98); }
+                  to { opacity: 1; transform: translateY(0) scale(1); }
+                }
+              `}</style>
+
+              {/* Selected preview */}
+              <div style={{ display: "grid", gap: 10, marginTop: 12 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "baseline", flexWrap: "wrap" }}>
+                  <div style={{ fontWeight: 900, color: TEXT }}>Urutan tampil</div>
+                  <div style={{ fontSize: 12, color: "rgba(17,17,17,0.65)" }}>Drag &amp; drop untuk ubah urutan.</div>
                 </div>
-              ) : (
-                <div style={{ display: "grid", gap: 10 }}>
-                  {selectedProducts.map((p) => {
+
+                {selectedProducts.length === 0 ? (
+                  <div
+                    style={{
+                      padding: 12,
+                      borderRadius: 12,
+                      border: `1px dashed ${BORDER}`,
+                      color: "rgba(17,17,17,0.65)",
+                      fontSize: 13,
+                    }}
+                  >
+                    Belum ada produk dipilih. Cari &amp; klik <b>Tambah</b> di bawah.
+                  </div>
+                ) : (
+                  <div style={{ display: "grid", gap: 10 }}>
+                    {selectedProducts.map((p) => {
+                      const thumbId = pickThumbImageId(p);
+                      const img = thumbId ? imageMap.get(Number(thumbId)) : undefined;
+
+                      return (
+                        <div
+                          key={p.id}
+                          draggable
+                          onDragStart={(e) => onDragStart(e, Number(p.id))}
+                          onDragOver={(e) => e.preventDefault()}
+                          onDrop={(e) => onDropOn(e, Number(p.id))}
+                          style={{
+                            display: "flex",
+                            gap: 12,
+                            alignItems: "center",
+                            padding: 10,
+                            borderRadius: 14,
+                            border: `1px solid ${BORDER}`,
+                            background: "white",
+                            cursor: "grab",
+                          }}
+                          title="Drag untuk ubah urutan"
+                        >
+                          <div
+                            style={{
+                              width: 56,
+                              height: 56,
+                              borderRadius: 12,
+                              border: `1px solid ${BORDER}`,
+                              overflow: "hidden",
+                              background: "rgba(0,0,0,0.03)",
+                              flex: "0 0 auto",
+                            }}
+                          >
+                            {img ? (
+                              <img
+                                src={img.url}
+                                alt={img.title ?? p.nama}
+                                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                              />
+                            ) : null}
+                          </div>
+
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontWeight: 900, color: TEXT, display: "flex", gap: 10, alignItems: "baseline", flexWrap: "wrap" }}>
+                              <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.nama}</span>
+                              <span style={{ fontSize: 12, color: "rgba(17,17,17,0.55)" }}>#{p.id}</span>
+                            </div>
+                            <div style={{ marginTop: 2, fontSize: 12, color: "rgba(17,17,17,0.7)" }}>
+                              {showPrice ? renderHargaInline(p) : null}
+                              {p.kategori ? `  ${p.kategori}` : ""}
+                              {p.subkategori ? `  ${p.subkategori}` : ""}
+                            </div>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => remove(Number(p.id))}
+                            style={{
+                              padding: "8px 10px",
+                              borderRadius: 10,
+                              border: `1px solid ${GOLD}`,
+                              background: "white",
+                              color: TEXT,
+                              fontWeight: 900,
+                              cursor: "pointer",
+                            }}
+                          >
+                            Hapus
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* Picker */}
+              <div style={{ display: "grid", gap: 10, marginTop: 14 }}>
+                <div style={{ fontWeight: 900, color: TEXT }}>Cari produk</div>
+                <input
+                  value={q}
+                  onChange={(e) => setQ(e.target.value)}
+                  placeholder="Cari (id / nama / kategori / subkategori)"
+                  style={{
+                    width: "100%",
+                    padding: "12px 12px",
+                    borderRadius: 12,
+                    border: `1px solid ${GOLD}`,
+                    background: "white",
+                    color: TEXT,
+                    outline: "none",
+                    fontWeight: 800,
+                  }}
+                />
+
+                <div style={{ fontSize: 12, color: "rgba(17,17,17,0.65)" }}>{filtered.length} hasil</div>
+
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
+                    gap: 10,
+                  }}
+                >
+                  {filtered.map((p) => {
+                    const id = Number(p.id);
                     const thumbId = pickThumbImageId(p);
                     const img = thumbId ? imageMap.get(Number(thumbId)) : undefined;
+                    const isSelected = selectedSet.has(id);
 
                     return (
                       <div
-                        key={p.id}
-                        draggable
-                        onDragStart={(e) => onDragStart(e, Number(p.id))}
-                        onDragOver={(e) => e.preventDefault()}
-                        onDrop={(e) => onDropOn(e, Number(p.id))}
+                        key={id}
                         style={{
                           display: "flex",
                           gap: 12,
@@ -328,9 +498,7 @@ export default function ProductCarouselPicker({
                           borderRadius: 14,
                           border: `1px solid ${BORDER}`,
                           background: "white",
-                          cursor: "grab",
                         }}
-                        title="Drag untuk ubah urutan"
                       >
                         <div
                           style={{
@@ -353,162 +521,63 @@ export default function ProductCarouselPicker({
                         </div>
 
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontWeight: 900, color: TEXT, display: "flex", gap: 10, alignItems: "baseline", flexWrap: "wrap" }}>
+                          <div style={{ fontWeight: 900, color: TEXT, display: "flex", gap: 10, alignItems: "baseline" }}>
                             <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.nama}</span>
-                            <span style={{ fontSize: 12, color: "rgba(17,17,17,0.55)" }}>#{p.id}</span>
+                            <span style={{ fontSize: 12, color: "rgba(17,17,17,0.55)" }}>#{id}</span>
                           </div>
-                          <div style={{ marginTop: 2, fontSize: 12, color: "rgba(17,17,17,0.7)" }}>
+                          <div style={{ marginTop: 2, fontSize: 12, color: "rgba(17,17,17,0.7)", wordBreak: "break-word" }}>
                             {showPrice ? renderHargaInline(p) : null}
                             {p.kategori ? `  ${p.kategori}` : ""}
                             {p.subkategori ? `  ${p.subkategori}` : ""}
                           </div>
                         </div>
 
-                        <button
-                          type="button"
-                          onClick={() => remove(Number(p.id))}
-                          style={{
-                            padding: "8px 10px",
-                            borderRadius: 10,
-                            border: `1px solid ${GOLD}`,
-                            background: "white",
-                            color: TEXT,
-                            fontWeight: 900,
-                            cursor: "pointer",
-                          }}
-                        >
-                          Hapus
-                        </button>
+                        {isSelected ? (
+                          <button
+                            type="button"
+                            onClick={() => remove(id)}
+                            style={{
+                              padding: "8px 10px",
+                              borderRadius: 10,
+                              border: `1px solid ${GOLD}`,
+                              background: GOLD_SOFT,
+                              color: TEXT,
+                              fontWeight: 900,
+                              cursor: "pointer",
+                              whiteSpace: "nowrap",
+                              flexShrink: 0,
+                            }}
+                          >
+                            Terpilih
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => add(id)}
+                            style={{
+                              padding: "8px 10px",
+                              borderRadius: 10,
+                              border: `1px solid ${GOLD}`,
+                              background: "white",
+                              color: TEXT,
+                              fontWeight: 900,
+                              cursor: "pointer",
+                              whiteSpace: "nowrap",
+                              flexShrink: 0,
+                            }}
+                          >
+                            Tambah
+                          </button>
+                        )}
                       </div>
                     );
                   })}
                 </div>
-              )}
-            </div>
-
-            {/* Picker */}
-            <div style={{ display: "grid", gap: 10, marginTop: 14 }}>
-              <div style={{ fontWeight: 900, color: TEXT }}>Cari produk</div>
-              <input
-                value={q}
-                onChange={(e) => setQ(e.target.value)}
-                placeholder="Cari (id / nama / kategori / subkategori)"
-                style={{
-                  width: "100%",
-                  padding: "12px 12px",
-                  borderRadius: 12,
-                  border: `1px solid ${GOLD}`,
-                  background: "white",
-                  color: TEXT,
-                  outline: "none",
-                  fontWeight: 800,
-                }}
-              />
-
-              <div style={{ fontSize: 12, color: "rgba(17,17,17,0.65)" }}>{filtered.length} hasil</div>
-
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
-                  gap: 10,
-                }}
-              >
-                {filtered.map((p) => {
-                  const id = Number(p.id);
-                  const thumbId = pickThumbImageId(p);
-                  const img = thumbId ? imageMap.get(Number(thumbId)) : undefined;
-                  const isSelected = selectedSet.has(id);
-
-                  return (
-                    <div
-                      key={id}
-                      style={{
-                        display: "flex",
-                        gap: 12,
-                        alignItems: "center",
-                        padding: 10,
-                        borderRadius: 14,
-                        border: `1px solid ${BORDER}`,
-                        background: "white",
-                      }}
-                    >
-                      <div
-                        style={{
-                          width: 56,
-                          height: 56,
-                          borderRadius: 12,
-                          border: `1px solid ${BORDER}`,
-                          overflow: "hidden",
-                          background: "rgba(0,0,0,0.03)",
-                          flex: "0 0 auto",
-                        }}
-                      >
-                        {img ? (
-                          <img
-                            src={img.url}
-                            alt={img.title ?? p.nama}
-                            style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                          />
-                        ) : null}
-                      </div>
-
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontWeight: 900, color: TEXT, display: "flex", gap: 10, alignItems: "baseline" }}>
-                          <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.nama}</span>
-                          <span style={{ fontSize: 12, color: "rgba(17,17,17,0.55)" }}>#{id}</span>
-                        </div>
-                        <div style={{ marginTop: 2, fontSize: 12, color: "rgba(17,17,17,0.7)", wordBreak: "break-word" }}>
-                          {showPrice ? renderHargaInline(p) : null}
-                          {p.kategori ? `  ${p.kategori}` : ""}
-                          {p.subkategori ? `  ${p.subkategori}` : ""}
-                        </div>
-                      </div>
-
-                      {isSelected ? (
-                        <button
-                          type="button"
-                          onClick={() => remove(id)}
-                          style={{
-                            padding: "8px 10px",
-                            borderRadius: 10,
-                            border: `1px solid ${GOLD}`,
-                            background: GOLD_SOFT,
-                            color: TEXT,
-                            fontWeight: 900,
-                            cursor: "pointer",
-                            whiteSpace: "nowrap",
-                            flexShrink: 0,
-                          }}
-                        >
-                          Terpilih
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => add(id)}
-                          style={{
-                            padding: "8px 10px",
-                            borderRadius: 10,
-                            border: `1px solid ${GOLD}`,
-                            background: "white",
-                            color: TEXT,
-                            fontWeight: 900,
-                            cursor: "pointer",
-                            whiteSpace: "nowrap",
-                            flexShrink: 0,
-                          }}
-                        >
-                          Tambah
-                        </button>
-                      )}
-                    </div>
-                  );
-                })}
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       ) : null}
     </div>
   );
