@@ -56,6 +56,16 @@ async function getHubungiData() {
     orderBy: [{ urutan: "asc" }, { id: "asc" }],
   });
 
+  // FORCE OVERRIDE: Update Media Sosial "WhatsApp" with the active Priority Number
+  // This ensures the Social List doesn't show the old number from the media_sosial table
+  if (utama?.nomor) {
+    const waItem = mediaSosial.find((m) => m.iconKey === "whatsapp");
+    if (waItem) {
+      const clean = utama.nomor.replace(/[^0-9]/g, "");
+      waItem.url = `https://wa.me/${clean}`;
+    }
+  }
+
   return { informasiToko, utama, mediaSosial, cabangToko };
 }
 

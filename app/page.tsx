@@ -409,6 +409,23 @@ async function fetchThemeData(themeKey: string, isPublished: boolean) {
     rows.forEach((r: any) => r.iconKey && mediaSosialByKey.set(String(r.iconKey), r));
   }
 
+  // OVERRIDE: Sync "whatsapp" social icon with Priority Number
+  // This prevents the old "783..." number in media_sosial table from showing up
+  const priorityHubungi = hubungiRows.find((h: any) => h.prioritas) || hubungiRows[0];
+  if (priorityHubungi && priorityHubungi.nomor) {
+    const waDigits = String(priorityHubungi.nomor).replace(/[^\d]/g, "");
+    const waUrl = `https://wa.me/${waDigits}`;
+
+    // Update existing map entry or create new one if social icon is requested
+    const existingWa = mediaSosialByKey.get("whatsapp");
+    if (existingWa) {
+      mediaSosialByKey.set("whatsapp", { ...existingWa, url: waUrl });
+    } else {
+      // Optional: if we want to force show it? 
+      // For now just update if it exists to fix the specific bug.
+    }
+  }
+
   // Get theme meta for this specific theme
   const metaSlug = themeMetaSlug(themeKey);
   const themeMetaRow = rawSections.find((d: any) => String(d?.slug ?? "") === metaSlug);

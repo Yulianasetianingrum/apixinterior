@@ -96,6 +96,8 @@ export const viewport = {
 import { prisma } from "@/lib/prisma";
 import { SettingsProvider } from "./context/SettingsContext";
 
+export const dynamic = "force-dynamic";
+
 export default async function RootLayout({
   children,
 }: {
