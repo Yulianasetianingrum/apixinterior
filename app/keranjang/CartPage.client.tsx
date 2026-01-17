@@ -1,7 +1,7 @@
 "use client";
 
 import { useCart } from "@/app/context/CartContext";
-import { formatIDR } from "@/lib/product-utils";
+import { formatIDR, normalizePublicUrl } from "@/lib/product-utils";
 import Image from "next/image";
 import Link from "next/link";
 import { FaTrash, FaMinus, FaPlus, FaWhatsapp } from "react-icons/fa6";
@@ -9,7 +9,6 @@ import { useState, useEffect } from "react";
 import styles from "./keranjang.module.css";
 import { useRouter } from "next/navigation";
 import SecureImage from "@/app/components/SecureImage";
-import { formatIDR, normalizePublicUrl } from "@/lib/product-utils";
 
 interface CartPageClientProps {
     waNumber: string;
