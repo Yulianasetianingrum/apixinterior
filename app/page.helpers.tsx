@@ -26,7 +26,7 @@ export type CategoryCommerceItem = {
     tabId?: string;
 };
 
-export const FALLBACK_CATEGORY_IMAGE_URL = "/logo/logo_apixinterior_biru.png.png";
+export const FALLBACK_CATEGORY_IMAGE_URL = "/logo/logo_apixinterior_biru.png";
 export const MAX_CUSTOM_PROMO_VOUCHERS = 20;
 
 export function safeDecode(v: string) {
@@ -80,7 +80,7 @@ export function resolveEffectiveTheme(raw: any, navbarTheme: string): string {
 export function getHeroThemeTokens(theme: string) {
     const navy = "#0b1d3a";
     const gold = "#d4af37";
-    const goldBold = "#8c6c18";
+    const goldBold = "#6d5412";
     const white = "#ffffff";
     const ink = "#0f172a";
 
@@ -180,7 +180,7 @@ export function getFooterIconPath(iconType: FooterIconType, themeElementColor: s
     switch (iconType) {
         case "WA": return `/uploads/WA_${colorType === "WHITE" ? "white" : colorType === "NAVY" ? "navy" : "gold"}.png`;
         case "LOC": return `/uploads/icon-${colorType === "WHITE" ? "white" : colorType === "NAVY" ? "navy" : "yellow"}.png`;
-        case "LOGO": return `/logo/logo_apixinterior_${colorType === "WHITE" ? "putih" : colorType === "NAVY" ? "biru" : "golden"}.png.png`;
+        case "LOGO": return `/logo/logo_apixinterior_${colorType === "WHITE" ? "putih" : colorType === "NAVY" ? "biru" : "golden"}.png`;
     }
 }
 

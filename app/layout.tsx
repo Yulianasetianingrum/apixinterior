@@ -13,10 +13,10 @@ const inter = {
 
 export const metadata: Metadata = {
   title: {
-    default: "Apix Interior - Jasa Desain Interior, Furniture Custom & Dekorasi Rumah Terbaik",
-    template: "%s | Apix Interior - Ahlinya Desain Interior & Furniture"
+    default: "Apix Interior - Ahlinya Desain Interior & Furniture Custom Terbaik",
+    template: "%s | Apix Interior - Interior & Furniture"
   },
-  description: "Jasa Desain Interior & Furniture Custom No. 1. Spesialis Kitchen Set, Lemari, Renovasi Rumah & Dekorasi Interior Modern. Melayani Jakarta, Bogor, Depok, Tangerang, Bekasi.",
+  description: "Apix Interior: Jasa Desain Interior & Furniture Custom No. 1. Spesialis Kitchen Set, Lemari, Renovasi Rumah & Dekorasi Interior Modern di Jabodetabek.",
   keywords: [
     // PRIMARY KEYWORDS (User Request - High Priority)
     "interior", "jasa interior", "desain interior", "interior design",
@@ -56,7 +56,7 @@ export const metadata: Metadata = {
     description: "Wujudkan rumah impian dengan Jasa Desain Interior & Furniture Custom terbaik. Kualitas premium, harga kompetitif, dan hasil memuaskan.",
     images: [
       {
-        url: "/logo/logo_apixinterior_biru.png.png",
+        url: "/logo/logo_apixinterior_biru.png",
         width: 1200,
         height: 630,
         alt: "Apix Interior - Jasa Desain Interior & Furniture",
@@ -67,7 +67,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Apix Interior - Jasa Desain Interior & Furniture Custom",
     description: "Jasa Desain Interior & Furniture Custom No. 1. Spesialis Kitchen Set, Lemari, & Dekorasi Rumah Modern.",
-    images: ["/logo/logo_apixinterior_biru.png.png"],
+    images: ["/logo/logo_apixinterior_biru.png"],
   },
   robots: {
     index: true,

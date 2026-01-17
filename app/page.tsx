@@ -479,7 +479,7 @@ export default async function HomePage({
     return (
       <main style={{ minHeight: "100vh", background: "#ffffff", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <div style={{ textAlign: "center", padding: "20px" }}>
-          <h1 style={{ fontSize: 24, color: "#333", marginBottom: 10 }}>Homepage Kosong</h1>
+          <h2 style={{ fontSize: 24, color: "#333", marginBottom: 10 }}>Homepage Kosong</h2>
           <p style={{ fontSize: 16, color: "#666" }}>Belum ada konten yang dipublikasikan.</p>
         </div>
       </main>
@@ -553,7 +553,7 @@ export default async function HomePage({
         }}
         telephone={schemaPhone || "+6281234567890"}
         openingHours={["Mo-Su 08:00-18:00"]}
-        image="/logo/logo_apixinterior_biru.png.png"
+        image="/logo/logo_apixinterior_biru.png"
       />
 
       <Navbar themeOverride={navbarTheme} />
@@ -755,7 +755,7 @@ export default async function HomePage({
                   <div className={styles.heroMedia}>
                     <div className={styles.heroMediaBg} aria-hidden="true" />
                     {imgUrl ? (
-                      <SecureImage className={styles.heroImage} src={imgUrl} alt={cfg.headline || "Hero Image"} />
+                      <SecureImage className={styles.heroImage} src={imgUrl} alt={`${cfg.headline || "Interior & Furniture"} - Apix Interior`} priority={true} />
                     ) : <div className={styles.heroMediaPlaceholder} aria-hidden="true" />}
                     <div className={styles.heroFloatingCards} aria-hidden="true">
                       {hasFloat1 ? (

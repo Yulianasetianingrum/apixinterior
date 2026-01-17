@@ -266,13 +266,14 @@ export default function ProductCarouselPicker({
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(0,0,0,0.65)",
-            zIndex: 99999,
+            background: "rgba(0,0,0,0.6)",
+            zIndex: 999999, // Extreme dominance
             display: "grid",
             placeItems: "center",
             padding: "20px 16px",
             overflow: "hidden",
-            backdropFilter: "blur(4px)",
+            backdropFilter: "blur(6px)",
+            pointerEvents: "auto", // Explicit dominance
           }}
           onClick={(e) => {
             if (e.target === e.currentTarget) setOpen(false);
@@ -281,16 +282,17 @@ export default function ProductCarouselPicker({
           <div
             style={{
               width: "100%",
-              maxWidth: 1100,
+              maxWidth: 1000,
               maxHeight: "90vh",
               background: "white",
               borderRadius: 24,
               border: `1px solid ${GOLD}`,
               display: "flex",
               flexDirection: "column",
-              boxShadow: "0 24px 48px rgba(0,0,0,0.3)",
+              boxShadow: "0 24px 64px rgba(0,0,0,0.4)",
               overflow: "hidden",
               animation: "modalIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+              pointerEvents: "auto",
             }}
           >
             {/* Modal Header */}

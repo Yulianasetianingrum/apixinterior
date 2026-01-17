@@ -1,35 +1,87 @@
 "use client";
 
-import { useState, useEffect, ImgHTMLAttributes } from "react";
+import { useState, useEffect } from "react";
+import Image, { ImageProps } from "next/image";
 
-interface SecureImageProps extends ImgHTMLAttributes<HTMLImageElement> {
+interface SecureImageProps extends Omit<ImageProps, "src"> {
+    src?: string | null;
     fallbackToProxy?: boolean;
 }
 
-export default function SecureImage({ src, alt, fallbackToProxy = true, ...props }: SecureImageProps) {
-    const [imgSrc, setImgSrc] = useState(src);
+/**
+ * Enhanced Image component for Apix Interior.
+ * Uses next/image for automatic optimization (WebP, resizing).
+ * Includes a proxy fallback for broken paths.
+ */
+export default function SecureImage({
+    src,
+    alt = "Apix Interior - Furniture & Interior Design",
+    fallbackToProxy = true,
+    fill,
+    width,
+    height,
+    style,
+    priority,
+    className,
+    sizes,
+    ...props
+}: SecureImageProps) {
+    const [imgSrc, setImgSrc] = useState<string | null>(src || null);
     const [hasErrored, setHasErrored] = useState(false);
 
     // Sync imgSrc with src prop changes
     useEffect(() => {
-        setImgSrc(src);
+        setImgSrc(src || null);
         setHasErrored(false);
     }, [src]);
 
     if (!imgSrc) {
-        return <div style={{ ...props.style, background: '#f0f0f0', display: 'grid', placeItems: 'center', color: '#999' }}>No image</div>;
+        return (
+            <div
+                className={className}
+                style={{
+                    backgroundColor: "#f8fafc",
+                    display: "grid",
+                    placeItems: "center",
+                    color: "#94a3b8",
+                    fontSize: "12px",
+                    fontWeight: 500,
+                    width: fill ? "100%" : width,
+                    height: fill ? "100%" : height,
+                    borderRadius: "inherit",
+                    ...style,
+                }}
+            >
+                No image
+            </div>
+        );
     }
 
+    // next/image requires width/height if NOT using fill
+    // We provide defaults to prevent crashes if common usage misses them
+    const finalWidth = !fill && !width ? 800 : width;
+    const finalHeight = !fill && !height ? 600 : height;
+
     return (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
+        <Image
             {...props}
             src={imgSrc}
             alt={alt}
-            onError={(e) => {
+            fill={fill}
+            width={fill ? undefined : finalWidth}
+            height={fill ? undefined : finalHeight}
+            style={style}
+            priority={priority}
+            className={className}
+            sizes={sizes || (fill ? "100vw" : undefined)}
+            onLoadingComplete={() => {
+                // If loaded via proxy successfully, we might want to track it
+            }}
+            onError={() => {
                 if (!hasErrored && fallbackToProxy) {
                     const urlStr = String(imgSrc);
-                    if (urlStr && !urlStr.includes("/api/img_proxy")) {
+                    // Don't proxy if already proxied or base64
+                    if (urlStr && !urlStr.includes("/api/img_proxy") && !urlStr.startsWith("data:")) {
                         let filename = "";
                         try {
                             const urlObj = new URL(urlStr, window.location.origin);
@@ -44,10 +96,6 @@ export default function SecureImage({ src, alt, fallbackToProxy = true, ...props
                             return;
                         }
                     }
-                }
-                // Call original onError if provided
-                if (props.onError) {
-                    props.onError(e);
                 }
             }}
         />

@@ -647,6 +647,37 @@ async function toggleDraft(formData: FormData) {
   return redirectBack({ notice: encodeURIComponent("Status section berhasil diubah.") });
 }
 
+async function duplicateDraftSection(formData: FormData) {
+  "use server";
+
+  const id = Number(formData.get("id"));
+  if (!id || Number.isNaN(id)) return;
+
+  const original = await prisma.homepageSectionDraft.findUnique({ where: { id } });
+  if (!original) return redirectBack({ error: encodeURIComponent("Section asli tidak ditemukan.") });
+
+  // Find max sortOrder to place at the end
+  const last = await prisma.homepageSectionDraft.findFirst({
+    orderBy: { sortOrder: "desc" },
+    select: { sortOrder: true },
+  });
+  const newSortOrder = last ? last.sortOrder + 1 : 1;
+
+  await prisma.homepageSectionDraft.create({
+    data: {
+      type: original.type,
+      title: `${original.title} (Copy)`,
+      slug: original.slug ? `${original.slug}-copy` : null,
+      enabled: original.enabled,
+      sortOrder: newSortOrder,
+      config: original.config as any,
+    },
+  });
+
+  revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko");
+  return redirectBack({ notice: encodeURIComponent("Section berhasil diduplikasi.") });
+}
+
 async function deleteDraft(formData: FormData) {
   "use server";
 
@@ -1764,17 +1795,59 @@ export default async function TokoPengaturanPage({
                   className={`${styles.sectionItem} ${(styles as any)[`sectionItem_${section.type}`] ?? ""} ${styles.sectionRowDraggable} js-section-row`}
                   draggable
                   data-id={section.id.toString()}
+                  style={{ position: "relative" }}
                 >
-                  <div className={styles.sectionTopRow}>
+                  <a
+                    href={`#section-editor-${section.id}`}
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      textDecoration: "none",
+                      color: "inherit",
+                      width: "100%",
+                      padding: "12px 16px",
+                    }}
+                    title="Klik untuk loncat ke editor section ini"
+                  >
                     <div className={styles.sectionTopLeft}>
                       <span className={styles.dragHandle}></span>
                       <span className={styles.sectionOrder}>#{index + 1}</span>
-                      <span className={`${styles.sectionTypePill} ${(styles as any)[`pill_${section.type}`] ?? ""}`}>  <span className={styles.sectionTypeIcon} aria-hidden="true">    {SECTION_ICON[section.type] ?? ""}  </span>  {label}</span>
+                      <span className={`${styles.sectionTypePill} ${(styles as any)[`pill_${section.type}`] ?? ""}`}>
+                        <span className={styles.sectionTypeIcon} aria-hidden="true">
+                          {SECTION_ICON[section.type] ?? ""}
+                        </span>
+                        {label}
+                      </span>
                     </div>
-                    <span className={section.enabled ? styles.statusBadgeActive : styles.statusBadgeInactive}>
-                      {section.enabled ? "Aktif" : "Nonaktif"}
-                    </span>
-                  </div>
+
+                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                      <span className={section.enabled ? styles.statusBadgeActive : styles.statusBadgeInactive}>
+                        {section.enabled ? "Aktif" : "Nonaktif"}
+                      </span>
+
+                      {/* Duplicate Button */}
+                      <form action={duplicateDraftSection} style={{ margin: 0 }}>
+                        <input type="hidden" name="id" value={section.id.toString()} />
+                        <button
+                          type="submit"
+                          title="Duplikat Section"
+                          className={styles.smallButton}
+                          style={{
+                            padding: "6px 8px",
+                            fontSize: 11,
+                            background: "rgba(255,255,255,0.1)",
+                            border: "1px solid rgba(255,255,255,0.2)",
+                            color: "inherit"
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          📋 Duplikat
+                        </button>
+                      </form>
+                    </div>
+                  </a>
                 </div>
               );
             })}
@@ -1917,7 +1990,12 @@ export default async function TokoPengaturanPage({
                 const legacyBannerPromoId = cfg?._legacyBannerPromoId ?? null;
 
                 return (
-                  <article key={section.id} className={`${styles.sectionItem} ${(styles as any)[`sectionItem_${section.type}`] ?? ""}`}>
+                  <article
+                    id={`section-editor-${section.id}`}
+                    key={section.id}
+                    className={`${styles.sectionItem} ${(styles as any)[`sectionItem_${section.type}`] ?? ""}`}
+                    style={{ scrollMarginTop: "100px" }}
+                  >
                     <div className={styles.sectionTopRow}>
                       <div className={styles.sectionTopLeft}>
                         <span className={styles.sectionOrder}>#{index + 1}</span>
