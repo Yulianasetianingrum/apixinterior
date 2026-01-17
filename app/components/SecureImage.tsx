@@ -61,17 +61,27 @@ export default function SecureImage({
     // We provide defaults to prevent crashes if common usage misses them
     const finalWidth = !fill && !width ? 800 : width;
     const finalHeight = !fill && !height ? 600 : height;
+    // For local/internal paths, optimization might fail in restricted prod environments
+    const isInternal = imgSrc.startsWith("/") || imgSrc.includes("localhost") || imgSrc.includes("127.0.0.1");
+
+    // Performance: Pass width to internal API to rescue performance score even in unoptimized mode
+    let finalSrc = imgSrc;
+    if (isInternal && finalSrc.includes("/api/img?f=") && !finalSrc.includes("&w=")) {
+        const w = finalWidth || 800;
+        finalSrc = `${finalSrc}&w=${w}`;
+    }
 
     return (
         <Image
             {...props}
-            src={imgSrc}
+            src={finalSrc}
             alt={alt}
             fill={fill}
             width={fill ? undefined : finalWidth}
             height={fill ? undefined : finalHeight}
             style={style}
             priority={priority}
+            unoptimized={isInternal}
             className={className}
             sizes={sizes || (fill ? "100vw" : undefined)}
             onLoadingComplete={() => {
@@ -79,7 +89,7 @@ export default function SecureImage({
             }}
             onError={() => {
                 if (!hasErrored && fallbackToProxy) {
-                    const urlStr = String(imgSrc);
+                    const urlStr = String(finalSrc);
                     // Don't proxy if already proxied or base64
                     if (urlStr && !urlStr.includes("/api/img_proxy") && !urlStr.startsWith("data:")) {
                         let filename = "";

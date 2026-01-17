@@ -7,6 +7,7 @@ export const dynamic = 'force-dynamic';
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const filename = searchParams.get('f');
+    const width = searchParams.get('w') ? parseInt(searchParams.get('w')!) : null;
 
     if (!filename) {
         return new NextResponse("Filename required", { status: 400 });
@@ -39,21 +40,36 @@ export async function GET(request: Request) {
         return new NextResponse("File not found", { status: 404 });
     }
 
-    // Read and serve
-    const fileBuffer = fs.readFileSync(filePath);
+    try {
+        let fileBuffer = fs.readFileSync(filePath);
+        let contentType = 'application/octet-stream';
+        if (safeFilename.endsWith('.webp')) contentType = 'image/webp';
+        else if (safeFilename.endsWith('.png')) contentType = 'image/png';
+        else if (safeFilename.endsWith('.jpg') || safeFilename.endsWith('.jpeg')) contentType = 'image/jpeg';
+        else if (safeFilename.endsWith('.svg')) contentType = 'image/svg+xml';
 
-    // Determine content type
-    let contentType = 'application/octet-stream';
-    if (safeFilename.endsWith('.webp')) contentType = 'image/webp';
-    if (safeFilename.endsWith('.png')) contentType = 'image/png';
-    if (safeFilename.endsWith('.jpg') || safeFilename.endsWith('.jpeg')) contentType = 'image/jpeg';
-    if (safeFilename.endsWith('.svg')) contentType = 'image/svg+xml';
+        // Performance: Resize on the fly if width is requested
+        if (width && width > 0 && contentType.startsWith('image/') && !contentType.includes('svg')) {
+            try {
+                const sharp = require('sharp');
+                fileBuffer = await sharp(fileBuffer)
+                    .resize({ width, withoutEnlargement: true })
+                    .toBuffer();
+            } catch (sharpError) {
+                console.error("[ImgRoute] Resize failed:", sharpError);
+                // Continue with original buffer if sharp fails
+            }
+        }
 
-    return new NextResponse(fileBuffer, {
-        headers: {
-            'Content-Type': contentType,
-            'Content-Length': fileBuffer.length.toString(),
-            'Cache-Control': 'public, max-age=31536000, immutable',
-        },
-    });
+        return new NextResponse(fileBuffer, {
+            headers: {
+                'Content-Type': contentType,
+                'Content-Length': fileBuffer.length.toString(),
+                'Cache-Control': 'public, max-age=31536000, immutable',
+            },
+        });
+    } catch (e) {
+        console.error("[ImgRoute] Error:", e);
+        return new NextResponse("Internal server error", { status: 500 });
+    }
 }
