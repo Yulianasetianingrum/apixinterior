@@ -924,12 +924,41 @@ export default async function HomePage({
             const cfg = normalizeConfig(t, section.config) as any;
             const sectionThemeResolved = resolveEffectiveTheme(cfg.sectionTheme ?? "FOLLOW_NAVBAR", navbarTheme);
             const cardThemeClass = sectionThemeResolved ? `theme-${String(sectionThemeResolved).toLowerCase()}` : "";
-            const colors = getHeroThemeTokens(sectionThemeResolved);
+
+            // Normalize theme string for parsing
+            const normalizedTheme = String(sectionThemeResolved || "")
+              .toUpperCase()
+              .trim()
+              .replace(/\s*\+\s*/g, "_")
+              .replace(/\s+/g, "_")
+              .replace(/-/g, "_");
+
+            // Manual color mapping for all 6 theme combinations
+            const themePair = parseThemePair(normalizedTheme);
+            let cardBg = "#ffffff";
+            let cardFg = "#0f172a";
+            let ctaBg = "#d4af37";
+            let ctaFg = "#0b1d3a";
+
+            if (themePair.a === "WHITE" && themePair.b === "GOLD") {
+              cardBg = "#ffffff"; cardFg = "#0f172a"; ctaBg = "#d4af37"; ctaFg = "#0b1d3a";
+            } else if (themePair.a === "NAVY" && themePair.b === "GOLD") {
+              cardBg = "#0b1d3a"; cardFg = "#ffffff"; ctaBg = "#d4af37"; ctaFg = "#0b1d3a";
+            } else if (themePair.a === "NAVY" && themePair.b === "WHITE") {
+              cardBg = "#0b1d3a"; cardFg = "#ffffff"; ctaBg = "#ffffff"; ctaFg = "#0b1d3a";
+            } else if (themePair.a === "GOLD" && themePair.b === "NAVY") {
+              cardBg = "#d4af37"; cardFg = "#0b1d3a"; ctaBg = "#0b1d3a"; ctaFg = "#ffffff";
+            } else if (themePair.a === "GOLD" && themePair.b === "WHITE") {
+              cardBg = "#d4af37"; cardFg = "#0b1d3a"; ctaBg = "#ffffff"; ctaFg = "#0b1d3a";
+            } else if (themePair.a === "WHITE" && themePair.b === "NAVY") {
+              cardBg = "#ffffff"; cardFg = "#0f172a"; ctaBg = "#0b1d3a"; ctaFg = "#ffffff";
+            }
+
+            const colors = { card: cardBg, cardFg, ctaBg, ctaFg };
 
             // Independent Background Logic
-            const pair = parseThemePair(sectionThemeResolved);
             const savedBg = (cfg as any).sectionBgTheme;
-            const effectiveBgToken = savedBg && ["NAVY", "GOLD", "WHITE"].includes(savedBg) ? savedBg : pair.a;
+            const effectiveBgToken = savedBg && ["NAVY", "GOLD", "WHITE"].includes(savedBg) ? savedBg : "NAVY";
 
             const sectionBgColor = effectiveBgToken === "WHITE" ? "#FFFFFF" : effectiveBgToken === "GOLD" ? "#D4AF37" : "#0B1D3A";
             const sectionTextColor = effectiveBgToken === "WHITE" || effectiveBgToken === "GOLD" ? "#0f172a" : "#FFFFFF";

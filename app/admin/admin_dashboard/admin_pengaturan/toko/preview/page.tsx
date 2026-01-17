@@ -1658,11 +1658,10 @@ export default async function TokoPreviewDraftPage({
                   // Card and button colors: ONLY from Tema Section dropdown
                   // Warna 1 = Card BACKGROUND color (warna cat card)
                   // Warna 2 = Button BACKGROUND color (warna cat tombol)
-                  // TEMPORARY: Hardcode gold for testing
-                  let cardBg = "#d4af37"; // GOLD for testing
-                  let cardFg = "#0b1d3a";
-                  let ctaBg = "#0b1d3a"; // NAVY for testing
-                  let ctaFg = "#ffffff";
+                  let cardBg = "#ffffff";
+                  let cardFg = "#0f172a";
+                  let ctaBg = "#d4af37";
+                  let ctaFg = "#0b1d3a";
 
                   // Normalize theme string: convert "NAVY + WHITE" or "NAVY WHITE" to "NAVY_WHITE"
                   const normalizedTheme = String(sectionThemeResolved || "")
