@@ -5,7 +5,7 @@ import { useCart } from "@/app/context/CartContext";
 import { formatIDR } from "@/lib/product-utils";
 import Image from "next/image";
 import Link from "next/link";
-import { FaHeart, FaCartShopping } from "react-icons/fa6";
+import { FaHeart, FaCartShopping, FaTrash } from "react-icons/fa6";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./favorite.module.css";
