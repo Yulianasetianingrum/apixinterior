@@ -1779,7 +1779,7 @@ export default async function TokoPreviewDraftPage({
                     return (
                       <article
                         key={Number(b?.id)}
-                        className={`${ui.pcCard} ${cardThemeClass}`}
+                        className={`${ui.pcCard}`}
                         style={{
                           ...(isSingle
                             ? cardStyleSingle

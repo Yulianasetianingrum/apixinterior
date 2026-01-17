@@ -6172,6 +6172,20 @@ export default async function TokoPengaturanPage({
                             <input name="slug" type="text" defaultValue={section.slug ?? ""} className={styles.input} />
                             <p className={styles.helperText}>Boleh kosong (slug akan jadi null).</p>
                           </div>
+
+                          <div className={styles.fieldGroup}>
+                            <label className={styles.label}>Background Section</label>
+                            <select
+                              name="sectionBgTheme"
+                              defaultValue={String((cfg as any).sectionBgTheme ?? "FOLLOW_NAVBAR")}
+                              className={styles.select}
+                            >
+                              <option value="FOLLOW_NAVBAR">Ikuti tema Navbar (default)</option>
+                              <option value="NAVY">NAVY (Biru Tua)</option>
+                              <option value="GOLD">GOLD (Emas)</option>
+                              <option value="WHITE">WHITE (Putih)</option>
+                            </select>
+                          </div>
                         </div>
 
                         {legacyBannerPromoId ? (
