@@ -1,7 +1,13 @@
 
 // app/components/GlobalFooter.tsx
+import Image from "next/image";
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { getHeroThemeTokens, getFooterIconPath, resolveEffectiveTheme } from "@/lib/theme-utils";
+
+import logoBlue from "../uploads/logo_apixinterior_biru.png.png";
+import logoGolden from "../uploads/logo_apixinterior_golden.png.png";
+import logoWhite from "../uploads/logo_apixinterior_putih.png.png";
 
 function normalizeConfig(sectionType: string, raw: unknown) {
     // Minimal normalizer for Footer only
@@ -26,6 +32,8 @@ export default async function GlobalFooter() {
     const cabangList = await prisma.cabangToko.findMany({ orderBy: [{ urutan: "asc" }, { id: "asc" }] });
     const hubungiList = await prisma.hubungi.findMany({ orderBy: [{ prioritas: "desc" }, { id: "asc" }] });
     const mediaListAll = await prisma.mediaSosial.findMany({ orderBy: [{ prioritas: "desc" }, { id: "asc" }] });
+    const info = await prisma.informasiToko.findUnique({ where: { id: 1 } });
+    const namaToko = info?.namaToko ?? "Apix Interior";
 
     // If no footer section enabled, return null or default?
     if (!section) return null;
@@ -56,11 +64,37 @@ export default async function GlobalFooter() {
 
                     {/* 1. Address + Brand */}
                     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                        <img
-                            src={getFooterIconPath("LOGO", colors.element)}
-                            alt="Apix Interior"
-                            style={{ height: 32, width: "auto", objectFit: "contain", alignSelf: "flex-start" }}
-                        />
+                        <Link href="/" style={{ display: "flex", alignItems: "center", gap: 12, textDecoration: "none", color: "inherit" }}>
+                            <div style={{
+                                position: "relative",
+                                width: 40,
+                                height: 40,
+                                borderRadius: "999px",
+                                overflow: "hidden",
+                                background: "#0f172a",
+                                border: `1px solid ${colors.element}66`
+                            }}>
+                                <Image
+                                    src={(() => {
+                                        const c = colors.element.toLowerCase();
+                                        if (c.includes("#ffffff") || c.includes("white") || c.includes("255,255,255")) return logoWhite;
+                                        if (c.includes("#0b1d3a") || c.includes("navy") || c.includes("#0f172a")) return logoBlue;
+                                        return logoGolden;
+                                    })()}
+                                    alt={namaToko}
+                                    fill
+                                    sizes="40px"
+                                    style={{ objectFit: "contain" }}
+                                />
+                            </div>
+                            <span style={{
+                                fontSize: "0.9rem",
+                                fontWeight: 600,
+                                letterSpacing: "0.04em",
+                                textTransform: "uppercase",
+                                color: colors.element
+                            }}>{namaToko}</span>
+                        </Link>
                         <div style={{ display: "flex", gap: 8 }}>
                             <img src={getFooterIconPath("LOC", colors.element)} alt="Loc" style={{ width: 14, height: 14, marginTop: 3, opacity: 0.8 }} />
                             <address style={{ fontStyle: "normal", lineHeight: 1.4, opacity: 0.8, whiteSpace: "pre-line", fontSize: 12 }}>

@@ -78,6 +78,6 @@ export function getFooterIconPath(iconType: FooterIconType, themeElementColor: s
             return `/uploads/icon-${locSuffix}.png`;
         case "LOGO":
             const logoSuffix = colorType === "WHITE" ? "putih" : colorType === "NAVY" ? "biru" : "golden";
-            return `/logo/logo_apixinterior_${logoSuffix}.png.png`;
+            return `/uploads/logo_apixinterior_${logoSuffix}.png.png`;
     }
 }

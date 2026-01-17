@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 
 import Navbar from "@/app/navbar/Navbar";
 import homeStyles from "@/app/page.module.css";
@@ -11,6 +12,10 @@ import ui from "./preview.module.css";
 import { CategoryGridPreview } from "./CategoryGridPreview";
 import CategoryCommerceColumns from "@/app/components/homepage/CategoryCommerceColumns.client";
 import { SocialIcon } from "@/app/components/homepage/social-icons";
+
+import logoBlue from "@/app/uploads/logo_apixinterior_biru.png.png";
+import logoGolden from "@/app/uploads/logo_apixinterior_golden.png.png";
+import logoWhite from "@/app/uploads/logo_apixinterior_putih.png.png";
 import { themeMetaSlug, getThemeKeyFromRow, isThemeMetaRow, getThemeKeyFromConfig, normalizeThemeKey, readSp, upperType } from "../toko-utils";
 import {
   normalizeConfig,
@@ -96,6 +101,9 @@ async function publishTheme(formData: FormData) {
   const allDrafts = await prisma.homepageSectionDraft.findMany({
     orderBy: [{ sortOrder: "asc" }, { id: "asc" }],
   });
+
+  const info = await prisma.informasiToko.findUnique({ where: { id: 1 } });
+  const namaToko = info?.namaToko ?? "Apix Interior";
 
   // ===== Prefetch contacts (hubungi) =====
   const hubungiAll = await prisma.hubungi.findMany({
@@ -2521,11 +2529,37 @@ export default async function TokoPreviewDraftPage({
 
                           {/* 1. Address + Brand (Top) */}
                           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                            <img
-                              src={getFooterIconPath("LOGO", colors.element)}
-                              alt="Apix Interior"
-                              style={{ height: 32, width: "auto", objectFit: "contain", alignSelf: "flex-start" }}
-                            />
+                            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                              <div style={{
+                                position: "relative",
+                                width: 40,
+                                height: 40,
+                                borderRadius: "999px",
+                                overflow: "hidden",
+                                background: "#0f172a",
+                                border: `1px solid ${colors.element}66`
+                              }}>
+                                <Image
+                                  src={(() => {
+                                    const c = colors.element.toLowerCase();
+                                    if (c.includes("#ffffff") || c.includes("white") || c.includes("255,255,255")) return logoWhite;
+                                    if (c.includes("#0b1d3a") || c.includes("navy") || c.includes("#0f172a")) return logoBlue;
+                                    return logoGolden;
+                                  })()}
+                                  alt={namaToko}
+                                  fill
+                                  sizes="40px"
+                                  style={{ objectFit: "contain" }}
+                                />
+                              </div>
+                              <span style={{
+                                fontSize: "0.9rem",
+                                fontWeight: 600,
+                                letterSpacing: "0.04em",
+                                textTransform: "uppercase",
+                                color: colors.element
+                              }}>{namaToko}</span>
+                            </div>
                             <div style={{ display: "flex", gap: 8 }}>
                               <img src={getFooterIconPath("LOC", colors.element)} alt="Loc" style={{ width: 14, height: 14, marginTop: 3, opacity: 0.8 }} />
                               <address style={{ fontStyle: "normal", lineHeight: 1.4, opacity: 0.8, whiteSpace: "pre-line", fontSize: 12 }}>
