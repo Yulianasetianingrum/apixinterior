@@ -804,7 +804,7 @@ export default async function HomePage({
                       const priceNode = cfg.showPrice ? (pr.isPromo ? <div style={{ display: "flex", flexDirection: "column", gap: 4 }}><div style={{ display: "flex", gap: 8 }}><span style={{ fontWeight: 800 }}>{formatRupiah(pr.hargaFinal)}</span></div><div style={{ display: "flex", gap: 8 }}><span style={{ textDecoration: "line-through", opacity: 0.6 }}>{formatRupiah(pr.hargaAsli)}</span><span style={{ fontWeight: 800, color: themeTokens.element }}>{pr.promoLabel}</span></div></div> : <>{formatRupiah(p.harga)}</>) : null;
                       return (
                         <article key={Number(p.id)} className={styles.pcCard} style={{ background: themeTokens.card, border: `1px solid ${themeTokens.cardBorder}`, color: themeTokens.cardFg }}>
-                          {imgUrl ? <div className={styles.pcMedia}><div className={styles.pcMediaBlur} style={{ backgroundImage: `url(${imgUrl})` }} /><SecureImage className={styles.pcMediaImg} src={imgUrl} alt={String(p.nama)} /></div> : <div className={styles.pcMediaPlaceholder} />}
+                          {imgUrl ? <div className={styles.pcMedia}><div className={styles.pcMediaBlur} aria-hidden="true" /><SecureImage className={styles.pcMediaImg} src={imgUrl} alt={String(p.nama)} /></div> : <div className={styles.pcMediaPlaceholder} />}
                           <div className={styles.pcBody}><div className={styles.pcTitle} style={{ color: themeTokens.cardFg }}>{String(p.nama)}</div>{cfg.showPrice ? <div className={styles.pcPrice} style={{ color: themeTokens.cardFg }}>{priceNode}</div> : null}
                             <div className={styles.pcCtaWrap}>{cfg.showCta ? <a className={styles.pcCta} href={href} style={{ background: themeTokens.ctaBg, color: themeTokens.ctaFg, border: `1px solid ${themeTokens.ctaBg}` }}>Lihat Produk</a> : null}</div></div>
                         </article>
@@ -862,7 +862,7 @@ export default async function HomePage({
                     return (
                       <article key={Number(p.id)} className={styles.productListingItem}>
                         <a href={href} className={styles.pcCard} style={{ background: themeTokens.card, border: `1px solid ${themeTokens.cardBorder}`, color: themeTokens.cardFg, textDecoration: "none", width: "100%", height: "100%" }}>
-                          {imgUrl ? <div className={styles.pcMedia}><div className={styles.pcMediaBlur} style={{ backgroundImage: `url(${imgUrl})` }} /><SecureImage className={styles.pcMediaImg} src={imgUrl} alt={String(p.nama)} /></div> : <div className={styles.pcMediaPlaceholder} />}
+                          {imgUrl ? <div className={styles.pcMedia}><div className={styles.pcMediaBlur} aria-hidden="true" /><SecureImage className={styles.pcMediaImg} src={imgUrl} alt={String(p.nama)} /></div> : <div className={styles.pcMediaPlaceholder} />}
                           <div className={styles.pcBody}>
                             <div className={styles.pcTitle} style={{ color: themeTokens.cardFg }}>{String(p.nama || "Nama Produk")}</div>
                             <div className={styles.pcPrice} style={{ color: themeTokens.cardFg }}>
@@ -1283,7 +1283,7 @@ export default async function HomePage({
 
                     return (
                       <Link key={idx} href={href} className={styles.roomCardLink}>
-                        <div className={`${styles.roomCard} ${isImageOnly ? styles.roomCardImageOnly : ""}`} style={{ borderColor: rcAccent, ["--rc-bg" as any]: imgUrl ? `url("${imgUrl}")` : undefined }}>
+                        <div className={`${styles.roomCard} ${isImageOnly ? styles.roomCardImageOnly : ""}`} style={{ borderColor: rcAccent }}>
                           <div className={styles.roomMedia}>{imgUrl ? <SecureImage className={styles.roomImg} src={imgUrl} alt={displayTitle || "Kategori"} /> : <div className={styles.roomMediaPlaceholder} />}</div>
                           {!isImageOnly ? <div className={styles.roomBody} style={{ background: rcLabelBg }}><div className={styles.roomTopRow}><div className={styles.roomTitle} style={{ color: rcAccent }}>{displayTitle}</div>{card.badge ? <span className={styles.roomBadge} style={{ borderColor: rcAccent, color: rcAccent }}>{card.badge}</span> : null}</div></div> : null}
                         </div>
