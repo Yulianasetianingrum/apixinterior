@@ -222,8 +222,9 @@ function scoreImageMatch(categoryName: string, img: GalleryImage): number {
 function pickBestImage(categoryName: string, images: GalleryImage[], used: Set<number>) {
   let best: { id: number; score: number } | null = null;
   for (const img of images) {
-    const urlOk = isPngUrl(img.url);
-    if (!urlOk) continue;
+    // Relaxed: allow any image format
+    // const urlOk = isPngUrl(img.url);
+    // if (!urlOk) continue;
     if (used.has(Number(img.id))) continue;
     const score = scoreImageMatch(categoryName, img);
     if (score < 12) continue;
@@ -285,9 +286,9 @@ function SortRow({
 
   const dropStyle: React.CSSProperties = isDragOver
     ? {
-        background: "rgba(212, 175, 55, 0.12)",
-        borderColor: "rgba(212, 175, 55, 0.6)",
-      }
+      background: "rgba(212, 175, 55, 0.12)",
+      borderColor: "rgba(212, 175, 55, 0.6)",
+    }
     : {};
 
   return (
@@ -314,7 +315,7 @@ function SortRow({
       }}
     >
       <button type="button" className={ui.handle} aria-label="Drag" {...attributes} {...listeners}>
-        
+
       </button>
 
       <div className={ui.rowMain}>
@@ -366,7 +367,7 @@ function SortRow({
               // eslint-disable-next-line @next/next/no-img-element
               <img src={imageUrl} alt="" />
             ) : (
-              <div className={ui.iconPlaceholder}>PNG</div>
+              <div className={ui.iconPlaceholder}>Icon</div>
             )}
           </div>
           {item.type === "category" ? (
@@ -374,26 +375,26 @@ function SortRow({
               action={uploadAction}
               sectionId={sectionId}
               attach={`CATEGORY_GRID_COMMERCE:icon:${item.kategoriId}`}
-            endpoint="/api/admin/admin_dashboard/admin_galeri/list_gambar?png=1"
-            limit={60}
-            buttonLabel="Pilih/Upload PNG"
-            allowUpload
-            autoApplyOnSelect
-            accept="image/png"
-            skipRefresh
-            onAppliedImageId={(id) => onUpdate(item.key, { imageId: id })}
-          />
+              endpoint="/api/admin/admin_dashboard/admin_galeri/list_gambar"
+              limit={60}
+              buttonLabel="Pilih/Upload Gambar"
+              allowUpload
+              autoApplyOnSelect
+              accept="image/*"
+              skipRefresh
+              onAppliedImageId={(id) => onUpdate(item.key, { imageId: id })}
+            />
           ) : (
             <ImagePickerCaptcha
               action={uploadAction}
               sectionId={sectionId}
               attach={`CATEGORY_GRID_COMMERCE:custom:${item.key}`}
-              endpoint="/api/admin/admin_dashboard/admin_galeri/list_gambar?png=1"
+              endpoint="/api/admin/admin_dashboard/admin_galeri/list_gambar"
               limit={60}
-              buttonLabel="Pilih/Upload PNG (custom)"
+              buttonLabel="Pilih/Upload Custom"
               allowUpload
               autoApplyOnSelect
-              accept="image/png"
+              accept="image/*"
               skipRefresh
               onAppliedImageId={(id) => onUpdate(item.key, { imageId: id })}
             />
@@ -524,18 +525,18 @@ export default function CategoryCommerceGridEditor({
     () => new Set(items.filter((it) => it.type === "category").map((it) => Number(it.kategoriId))),
     [items],
   );
-  const pngImages = React.useMemo(() => {
-    return (images || []).filter((img) => isPngUrl(img.url));
+  const availableImages = React.useMemo(() => {
+    return images || [];
   }, [images]);
 
   const imageById = React.useMemo(() => {
     const m = new Map<number, GalleryImage>();
-    for (const img of pngImages || []) {
+    for (const img of availableImages || []) {
       const id = Number(img.id);
       if (Number.isFinite(id)) m.set(id, img);
     }
     return m;
-  }, [pngImages]);
+  }, [availableImages]);
 
   const filteredCategories = React.useMemo(() => {
     const qq = q.trim().toLowerCase();
@@ -600,8 +601,8 @@ export default function CategoryCommerceGridEditor({
           const nextLabel = limitWords(ensureScopeLabel(templated.trim(), scopeWord), 6);
           const currentImg = it.imageId ? imageById.get(Number(it.imageId)) : null;
           const currentScore =
-            currentImg && isPngUrl(currentImg.url) ? scoreImageMatch(nextLabel, currentImg) : 0;
-          const pickedId = pickBestImage(nextLabel, pngImages || [], usedImageIds);
+            currentImg ? scoreImageMatch(nextLabel, currentImg) : 0;
+          const pickedId = pickBestImage(nextLabel, availableImages || [], usedImageIds);
           const finalImageId = currentScore >= 12 ? it.imageId : pickedId ?? null;
           if (finalImageId) usedImageIds.add(Number(finalImageId));
           const nextImageUrl = finalImageId ? imageById.get(Number(finalImageId))?.url ?? "" : it.imageUrl ?? "";
@@ -622,8 +623,8 @@ export default function CategoryCommerceGridEditor({
         const desiredSlug = makeUnique(buildSeoSlug(nextLabel));
         const currentImg = it.imageId ? imageById.get(Number(it.imageId)) : null;
         const currentScore =
-          currentImg && isPngUrl(currentImg.url) ? scoreImageMatch(baseRaw, currentImg) : 0;
-        const pickedId = pickBestImage(baseRaw, pngImages || [], usedImageIds);
+          currentImg ? scoreImageMatch(baseRaw, currentImg) : 0;
+        const pickedId = pickBestImage(baseRaw, availableImages || [], usedImageIds);
         const finalImageId = currentScore >= 12 ? it.imageId : pickedId ?? null;
         if (finalImageId) usedImageIds.add(Number(finalImageId));
 
@@ -725,10 +726,9 @@ export default function CategoryCommerceGridEditor({
       const targetKey = targetItems[i].key;
       if (!targetId || targetItems[i].type !== "category") continue;
       const mime = String(file.type ?? "").toLowerCase();
-      const mimeOk = mime === "image/png";
-      const nameOk = /\.png$/i.test(String(file.name ?? ""));
-      if (!mimeOk && !nameOk) {
-        setUploadErr("Icon harus PNG.");
+      const isImage = mime.startsWith("image/");
+      if (!isImage) {
+        setUploadErr("File harus berupa gambar.");
         continue;
       }
 
@@ -901,11 +901,11 @@ export default function CategoryCommerceGridEditor({
                     const iconUrl =
                       it.type === "custom"
                         ? (it.imageId
-                            ? imageById.get(Number(it.imageId))?.url ?? null
-                            : it.imageUrl || null)
+                          ? imageById.get(Number(it.imageId))?.url ?? null
+                          : it.imageUrl || null)
                         : it.imageId
-                        ? imageById.get(Number(it.imageId))?.url ?? null
-                        : null;
+                          ? imageById.get(Number(it.imageId))?.url ?? null
+                          : null;
                     return (
                       <SortRow
                         key={String(it.key)}

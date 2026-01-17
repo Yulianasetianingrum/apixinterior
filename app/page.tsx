@@ -1263,7 +1263,8 @@ export default async function HomePage({
             const roomThemeKey = resolveEffectiveTheme(String(cfg.sectionTheme ?? "FOLLOW_NAVBAR"), navbarTheme);
             const { a: rcA, b: rcB } = parseThemePair(roomThemeKey);
             const rcLabelBg = colorForToken(rcA);
-            const rcAccent = colorForToken(rcB);
+            // Override Gold to be brighter specifically for Room Category
+            const rcAccent = rcB === "GOLD" ? "#d4af37" : colorForToken(rcB);
 
             return (
               <section key={section.id} className={styles.previewSection}>
@@ -1275,12 +1276,16 @@ export default async function HomePage({
                     const href = k?.slug ? `/kategori/${k.slug}` : "#";
                     const imageId = Number(card?.imageId);
                     const imgUrl = Number.isFinite(imageId) ? imageMap.get(imageId)?.url : (kategoriId ? autoCoverUrlByKategori.get(kategoriId) : null);
-                    const isImageOnly = !card.title;
+
+                    // Fallback title to category name if manual title is empty
+                    const displayTitle = card.title || k?.nama || "";
+                    const isImageOnly = !displayTitle;
+
                     return (
                       <Link key={idx} href={href} className={styles.roomCardLink}>
                         <div className={`${styles.roomCard} ${isImageOnly ? styles.roomCardImageOnly : ""}`} style={{ borderColor: rcAccent, ["--rc-bg" as any]: imgUrl ? `url("${imgUrl}")` : undefined }}>
-                          <div className={styles.roomMedia}>{imgUrl ? <SecureImage className={styles.roomImg} src={imgUrl} alt={card.title || "Kategori"} /> : <div className={styles.roomMediaPlaceholder} />}</div>
-                          {!isImageOnly ? <div className={styles.roomBody} style={{ background: rcLabelBg }}><div className={styles.roomTopRow}><div className={styles.roomTitle} style={{ color: rcAccent }}>{card.title}</div>{card.badge ? <span className={styles.roomBadge} style={{ borderColor: rcAccent, color: rcAccent }}>{card.badge}</span> : null}</div></div> : null}
+                          <div className={styles.roomMedia}>{imgUrl ? <SecureImage className={styles.roomImg} src={imgUrl} alt={displayTitle || "Kategori"} /> : <div className={styles.roomMediaPlaceholder} />}</div>
+                          {!isImageOnly ? <div className={styles.roomBody} style={{ background: rcLabelBg }}><div className={styles.roomTopRow}><div className={styles.roomTitle} style={{ color: rcAccent }}>{displayTitle}</div>{card.badge ? <span className={styles.roomBadge} style={{ borderColor: rcAccent, color: rcAccent }}>{card.badge}</span> : null}</div></div> : null}
                         </div>
                       </Link>
                     );

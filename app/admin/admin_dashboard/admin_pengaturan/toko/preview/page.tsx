@@ -1001,40 +1001,48 @@ export default async function TokoPreviewDraftPage({
                     );
                   }
 
-                  const textColor = mode === "clean" ? pageThemeTokens.element : "var(--t-card-fg)";
+                  const textColor = themeTokens.element;
+                  const bgColor = themeTokens.bg;
+
                   return (
                     <div
                       key={section.id}
-                      className={ui.themeScope}
-                      data-theme={sectionThemeResolved}
+                      className={ui.previewSectionFull}
                       style={{
-                        background: mode === "clean" ? "transparent" : "var(--t-card)",
+                        background: bgColor,
                         color: textColor,
-                        padding: "24px 0",
-                        ["--t-bg" as any]: themeTokens.bg,
-                        ["--t-element" as any]: themeTokens.element,
-                        ["--t-card" as any]: themeTokens.card,
-                        ["--t-card-fg" as any]: mode === "clean" ? textColor : themeTokens.cardFg,
-                        ["--t-card-border" as any]: themeTokens.cardBorder,
-                        ["--t-cta-bg" as any]: themeTokens.ctaBg,
-                        ["--t-cta-fg" as any]: themeTokens.ctaFg,
-                        ["--t-cta-hover-bg" as any]: themeTokens.ctaHoverBg,
-                        ["--t-cta-hover-fg" as any]: themeTokens.ctaHoverFg,
-                        ["--t-divider" as any]: themeTokens.divider,
                       }}
                     >
-                      <div style={{ maxWidth: 1400, margin: "0 auto", padding: "0 24px" }}>
-                        {commerceGridData.title ? (
-                          <h2 style={{ fontSize: 22, fontWeight: 600, margin: "0 0 16px", color: "var(--t-element)" }}>
-                            {commerceGridData.title}
-                          </h2>
-                        ) : null}
-                        {commerceGridData.items.length >= 2 ? (
-                          <CategoryCommerceColumns
-                            {...commerceGridData}
-                            viewAllHref={commerceGridData.mode === "reverse" ? "/kategori" : null}
-                          />
-                        ) : null}
+                      <div
+                        className={ui.themeScope}
+                        data-theme={sectionThemeResolved}
+                        style={{
+                          padding: "56px 0",
+                          ["--t-bg" as any]: bgColor,
+                          ["--t-element" as any]: textColor,
+                          ["--t-card" as any]: themeTokens.card,
+                          ["--t-card-fg" as any]: themeTokens.cardFg, // Text inside card
+                          ["--t-card-border" as any]: themeTokens.cardBorder,
+                          ["--t-cta-bg" as any]: themeTokens.ctaBg,
+                          ["--t-cta-fg" as any]: themeTokens.ctaFg,
+                          ["--t-cta-hover-bg" as any]: themeTokens.ctaHoverBg,
+                          ["--t-cta-hover-fg" as any]: themeTokens.ctaHoverFg,
+                          ["--t-divider" as any]: themeTokens.divider,
+                        }}
+                      >
+                        <div style={{ maxWidth: 1400, margin: "0 auto", padding: "0 24px" }}>
+                          {commerceGridData.title ? (
+                            <h2 style={{ fontSize: 22, fontWeight: 600, margin: "0 0 16px", color: "var(--t-element)" }}>
+                              {commerceGridData.title}
+                            </h2>
+                          ) : null}
+                          {commerceGridData.items.length >= 1 ? (
+                            <CategoryCommerceColumns
+                              {...commerceGridData}
+                              viewAllHref={commerceGridData.mode === "reverse" ? "/kategori" : null}
+                            />
+                          ) : null}
+                        </div>
                       </div>
                     </div>
                   );
@@ -1279,10 +1287,6 @@ export default async function TokoPreviewDraftPage({
                 // PRODUCT CAROUSEL
                 if (t === "PRODUCT_CAROUSEL") {
                   const cfg = normalizeConfig(t, section.config) as any;
-                  const desc = String(cfg.description ?? "").trim();
-                  const showPrice = cfg.showPrice === undefined ? true : Boolean(cfg.showPrice);
-                  const showCta = cfg.showCta === undefined ? true : Boolean(cfg.showCta);
-
                   // Align theme resolution with Frontend
                   const sectionThemeRaw = String((cfg as any).sectionTheme ?? (cfg as any).carouselTheme ?? (cfg as any).theme ?? "FOLLOW_NAVBAR").trim();
                   const sectionTheme = resolveEffectiveTheme(sectionThemeRaw, navbarTheme);
@@ -1297,106 +1301,50 @@ export default async function TokoPreviewDraftPage({
                   const ids = Array.isArray(cfg.productIds) ? cfg.productIds : [];
                   const products = ids.map((id: any) => produkMap.get(Number(id))).filter(Boolean) as any[];
 
-                  return (
-                    <section
-                      key={section.id}
-                      className={hasBgOverride ? ui.previewSectionFull : ui.previewSection}
-                      style={
-                        hasBgOverride
-                          ? { ...bgStyle, padding: "32px 0", marginBottom: 28 }
-                          : { ...bgStyle }
-                      }
-                    >
-                      <div
-                        className={hasBgOverride ? ui.previewSection : undefined}
-                        style={
-                          hasBgOverride
-                            ? { margin: "0 auto", padding: "0 16px", background: "transparent", border: "none" }
-                            : undefined
-                        }
-                      >
-                        {section.title ? (
-                          <h2 className={ui.sectionTitle}>{section.title}</h2>
-                        ) : null}
-
-                        {desc ? <div style={{ marginBottom: 10, fontSize: 13, opacity: 0.72, maxWidth: 820, color: themeTokens.cardFg }}>{desc}</div> : null}
-
-                        {products.length ? (
-                          <div className={ui.pcRow}>
-                            {products.map((p: any) => {
-                              const mainId = p.mainImageId ? Number(p.mainImageId) : null;
-                              const gId = pickFirstGalleryImageId(p.galleryImageIds || []);
-                              const pickedId = mainId || gId;
-                              const imgUrl = pickedId ? imageMap.get(Number(pickedId))?.url ?? null : null;
-
-                              const href = p.slug ? `/produk/${p.slug}` : "#";
-                              const pr = computeHargaSetelahPromo(p);
-                              const metaParts = [p.kategori, p.subkategori].filter(Boolean);
-                              const priceNode = showPrice ? (
-                                pr.isPromo ? (
-                                  <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                                    <div style={{ display: "flex", alignItems: "baseline", gap: 8, flexWrap: "wrap" }}>
-                                      <span style={{ fontWeight: 800 }}>{formatRupiah(pr.hargaFinal)}</span>
-                                    </div>
-                                    <div style={{ display: "flex", alignItems: "baseline", gap: 8, flexWrap: "wrap" }}>
-                                      <span style={{ textDecoration: "line-through", opacity: 0.6 }}>
-                                        {formatRupiah(pr.hargaAsli)}
-                                      </span>
-                                      <span style={{ fontWeight: 800, color: themeTokens.element }}>{pr.promoLabel}</span>
-                                    </div>
-                                  </div>
-                                ) : (
-                                  <>{formatRupiah(p.harga)}</>
-                                )
-                              ) : null;
-
-                              return (
-                                <article key={Number(p.id)} className={ui.pcCard} style={{ background: themeTokens.card, border: `1px solid ${themeTokens.cardBorder}`, color: themeTokens.cardFg }}>
-                                  {imgUrl ? (
-                                    <div className={ui.pcMedia}>
-                                      <div className={ui.pcMediaBlur} style={{ backgroundImage: `url(${imgUrl})` }} />
-                                      <img className={ui.pcMediaImg} src={imgUrl} alt={String(p.nama ?? "Produk")} />
-                                    </div>
-                                  ) : (
-                                    <div className={ui.pcMediaPlaceholder} />
-                                  )}
-
-                                  <div className={ui.pcBody}>
-                                    <div className={ui.pcTitle} style={{ color: themeTokens.cardFg }}>{String(p.nama ?? "Produk")}</div>
-
-                                    {showPrice ? <div className={ui.pcPrice} style={{ color: themeTokens.cardFg }}>{priceNode}</div> : null}
-                                    <div className={ui.pcMeta} style={{ color: themeTokens.cardFg, opacity: 0.7 }}>{metaParts.length ? metaParts.join(" • ") : ""}</div>
-
-                                    <div className={ui.pcCtaWrap}>
-                                      {showCta ? (
-                                        <a className={ui.pcCta} href={href} style={{ background: themeTokens.ctaBg, color: themeTokens.ctaFg, border: `1px solid ${themeTokens.ctaBg}` }}>
-                                          Lihat Produk
-                                        </a>
-                                      ) : (
-                                        <div className={ui.pcCtaPlaceholder} />
-                                      )}
-                                    </div>
-                                  </div>
-                                </article>
-                              );
-                            })}
-                          </div>
-                        ) : (
-                          <div className={ui.notice}>Belum ada produk dipilih.</div>
-                        )}
-                      </div>
+                  const carouselContent = (
+                    <section className={hasBgOverride ? "" : homeStyles.previewSection} style={{ background: "transparent", padding: hasBgOverride ? "0 16px" : undefined }}>
+                      {section.title ? <h2 className={homeStyles.sectionTitle}>{section.title}</h2> : null}
+                      {cfg.description ? <div style={{ marginBottom: 10, fontSize: 13, opacity: 0.72, maxWidth: 820, color: themeTokens.cardFg }}>{cfg.description}</div> : null}
+                      {products.length ? (
+                        <div className={homeStyles.pcRow}>
+                          {products.map((p: any) => {
+                            const mainId = p.mainImageId ? Number(p.mainImageId) : null;
+                            const gId = pickFirstGalleryImageId(p.galleryImageIds || []);
+                            const pickedId = mainId || gId;
+                            const imgUrl = pickedId ? imageMap.get(Number(pickedId))?.url ?? null : null;
+                            const href = "#";
+                            const pr = computeHargaSetelahPromo(p);
+                            const priceNode = cfg.showPrice ? (pr.isPromo ? <div style={{ display: "flex", flexDirection: "column", gap: 4 }}><div style={{ display: "flex", gap: 8 }}><span style={{ fontWeight: 800 }}>{formatRupiah(pr.hargaFinal)}</span></div><div style={{ display: "flex", gap: 8 }}><span style={{ textDecoration: "line-through", opacity: 0.6 }}>{formatRupiah(pr.hargaAsli)}</span><span style={{ fontWeight: 800, color: themeTokens.element }}>{pr.promoLabel}</span></div></div> : <>{formatRupiah(p.harga)}</>) : null;
+                            return (
+                              <article key={Number(p.id)} className={homeStyles.pcCard} style={{ background: themeTokens.card, border: `1px solid ${themeTokens.cardBorder}`, color: themeTokens.cardFg }}>
+                                {imgUrl ? <div className={homeStyles.pcMedia}><div className={homeStyles.pcMediaBlur} style={{ backgroundImage: `url(${imgUrl})` }} /><SecureImage className={homeStyles.pcMediaImg} src={imgUrl} alt={String(p.nama)} /></div> : <div className={homeStyles.pcMediaPlaceholder} />}
+                                <div className={homeStyles.pcBody}><div className={homeStyles.pcTitle} style={{ color: themeTokens.cardFg }}>{String(p.nama)}</div>{cfg.showPrice ? <div className={homeStyles.pcPrice} style={{ color: themeTokens.cardFg }}>{priceNode}</div> : null}
+                                  <div className={homeStyles.pcCtaWrap}>{cfg.showCta ? <a className={homeStyles.pcCta} href={href} style={{ background: themeTokens.ctaBg, color: themeTokens.ctaFg, border: `1px solid ${themeTokens.ctaBg}`, pointerEvents: "none" }}>Lihat Produk</a> : null}</div></div>
+                              </article>
+                            );
+                          })}
+                        </div>
+                      ) : <div className={ui.notice}>Belum ada produk dipilih.</div>}
                     </section>
                   );
+
+                  if (hasBgOverride) {
+                    return (
+                      <div key={section.id} className={homeStyles.previewSectionFull} style={{ background: palette.bg, color: palette.fg }}>
+                        {carouselContent}
+                      </div>
+                    );
+                  }
+                  return <div key={section.id}>{carouselContent}</div>;
                 }              // HIGHLIGHT COLLECTION
                 // PRODUCT LISTING
                 if (t === "PRODUCT_LISTING") {
                   const cfg = normalizeConfig(t, section.config) as any;
-                  // Aligning theme fallback with frontend logic
                   const sectionThemeRaw = String((cfg as any).sectionTheme ?? (cfg as any).carouselTheme ?? (cfg as any).theme ?? "FOLLOW_NAVBAR").trim();
                   const sectionTheme = resolveEffectiveTheme(sectionThemeRaw, navbarTheme);
                   const themeTokens = getHeroThemeTokens(sectionTheme);
 
-                  // Resolve Background & Text Palette
+                  // Resolve Background Override
                   const bgThemeRaw = (cfg as any).sectionBgTheme;
                   const palette = resolveCustomPromoPalette(bgThemeRaw, navbarTheme);
                   const hasBgOverride = bgThemeRaw && bgThemeRaw !== "FOLLOW_NAVBAR";
@@ -1404,14 +1352,11 @@ export default async function TokoPreviewDraftPage({
 
                   const productIds = Array.isArray(cfg.productIds) ? cfg.productIds : [];
                   let products: any[] = [];
-
                   if (productIds.length > 0) {
                     products = productIds.map((id: any) => produkMap.get(Number(id))).filter(Boolean) as any[];
                   } else {
                     products = Array.isArray(productListingItems) ? productListingItems : [];
                   }
-
-                  const showMore = true;
 
                   if (!products.length) {
                     return (
@@ -1422,86 +1367,54 @@ export default async function TokoPreviewDraftPage({
                     );
                   }
 
-                  return (
-                    <section
-                      key={section.id}
-                      className={hasBgOverride ? ui.previewSectionFull : ui.previewSection}
-                      style={
-                        hasBgOverride
-                          ? { ...bgStyle, padding: "32px 0", marginBottom: 28 }
-                          : { ...bgStyle }
-                      }
-                    >
-                      <div
-                        className={hasBgOverride ? ui.previewSection : undefined}
-                        style={
-                          hasBgOverride
-                            ? { margin: "0 auto", padding: "0 16px", background: "transparent", border: "none" }
-                            : undefined
-                        }
-                      >
-                        {section.title ? <h2 className={ui.sectionTitle}>{section.title}</h2> : null}
-
-                        <div className={ui.productListingGrid}>
-                          {products.map((p: any) => {
-                            const mainId = p.mainImageId ? Number(p.mainImageId) : null;
-                            const gId = pickFirstGalleryImageId(p.galleryImageIds || []);
-                            const pickedId = mainId || gId;
-                            const imgUrl = pickedId ? imageMap.get(Number(pickedId))?.url ?? null : null;
-                            const href = p.slug ? `/produk/${p.slug}` : "#";
-                            const pr = computeHargaSetelahPromo(p);
-                            const metaParts = [p.kategori, p.subkategori].filter(Boolean);
-
-                            return (
-                              <article key={Number(p.id)} className={ui.productListingItem}>
-                                <Link href={href} className={ui.pcCard} style={{ background: themeTokens.card, border: `1px solid ${themeTokens.cardBorder}`, color: themeTokens.cardFg, textDecoration: "none", width: "100%", height: "100%" }}>
-                                  {imgUrl ? (
-                                    <div className={ui.pcMedia}>
-                                      <div className={ui.pcMediaBlur} style={{ backgroundImage: `url(${imgUrl})` }} />
-                                      <img className={ui.pcMediaImg} src={imgUrl} alt={String(p.nama ?? "Produk")} />
-                                    </div>
-                                  ) : (
-                                    <div className={ui.pcMediaPlaceholder} />
-                                  )}
-
-                                  <div className={ui.pcBody}>
-                                    <div className={ui.pcTitle} style={{ color: themeTokens.cardFg }}>{String(p.nama ?? "Produk")}</div>
-
-                                    <div className={ui.pcPrice} style={{ color: themeTokens.cardFg }}>
-                                      {pr.isPromo ? (
-                                        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                                          <div style={{ display: "flex", alignItems: "baseline", gap: 8, flexWrap: "wrap" }}>
-                                            <span style={{ fontWeight: 800 }}>{formatRupiah(pr.hargaFinal)}</span>
-                                          </div>
-                                          <div style={{ display: "flex", alignItems: "baseline", gap: 8, flexWrap: "wrap" }}>
-                                            <span style={{ textDecoration: "line-through", opacity: 0.6 }}>
-                                              {formatRupiah(pr.hargaAsli)}
-                                            </span>
-                                            <span style={{ fontWeight: 800, color: themeTokens.element }}>{pr.promoLabel}</span>
-                                          </div>
+                  const listingContent = (
+                    <section className={hasBgOverride ? "" : homeStyles.previewSection} style={{ background: "transparent", padding: hasBgOverride ? "0 16px" : undefined }}>
+                      {section.title ? <h2 className={homeStyles.sectionTitle}>{section.title}</h2> : null}
+                      <div className={homeStyles.productListingGrid}>
+                        {products.map((p: any, idx: number) => {
+                          const mainId = p.mainImageId ? Number(p.mainImageId) : null;
+                          const gId = pickFirstGalleryImageId(p.galleryImageIds || []);
+                          const pickedId = mainId || gId;
+                          const imgUrl = pickedId ? imageMap.get(Number(pickedId))?.url ?? null : null;
+                          const href = "#";
+                          const pr = computeHargaSetelahPromo(p);
+                          return (
+                            <article key={Number(p.id)} className={homeStyles.productListingItem}>
+                              <div className={homeStyles.pcCard} style={{ background: themeTokens.card, border: `1px solid ${themeTokens.cardBorder}`, color: themeTokens.cardFg, width: "100%", height: "100%", cursor: "default" }}>
+                                {imgUrl ? <div className={homeStyles.pcMedia}><div className={homeStyles.pcMediaBlur} style={{ backgroundImage: `url(${imgUrl})` }} /><SecureImage className={homeStyles.pcMediaImg} src={imgUrl} alt={String(p.nama)} /></div> : <div className={homeStyles.pcMediaPlaceholder} />}
+                                <div className={homeStyles.pcBody}>
+                                  <div className={homeStyles.pcTitle} style={{ color: themeTokens.cardFg }}>{String(p.nama || "Nama Produk")}</div>
+                                  <div className={homeStyles.pcPrice} style={{ color: themeTokens.cardFg }}>
+                                    {pr.isPromo ? (
+                                      <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                                        <span style={{ fontWeight: 800 }}>{formatRupiah(pr.hargaFinal)}</span>
+                                        <div style={{ display: "flex", gap: 8 }}>
+                                          <span style={{ textDecoration: "line-through", opacity: 0.6 }}>{formatRupiah(pr.hargaAsli)}</span>
+                                          <span style={{ fontWeight: 800, color: themeTokens.element }}>{pr.promoLabel}</span>
                                         </div>
-                                      ) : (
-                                        <>{formatRupiah(p.harga)}</>
-                                      )}
-                                    </div>
-                                    <div className={ui.pcMeta} style={{ color: themeTokens.cardFg, opacity: 0.7 }}>{metaParts.length ? metaParts.join(" · ") : ""}</div>
+                                      </div>
+                                    ) : (
+                                      <>{formatRupiah(p.harga)}</>
+                                    )}
                                   </div>
-                                </Link>
-                              </article>
-                            );
-                          })}
-                        </div>
-
-                        {showMore ? (
-                          <div className={ui.productListingFooter}>
-                            <a className={ui.productListingMore} href="/produk" style={{ background: themeTokens.ctaBg, color: themeTokens.ctaFg, border: `1px solid ${themeTokens.ctaBg}` }}>
-                              Tampilkan Semua
-                            </a>
-                          </div>
-                        ) : null}
+                                </div>
+                              </div>
+                            </article>
+                          );
+                        })}
                       </div>
+                      <div className={homeStyles.productListingFooter}><a className={homeStyles.productListingMore} href="#" style={{ background: themeTokens.ctaBg, color: themeTokens.ctaFg, border: `1px solid ${themeTokens.ctaBg}`, pointerEvents: "none" }}>Tampilkan Semua</a></div>
                     </section>
                   );
+
+                  if (hasBgOverride) {
+                    return (
+                      <div key={section.id} className={homeStyles.previewSectionFull} style={{ background: palette.bg, color: palette.fg }}>
+                        {listingContent}
+                      </div>
+                    );
+                  }
+                  return <div key={section.id}>{listingContent}</div>;
                 }
 
                 // HIGHLIGHT COLLECTION
@@ -2419,7 +2332,8 @@ export default async function TokoPreviewDraftPage({
                   const roomThemeKey = resolveEffectiveTheme(String(cfg.sectionTheme ?? "FOLLOW_NAVBAR"), navbarTheme);
                   const { a: rcA, b: rcB } = parseThemePair(roomThemeKey);
                   const rcLabelBg = colorForToken(rcA);
-                  const rcAccent = colorForToken(rcB);
+                  // Override Gold to be brighter specifically for Room Category
+                  const rcAccent = rcB === "GOLD" ? "#d4af37" : colorForToken(rcB);
 
                   return (
                     <section key={section.id} className={ui.previewSection}>
@@ -2430,16 +2344,18 @@ export default async function TokoPreviewDraftPage({
                           {cards.map((card: any, idx: number) => {
                             const key = String(card?.key ?? idx);
 
-                            const title = String(card?.title ?? "").trim();
+                            const cardTitle = String(card?.title ?? "").trim();
                             const badge = typeof card?.badge === "string" ? String(card.badge).trim() : "";
-
-                            // Rule: kalau tidak ada judul -> image-only (tanpa body putih, gambar tidak crop)
-                            const isImageOnly = !title;
 
                             const kategoriId = Number(card?.kategoriId);
                             const kategori =
                               Number.isFinite(kategoriId) && kategoriId > 0 ? kategoriMap.get(kategoriId) : null;
                             const href = kategori?.slug ? `/kategori/${kategori.slug}` : "#";
+
+                            // Fallback title to category name if manual title is empty
+                            const title = cardTitle || kategori?.nama || "";
+                            // Rule: kalau tidak ada judul (baik manual maupun kategori) -> image-only
+                            const isImageOnly = !title;
 
                             const imageId = Number(card?.imageId);
                             const imgUrl =
