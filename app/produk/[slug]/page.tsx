@@ -213,7 +213,7 @@ export default async function ProdukDetailPage({ params }: PageProps) {
         </div>
 
 
-        <ProductDetailClient product={productForClient} waNumber={waNumber} />
+        <ProductDetailClient product={productForClient} />
 
         <section className={styles.detailSection}>
           <h2 className={styles.sectionTitle}>Detail Lengkap</h2>

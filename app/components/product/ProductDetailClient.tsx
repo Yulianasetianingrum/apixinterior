@@ -8,10 +8,9 @@ import { normalizePublicUrl } from "@/lib/product-utils";
 
 type WrapperProps = {
     product: any; // Full prisma object
-    waNumber: string;
 };
 
-export default function ProductDetailClient({ product, waNumber }: WrapperProps) {
+export default function ProductDetailClient({ product }: WrapperProps) {
     // Image State
     const [activeImage, setActiveImage] = useState<string | null>(
         product.mainImage?.url ? normalizePublicUrl(product.mainImage.url) : null
@@ -137,7 +136,6 @@ export default function ProductDetailClient({ product, waNumber }: WrapperProps)
                     <ProductVariationSelector
                         product={product}
                         onImageChange={(url) => setActiveImage(normalizePublicUrl(url))}
-                        baseWaNumber={waNumber}
                     />
                 </div>
 

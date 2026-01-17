@@ -551,7 +551,7 @@ export default async function HomePage({
           latitude: -6.294167,
           longitude: 106.966111
         }}
-        telephone={schemaPhone || "+6281234567890"}
+        telephone={schemaPhone}
         openingHours={["Mo-Su 08:00-18:00"]}
         image="/logo/logo_apixinterior_biru.png"
       />

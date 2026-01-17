@@ -10,6 +10,8 @@ import { formatIDR, normalizePublicUrl, computeHargaSetelahPromo } from "@/lib/p
 import { useCart } from "@/app/context/CartContext";
 import { useWishlist } from "@/app/context/WishlistContext";
 
+import { useSettings } from "@/app/context/SettingsContext";
+
 interface ProductCardProps {
     product: any;
     index: number;
@@ -109,6 +111,8 @@ export default function ProductCard({ product: pRaw, index }: ProductCardProps) 
         }, 800);
     };
 
+    const { waNumber } = useSettings();
+
     const handleContact = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
@@ -124,8 +128,16 @@ export default function ProductCard({ product: pRaw, index }: ProductCardProps) 
         } catch { }
 
         const message = `Halo, saya tertarik dengan produk: ${p.nama}`;
-        const waUrl = `https://wa.me/6281234567890?text=${encodeURIComponent(message)}`;
-        window.open(waUrl, "_blank");
+        const cleanNumber = waNumber.replace(/[^\d]/g, "");
+        const waUrl = cleanNumber
+            ? `https://wa.me/${cleanNumber}?text=${encodeURIComponent(message)}`
+            : "#";
+
+        if (cleanNumber) {
+            window.open(waUrl, "_blank");
+        } else {
+            alert("Nomor WhatsApp belum diatur oleh admin.");
+        }
     };
 
     return (

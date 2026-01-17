@@ -93,20 +93,32 @@ export const viewport = {
   maximumScale: 5,
 };
 
-export default function RootLayout({
+import { prisma } from "@/lib/prisma";
+import { SettingsProvider } from "./context/SettingsContext";
+
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // Fetch priority WhatsApp number
+  const waRow = await prisma.hubungi.findFirst({
+    orderBy: [{ prioritas: "desc" }, { id: "asc" }],
+    select: { nomor: true },
+  });
+  const waNumber = waRow?.nomor ?? "";
+
   return (
     <html lang="id" className={inter.variable}>
       <body className={`bg-white ${inter.className}`}>
-        <CartProvider>
-          <WishlistProvider>
-            <PageViewTracker />
-            {children}
-          </WishlistProvider>
-        </CartProvider>
+        <SettingsProvider waNumber={waNumber}>
+          <CartProvider>
+            <WishlistProvider>
+              <PageViewTracker />
+              {children}
+            </WishlistProvider>
+          </CartProvider>
+        </SettingsProvider>
       </body>
     </html>
   );

@@ -9,15 +9,16 @@ import { useState, useEffect } from "react";
 import styles from "./keranjang.module.css";
 import { useRouter } from "next/navigation";
 import SecureImage from "@/app/components/SecureImage";
+import { useSettings } from "@/app/context/SettingsContext";
 
 interface CartPageClientProps {
-    waNumber: string;
 }
 
 // Helper to ensure image URL is correct
 // Removed local ensureImageUrl in favor of centralized normalizePublicUrl
 
-export default function CartPageClient({ waNumber }: CartPageClientProps) {
+export default function CartPageClient({ }: CartPageClientProps) {
+    const { waNumber } = useSettings();
     const { items, updateQuantity, removeFromCart, totalPrice, totalItems } = useCart();
     const router = useRouter();
     const [isClient, setIsClient] = useState(false);
@@ -39,8 +40,16 @@ export default function CartPageClient({ waNumber }: CartPageClientProps) {
             message += `   Subtotal: ${formatIDR(item.price * item.quantity)}\n\n`;
         });
         message += `*Total Belanja: ${formatIDR(totalPrice)}*`;
-        const url = `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`;
-        window.open(url, "_blank");
+        const cleanNumber = waNumber.replace(/[^\d]/g, "");
+        const url = cleanNumber
+            ? `https://wa.me/${cleanNumber}?text=${encodeURIComponent(message)}`
+            : "#";
+
+        if (cleanNumber) {
+            window.open(url, "_blank");
+        } else {
+            alert("Nomor WhatsApp belum diatur oleh admin.");
+        }
     };
 
     if (items.length === 0) {

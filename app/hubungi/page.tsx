@@ -45,8 +45,7 @@ async function getHubungiData() {
   });
 
   const utama = await prisma.hubungi.findFirst({
-    where: { prioritas: true },
-    orderBy: { id: "asc" },
+    orderBy: [{ prioritas: "desc" }, { id: "asc" }],
   });
 
   const mediaSosial = await prisma.mediaSosial.findMany({

@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { FaInstagram } from "react-icons/fa6";
+import { useSettings } from "@/app/context/SettingsContext";
 
 // Real Instagram Posts from @apix_interior
 // Last updated: January 10, 2026
@@ -25,6 +26,11 @@ interface PortfolioGalleryProps {
 }
 
 export default function PortfolioGallery({ initialImages = [] }: PortfolioGalleryProps) {
+    const { waNumber } = useSettings();
+    const cleanNumber = waNumber.replace(/[^\d]/g, "");
+    const waText = encodeURIComponent("Halo Apix Interior, saya tertarik dengan portofolio Anda");
+    const waUrl = cleanNumber ? `https://wa.me/${cleanNumber}?text=${waText}` : "#";
+
     return (
         <section>
             {/* Simple Title */}
@@ -105,7 +111,7 @@ export default function PortfolioGallery({ initialImages = [] }: PortfolioGaller
             {/* View More / Contact Button */}
             <div style={{ textAlign: "center", marginTop: "40px" }}>
                 <a
-                    href="https://wa.me/6281234567890?text=Halo%20Apix%20Interior%2C%20saya%20tertarik%20dengan%20portofolio%20Anda" // Replace with dynamic WA if available in context, or keep generic for now
+                    href={waUrl}
                     target="_blank"
                     rel="noreferrer"
                     style={{

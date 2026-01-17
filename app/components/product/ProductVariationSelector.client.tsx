@@ -5,6 +5,7 @@ import { formatIDR, computeHargaSetelahPromo, normalizePublicUrl } from "@/lib/p
 import { useCart } from "@/app/context/CartContext";
 import { useWishlist } from "@/app/context/WishlistContext";
 import SecureImage from "@/app/components/SecureImage";
+import { useSettings } from "@/app/context/SettingsContext";
 
 type Product = {
     id: number;
@@ -76,7 +77,8 @@ function unitSymbolShort(u: string | null | undefined) {
     return `/ ${lower}`;
 }
 
-export default function ProductVariationSelector({ product, onImageChange, baseWaNumber }: Props) {
+export default function ProductVariationSelector({ product, onImageChange }: Props) {
+    const { waNumber } = useSettings();
     const { addToCart } = useCart();
     const { isInWishlist, toggleWishlist } = useWishlist();
 
@@ -282,7 +284,7 @@ export default function ProductVariationSelector({ product, onImageChange, baseW
 
     // Action: WhatsApp Redirect
     const handlePesan = () => {
-        if (!baseWaNumber) return;
+        if (!waNumber) return;
 
         // Track Click (Non-blocking)
         try {
@@ -314,7 +316,7 @@ export default function ProductVariationSelector({ product, onImageChange, baseW
         text += `\nEstimasi Harga: ${formatIDR(finalPriceData.hargaFinal)}`;
         if (displayUnit) text += ` ${displayUnit}`; // Include unit in WA message too
 
-        const url = `https://wa.me/${baseWaNumber}?text=${encodeURIComponent(text)}`;
+        const url = `https://wa.me/${waNumber}?text=${encodeURIComponent(text)}`;
         window.open(url, '_blank');
     };
 
@@ -511,25 +513,25 @@ export default function ProductVariationSelector({ product, onImageChange, baseW
                 {/* CTA BUTTON WA */}
                 <button
                     onClick={handlePesan}
-                    disabled={!baseWaNumber}
+                    disabled={!waNumber}
                     style={{
                         flex: "1 1 auto", // Takes remaining space
                         height: "44px",
                         padding: "0 12px",
                         borderRadius: 12,
-                        background: baseWaNumber ? "#D4AF37" : "#cbd5e1", // Golden
+                        background: waNumber ? "#D4AF37" : "#cbd5e1", // Golden
                         color: "#020617", // Very Dark Navy
                         fontWeight: 700,
                         fontSize: "14px", // Readable size
                         border: "none",
-                        cursor: baseWaNumber ? "pointer" : "not-allowed",
+                        cursor: waNumber ? "pointer" : "not-allowed",
                         display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
                         whiteSpace: "nowrap",
                         overflow: "hidden",
                         textOverflow: "ellipsis"
                     }}
                 >
-                    {baseWaNumber && (
+                    {waNumber && (
                         // eslint-disable-next-line @next/next/no-img-element
                         <SecureImage
                             src="/uploads/WA_navy.png"
@@ -543,7 +545,7 @@ export default function ProductVariationSelector({ product, onImageChange, baseW
 
             {/* Notice for details (below buttons) */}
             <div>
-                {!baseWaNumber && (
+                {!waNumber && (
                     <div style={{ marginTop: 8, fontSize: 12, color: "#ef4444" }}>
                         Nomor WhatsApp belum diatur oleh Admin.
                     </div>

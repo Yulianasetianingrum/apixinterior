@@ -9,17 +9,10 @@ export const metadata = {
 };
 
 export default async function CartPage() {
-    // Fetch primary WhatsApp number from database
-    const hubungi = await prisma.hubungi.findFirst({
-        orderBy: { prioritas: 'desc' }
-    });
-
-    const waNumber = hubungi?.nomor || "628123456789"; // fallback
-
     return (
         <div className="min-h-screen bg-white">
             <Navbar />
-            <CartPageClient waNumber={waNumber} />
+            <CartPageClient />
         </div>
     );
 }
