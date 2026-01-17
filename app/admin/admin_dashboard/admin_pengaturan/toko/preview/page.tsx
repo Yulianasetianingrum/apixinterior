@@ -2492,36 +2492,8 @@ export default async function TokoPreviewDraftPage({
                       }}
                     >
                       <div className={ui.footerLayout}>
-                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 30 }}>
-                          {(() => {
-                            const tags = Array.isArray((cfg as any).footerTags) ? (cfg as any).footerTags : [];
-                            if (tags.length === 0) return <div style={{ opacity: 0.5 }}>No tags (preview)</div>;
-
-                            const mid = Math.ceil(tags.length / 2);
-                            const leftTags = tags.slice(0, mid);
-                            const rightTags = tags.slice(mid);
-
-                            return (
-                              <>
-                                <div className={ui.footerTagsGrid}>
-                                  {leftTags.map((tag: any, idx: number) => (
-                                    <span key={idx} style={{ color: "inherit", opacity: 0.6, fontSize: 12 }}>
-                                      {tag.label}
-                                    </span>
-                                  ))}
-                                </div>
-                                {rightTags.length > 0 && (
-                                  <div className={ui.footerTagsGrid}>
-                                    {rightTags.map((tag: any, idx: number) => (
-                                      <span key={idx} style={{ color: "inherit", opacity: 0.6, fontSize: 12 }}>
-                                        {tag.label}
-                                      </span>
-                                    ))}
-                                  </div>
-                                )}
-                              </>
-                            );
-                          })()}
+                        <div className={ui.footerLeftStack}>
+                          {/* Tags moved below columns to match live site */}
                         </div>
 
                         {/* RIGHT: Info Stack (Split Height) */}
@@ -2536,16 +2508,15 @@ export default async function TokoPreviewDraftPage({
                                 height: 40,
                                 borderRadius: "999px",
                                 overflow: "hidden",
-                                background: "#0f172a",
-                                border: `1px solid ${colors.element}66`
+                                background: (() => {
+                                  const c = colors.element.toLowerCase();
+                                  if (c.includes("#ffffff") || c.includes("white") || c.includes("255,255,255")) return "#0b1d3a";
+                                  return "#ffffff";
+                                })(),
+                                border: `1px solid ${colors.element}33`
                               }}>
                                 <Image
-                                  src={(() => {
-                                    const c = colors.element.toLowerCase();
-                                    if (c.includes("#ffffff") || c.includes("white") || c.includes("255,255,255")) return logoWhite;
-                                    if (c.includes("#0b1d3a") || c.includes("navy") || c.includes("#0f172a")) return logoBlue;
-                                    return logoGolden;
-                                  })()}
+                                  src={getFooterIconPath("LOGO", colors.element)}
                                   alt={namaToko}
                                   fill
                                   sizes="40px"
@@ -2668,6 +2639,19 @@ export default async function TokoPreviewDraftPage({
                           </div>
                         </div>
                       </div>
+
+                      {/* Tag Grid (SEO Text Only) - Match GlobalFooter.tsx */}
+                      {Array.isArray((cfg as any).footerTags) && (cfg as any).footerTags.length > 0 && (
+                        <div style={{ maxWidth: 1200, margin: "40px auto 0", borderTop: `1px solid ${colors.divider}`, paddingTop: 30 }}>
+                          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "10px 24px" }}>
+                            {(cfg as any).footerTags.map((tag: any, idx: number) => (
+                              <span key={idx} style={{ color: "inherit", opacity: 0.6, fontSize: 12, cursor: "default" }}>
+                                {tag.label}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
 
                       <div style={{ borderTop: `1px solid ${colors.divider}`, marginTop: 60, paddingTop: 24, textAlign: "center", fontSize: 13, opacity: 0.6 }}>
                         {(cfg as any).copyright ? (cfg as any).copyright : (

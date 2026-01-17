@@ -71,16 +71,17 @@ export default async function GlobalFooter() {
                                 height: 40,
                                 borderRadius: "999px",
                                 overflow: "hidden",
-                                background: "#0f172a",
-                                border: `1px solid ${colors.element}66`
+                                background: (() => {
+                                    const c = colors.element.toLowerCase();
+                                    // If element is white/light, background should be navy (Contrast)
+                                    // If element is gold/navy, background should be white (Standard navbar look)
+                                    if (c.includes("#ffffff") || c.includes("white") || c.includes("255,255,255")) return "#0b1d3a";
+                                    return "#ffffff";
+                                })(),
+                                border: `1px solid ${colors.element}33`
                             }}>
                                 <Image
-                                    src={(() => {
-                                        const c = colors.element.toLowerCase();
-                                        if (c.includes("#ffffff") || c.includes("white") || c.includes("255,255,255")) return logoWhite;
-                                        if (c.includes("#0b1d3a") || c.includes("navy") || c.includes("#0f172a")) return logoBlue;
-                                        return logoGolden;
-                                    })()}
+                                    src={getFooterIconPath("LOGO", colors.element)}
                                     alt={namaToko}
                                     fill
                                     sizes="40px"

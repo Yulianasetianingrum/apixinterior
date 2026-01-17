@@ -34,6 +34,44 @@ export default function FooterGeneralConfig({
 
     return (
         <div className={styles.sectionEditGrid}>
+            {/* COPYRIGHT (Top Priority Highlight) */}
+            <div className={styles.fieldGroup} style={{ gridColumn: "1 / -1", marginBottom: 20, padding: "20px", background: "#f8fafc", borderRadius: 12, border: "2px solid #3b82f6" }}>
+                <label className={styles.label} style={{ fontSize: "1.1rem", fontWeight: 800, color: "#1e40af", display: "flex", alignItems: "center", gap: 8 }}>
+                    <span>📅</span> Teks Copyright Footer (Tahun)
+                </label>
+                <div style={{ display: "flex", gap: 10, marginTop: 12 }}>
+                    <input
+                        type="text"
+                        value={copyright}
+                        onChange={(e) => setCopyright(e.target.value)}
+                        className={styles.input}
+                        style={{ fontSize: "1rem", height: "46px", border: "1px solid #94a3b8" }}
+                        placeholder={`© ${new Date().getFullYear()} Apix Interior. All rights reserved.`}
+                    />
+                    <button
+                        type="button"
+                        onClick={() => setCopyright(`© ${new Date().getFullYear()} Apix Interior. All rights reserved.`)}
+                        style={{
+                            padding: "0 24px",
+                            background: "#1e40af",
+                            color: "white",
+                            border: "none",
+                            borderRadius: 8,
+                            fontSize: 14,
+                            fontWeight: 700,
+                            cursor: "pointer",
+                            whiteSpace: "nowrap",
+                            boxShadow: "0 4px 10px rgba(30, 64, 175, 0.2)"
+                        }}
+                    >
+                        Pasang Tahun {new Date().getFullYear()}
+                    </button>
+                </div>
+                <p style={{ fontSize: 13, color: "#475569", marginTop: 10 }}>
+                    <b>PENTING:</b> Teks ini akan muncul di bagian paling bawah website Anda. Klik tombol biru untuk otomatis update ke tahun {new Date().getFullYear()}.
+                </p>
+            </div>
+
             {/* CONTACT TOGGLE */}
             <div style={{ gridColumn: "1 / -1", marginBottom: 12, padding: "12px", background: "#f0fdf4", borderRadius: 6, border: "1px solid #bbf7d0" }}>
                 <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
@@ -134,36 +172,6 @@ export default function FooterGeneralConfig({
                     </div>
                 </div>
             )}
-
-            <div className={styles.fieldGroup} style={{ gridColumn: "1 / -1" }}>
-                <label className={styles.label}>Teks Copyright</label>
-                <div style={{ display: "flex", gap: 10 }}>
-                    <input
-                        type="text"
-                        value={copyright}
-                        onChange={(e) => setCopyright(e.target.value)}
-                        className={styles.input}
-                        placeholder={`© ${new Date().getFullYear()} Apix Interior. All rights reserved.`}
-                    />
-                    <button
-                        type="button"
-                        onClick={() => setCopyright(`© ${new Date().getFullYear()} Apix Interior. All rights reserved.`)}
-                        style={{
-                            padding: "0 15px",
-                            background: "#0f172a",
-                            color: "white",
-                            border: "none",
-                            borderRadius: 6,
-                            fontSize: 12,
-                            cursor: "pointer",
-                            whiteSpace: "nowrap"
-                        }}
-                    >
-                        Update Tahun ({new Date().getFullYear()})
-                    </button>
-                </div>
-                <p style={{ fontSize: 12, opacity: 0.6, marginTop: 4 }}>Warna teks copyright akan otomatis mengikuti warna teks "Tags".</p>
-            </div>
         </div>
     );
 }

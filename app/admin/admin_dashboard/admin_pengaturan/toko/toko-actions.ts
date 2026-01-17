@@ -448,12 +448,6 @@ export async function saveContactConfig(formData: FormData) {
         if (v) buttonLabels[key] = v;
     }
 
-    try {
-        await validateExistence({ hubungiIds, ...(imageId ? { imageIds: [imageId] } : {}) });
-    } catch (e: any) {
-        return redirectBack({ error: encodeURIComponent(e?.message ?? "Validasi gagal.") });
-    }
-
     await updateDraftConfigPreserveTheme(
         id,
         {
