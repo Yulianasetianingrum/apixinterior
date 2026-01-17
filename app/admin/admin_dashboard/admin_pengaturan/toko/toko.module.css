@@ -25,9 +25,17 @@
     radial-gradient(circle at 82% 12%, rgba(227, 196, 74, .12), transparent 26%),
     linear-gradient(145deg, var(--navy), var(--navy2));
   color: #eef2ff;
-  min-height: 100vh;
+  /* min-height: 100vh; -- Removed to fit in dashboard main */
+  background:
+    radial-gradient(circle at 12% 10%, rgba(227, 196, 74, .14), transparent 30%),
+    radial-gradient(circle at 82% 12%, rgba(227, 196, 74, .12), transparent 26%),
+    linear-gradient(145deg, var(--navy), var(--navy2));
+  color: #eef2ff;
 
-  padding: 86px 14px 28px;
+  /* padding: 86px 14px 28px; -- Reduced padding as parent handles it */
+  padding: 0;
+  border-radius: 12px;
+  /* Optional: adds nice corner if it's a card-like container */
   font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
 }
 
