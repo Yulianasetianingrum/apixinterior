@@ -83,7 +83,8 @@
 
 .sectionSubheading {
   font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--text-muted);
+  /* FIXED: Use dark muted color for white background */
   margin-bottom: 1.5rem;
 }
 
@@ -99,9 +100,10 @@
 .emptyState {
   text-align: center;
   padding: 3rem;
-  border: 2px dashed rgba(255, 255, 255, 0.1);
+  border: 2px dashed var(--border);
   border-radius: 12px;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-muted);
+  /* FIXED: Dark color for white card */
   margin-bottom: 2rem;
 }
 
@@ -138,6 +140,12 @@
   .grid2 {
     grid-template-columns: 1fr;
   }
+}
+
+.input::placeholder,
+.select::placeholder {
+  color: rgba(10, 31, 68, 0.4);
+  /* Visible but distinct placeholder */
 }
 
 @media (min-width: 1024px) {
@@ -543,9 +551,10 @@
 .emptyText {
   color: var(--text-muted);
   font-style: italic;
-  padding: 20px;
+  padding: 30px;
   text-align: center;
   background: #f8fafc;
+  border: 1px dashed var(--border);
   border-radius: var(--radius-md);
 }
 
@@ -639,6 +648,14 @@
   align-items: center;
   gap: 8px;
   border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.sectionDescription {
+  font-size: 11px;
+  color: var(--text-muted);
+  /* Dark color for readability */
+  line-height: 1.4;
+  margin-right: 12px;
 }
 
 /* Status Badges */
