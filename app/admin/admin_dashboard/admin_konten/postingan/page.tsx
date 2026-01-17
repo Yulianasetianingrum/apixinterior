@@ -448,24 +448,145 @@ export default function AdminPostinganPage() {
 
             {/* GALLERY MODAL */}
             {galleryOpen && (
-                <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999 }} onClick={() => setGalleryOpen(false)}>
-                    <div style={{ ...cardStyle, width: "90%", maxWidth: 800, maxHeight: "80vh", display: "flex", flexDirection: "column" }} onClick={(e) => e.stopPropagation()}>
-                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
-                            <h3 style={{ margin: 0 }}>Pilih Gambar dari Galeri</h3>
-                            <button onClick={() => setGalleryOpen(false)} style={{ background: "none", border: "none", fontSize: 24, cursor: "pointer" }}>×</button>
+                <div style={{
+                    position: "fixed", inset: 0,
+                    background: "rgba(10, 20, 40, 0.75)",
+                    backdropFilter: "blur(8px)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    zIndex: 9999,
+                    animation: "fadeIn 0.2s ease-out"
+                }} onClick={() => setGalleryOpen(false)}>
+
+                    {/* Keyframes for animation injected inline */}
+                    <style dangerouslySetInnerHTML={{
+                        __html: `
+                        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+                        @keyframes scaleIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+                        .gallery-scroll::-webkit-scrollbar { width: 8px; }
+                        .gallery-scroll::-webkit-scrollbar-track { background: transparent; }
+                        .gallery-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; }
+                        .gallery-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+                    `}} />
+
+                    <div style={{
+                        ...cardStyle,
+                        width: "95%", maxWidth: 1100,
+                        height: "85vh",
+                        display: "flex", flexDirection: "column",
+                        animation: "scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+                        padding: 0,
+                        overflow: "hidden",
+                        border: darkMode ? "1px solid #334155" : "1px solid rgba(255,255,255,0.8)",
+                        boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)"
+                    }} onClick={(e) => e.stopPropagation()}>
+
+                        {/* Header */}
+                        <div style={{
+                            padding: "20px 24px",
+                            borderBottom: darkMode ? "1px solid #334155" : "1px solid #e2e8f0",
+                            display: "flex", justifyContent: "space-between", alignItems: "center",
+                            background: darkMode ? "#1e293b" : "#fff"
+                        }}>
+                            <div>
+                                <h3 style={{ margin: "0 0 4px 0", fontSize: 18, fontWeight: 700 }}>Pilih Gambar dari Galeri</h3>
+                                <p style={{ margin: 0, fontSize: 13, opacity: 0.6 }}>Klik gambar untuk menjadikannya cover artikel.</p>
+                            </div>
+                            <button onClick={() => setGalleryOpen(false)} style={{
+                                background: darkMode ? "#334155" : "#f1f5f9",
+                                border: "none", fontSize: 20, fontWeight: 600,
+                                width: 36, height: 36, borderRadius: "50%",
+                                display: "flex", alignItems: "center", justifyContent: "center",
+                                cursor: "pointer", color: "inherit", transition: "all 0.2s"
+                            }}>×</button>
                         </div>
 
-                        <div style={{ marginBottom: 16 }}>
-                            <input style={inputStyle} type="text" placeholder="Cari gambar..." value={gallerySearch} onChange={(e) => setGallerySearch(e.target.value)} />
+                        {/* Search Bar */}
+                        <div style={{ padding: "16px 24px", background: darkMode ? "#0f172a" : "#f8fafc" }}>
+                            <div style={{ position: "relative" }}>
+                                <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", opacity: 0.5 }}>🔍</span>
+                                <input
+                                    style={{ ...inputStyle, paddingLeft: 36, height: 44, fontSize: 15 }}
+                                    type="text"
+                                    placeholder="Cari gambar berdasarkan nama..."
+                                    value={gallerySearch}
+                                    onChange={(e) => setGallerySearch(e.target.value)}
+                                    autoFocus
+                                />
+                            </div>
                         </div>
 
-                        <div style={{ flex: 1, overflowY: "auto", display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))", gap: 12 }}>
-                            {galleryLoading ? <p>Memuat galeri...</p> : filteredGallery.map(img => (
-                                <div key={img.id} style={{ cursor: "pointer", border: "2px solid transparent", borderRadius: 6, overflow: "hidden", position: "relative", aspectRatio: "1/1" }} onClick={() => selectImage(img.url)}>
-                                    <img src={img.url} alt={img.title || "img"} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                                    <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "rgba(0,0,0,0.6)", color: "#fff", fontSize: 10, padding: 4, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{img.title || "Untitled"}</div>
+                        {/* Grid */}
+                        <div className="gallery-scroll" style={{
+                            flex: 1, overflowY: "auto",
+                            padding: "24px",
+                            background: darkMode ? "#0f172a" : "#f8fafc"
+                        }}>
+                            {galleryLoading ? (
+                                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: 200, opacity: 0.6 }}>
+                                    <div style={{ fontSize: 32, marginBottom: 16 }}>⏳</div>
+                                    <div>Memuat galeri...</div>
                                 </div>
-                            ))}
+                            ) : (
+                                <div style={{
+                                    display: "grid",
+                                    gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+                                    gap: 20
+                                }}>
+                                    {filteredGallery.map(img => {
+                                        const isSelected = formCoverImage === img.url;
+                                        return (
+                                            <div key={img.id}
+                                                title={img.title || "Untitled"}
+                                                style={{
+                                                    cursor: "pointer",
+                                                    borderRadius: 12,
+                                                    overflow: "hidden",
+                                                    position: "relative",
+                                                    aspectRatio: "4/3",
+                                                    border: isSelected ? "3px solid #d4af37" : (darkMode ? "1px solid #334155" : "1px solid #e2e8f0"),
+                                                    background: darkMode ? "#1e293b" : "#fff",
+                                                    boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                                                    transition: "transform 0.2s, box-shadow 0.2s",
+                                                }}
+                                                onClick={() => selectImage(img.url)}
+                                                onMouseEnter={(e) => {
+                                                    e.currentTarget.style.transform = "translateY(-4px)";
+                                                    e.currentTarget.style.boxShadow = "0 10px 15px -3px rgba(0, 0, 0, 0.1)";
+                                                }}
+                                                onMouseLeave={(e) => {
+                                                    e.currentTarget.style.transform = "none";
+                                                    e.currentTarget.style.boxShadow = "0 4px 6px -1px rgba(0, 0, 0, 0.1)";
+                                                }}
+                                            >
+                                                <img src={img.url} alt={img.title || "img"} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+
+                                                {/* Overlay Gradient */}
+                                                <div style={{
+                                                    position: "absolute", inset: 0,
+                                                    background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 30%, transparent 100%)",
+                                                    display: "flex", alignItems: "flex-end", padding: 12,
+                                                    opacity: 0.9
+                                                }}>
+                                                    <div style={{ color: "#fff", fontSize: 13, fontWeight: 500, lineHeight: 1.3, textShadow: "0 1px 2px rgba(0,0,0,0.5)" }}>
+                                                        {img.title || "Untitled"}
+                                                    </div>
+                                                </div>
+
+                                                {/* Selected Badge */}
+                                                {isSelected && (
+                                                    <div style={{
+                                                        position: "absolute", top: 10, right: 10,
+                                                        background: "#d4af37", color: "#0b1d3a",
+                                                        width: 24, height: 24, borderRadius: "50%",
+                                                        display: "flex", alignItems: "center", justifyContent: "center",
+                                                        fontWeight: 700, fontSize: 14, boxShadow: "0 2px 4px rgba(0,0,0,0.2)"
+                                                    }}>✓</div>
+                                                )}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

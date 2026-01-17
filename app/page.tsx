@@ -1335,8 +1335,6 @@ export default async function HomePage({
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 30 }}>
                     {(() => {
                       const tags = Array.isArray(cfg.footerTags) ? cfg.footerTags : [];
-                      // Allow rendering even if tags are empty (so logo/contact still shows)
-                      // if (tags.length === 0) return null; 
 
                       const mid = Math.ceil(tags.length / 2);
                       const leftTags = tags.slice(0, mid);
@@ -1403,8 +1401,7 @@ export default async function HomePage({
                             const waCfg = cfg.whatsapp;
                             const useGlobal = cfg.useGlobalContact;
                             let globalWa = "";
-                            // Need access to hubungiMap (globally available as map of cached hubungi)
-                            // In page.tsx rendering logic, we have hubungiMap.
+
                             if (useGlobal && hubungiMap && hubungiMap.size > 0) {
                               for (const h of hubungiMap.values()) {
                                 if (h.prioritas) { globalWa = h.nomor; break; }
@@ -1419,7 +1416,6 @@ export default async function HomePage({
 
                             return (
                               <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, fontWeight: 500, opacity: 0.7 }}>
-                                {/* Use footer icon helper or emoji if path not avail? We have getFooterIconPath */}
                                 <img src={getFooterIconPath("WA", colors.element)} alt="WA" style={{ width: 14, height: 14, opacity: 0.8 }} />
                                 <a href={`https://wa.me/${linkWa}`} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none", color: "inherit", fontWeight: 600 }}>
                                   {displayWa}
@@ -1430,7 +1426,6 @@ export default async function HomePage({
 
                           {cfg.email && (
                             <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, opacity: 0.7, fontWeight: 500 }}>
-                              {/* Use generic envelope or icon */}
                               <span>✉</span>
                               <span>{cfg.email}</span>
                             </div>
@@ -1446,7 +1441,6 @@ export default async function HomePage({
                                   items.push({ key, url: val.url, label: val.nama || key });
                                 }
                               } else {
-                                // Manual fallback
                                 const ig = cfg.instagram;
                                 const fb = cfg.facebook;
                                 if (ig) items.push({ key: "instagram", url: `https://instagram.com/${ig.replace("@", "")}`, label: "IG" });
@@ -1469,6 +1463,12 @@ export default async function HomePage({
                     </div>
                   </div>
                 </div>
+                {/* Copyright Bar */}
+                {cfg.copyright && (
+                  <div style={{ borderTop: "1px solid rgba(0,0,0,0.08)", marginTop: 30, paddingTop: 16, textAlign: "center", fontSize: 12, opacity: 0.6 }}>
+                    {cfg.copyright}
+                  </div>
+                )}
               </section>
             );
           }

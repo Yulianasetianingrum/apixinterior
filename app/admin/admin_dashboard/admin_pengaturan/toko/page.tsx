@@ -335,6 +335,7 @@ type SectionTypeId =
   | "CONTACT"
   | "SOCIAL"
   | "CUSTOM_PROMO"
+  | "TESTIMONIALS"
   | "FOOTER";
 
 type SectionDef = {
@@ -505,6 +506,18 @@ const SECTION_DEFS: SectionDef[] = [
       layout: "carousel",
       sectionBgTheme: "FOLLOW_NAVBAR",
       voucherImageIds: [],
+    },
+  },
+  {
+    type: "TESTIMONIALS",
+    label: "Ulasan / Testimoni",
+    description: "Tampilkan ulasan pelanggan (sumber Google Maps atau manual).",
+    defaultSlug: "testimoni",
+    defaultConfig: {
+      title: "Apa Kata Mereka?",
+      subtitle: "Ulasan dari pelanggan setia kami",
+      mapsUrl: "",
+      reviews: [],
     },
   },
   {
@@ -3253,7 +3266,8 @@ async function saveFooterConfig(formData: FormData) {
       menuLinks,
       footerTags,
       useGlobalContact,
-      useGlobalSocial
+      useGlobalSocial,
+      copyright: (formData.get("copyright") as string | null)?.trim() ?? "",
     },
     { title, slug }
   );
