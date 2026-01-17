@@ -38,8 +38,9 @@ export default function AdminLayoutFrame({ children }: { children: ReactNode }) 
         }
     };
 
-    // Skip sidebar for preview routes
-    if (pathname.includes('/preview')) {
+    // Skip sidebar for preview routes OR the main Toko settings page (which has its own sidebar)
+    const isTokoSettings = pathname.includes('/admin_pengaturan/toko');
+    if (pathname.includes('/preview') || isTokoSettings) {
         return <>{children}</>;
     }
 

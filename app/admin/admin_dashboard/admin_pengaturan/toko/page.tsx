@@ -38,6 +38,17 @@ import {
   parseCustomPromoBgTheme,
   redirectBack,
 } from "./toko-utils";
+import {
+  FaArrowLeft,
+  FaTimes,
+  FaTrash,
+  FaPlus,
+  FaGripVertical,
+  FaChevronRight,
+  FaCheckCircle,
+  FaMinusCircle
+} from "react-icons/fa6";
+
 
 
 // selalu ambil data terbaru
@@ -4600,8 +4611,10 @@ export default async function TokoPengaturanPage({
           className={styles.secondaryButton}
           style={{ marginLeft: "auto", textDecoration: "none" }}
         >
-          &lt;- Kembali
+          <FaArrowLeft /> Kembali
         </Link>
+
+
       </header>
 
       <label htmlFor="tokoSidebarToggle" className={styles.sidebarOverlay} aria-label="Tutup menu" />
@@ -4619,8 +4632,9 @@ export default async function TokoPengaturanPage({
           </div>
 
           <label htmlFor="tokoSidebarToggle" className={styles.sidebarClose} aria-label="Tutup menu">
-            X
+            <FaTimes />
           </label>
+
         </div>
 
         <div style={{ padding: "0 16px 12px" }}>
@@ -4629,8 +4643,9 @@ export default async function TokoPengaturanPage({
 
         <nav className={styles.sidebarNav}>
           <a href="/admin/admin_dashboard/admin_pengaturan" className={`${styles.sidebarLink} ${styles.sidebarLinkBack}`}>
-            &lt;- Kembali ke Pengaturan
+            <FaArrowLeft style={{ fontSize: '12px' }} /> Kembali ke Pengaturan
           </a>
+
           <a href="#preview-theme" className={`${styles.sidebarLink} ${styles.sidebarLinkPreview}`}>
             Preview &amp; Theme
           </a>
@@ -4694,8 +4709,9 @@ export default async function TokoPengaturanPage({
 
           <form action={createTheme}>
             <button type="submit" className={styles.primaryButton} style={{ fontWeight: 800 }}>
-              + Theme
+              <FaPlus /> Theme
             </button>
+
           </form>
         </div>
 
@@ -4903,9 +4919,11 @@ export default async function TokoPengaturanPage({
           <div>
             <h2 className={styles.sectionHeading}>Urutkan Section Draft (Drag &amp; Drop)</h2>
             <p className={styles.sectionSubheading}>
-              Tarik handle <span className={styles.dragHandle}></span> ke atas/bawah untuk mengubah urutan section di
+              Tarik handle <span className={styles.dragHandle}><FaGripVertical /></span> ke atas/bawah untuk mengubah urutan section di
               homepage draft. Setelah diurutkan, klik tombol &quot;Simpan Urutan&quot;.
             </p>
+
+
           </div>
           <button type="button" className={`${styles.smallButton} js-save-order`}>
             Simpan Urutan
@@ -4932,8 +4950,10 @@ export default async function TokoPengaturanPage({
                 >
                   <div className={styles.sectionTopRow}>
                     <div className={styles.sectionTopLeft}>
-                      <span className={styles.dragHandle}></span>
+                      <span className={styles.dragHandle}><FaGripVertical /></span>
                       <span className={styles.sectionOrder}>#{index + 1}</span>
+
+
                       <span className={`${styles.sectionTypePill} ${(styles as any)[`pill_${section.type}`] ?? ""}`}>
                         <span className={styles.sectionTypeIcon} aria-hidden="true">{SECTION_ICON[section.type] ?? ""}</span>
                         {label}

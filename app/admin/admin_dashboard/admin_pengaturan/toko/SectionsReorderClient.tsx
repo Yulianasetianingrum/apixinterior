@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import React, { useState } from "react";
+import { FaGripVertical } from "react-icons/fa6";
 
 type SectionItem = {
   id: number;
@@ -119,10 +120,10 @@ export default function SectionsReorderClient({
             <div className="flex items-center gap-2">
               {/* HANDLE :: /  */}
               <span
-                className="font-mono text-lg leading-none text-gray-400 select-none"
+                className="text-gray-400 cursor-grab hover:text-gray-600 transition-colors"
                 aria-hidden="true"
               >
-                
+                <FaGripVertical />
               </span>
               <span className="w-4 text-[11px] text-gray-400 text-right">
                 {index + 1}

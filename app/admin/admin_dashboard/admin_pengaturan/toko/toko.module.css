@@ -8,10 +8,16 @@
   --gold: #c6a100;
   --gold2: #e3c44a;
 
-  --text: var(--navy);
-  --muted: rgba(10, 31, 68, .62);
+  /* Abstracted variables used by components */
+  --primary: var(--gold);
+  --primary-hover: var(--gold2);
+  --text-main: var(--navy);
+  --text-muted: rgba(10, 31, 68, .62);
+  --bg-card: var(--white);
+  --bg-page: linear-gradient(145deg, var(--navy), var(--navy2));
   --border: rgba(198, 161, 0, .32);
   --borderStrong: rgba(198, 161, 0, .46);
+  --radius-md: 10px;
 
   /* flat */
   --shadowTiny: 0 8px 26px rgba(0, 0, 0, .18);
@@ -27,7 +33,8 @@
   color: #eef2ff;
   min-height: 100vh;
 
-  padding: 86px 14px 28px;
+  /* Reset padding as we are now standalone */
+  padding: 30px 14px 28px;
   font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
 }
 
@@ -50,12 +57,13 @@
   color: var(--navy);
   border: 1px solid rgba(198, 161, 0, .48);
   border-radius: var(--r2);
-  padding: 14px;
+  padding: 18px;
   box-shadow: var(--shadowTiny);
   margin: 14px 0;
   scroll-margin-top: 96px;
   /* align anchor scroll with fixed header */
 }
+
 
 .sectionsHeader {
   display: flex;
@@ -166,6 +174,14 @@
     grid-template-columns: 1fr;
   }
 }
+
+@media (min-width: 1024px) {
+  .page {
+    margin-left: 280px;
+    /* Space for local sidebar */
+  }
+}
+
 
 
 
@@ -314,9 +330,10 @@
 @media (min-width: 1024px) {
   .pageTopbar {
     left: 280px;
-    /* Sidebar width */
+    /* Aligned with local sidebar width */
   }
 }
+
 
 .pageTopbarTitle {
   font-size: 14px;
@@ -351,13 +368,15 @@
   left: 0;
   bottom: 0;
   width: 280px;
-  background: var(--bg-card);
+  background: var(--navy);
+  /* Deep Navy back for sidebar */
   border-right: 1px solid var(--border);
   z-index: 50;
   transform: translateX(-100%);
   transition: transform 0.3s ease;
   overflow-y: auto;
 }
+
 
 @media (min-width: 1024px) {
   .sidebar {
@@ -395,10 +414,35 @@
 }
 
 .sidebarBrand {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--primary);
-  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sidebarBrandTitle {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--gold);
+  line-height: 1.2;
+}
+
+.sidebarBrandSub {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.sidebarAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  color: var(--navy);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 20px;
+  flex-shrink: 0;
 }
 
 .sidebarNav {
@@ -422,9 +466,10 @@
 }
 
 .sidebarLink:hover {
-  background: #f1f5f9;
-  color: var(--primary);
+  background: var(--gold);
+  color: var(--navy);
 }
+
 
 /* Active/Featured Links */
 .sidebarLinkBack,
@@ -433,10 +478,19 @@
 .sidebarLinkUrutkan,
 .sidebarLinkTambah {
   font-weight: 600;
-  color: var(--primary);
-  background: #f8fafc;
+  color: #fff;
+  /* White text for these featured links */
+  background: var(--navy2);
+  /* Dark background */
   border: 1px solid var(--border);
 }
+
+.sidebarLinkActive {
+  background: var(--gold);
+  color: var(--navy);
+  font-weight: 700;
+}
+
 
 .sidebarLinkBack:hover,
 .sidebarLinkPreview:hover,
@@ -538,4 +592,55 @@
 .sidebar::-webkit-scrollbar-thumb {
   background-color: #cbd5e1;
   border-radius: 99px;
+}
+
+.dragHandle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 32px;
+  cursor: grab;
+  color: var(--gold);
+  opacity: 0.6;
+  transition: opacity 0.2s, transform 0.2s;
+  padding: 4px;
+}
+
+.dragHandle:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.dragHandle:active {
+  cursor: grabbing;
+}
+
+.dragHandle::before {
+  content: "::::";
+  font-family: monospace;
+  font-weight: bold;
+  letter-spacing: -2px;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.sidebarClose {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #fff;
+  opacity: 0.8;
+  transition: all 0.2s;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+.sidebarClose:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
 }
