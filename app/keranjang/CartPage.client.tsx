@@ -7,6 +7,7 @@ import Link from "next/link";
 import { FaTrash, FaMinus, FaPlus, FaWhatsapp } from "react-icons/fa6";
 import { useState, useEffect } from "react";
 import styles from "./keranjang.module.css";
+import { useRouter } from "next/navigation";
 import SecureImage from "@/app/components/SecureImage";
 
 interface CartPageClientProps {
@@ -39,6 +40,7 @@ const ensureImageUrl = (url: string | null | undefined) => {
 
 export default function CartPageClient({ waNumber }: CartPageClientProps) {
     const { items, updateQuantity, removeFromCart, totalPrice, totalItems } = useCart();
+    const router = useRouter();
     const [isClient, setIsClient] = useState(false);
 
     useEffect(() => {
