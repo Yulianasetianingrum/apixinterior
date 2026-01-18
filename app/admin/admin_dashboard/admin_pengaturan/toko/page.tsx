@@ -1906,7 +1906,8 @@ async function deleteTheme(formData: FormData) {
   ]);
 
   revalidatePath(ADMIN_TOKO_PATH);
-  return redirectBack({ notice: encodeURIComponent("Theme berhasil dihapus.") });
+  // Redirect explicitly to base path to avoid "Referer" resurrecting the deleted theme.
+  return redirect(`${ADMIN_TOKO_PATH}?notice=${encodeURIComponent("Theme berhasil dihapus.")}`);
 }
 
 

@@ -14,6 +14,8 @@ interface ProductFilterProps {
     initialMinPrice?: string;
     initialMaxPrice?: string;
     initialSort?: string;
+    isOpen?: boolean;
+    setIsOpen?: (v: boolean) => void;
 }
 
 export default function ProductFilter({
@@ -25,6 +27,8 @@ export default function ProductFilter({
     initialMinPrice,
     initialMaxPrice,
     initialSort,
+    isOpen: controlledIsOpen,
+    setIsOpen: controlledSetIsOpen,
 }: ProductFilterProps) {
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -35,7 +39,12 @@ export default function ProductFilter({
     const [minPrice, setMinPrice] = useState(initialMinPrice ?? searchParams.get("min") ?? "");
     const [maxPrice, setMaxPrice] = useState(initialMaxPrice ?? searchParams.get("max") ?? "");
     const [sort, setSort] = useState(initialSort ?? searchParams.get("sort") ?? "latest");
-    const [isOpen, setIsOpen] = useState(false);
+
+    // Internal state fallback
+    const [internalIsOpen, setInternalIsOpen] = useState(false);
+
+    const isOpen = controlledIsOpen ?? internalIsOpen;
+    const setIsOpen = controlledSetIsOpen ?? setInternalIsOpen;
 
     const selectedCatName = searchParams.get("cat") ?? selectedCategory ?? "";
     const selectedTagName = searchParams.get("tag") ?? selectedTag ?? "";

@@ -35,6 +35,26 @@
     gap: 20px;
 }
 
+.mobileFilterButton {
+    display: none;
+    align-items: center;
+    padding: 10px 16px;
+    background-color: #fff;
+    border: 1px solid #D4AF37;
+    color: #D4AF37;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    margin-bottom: 24px;
+    transition: all 0.2s;
+}
+
+.mobileFilterButton:hover {
+    background-color: #D4AF37;
+    color: #fff;
+}
+
 /* Tablet & Mobile Responsive */
 @media (max-width: 1024px) {
     .layout {
@@ -44,7 +64,70 @@
     .sidebar {
         width: 100%;
         position: static;
-        margin-bottom: 24px;
+        margin-bottom: 0;
+        /* Sidebar is hidden/fixed on mobile controlled by ProductFilter, 
+           but the container needs to be hidden or zero height if using the drawer mode?
+           Actually `ProductFilter` CSS handles hiding `.sidebar` and making it fixed when open.
+           Wait, `ProductFilter` CSS `.sidebar` has `position: fixed` on mobile.
+           But here `page.module.css` `.sidebar` has styles too.
+           We need to ensure `page.module.css` doesn't conflict.
+           
+           In `ProductFilter.client.tsx`: <div className={`${styles.sidebar} ${isOpen ? styles.open : ""}`}>
+           It uses `ProductFilter.module.css`.
+           
+           In `page.tsx`: <aside className={styles.sidebar}> <ProductFilter.../></aside>
+           The `aside` has `page.module.css` class. The `div` inside has `ProductFilter.module.css`.
+           
+           On mobile, `ProductFilter`'s `div` becomes the fixed drawer. 
+           The wrapper `aside` in `page.tsx` simply stays in flow but empty?
+           Actually the `aside` contains the `ProductFilter`. 
+           If `ProductFilter` becomes fixed/portal-like, the `aside` might be empty of height?
+           
+           Let's check `ProductFilter.module.css` again. `.sidebar` there is the DRAWER.
+           The `aside` in `page.tsx` just wraps it.
+           
+           So effectively:
+           <aside class="page_sidebar"> 
+              <div class="filter_sidebar"> ... </div>
+           </aside>
+           
+           If `filter_sidebar` is `fixed`, `page_sidebar` collapses to 0 height?
+           We should hide `page_sidebar` on mobile visually if we rely on the drawer?
+           Or utilize `mobileFilterButton` to trigger.
+           
+           Let's verify `page.module.css` media query.
+           .sidebar { width: 100%; position: static; margin-bottom: 24px; }
+           
+           If we want the sidebar hidden until clicked:
+           We should probably hide the wrapper `aside` on mobile IF the filter is purely a modal.
+           However, ProductFilter's CSS `.mobileToggle` handles the FAB.
+           
+           Wait, `ProductFilter.client.tsx` renders `<div className={styles.sidebar}>`.
+           And `page.tsx` renders `<aside className={styles.sidebar}>`.
+           These are two different `.sidebar` classes from two different modules.
+           
+           If `ProductFilter`'s component on mobile is `fixed` (drawer), then the `aside` wrapper is just an empty container in the flow?
+           
+           Let's look at `ProductFilter.module.css` again.
+           @media (max-width: 1024px) { .sidebar { position: fixed ... transform: translateX(-100%) } }
+           
+           Yes, the inner div becomes fixed.
+           The outer `aside` (page.css) is `width: 100% position: static`.
+           Since inner is fixed, outer is effectively 0 height unless there's other content.
+        */
+
+        display: none;
+        /* Hide the wrapper aside on mobile, since the inner content becomes a fixed drawer anyway? */
+        /* BUT wait, if we hide the wrapper, we hide the inner component too! display:none kills children. */
+
+        /* So we must NOT hide it. We can leave it. */
+        width: 100%;
+        position: static;
+        margin-bottom: 0;
+    }
+
+    .mobileFilterButton {
+        display: inline-flex;
     }
 
     .grid {

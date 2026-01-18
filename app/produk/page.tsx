@@ -2,6 +2,7 @@ import Navbar from "@/app/navbar/Navbar";
 import { prisma } from "@/lib/prisma";
 import ProductCard from "@/app/components/product/ProductCard.client";
 import ProductFilter from "@/app/components/product/ProductFilter.client";
+import ProductPageClient from "./ProductPageClient";
 import styles from "./page.module.css";
 import GlobalFooter from "@/app/components/GlobalFooter";
 import { Metadata } from "next";
@@ -185,48 +186,43 @@ export default async function ProductListingPage(props: {
     return (
         <div style={{ background: "#ffffff", minHeight: "100vh", fontFamily: "Inter, sans-serif" }}>
             <Navbar />
-            <main className={styles.container}>
-                <h1 className={styles.title}>{pageTitle}</h1>
-
-                <div className={styles.layout}>
-                    <aside className={styles.sidebar}>
-                        <ProductFilter
-                            categories={uniqueCategories}
-                            tags={uniqueTags}
-                            selectedCategory={catName}
-                            selectedTag={tagName}
-                            initialSearch={q}
-                            initialMinPrice={minRaw}
-                            initialMaxPrice={maxRaw}
-                            initialSort={sort}
-                        />
-                    </aside>
-
-                    <div className={styles.mainContent}>
-                        {products.length > 0 ? (
-                            <div className={styles.grid}>
-                                {products.map((p: any, idx: number) => (
-                                    <ProductCard
-                                        key={p.id}
-                                        product={p}
-                                        index={idx}
-                                    />
-                                ))}
-                            </div>
-                        ) : (
-                            <div style={{ textAlign: "center", padding: "40px", color: "#64748b", background: "#f8fafc", borderRadius: "12px", border: "1px dashed #cbd5e1" }}>
-                                <div style={{ fontSize: "24px", marginBottom: "8px" }}>🔍</div>
-                                <div>Tidak ada produk yang ditemukan.</div>
-                                {(q || catName || minPrice !== undefined || maxPrice !== undefined) && (
-                                    <div style={{ fontSize: "14px", marginTop: "4px", color: "#94a3b8" }}>
-                                        Coba kurangi filter pencarian Anda.
-                                    </div>
-                                )}
+            <ProductPageClient
+                title={pageTitle}
+                sidebarSlot={
+                    <ProductFilter
+                        categories={uniqueCategories}
+                        tags={uniqueTags}
+                        selectedCategory={catName}
+                        selectedTag={tagName}
+                        initialSearch={q}
+                        initialMinPrice={minRaw}
+                        initialMaxPrice={maxRaw}
+                        initialSort={sort}
+                    />
+                }
+            >
+                {products.length > 0 ? (
+                    <div className={styles.grid}>
+                        {products.map((p: any, idx: number) => (
+                            <ProductCard
+                                key={p.id}
+                                product={p}
+                                index={idx}
+                            />
+                        ))}
+                    </div>
+                ) : (
+                    <div style={{ textAlign: "center", padding: "40px", color: "#64748b", background: "#f8fafc", borderRadius: "12px", border: "1px dashed #cbd5e1" }}>
+                        <div style={{ fontSize: "24px", marginBottom: "8px" }}>🔍</div>
+                        <div>Tidak ada produk yang ditemukan.</div>
+                        {(q || catName || minPrice !== undefined || maxPrice !== undefined) && (
+                            <div style={{ fontSize: "14px", marginTop: "4px", color: "#94a3b8" }}>
+                                Coba kurangi filter pencarian Anda.
                             </div>
                         )}
                     </div>
-                </div>
-            </main>
+                )}
+            </ProductPageClient>
             <GlobalFooter />
         </div>
     );
