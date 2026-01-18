@@ -1249,7 +1249,11 @@ async function createDraftSection(formData: FormData) {
   revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko");
   revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko/preview");
   revalidatePath("/");
-  return redirectBack({ notice: encodeURIComponent("Section draft berhasil ditambahkan.") });
+  return redirectBack({
+    notice: encodeURIComponent("Section draft berhasil ditambahkan."),
+    anchor: `section-${created.id}`,
+    sectionId: created.id,
+  });
 }
 
 async function updateDraftMeta(formData: FormData) {
