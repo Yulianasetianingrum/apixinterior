@@ -552,6 +552,7 @@ const SECTION_ICON: Record<string, string> = {
   CONTACT: "T",
   SOCIAL: "S",
   CUSTOM_PROMO: "CP",
+  TESTIMONIALS: "TM",
   FOOTER: "F",
 };
 

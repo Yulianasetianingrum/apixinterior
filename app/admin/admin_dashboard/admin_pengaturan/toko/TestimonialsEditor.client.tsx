@@ -18,6 +18,8 @@ type Props = {
 };
 
 export default function TestimonialsEditor({ config, onChange }: Props) {
+    if (!config) return <div style={{ color: "red", padding: 10 }}>Error: Config is missing.</div>;
+
     const [title, setTitle] = useState(config.title ?? "Apa Kata Mereka?");
     const [subtitle, setSubtitle] = useState(config.subtitle ?? "Ulasan dari pelanggan setia kami");
     const [mapsUrl, setMapsUrl] = useState(config.mapsUrl ?? "");
