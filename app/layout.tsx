@@ -104,10 +104,18 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   // Fetch priority WhatsApp number
-  const waRow = await prisma.hubungi.findFirst({
-    orderBy: [{ prioritas: "desc" }, { id: "asc" }],
+  // Fetch priority WhatsApp number
+  let waRow = await prisma.hubungi.findFirst({
+    where: { prioritas: true },
     select: { nomor: true },
   });
+
+  if (!waRow) {
+    waRow = await prisma.hubungi.findFirst({
+      orderBy: { id: "asc" },
+      select: { nomor: true },
+    });
+  }
   const waNumber = waRow?.nomor ?? "";
 
   return (

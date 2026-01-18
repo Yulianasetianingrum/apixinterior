@@ -148,16 +148,16 @@ export async function PATCH(req: NextRequest) {
       );
     }
 
-    // matikan semua prioritas
-    await prisma.hubungi.updateMany({
-      data: { prioritas: false },
-    });
-
-    // aktifkan prioritas untuk satu id
-    const record = await prisma.hubungi.update({
-      where: { id },
-      data: { prioritas: true },
-    });
+    // Gunakan transaction agar atomik (tidak ada jeda waktu di mana semua false)
+    const [_, record] = await prisma.$transaction([
+      prisma.hubungi.updateMany({
+        data: { prioritas: false },
+      }),
+      prisma.hubungi.update({
+        where: { id },
+        data: { prioritas: true },
+      }),
+    ]);
 
     return NextResponse.json(
       { message: "Nomor prioritas berhasil diubah", item: record },
