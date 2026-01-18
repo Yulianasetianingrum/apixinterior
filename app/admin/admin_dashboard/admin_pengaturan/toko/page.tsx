@@ -1235,7 +1235,7 @@ async function createDraftSection(formData: FormData) {
     return redirectBack({ error: encodeURIComponent("Type definition is missing.") });
   }
 
-  await prisma.homepageSectionDraft.create({
+  const created = await prisma.homepageSectionDraft.create({
     data: {
       type: def.type as any,
       title: titleRaw,
