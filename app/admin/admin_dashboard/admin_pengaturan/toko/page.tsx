@@ -4340,7 +4340,25 @@ export default async function TokoPengaturanPage({
   const errorRaw = typeof sp?.error === "string" ? sp.error : "";
   const notice = safeDecode(noticeRaw);
   const error = safeDecode(errorRaw);
-  const requestedThemeKey = normalizeThemeKey(typeof sp?.theme === "string" ? sp.theme : "");
+  const spTheme = typeof sp?.theme === "string" ? sp.theme : "";
+  let requestedThemeKey = "";
+
+  if (spTheme) {
+    requestedThemeKey = normalizeThemeKey(spTheme);
+    await ensureThemeMeta(requestedThemeKey);
+  } else {
+    // If no theme requested, try to use the first existing theme to avoid resurrecting deleted default theme
+    const firstMeta = await prisma.homepageSectionDraft.findFirst({
+      where: { slug: { startsWith: THEME_META_SLUG_PREFIX } },
+      orderBy: { id: "asc" },
+    });
+    if (firstMeta) {
+      requestedThemeKey = getThemeKeyFromRow(firstMeta);
+    } else {
+      requestedThemeKey = DEFAULT_THEME_KEY;
+      await ensureThemeMeta(requestedThemeKey);
+    }
+  }
 
   const buildCloseUrl = (removeKeys: string[]) => {
     const params = new URLSearchParams();
@@ -4362,11 +4380,6 @@ export default async function TokoPengaturanPage({
   };
   const closeNoticeUrl = buildCloseUrl(["notice", "r"]);
   const closeErrorUrl = buildCloseUrl(["error", "r"]);
-
-
-
-  // Ensure meta row exists for the requested theme
-  await ensureThemeMeta(requestedThemeKey);
 
   const [
     navbarSetting,
