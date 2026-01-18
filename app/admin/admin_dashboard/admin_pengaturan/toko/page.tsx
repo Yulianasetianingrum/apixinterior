@@ -4451,6 +4451,24 @@ export default async function TokoPengaturanPage({
     ])
   );
 
+
+  // === EMERGENCY CLEANUP ===
+  // Force delete the known corrupt themes if they are found in the fetch result
+  const corruptKeys = ["theme_mkjikfer_7ejzs", "theme_mki79liq_99yhj"];
+  const corruptIds = (draftSections as any[])
+    .filter(d => {
+      const k = getThemeKeyFromRow(d);
+      return corruptKeys.includes(k);
+    })
+    .map(d => d.id);
+
+  if (corruptIds.length > 0) {
+    console.log("🔥 EMERGENCY CLEANUP: Deleting corrupt theme rows:", corruptIds);
+    await prisma.homepageSectionDraft.deleteMany({
+      where: { id: { in: corruptIds } }
+    });
+  }
+
   // =========================
   // THEME list (hanya theme yang sudah dibuat via meta row)
   // =========================
