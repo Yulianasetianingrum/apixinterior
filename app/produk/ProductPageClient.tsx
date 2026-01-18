@@ -42,7 +42,7 @@ export default function ProductPageClient({
 
                 <div className={styles.layout}>
                     <aside className={styles.sidebar}>
-                        {cloneElement(sidebarSlot, { isOpen, setIsOpen })}
+                        {cloneElement(sidebarSlot as ReactElement<any>, { isOpen, setIsOpen })}
                     </aside>
                     <div className={styles.mainContent}>
                         {children}
