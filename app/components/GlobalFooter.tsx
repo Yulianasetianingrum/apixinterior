@@ -1,13 +1,9 @@
 
 // app/components/GlobalFooter.tsx
-import Image from "next/image";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { getHeroThemeTokens, getFooterIconPath, resolveEffectiveTheme } from "@/lib/theme-utils";
-
-const logoBlue = "/logo/logo_apixinterior_biru.png.png";
-const logoGolden = "/logo/logo_apixinterior_golden.png.png";
-const logoWhite = "/logo/logo_apixinterior_putih.png.png";
+import { getHeroThemeTokens, resolveEffectiveTheme } from "@/lib/theme-utils";
+import { FaLocationDot, FaWhatsapp, FaInstagram, FaFacebook } from "react-icons/fa6";
 
 function normalizeConfig(sectionType: string, raw: unknown) {
     // Minimal normalizer for Footer only
@@ -75,7 +71,7 @@ export default async function GlobalFooter() {
                             }}>{namaToko}</span>
                         </Link>
                         <div style={{ display: "flex", gap: 8 }}>
-                            <img src={getFooterIconPath("LOC", colors.element)} alt="Loc" style={{ width: 14, height: 14, marginTop: 3, opacity: 0.8 }} />
+                            <FaLocationDot style={{ width: 14, height: 14, marginTop: 3, opacity: 0.8, color: colors.element }} />
                             <address style={{ fontStyle: "normal", lineHeight: 1.4, opacity: 0.8, whiteSpace: "pre-line", fontSize: 12 }}>
                                 {(() => {
                                     const useGlobal = (cfg as any).useGlobalContact;
@@ -122,7 +118,7 @@ export default async function GlobalFooter() {
 
                                 return (
                                     <a href={`https://wa.me/${waDisplay.replace("+", "")}`} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none", color: "inherit", fontSize: 12, fontWeight: 500, opacity: 0.7 }}>
-                                        <img src={getFooterIconPath("WA", colors.element)} alt="WA" style={{ width: 14, height: 14, opacity: 0.8 }} />
+                                        <FaWhatsapp style={{ width: 14, height: 14, opacity: 0.8, color: colors.element }} />
                                         <span>WhatsApp Kami</span>
                                     </a>
                                 );
