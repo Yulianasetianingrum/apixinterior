@@ -128,7 +128,14 @@ export default function ProductCard({ product: pRaw, index }: ProductCardProps) 
         } catch { }
 
         const message = `Halo, saya tertarik dengan produk: ${p.nama}`;
-        const cleanNumber = waNumber.replace(/[^\d]/g, "");
+        let cleanNumber = waNumber.replace(/[^\d]/g, "");
+
+        // HARD BLOCK GHOST NUMBER
+        if (cleanNumber.includes("1234567890")) {
+            console.warn("Blocked ghost number in ProductCard:", cleanNumber);
+            cleanNumber = "";
+        }
+
         const waUrl = cleanNumber
             ? `https://wa.me/${cleanNumber}?text=${encodeURIComponent(message)}`
             : "#";
