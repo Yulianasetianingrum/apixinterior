@@ -1319,7 +1319,7 @@ export default function KategoriProdukPage() {
           {/* MODAL KELOLA PRODUK */}
           {modalOpen && modalCategory && (
             <div className={`${styles.modalOverlay} ${styles.aiOverlay}`}>
-              <div className={`${styles.modal} ${styles.aiModal}`}>
+              <div className={`${styles.modal} ${styles.aiModal} ${isDark ? styles.modalDark : ""}`}>
                 <div className={`${styles.modalHeader} ${styles.aiModalHeader}`}>
                   <h2>
                     Kelola Produk: <b>{modalCategory.nama}</b>
@@ -1604,7 +1604,7 @@ export default function KategoriProdukPage() {
           {/* MODAL GENERATE KATEGORI OTOMATIS (AI) */}
           {genModalOpen && (
             <div className={styles.modalOverlay}>
-              <div className={styles.modal}>
+              <div className={`${styles.modal} ${isDark ? styles.modalDark : ""}`}>
                 <div className={styles.modalHeader}>
                   <h2>Generate Kategori Otomatis (AI)</h2>
                   <button

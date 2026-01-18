@@ -687,6 +687,88 @@
 
 
 
+
+/* ==============================
+   MODAL DARK MODE SUPPORT
+   ============================== */
+.modalDark {
+  background: #1e293b !important;
+  color: #f8fafc !important;
+  border: 1px solid #334155 !important;
+}
+
+.modalDark .aiModalHeader,
+.modalDark .aiModalFooter,
+.modalDark .modalHeader,
+.modalDark .modalFooter {
+  background: rgba(30, 41, 59, 0.95) !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+.modalDark .modalClose {
+  color: #f8fafc !important;
+}
+
+.modalDark .modalClose:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.modalDark input,
+.modalDark select,
+.modalDark textarea {
+  background: #020617 !important;
+  color: #f8fafc !important;
+  border-color: #334155 !important;
+}
+
+.modalDark .modalItem {
+  background: #334155 !important;
+  color: #f8fafc !important;
+}
+
+.modalDark .modalName {
+  color: #f8fafc !important;
+}
+
+.modalDark .modalPrice {
+  color: #cbd5e1 !important;
+}
+
+.modalDark .modalMeta {
+  color: #94a3b8 !important;
+}
+
+.modalDark .selectedList {
+  background: #020617 !important;
+  border-color: #334155 !important;
+}
+
+.modalDark .selectedHeader {
+  color: #f8fafc !important;
+}
+
+.modalDark .selectedHint {
+  color: #94a3b8 !important;
+}
+
+.modalDark .selectedItem {
+  background: #334155 !important;
+  color: #f8fafc !important;
+}
+
+.modalDark .selectedName {
+  color: #f8fafc !important;
+}
+
+.modalDark .selectedPrice {
+  color: #cbd5e1 !important;
+}
+
+.modalDark .aiModalRight {
+  border-color: #334155 !important;
+}
+
 /* ==============================
    CONFIRM MODAL (Hapus Semua)
    ============================== */
