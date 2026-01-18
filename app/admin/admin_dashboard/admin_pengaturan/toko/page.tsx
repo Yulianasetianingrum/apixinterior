@@ -7680,6 +7680,7 @@ export default async function TokoPengaturanPage({
           themeKey={activeThemeKey}
           previewHref={`${ADMIN_TOKO_PATH}/preview?theme=${encodeURIComponent(activeThemeKey)}`}
           resetAction={resetTheme}
+          deleteThemeAction={deleteTheme}
           autoGenerateAction={autoGenerateThemeContent}
           previewClassName={styles.secondaryButton}
           saveClassName={styles.primaryButton}

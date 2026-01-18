@@ -8,6 +8,7 @@ export default function FloatingPreviewActions({
   themeKey,
   previewHref,
   resetAction,
+  deleteThemeAction,
   autoGenerateAction,
   previewClassName,
   saveClassName,
@@ -17,6 +18,7 @@ export default function FloatingPreviewActions({
   themeKey: string;
   previewHref: string;
   resetAction: (formData: FormData) => void | Promise<void>;
+  deleteThemeAction: (formData: FormData) => void | Promise<void>;
   autoGenerateAction: (formData: FormData) => void | Promise<void>;
   previewClassName: string;
   saveClassName: string;
@@ -92,9 +94,17 @@ export default function FloatingPreviewActions({
       </button>
 
       <ConfirmActionForm
+        action={deleteThemeAction}
+        themeKey={themeKey}
+        label="Hapus Theme"
+        confirmMessage={`Yakin ingin menghapus theme "${themeKey}" selamanya? Tindakan ini tidak bisa dibatalkan.`}
+        className={dangerClassName}
+      />
+
+      <ConfirmActionForm
         action={resetAction}
         themeKey={themeKey}
-        label="Drop All"
+        label="Drop All Sections"
         confirmMessage="Hapus semua section draft di theme ini? Tindakan ini tidak bisa dibatalkan."
         className={dangerClassName}
       />
