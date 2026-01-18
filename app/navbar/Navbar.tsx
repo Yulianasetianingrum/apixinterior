@@ -7,13 +7,17 @@ import SearchInputClient from "./SearchInput.client";
 import CartBadgeClient from "./CartBadge.client";
 import WishlistBadgeClient from "./WishlistBadge.client";
 
-import logoBlue from "../uploads/logo_apixinterior_biru.png.png";
-import logoGolden from "../uploads/logo_apixinterior_golden.png.png";
-import logoWhite from "../uploads/logo_apixinterior_putih.png.png";
+// Corrected paths for public/logo/
+const logoBlue = "/logo/logo_apixinterior_biru.png.png";
+const logoGolden = "/logo/logo_apixinterior_golden.png.png";
+const logoWhite = "/logo/logo_apixinterior_putih.png.png";
 
-import searchGold from "../uploads/search_gold.png";
-import searchNavy from "../uploads/search_navy.png";
-import searchWhite from "../uploads/search_white.png";
+// Corrected paths for public/uploads/
+// Assuming search icons are in uploads based on previous successful usage, or maybe check them too.
+// Let's assume standard uploads path.
+const searchGold = "/uploads/search_gold.png";
+const searchNavy = "/uploads/search_navy.png";
+const searchWhite = "/uploads/search_white.png";
 
 export const dynamic = "force-dynamic";
 
