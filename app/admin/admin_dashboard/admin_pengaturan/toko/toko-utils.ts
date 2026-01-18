@@ -187,18 +187,6 @@ export const SECTION_DEFS: SectionDef[] = [
         },
     },
     {
-        type: "TESTIMONIALS",
-        label: "Ulasan / Testimoni",
-        description: "Tampilkan ulasan pelanggan (sumber Google Maps atau manual).",
-        defaultSlug: "testimoni",
-        defaultConfig: {
-            title: "Apa Kata Mereka?",
-            subtitle: "Ulasan dari pelanggan setia kami",
-            mapsUrl: "",
-            reviews: [],
-        },
-    },
-    {
         type: "FOOTER",
         label: "🚀 FOOTER (Copyright & Contact)",
         description: "Informasi copyright, kontak, alamat, dan social media.",
@@ -229,7 +217,6 @@ export const SECTION_ICON: Record<string, string> = {
     CONTACT: "T",
     SOCIAL: "S",
     CUSTOM_PROMO: "CP",
-    TESTIMONIALS: "TM",
     FOOTER: "F",
 };
 
