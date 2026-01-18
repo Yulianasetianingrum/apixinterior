@@ -371,6 +371,7 @@ enum HomepageSectionType {
   CUSTOM_PROMO // Custom / Promo Section
   FOOTER // Footer Section
   TESTIMONIALS // Ulasan Google Maps
+  THEME_META // Metadata Theme (Hidden)
 }
 
 enum HomepageSectionItemType {
