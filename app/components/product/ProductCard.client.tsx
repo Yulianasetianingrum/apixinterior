@@ -202,9 +202,9 @@ export default function ProductCard({ product: pRaw, index }: ProductCardProps) 
                 </div>
 
                 {/* Contact Button */}
-                <button className={styles.contactBtn} onClick={handleContact}>
+                <button className={styles.contactBtn} onClick={handleContact} title={waNumber ? `Send to: ${waNumber}` : "No Number"}>
                     <FaWhatsapp size={16} />
-                    Hubungi Kami
+                    Hubungi Kami {waNumber ? `(${waNumber.slice(-4)})` : "(?)"}
                 </button>
             </div>
 

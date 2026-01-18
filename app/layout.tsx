@@ -106,24 +106,22 @@ export default async function RootLayout({
   // Fetch priority WhatsApp number
   // Fetch priority WhatsApp number
   // EXPLICIT FILTER: Ignore known dummy number '81234567890'
-  let waRow = await prisma.hubungi.findFirst({
-    where: {
-      prioritas: true,
-      NOT: { nomor: { contains: "81234567890" } }
-    },
-    select: { nomor: true },
+  // Fetch ALL candidate numbers
+  const allWaItems = await prisma.hubungi.findMany({
+    orderBy: [{ prioritas: "desc" }, { id: "asc" }]
   });
 
-  if (!waRow) {
-    waRow = await prisma.hubungi.findFirst({
-      where: {
-        NOT: { nomor: { contains: "81234567890" } }
-      },
-      orderBy: { id: "asc" },
-      select: { nomor: true },
-    });
-  }
-  const waNumber = waRow?.nomor ?? "";
+  // Helper: Strip non-digits
+  const clean = (s: string) => s.replace(/[^\d]/g, "");
+
+  // Filter out ghost number "081234567890" or "6281234567890" regardless of formatting
+  const validWaItems = allWaItems.filter(item => {
+    const c = clean(item.nomor);
+    return !c.includes("81234567890");
+  });
+
+  // Pick priority if exists (already sorted by desc prioritas, so first valid is best candidate)
+  const waNumber = validWaItems[0]?.nomor ?? "";
 
   return (
     <html lang="id" className={inter.variable}>

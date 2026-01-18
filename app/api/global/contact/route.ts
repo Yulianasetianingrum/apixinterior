@@ -8,29 +8,30 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
     try {
-        // 1. Try finding Priority
-        let waRow = await prisma.hubungi.findFirst({
-            where: {
-                prioritas: true,
-                NOT: { nomor: { contains: "81234567890" } } // Blokir nomor hantu
-            },
-            select: { nomor: true },
+        // Fetch ALL candidate numbers
+        const allItems = await prisma.hubungi.findMany({
+            orderBy: [{ prioritas: "desc" }, { id: "asc" }]
         });
 
-        // 2. Fallback to first valid number
-        if (!waRow) {
-            waRow = await prisma.hubungi.findFirst({
-                where: {
-                    NOT: { nomor: { contains: "81234567890" } }
-                },
-                orderBy: { id: "asc" },
-                select: { nomor: true },
-            });
+        // Helper: Strip non-digits
+        const clean = (s: string) => s.replace(/[^\d]/g, "");
+
+        // Filter out ghost number "081234567890" or "6281234567890" regardless of formatting
+        const validItems = allItems.filter(item => {
+            const c = clean(item.nomor);
+            return !c.includes("81234567890");
+        });
+
+        if (validItems.length === 0) {
+            return NextResponse.json({ number: "" });
         }
 
-        const number = waRow?.nomor ?? "";
-        return NextResponse.json({ number });
+        // Pick priority if exists. First element is best candidate.
+        const best = validItems[0];
+
+        return NextResponse.json({ number: best.nomor });
     } catch (error) {
+        console.error("Error fetching global contact:", error);
         return NextResponse.json({ number: "" }, { status: 500 });
     }
 }
