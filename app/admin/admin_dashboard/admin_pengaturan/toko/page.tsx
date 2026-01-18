@@ -1219,7 +1219,7 @@ async function createDraftSection(formData: FormData) {
   const slugRaw = (formData.get("slug") as string | null)?.trim() ?? "";
 
   const def = SECTION_DEFS.find((d) => d.type === typeRaw);
-  if (!def) return redirectBack({ error: encodeURIComponent("Jenis section tidak valid.") });
+  if (!def || !def.type) return redirectBack({ error: encodeURIComponent("Jenis section tidak valid (Internal Def Error).") });
 
   const last = await prisma.homepageSectionDraft.findFirst({ orderBy: { sortOrder: "desc" } });
   const sortOrder = last ? last.sortOrder + 1 : 1;
@@ -1227,6 +1227,11 @@ async function createDraftSection(formData: FormData) {
   const slug = slugRaw ? slugify(slugRaw) : def.defaultSlug;
   if (slug === "__active_theme__" || slug.startsWith(THEME_META_SLUG_PREFIX)) {
     return redirectBack({ error: encodeURIComponent("Slug tersebut diproteksi oleh sistem.") });
+  }
+
+  // Final Safety Check
+  if (!def.type) {
+    return redirectBack({ error: encodeURIComponent("Type definition is missing.") });
   }
 
   await prisma.homepageSectionDraft.create({

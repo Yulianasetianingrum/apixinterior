@@ -780,7 +780,7 @@ export default async function TokoPreviewDraftPage({
   // STRICT ISOLATION: DRAFT CONFIG ONLY.
   // We do NOT fallback to global NavbarSetting to prevent "theme leak" (cross-talk between drafts).
   // If a draft has no setting, it defaults to "NAVY_GOLD". The user must explicitly SAVE the theme to "lock" it.
-  const { draftSections, categoryGridById, categoryCommerceById, kategoriMap, imageMap, autoCoverUrlByKategori, produkMap, productListingItems, cabangMap, hubungiById, mediaSosialByKey, backgroundTheme, themeName, navbarTheme: rawNavbarTheme } =
+  const { draftSections, categoryGridById, categoryCommerceById, kategoriMap, imageMap, autoCoverUrlByKategori, produkMap, productListingItems, cabangMap, hubungiById, mediaSosialByKey, backgroundTheme, themeName, navbarTheme: rawNavbarTheme, namaToko } =
     await fetchPreviewThemeOptimized(themeKey);
 
   const navbarTheme = normalizeThemeAttr(rawNavbarTheme || "NAVY_GOLD") || "NAVY_GOLD";
@@ -2493,6 +2493,7 @@ export default async function TokoPreviewDraftPage({
                   // Resolve Theme
                   const footerThemeKey = resolveEffectiveTheme(String(cfg.sectionTheme ?? "FOLLOW_NAVBAR"), navbarTheme);
                   const colors = getHeroThemeTokens(footerThemeKey);
+                  // const namaToko = ... (Passed from top-level)
 
                   return (
                     <section
@@ -2515,28 +2516,7 @@ export default async function TokoPreviewDraftPage({
                           {/* 1. Address + Brand (Top) */}
                           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                              <div style={{
-                                position: "relative",
-                                width: 40,
-                                height: 40,
-                                borderRadius: "999px",
-                                overflow: "hidden",
-                                background: (() => {
-                                  const c = colors.element.toLowerCase();
-                                  if (c.includes("#ffffff") || c.includes("white") || c.includes("255,255,255")) return "#0b1d3a";
-                                  return "#ffffff";
-                                })(),
-                                border: `1px solid ${colors.element}33`
-                              }}>
-                                <Image
-                                  src={getFooterIconPath("LOGO", colors.element)}
-                                  alt={namaToko}
-                                  fill
-                                  sizes="40px"
-                                  unoptimized
-                                  style={{ objectFit: "contain" }}
-                                />
-                              </div>
+
                               <span style={{
                                 fontSize: "0.9rem",
                                 fontWeight: 600,
@@ -2727,6 +2707,9 @@ async function fetchPreviewThemeOptimized(themeKey: string) {
   const mediaIconKeys: string[] = [];
   let needsProductListing = false;
   let footerNeedsGlobalBranches = false;
+
+  const info = await prisma.informasiToko.findUnique({ where: { id: 1 } });
+  const namaToko = info?.namaToko ?? "Apix Interior";
 
   const categoryGridById = new Map<number, { items: CategoryGridItem[]; columns: number; maxItems?: number }>();
   const categoryCommerceById = new Map<number, { items: CategoryCommerceItem[]; columns: number; maxItems?: number }>();
@@ -3004,7 +2987,7 @@ async function fetchPreviewThemeOptimized(themeKey: string) {
   const themeName =
     typeof themeMetaCfg?.themeName === "string" ? String(themeMetaCfg.themeName).trim() : "";
 
-  return { draftSections, categoryGridById, categoryCommerceById, kategoriMap, imageMap, autoCoverUrlByKategori, produkMap: produkById, productListingItems, cabangMap, hubungiById, mediaSosialByKey, backgroundTheme, themeName, navbarTheme };
+  return { draftSections, categoryGridById, categoryCommerceById, kategoriMap, imageMap, autoCoverUrlByKategori, produkMap: produkById, productListingItems, cabangMap, hubungiById, mediaSosialByKey, backgroundTheme, themeName, navbarTheme, namaToko };
 }
 
 
