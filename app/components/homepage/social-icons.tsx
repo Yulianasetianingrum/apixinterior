@@ -9,7 +9,6 @@ import {
   SiX,
   SiPinterest,
   SiTelegram,
-  SiTwitter,
 } from "react-icons/si";
 import { IconType } from "react-icons";
 
@@ -36,7 +35,7 @@ const iconMap: Record<string, IconType> = {
   youtube: SiYoutube,
   linkedin: SiLinkedin,
   x: SiX,
-  twitter: SiTwitter, // or SiX if preferred, but keeping distinct if library has both
+  twitter: SiX, // Legacy mapping
   pinterest: SiPinterest,
   telegram: SiTelegram,
 };
