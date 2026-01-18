@@ -105,13 +105,20 @@ export default async function RootLayout({
 }) {
   // Fetch priority WhatsApp number
   // Fetch priority WhatsApp number
+  // EXPLICIT FILTER: Ignore known dummy number '81234567890'
   let waRow = await prisma.hubungi.findFirst({
-    where: { prioritas: true },
+    where: {
+      prioritas: true,
+      NOT: { nomor: { contains: "81234567890" } }
+    },
     select: { nomor: true },
   });
 
   if (!waRow) {
     waRow = await prisma.hubungi.findFirst({
+      where: {
+        NOT: { nomor: { contains: "81234567890" } }
+      },
       orderBy: { id: "asc" },
       select: { nomor: true },
     });
