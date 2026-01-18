@@ -93,6 +93,12 @@ export default function TestimonialsEditor({ config, onChange }: Props) {
 
     return (
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            {/* Hidden Inputs for Server Action */}
+            <input type="hidden" name="title" value={title} />
+            <input type="hidden" name="subtitle" value={subtitle} />
+            <input type="hidden" name="mapsUrl" value={mapsUrl} />
+            <input type="hidden" name="reviews" value={JSON.stringify(reviews)} />
+
             {/* Header Config */}
             <div className={styles.fieldGroup}>
                 <label className={styles.label}>Judul Section</label>
@@ -185,6 +191,6 @@ export default function TestimonialsEditor({ config, onChange }: Props) {
                     </p>
                 )}
             </div>
-        </div>
+        </div >
     );
 }

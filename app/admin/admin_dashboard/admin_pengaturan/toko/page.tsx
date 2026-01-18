@@ -6560,11 +6560,10 @@ export default async function TokoPengaturanPage({
                         data-section-form="1"
                       >
                         <input type="hidden" name="id" value={section.id.toString()} />
-                        {/* <TestimonialsEditor
+                        <TestimonialsEditor
                           config={cfg}
                           onChange={() => { }}
-                        /> */}
-                        <div style={{ padding: 20 }}>Editor disabled for debugging.</div>
+                        />
                       </form>
 
                       {/* Footer Actions */}
