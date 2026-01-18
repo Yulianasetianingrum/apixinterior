@@ -552,6 +552,7 @@ const SECTION_ICON: Record<string, string> = {
   CONTACT: "T",
   SOCIAL: "S",
   CUSTOM_PROMO: "CP",
+  TESTIMONIALS: "TM",
   FOOTER: "F",
 };
 
@@ -1234,7 +1235,7 @@ async function createDraftSection(formData: FormData) {
     return redirectBack({ error: encodeURIComponent("Type definition is missing.") });
   }
 
-  await prisma.homepageSectionDraft.create({
+  const created = await prisma.homepageSectionDraft.create({
     data: {
       type: def.type as any,
       title: titleRaw,
@@ -1248,7 +1249,11 @@ async function createDraftSection(formData: FormData) {
   revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko");
   revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko/preview");
   revalidatePath("/");
-  return redirectBack({ notice: encodeURIComponent("Section draft berhasil ditambahkan.") });
+  return redirectBack({
+    notice: encodeURIComponent("Section draft berhasil ditambahkan."),
+    anchor: `section-${created.id}`,
+    sectionId: created.id,
+  });
 }
 
 async function updateDraftMeta(formData: FormData) {
