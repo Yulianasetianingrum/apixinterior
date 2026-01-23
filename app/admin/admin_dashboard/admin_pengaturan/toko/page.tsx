@@ -6588,8 +6588,8 @@ export default async function TokoPengaturanPage({
                       >
                         <input type="hidden" name="id" value={section.id.toString()} />
                         <TestimonialsEditor
-                          config={cfg}
-                          onChange={() => { }}
+                          initialConfig={cfg}
+                          sectionId={section.id.toString()}
                         />
                       </form>
 
