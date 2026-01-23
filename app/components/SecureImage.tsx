@@ -83,7 +83,9 @@ export default function SecureImage({
             style={style}
             priority={priority}
             loading={priority ? undefined : (loading || "lazy")}
-            unoptimized={isInternal}
+            // ENABLE OPTIMIZATION FOR INTERNAL IMAGES
+            // We removed unoptimized={isInternal} so Next.js can compress them to WebP
+            unoptimized={false}
             className={className}
             sizes={sizes || (fill ? "100vw" : undefined)}
             onLoadingComplete={() => {

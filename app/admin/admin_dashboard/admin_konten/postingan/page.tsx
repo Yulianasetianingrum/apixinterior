@@ -207,6 +207,32 @@ export default function AdminPostinganPage() {
     );
 
     // --- AUTO GENERATE LOGIC ---
+    // Helper: Buat slug yang lebih cerdas & variatif (SEO Friendly)
+    const generateSmartSlug = (baseTitle: string, contextType: string) => {
+        const cleanBase = baseTitle.toLowerCase()
+            .replace(/[^a-z0-9]+/g, "-") // Ganti simbol jadi dash
+            .replace(/^-|-$/g, "");       // Hapus dash di awal/akhir
+
+        // Library suffix/prefix biar ga bosen
+        const suffixes = [
+            "-terbaik", "-terbaru", "-2026", "-modern", "-minimalis",
+            "-autentik", "-premium", "-jakarta", "-indonesia", "-home-decor",
+            "-inspirasi", "-guide", "-tips", "-solusi"
+        ];
+
+        // Pura-pura "mikir" buat variasi
+        const randomSuffix = suffixes[Math.floor(Math.random() * suffixes.length)];
+        const useSuffix = Math.random() > 0.4; // 60% chance pake suffix
+
+        let finalSlug = cleanBase;
+        if (useSuffix) {
+            finalSlug = `${cleanBase}${randomSuffix}`;
+        }
+
+        // Anti-duplicate simple logic (add random ID if needed, but keeping it clean for now)
+        return finalSlug;
+    };
+
     const handleAutoGenerate = async () => {
         const keyword = formTitle.trim() || "Interior";
 
@@ -271,7 +297,10 @@ export default function AdminPostinganPage() {
 
         const selected = contexts[Math.floor(Math.random() * contexts.length)];
         const newTitle = selected.title;
-        const newSlug = newTitle.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
+        // SMART SLUG GENERATION
+        const newSlug = generateSmartSlug(newTitle, selected.type);
+
         const newExcerpt = selected.excerpt;
         const newContent = selected.content.trim();
         const authorName = "Made by Apix Interior";
@@ -280,7 +309,7 @@ export default function AdminPostinganPage() {
         const seoTitle = `${newTitle} | Apix Interior`;
         const seoDesc = newExcerpt.substring(0, 155);
 
-        // 2. Auto Select Image (tetap gunakan gallery yang sudah ada)
+        // 2. Auto Select Image (Random Shuffle Logic)
         let images = galleryImages;
         if (images.length === 0) {
             setLoading(true);
@@ -298,26 +327,31 @@ export default function AdminPostinganPage() {
 
         let selectedUrl = "";
         if (images.length > 0) {
-            // Coba cari gambar yang relevan dengan keyword
-            const match = images.find(img => (img.title || "").toLowerCase().includes(keyword.toLowerCase()));
+            // Acak total (Shuffle) biar ga repetitif
+            const shuffled = [...images].sort(() => 0.5 - Math.random());
+
+            // Prioritas 1: Cari yang match keyword (50% chance biar tetep relevan)
+            const match = Math.random() > 0.5
+                ? shuffled.find(img => (img.title || "").toLowerCase().includes(keyword.toLowerCase()))
+                : null;
+
             if (match) {
                 selectedUrl = match.url;
             } else {
-                selectedUrl = images[Math.floor(Math.random() * images.length)].url;
+                // Prioritas 2: Ambil random apa saja dari hasil shuffle
+                selectedUrl = shuffled[0].url;
             }
         }
 
-        if (confirm(`Generate konten KREATIF & SEO untuk "${keyword}"?\n\n(Catatan: Ini akan mengisi Judul, Slug, Excerpt, Konten, Author, dan Meta SEO secara otomatis)`)) {
+        if (confirm(`Generate konten KREATIF & SEO untuk "${keyword}"?\n\n- Slug: /${newSlug}\n- Gambar: ${selectedUrl ? "Termasuk (Auto)" : "Manual"}`)) {
             setFormTitle(newTitle);
             setFormSlug(newSlug);
             setFormExcerpt(newExcerpt);
             setFormContent(newContent);
+            setFormCoverImage(selectedUrl);
             setFormAuthor(authorName);
             setFormSeoTitle(seoTitle);
             setFormSeoDescription(seoDesc);
-            if (selectedUrl) {
-                setFormCoverImage(selectedUrl);
-            }
         }
     };
     // ---------------------------

@@ -1,7 +1,8 @@
 ﻿"use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaGripVertical } from "react-icons/fa6";
+import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
 
 type SectionItem = {
   id: number;
@@ -23,6 +24,8 @@ const TYPE_LABEL: Record<string, string> = {
   CONTACT: "Hubungi Kami",
   SOCIAL: "Media Sosial",
   CUSTOM_PROMO: "Custom / Promo Section",
+  TESTIMONIALS: "Ulasan / Testimoni",
+  FOOTER: "Footer",
 };
 
 export default function SectionsReorderClient({
@@ -32,31 +35,31 @@ export default function SectionsReorderClient({
 }) {
   const [items, setItems] = useState<SectionItem[]>(sections);
   const [saving, setSaving] = useState(false);
+  const [enabled, setEnabled] = useState(false);
 
-  const handleDragStart =
-    (fromIndex: number) => (e: React.DragEvent<HTMLDivElement>) => {
-      e.dataTransfer.setData("text/plain", String(fromIndex));
+  // Strict mode fix for dnd
+  useEffect(() => {
+    const animation = requestAnimationFrame(() => setEnabled(true));
+    return () => {
+      cancelAnimationFrame(animation);
+      setEnabled(false);
     };
+  }, []);
 
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    // wajib supaya onDrop kepanggil
-    e.preventDefault();
+  const onDragEnd = (result: DropResult) => {
+    if (!result.destination) return;
+
+    const sourceIndex = result.source.index;
+    const destinationIndex = result.destination.index;
+
+    if (sourceIndex === destinationIndex) return;
+
+    const newItems = Array.from(items);
+    const [moved] = newItems.splice(sourceIndex, 1);
+    newItems.splice(destinationIndex, 0, moved);
+
+    setItems(newItems);
   };
-
-  const handleDrop =
-    (toIndex: number) => (e: React.DragEvent<HTMLDivElement>) => {
-      e.preventDefault();
-      const fromIndexRaw = e.dataTransfer.getData("text/plain");
-      const fromIndex = Number(fromIndexRaw);
-      if (Number.isNaN(fromIndex) || fromIndex === toIndex) return;
-
-      setItems((prev) => {
-        const next = [...prev];
-        const [moved] = next.splice(fromIndex, 1);
-        next.splice(toIndex, 0, moved);
-        return next;
-      });
-    };
 
   async function handleSave() {
     if (saving) return;
@@ -87,6 +90,19 @@ export default function SectionsReorderClient({
     }
   }
 
+  if (!enabled) {
+    return (
+      <div className="border rounded-xl p-4 bg-white shadow-sm space-y-3">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm font-semibold">Urutan Section (Drag & Drop)</p>
+            <p className="text-[11px] text-gray-500">Memuat fitur drag & drop...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="border rounded-xl p-4 bg-white shadow-sm space-y-3">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -107,47 +123,69 @@ export default function SectionsReorderClient({
         </button>
       </div>
 
-      <div className="space-y-2">
-        {items.map((item, index) => (
-          <div
-            key={item.id}
-            draggable
-            onDragStart={handleDragStart(index)}
-            onDragOver={handleDragOver}
-            onDrop={handleDrop(index)}
-            className="flex items-center justify-between rounded-lg border bg-gray-50 px-3 py-2 text-xs cursor-grab touch-none"
-          >
-            <div className="flex items-center gap-2">
-              {/* HANDLE :: /  */}
-              <span
-                className="text-gray-400 cursor-grab hover:text-gray-600 transition-colors"
-                aria-hidden="true"
-              >
-                <FaGripVertical />
-              </span>
-              <span className="w-4 text-[11px] text-gray-400 text-right">
-                {index + 1}
-              </span>
-              <div className="flex flex-col">
-                <span className="font-medium">{item.title}</span>
-                <span className="text-[11px] text-gray-500">
-                  {TYPE_LABEL[item.type] ?? item.type}
-                </span>
-              </div>
-            </div>
-            <span
-              className={
-                "text-[11px] rounded-full px-2 py-0.5 border " +
-                (item.enabled
-                  ? "border-emerald-200 text-emerald-700 bg-emerald-50"
-                  : "border-gray-200 text-gray-500 bg-white")
-              }
+      <DragDropContext onDragEnd={onDragEnd}>
+        <Droppable droppableId="sections-list">
+          {(provided) => (
+            <div
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+              className="space-y-2"
             >
-              {item.enabled ? "Aktif" : "Nonaktif"}
-            </span>
-          </div>
-        ))}
-      </div>
+              {items.map((item, index) => (
+                <Draggable key={item.id} draggableId={String(item.id)} index={index}>
+                  {(provided, snapshot) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      className={`flex items-center justify-between rounded-lg border px-3 py-3 text-xs ${snapshot.isDragging ? "bg-blue-50 border-blue-200 shadow-lg z-50" : "bg-gray-50 border-gray-200"
+                        }`}
+                      style={{
+                        ...provided.draggableProps.style,
+                        touchAction: "none" // Crucial for mobile
+                      }}
+                    >
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        {/* HANDLE */}
+                        <div
+                          {...provided.dragHandleProps}
+                          className="text-gray-400 hover:text-gray-600 p-2 -ml-2 cursor-grab active:cursor-grabbing touch-none"
+                          style={{ touchAction: "none" }}
+                          aria-label="Drag handle"
+                        >
+                          <FaGripVertical size={16} />
+                        </div>
+
+                        <span className="w-5 text-[11px] text-gray-400 text-right flex-shrink-0">
+                          {index + 1}
+                        </span>
+
+                        <div className="flex flex-col min-w-0 flex-1">
+                          <span className="font-medium truncate">{item.title || "(Tanpa Judul)"}</span>
+                          <span className="text-[10px] text-gray-500 truncate">
+                            {TYPE_LABEL[item.type] ?? item.type}
+                          </span>
+                        </div>
+                      </div>
+
+                      <span
+                        className={
+                          "text-[10px] rounded-full px-2 py-0.5 border ml-2 flex-shrink-0 " +
+                          (item.enabled
+                            ? "border-emerald-200 text-emerald-700 bg-emerald-50"
+                            : "border-gray-200 text-gray-500 bg-white")
+                        }
+                      >
+                        {item.enabled ? "Aktif" : "Nonaktif"}
+                      </span>
+                    </div>
+                  )}
+                </Draggable>
+              ))}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
     </div>
   );
 }

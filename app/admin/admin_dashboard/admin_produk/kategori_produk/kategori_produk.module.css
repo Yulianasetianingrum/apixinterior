@@ -214,7 +214,11 @@
 }
 
 .modalItem {
-  background: var(--item-bg, #f9fafb);
+  /* LIGHT MODE: Premium Golden & Navy */
+  background: linear-gradient(145deg, #fffbf0 0%, #fff7d6 100%);
+  /* Soft Golden */
+  border: 1px solid #fde68a;
+  /* Golden Border */
   border-radius: 1rem;
   padding: 0.75rem;
   display: flex;
@@ -222,7 +226,15 @@
   gap: 0.25rem;
   font-size: 0.85rem;
   transition: all 0.2s ease;
-  border: 1px solid transparent;
+  color: #0f172a;
+  /* Navy Text */
+  box-shadow: 0 4px 6px -1px rgba(212, 175, 55, 0.1);
+}
+
+.modalItem:hover {
+  border-color: #d4af37;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(212, 175, 55, 0.2);
 }
 
 [data-theme='dark'] .modalItem,

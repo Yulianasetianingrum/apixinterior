@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import Navbar from "@/app/navbar/Navbar";
 import GlobalFooter from "@/app/components/GlobalFooter";
-import Image from "next/image";
+import SecureImage from "@/app/components/SecureImage";
 
 export const dynamic = "force-dynamic";
 
@@ -39,7 +39,7 @@ export default async function ArtikelIndexPage() {
                             >
                                 <div style={{ aspectRatio: "16/9", background: "#f1f5f9", borderRadius: "12px", overflow: "hidden", position: "relative" }}>
                                     {post.coverImage ? (
-                                        <Image
+                                        <SecureImage
                                             src={post.coverImage}
                                             alt={post.title}
                                             fill
