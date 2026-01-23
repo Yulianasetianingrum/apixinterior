@@ -4430,7 +4430,16 @@ export default async function TokoPengaturanPage({
   }
 
   // Fetch products (latest 200 + used ones)
-  const latestProducts = await prisma.produk.findMany({ orderBy: { id: "desc" }, take: 200 });
+  const latestProducts = await prisma.produk.findMany({
+    orderBy: { urutan: "asc" },
+    take: 200,
+    include: {
+      galeri: {
+        select: { gambarId: true },
+        orderBy: { urutan: "asc" },
+      },
+    },
+  });
   const fetchedIds = new Set(latestProducts.map((p) => p.id));
 
   const missingIds = Array.from(usedProductIds).filter((id) => !fetchedIds.has(id));
@@ -4438,6 +4447,12 @@ export default async function TokoPengaturanPage({
   if (missingIds.length > 0) {
     extraProducts = await prisma.produk.findMany({
       where: { id: { in: missingIds } },
+      include: {
+        galeri: {
+          select: { gambarId: true },
+          orderBy: { urutan: "asc" },
+        },
+      },
     });
   }
 
@@ -6013,9 +6028,10 @@ export default async function TokoPengaturanPage({
                                 kategori: (p.kategori as string) || undefined,
                                 subkategori: (p.subkategori as string) || undefined,
                                 mainImageId: p.mainImageId ?? null,
-                                galleryImageIds: Array.isArray(p.galleryImageIds)
-                                  ? (p.galleryImageIds as any[])
-                                    .map((v: any) => Number(v))
+                                mainImageId: p.mainImageId ?? null,
+                                galleryImageIds: Array.isArray((p as any).galeri)
+                                  ? ((p as any).galeri as any[])
+                                    .map((v: any) => Number(v.gambarId))
                                     .filter((n: any) => Number.isFinite(n))
                                   : [],
                               };
@@ -6186,9 +6202,10 @@ export default async function TokoPengaturanPage({
                                   kategori: (p.kategori as string) || undefined,
                                   subkategori: (p.subkategori as string) || undefined,
                                   mainImageId: p.mainImageId ?? null,
-                                  galleryImageIds: Array.isArray(p.galleryImageIds)
-                                    ? (p.galleryImageIds as any[])
-                                      .map((v: any) => Number(v))
+                                  mainImageId: p.mainImageId ?? null,
+                                  galleryImageIds: Array.isArray((p as any).galeri)
+                                    ? ((p as any).galeri as any[])
+                                      .map((v: any) => Number(v.gambarId))
                                       .filter((n: any) => Number.isFinite(n))
                                     : [],
                                 };

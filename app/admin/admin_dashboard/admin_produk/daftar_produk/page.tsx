@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 
 import styles from "./daftar_produk.module.css";
 import { useAdminTheme } from "../../AdminThemeContext";
+import SecureImage from "@/app/components/SecureImage";
 
 
 
@@ -1436,16 +1437,12 @@ export default function DaftarProdukPage() {
 
                           onClick={() => openPreview(p, idx)}>
 
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-
-                          <img
-
+                          <SecureImage
                             src={url}
-
                             alt={`${p.nama} ${idx + 1}`}
-
+                            width={120}
+                            height={120}
                             className={styles.thumb}
-
                           />
 
                         </button>
@@ -1748,8 +1745,7 @@ export default function DaftarProdukPage() {
                       >
                         {thumb ? (
                           <span className={styles.variationPillThumb}>
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={thumb} alt={label} />
+                            <SecureImage src={thumb} alt={label} width={32} height={32} />
                           </span>
                         ) : null}
                         <span className={styles.variationPillName}>{label}</span>

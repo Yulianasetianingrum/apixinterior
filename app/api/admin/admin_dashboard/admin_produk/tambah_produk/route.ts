@@ -51,8 +51,8 @@ async function saveOptimizedWebpToUploads(
     .webp({ quality })
     .toFile(outAbs);
 
-  // url publik
-  return `/uploads/${filename}`;
+  // url publik - use API route for consistent serving
+  return `/api/img?f=${filename}`;
 }
 
 function slugify(text: string) {
@@ -622,6 +622,9 @@ export async function POST(req: NextRequest) {
         });
       }
     }
+
+    revalidatePath("/produk");
+    revalidatePath("/admin/admin_dashboard/admin_produk/daftar_produk");
 
     return NextResponse.json({ ok: true, id: created.id, slug: created.slug }, { status: 201 });
   } catch (err: any) {
