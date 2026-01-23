@@ -1,21 +1,21 @@
 /* Dark Mode Overrides for Modal */
 .modalDark {
-    background: #1e293b !important;
-    color: #f8fafc !important;
-    border-color: #334155 !important;
+    background: #111827 !important;
+    color: #ffffff !important;
+    border: 1px solid #374151 !important;
 }
 
 .modalDark .aiModalHeader,
 .modalDark .aiModalFooter,
 .modalDark .modalHeader,
 .modalDark .modalFooter {
-    background: rgba(30, 41, 59, 0.95) !important;
-    border-color: #334155 !important;
-    color: #f8fafc !important;
+    background: rgba(17, 24, 39, 0.95) !important;
+    border-color: #374151 !important;
+    color: #ffffff !important;
 }
 
 .modalDark .modalClose {
-    color: #f8fafc !important;
+    color: #ffffff !important;
 }
 
 .modalDark .modalClose:hover {
@@ -25,35 +25,42 @@
 .modalDark input,
 .modalDark select,
 .modalDark textarea {
-    background: #020617 !important;
-    color: #f8fafc !important;
-    border-color: #334155 !important;
+    background: #0f172a !important;
+    color: #ffffff !important;
+    border: 1px solid #475569 !important;
 }
 
-.modalDark .modalItem {
-    background: #334155 !important;
-    color: #f8fafc !important;
-}
-
-.modalDark .modalName {
-    color: #f8fafc !important;
-}
-
-.modalDark .modalPrice {
+.modalDark label {
     color: #cbd5e1 !important;
 }
 
+.modalDark .modalItem {
+    background: #1e293b !important;
+    color: #ffffff !important;
+    border: 1px solid #334155 !important;
+}
+
+.modalDark .modalName {
+    color: #ffffff !important;
+    font-weight: 700 !important;
+}
+
+.modalDark .modalPrice {
+    color: #e2e8f0 !important;
+}
+
 .modalDark .modalMeta {
-    color: #94a3b8 !important;
+    color: #cbd5e1 !important;
 }
 
 .modalDark .selectedList {
-    background: #020617 !important;
+    background: #0f172a !important;
     border-color: #334155 !important;
 }
 
 .modalDark .selectedHeader {
-    color: #f8fafc !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
 }
 
 .modalDark .selectedHint {
@@ -61,16 +68,18 @@
 }
 
 .modalDark .selectedItem {
-    background: #334155 !important;
-    color: #f8fafc !important;
+    background: #1e293b !important;
+    color: #ffffff !important;
+    border: 1px solid #334155 !important;
 }
 
 .modalDark .selectedName {
-    color: #f8fafc !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
 }
 
 .modalDark .selectedPrice {
-    color: #cbd5e1 !important;
+    color: #e2e8f0 !important;
 }
 
 .modalDark .aiModalRight {

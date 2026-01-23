@@ -43,8 +43,10 @@ export default function AdminPostinganPage() {
     const [formExcerpt, setFormExcerpt] = useState("");
     const [formContent, setFormContent] = useState("");
     const [formCoverImage, setFormCoverImage] = useState("");
-    const [formAuthor, setFormAuthor] = useState("Admin");
+    const [formAuthor, setFormAuthor] = useState("Made by Apix Interior");
     const [formPublished, setFormPublished] = useState(true);
+    const [formSeoTitle, setFormSeoTitle] = useState("");
+    const [formSeoDescription, setFormSeoDescription] = useState("");
 
     // Create / Update Loading
     const [saving, setSaving] = useState(false);
@@ -83,8 +85,10 @@ export default function AdminPostinganPage() {
         setFormExcerpt("");
         setFormContent("");
         setFormCoverImage("");
-        setFormAuthor("Admin");
+        setFormAuthor("Made by Apix Interior");
         setFormPublished(true);
+        setFormSeoTitle("");
+        setFormSeoDescription("");
         setIsEditing(true);
     };
 
@@ -95,8 +99,10 @@ export default function AdminPostinganPage() {
         setFormExcerpt(post.excerpt || "");
         setFormContent(post.content);
         setFormCoverImage(post.coverImage || "");
-        setFormAuthor(post.author || "Admin");
+        setFormAuthor(post.author || "Made by Apix Interior");
         setFormPublished(post.isPublished);
+        setFormSeoTitle(post.seoTitle || "");
+        setFormSeoDescription(post.seoDescription || "");
         setIsEditing(true);
     };
 
@@ -139,6 +145,8 @@ export default function AdminPostinganPage() {
                 coverImage: formCoverImage,
                 author: formAuthor,
                 isPublished: formPublished,
+                seoTitle: formSeoTitle,
+                seoDescription: formSeoDescription,
             };
 
             const res = await fetch("/api/admin/admin_dashboard/admin_konten/postingan", {
@@ -200,36 +208,82 @@ export default function AdminPostinganPage() {
 
     // --- AUTO GENERATE LOGIC ---
     const handleAutoGenerate = async () => {
-        const keyword = formTitle || "Interior";
+        const keyword = formTitle.trim() || "Interior";
 
-        // 1. Generate Intelligent Content
-        const cleanSlug = keyword.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-        const newTitle = `${keyword}: Inspirasi & Tips Terbaik untuk Hunian Anda`;
-        const newExcerpt = `Temukan berbagai inspirasi menarik seputar ${keyword}. Tips memilih, merawat, dan menata ${keyword} agar rumah semakin nyaman dan estetik.`;
+        // Pilih konteks acak biar gak bosen
+        const contexts = [
+            {
+                type: "Tips & Trik",
+                title: `7 Tips Memilih ${keyword} Berkualitas untuk Rumah Minimalis`,
+                excerpt: `Bingung cari ${keyword} yang pas? Simak panduan lengkap memilih ${keyword} terbaik yang awet dan estetik untuk hunian Anda bersama Apix Interior.`,
+                content: `
+<h2>Pentingnya Memilih ${keyword} yang Tepat</h2>
+<p>Rumah adalah cerminan kepribadian penghuninya. Memilih <strong>${keyword}</strong> bukan sekadar membeli perabot, tapi membangun atmosfer. Di Apix Interior, kami percaya bahwa kualitas adalah prioritas utama.</p>
 
-        const newContent = `
-<h2>Mengenal Lebih Dekat ${keyword}</h2>
-<p>Memilih <strong>${keyword}</strong> yang tepat bisa menjadi tantangan tersendiri bagi banyak pemilik rumah. Tidak hanya soal estetika, tetapi juga fungsionalitas dan kenyamanan jangka panjang. Dalam artikel ini, kita akan membahas tuntas segala hal tentang ${keyword}.</p>
+<h3>1. Perhatikan Material Utama</h3>
+<p>Pastikan ${keyword} Anda menggunakan bahan berkualitas tinggi seperti kayu solid atau plywood pilihan. Material yang buruk hanya akan membuat ${keyword} Anda cepat rusak dalam hitungan bulan.</p>
 
-<h3>Mengapa Memilih ${keyword}?</h3>
-<ul>
-    <li><strong>Nilai Estetika:</strong> Menambah keindahan visual ruangan Anda.</li>
-    <li><strong>Fungsionalitas:</strong> Mendukung aktivitas sehari-hari dengan lebih baik.</li>
-    <li><strong>Investasi Jangka Panjang:</strong> Produk berkualitas akan bertahan bertahun-tahun.</li>
-</ul>
+<h3>2. Sesuaikan dengan Luas Ruangan</h3>
+<p>Jangan memaksakan ${keyword} berukuran besar di ruangan sempit. Sebaliknya, gunakan solusi custom dari <strong>Apix Interior</strong> untuk memaksimalkan setiap sudut ruangan Anda secara fungsional.</p>
 
-<h3>Tips Merawat ${keyword} Agar Awet</h3>
-<p>Agar tetap terlihat baru dan tahan lama, pastikan Anda melakukan perawatan rutin. Bersihkan debu secara berkala dan hindari paparan sinar matahari langsung yang berlebihan jika material tidak mendukung.</p>
+<h3>3. Pilih Warna yang Harmonis</h3>
+<p>Warna netral biasanya lebih aman, namun jangan ragu untuk memberikan aksen berani pada ${keyword} tertentu untuk menciptakan <i>focal point</i> yang menarik di mata tamu Anda.</p>
 
 <h3>Kesimpulan</h3>
-<p>Dengan pemilihan yang tepat, <strong>${keyword}</strong> dapat mengubah suasana rumah Anda secara drastis. Jangan ragu untuk memadukan gaya dan warna sesuai dengan kepribadian Anda.</p>
-        `;
+<p>Investasi pada ${keyword} berkualitas adalah investasi kenyamanan jangka panjang. Hubungi tim ahli kami untuk konsultasi desain interior dan kebutuhan mebel custom Anda.</p>
+                `
+            },
+            {
+                type: "Tren Desain",
+                title: `Tren ${keyword} Terbaru 2026: Modern, Estetik & Fungsional`,
+                excerpt: `Ingin rumah tampil kekinian? Cek tren ${keyword} paling hits tahun ini. Dari gaya Japandi hingga Modern Industrial, temukan inspirasinya hanya di sini.`,
+                content: `
+<h2>Inspirasi ${keyword} Modern untuk Masa Kini</h2>
+<p>Dunia interior terus berkembang, dan tahun ini <strong>${keyword}</strong> tampil dengan konsep yang lebih menekankan pada keberlanjutan dan kenyamanan maksimal. Apix Interior siap membantu mewujudkan hunian impian Anda dengan sentuhan profesional.</p>
 
-        // 2. Auto Select Image
-        // Ensure gallery is loaded
+<h3>Sentuhan Alami dan Ramah Lingkungan</h3>
+<p>Tahun 2026 adalah tahunnya material alami. Penggunaan kayu jepara dengan finishing natural pada ${keyword} memberikan kesan hangat dan mewah sekaligus ramah lingkungan.</p>
+
+<h3>Fungsionalitas dalam Estetika</h3>
+<p>Bukan cuma cantik, ${keyword} masa kini harus multifungsi. Lemari dengan penyimpanan tersembunyi atau meja yang bisa dilipat kini menjadi standar baru dalam desain interior modern.</p>
+
+<p><strong>Kenapa Apix Interior?</strong> Kami mengombinasikan keahlian tukang kayu tradisional dengan teknologi desain modern untuk menghasilkan ${keyword} yang presisi dan memiliki nilai seni tinggi.</p>
+                `
+            },
+            {
+                type: "Panduan Perawatan",
+                title: `Cara Merawat ${keyword} Agar Tetap Terlihat Mewah Seperti Baru`,
+                excerpt: `Punya ${keyword} favorit tapi takut cepat rusak? Ikuti tips perawatan profesional dari Apix Interior agar koleksi mebel Anda tetap kinclong bertahun-tahun.`,
+                content: `
+<h2>Rahasia ${keyword} Tahan Lama</h2>
+<p>Banyak orang mengeluh ${keyword} mereka cepat pudar atau berjamur. Padahal, dengan perawatan yang benar, ${keyword} berkualitas dari Apix Interior bisa bertahan hingga puluhan tahun.</p>
+
+<h3>Bersihkan Secara Rutin</h3>
+<p>Gunakan kain microfiber yang lembut untuk mengelap debu pada ${keyword}. Hindari penggunaan cairan pembersih berbahan kimia keras yang dapat merusak lapisan cat atau melamin.</p>
+
+<h3>Hindari Kelembapan Berlebih</h3>
+<p>Letakkan ${keyword} Anda di area dengan sirkulasi udara yang baik. Kelembapan adalah musuh utama kayu. Gunakan alas jika meletakkan benda panas atau dingin di atas permukaan mebel.</p>
+
+<p>Jika Anda memerlukan bantuan profesional untuk perbaikan atau <i>refinishing</i> ${keyword}, tim kami di Apix Interior selalu siap membantu mengembalikan kejayaan interior rumah Anda.</p>
+                `
+            }
+        ];
+
+        const selected = contexts[Math.floor(Math.random() * contexts.length)];
+        const newTitle = selected.title;
+        const newSlug = newTitle.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+        const newExcerpt = selected.excerpt;
+        const newContent = selected.content.trim();
+        const authorName = "Made by Apix Interior";
+
+        // SEO Automation
+        const seoTitle = `${newTitle} | Apix Interior`;
+        const seoDesc = newExcerpt.substring(0, 155);
+
+        // 2. Auto Select Image (tetap gunakan gallery yang sudah ada)
         let images = galleryImages;
         if (images.length === 0) {
-            setLoading(true); // Temporary visual feedback
+            setLoading(true);
             try {
                 const res = await fetch("/api/admin/admin_dashboard/admin_galeri/list_gambar");
                 const json = await res.json();
@@ -244,23 +298,23 @@ export default function AdminPostinganPage() {
 
         let selectedUrl = "";
         if (images.length > 0) {
-            // Try fuzzy match
+            // Coba cari gambar yang relevan dengan keyword
             const match = images.find(img => (img.title || "").toLowerCase().includes(keyword.toLowerCase()));
             if (match) {
                 selectedUrl = match.url;
             } else {
-                // Random fallback
-                const random = images[Math.floor(Math.random() * images.length)];
-                selectedUrl = random.url;
+                selectedUrl = images[Math.floor(Math.random() * images.length)].url;
             }
         }
 
-        // 3. Update Form
-        if (confirm(`Generate konten otomatis untuk "${keyword}"?\n(Ini akan menimpa isi saat ini)`)) {
+        if (confirm(`Generate konten KREATIF & SEO untuk "${keyword}"?\n\n(Catatan: Ini akan mengisi Judul, Slug, Excerpt, Konten, Author, dan Meta SEO secara otomatis)`)) {
             setFormTitle(newTitle);
-            setFormSlug(cleanSlug);
+            setFormSlug(newSlug);
             setFormExcerpt(newExcerpt);
-            setFormContent(newContent.trim());
+            setFormContent(newContent);
+            setFormAuthor(authorName);
+            setFormSeoTitle(seoTitle);
+            setFormSeoDescription(seoDesc);
             if (selectedUrl) {
                 setFormCoverImage(selectedUrl);
             }
@@ -375,6 +429,18 @@ export default function AdminPostinganPage() {
                                 <div style={formGroup}>
                                     <label style={labelStyle}>Penulis</label>
                                     <input style={inputStyle} type="text" value={formAuthor} onChange={(e) => setFormAuthor(e.target.value)} />
+                                </div>
+
+                                <div style={{ ...formGroup, marginTop: 32 }}>
+                                    <label style={{ ...labelStyle, color: "#d4af37", borderBottom: "1px solid rgba(212,175,55,0.3)", paddingBottom: 4 }}>SEO Meta Data</label>
+                                    <div style={{ marginTop: 12 }}>
+                                        <label style={labelStyle}>SEO Title</label>
+                                        <input style={inputStyle} type="text" value={formSeoTitle} onChange={(e) => setFormSeoTitle(e.target.value)} placeholder="Title tag untuk Google..." />
+                                    </div>
+                                    <div style={{ marginTop: 12 }}>
+                                        <label style={labelStyle}>SEO Description</label>
+                                        <textarea style={{ ...inputStyle, minHeight: 80 }} value={formSeoDescription} onChange={(e) => setFormSeoDescription(e.target.value)} placeholder="Meta description untuk Google..." />
+                                    </div>
                                 </div>
 
                                 <div style={{ ...formGroup, display: "flex", alignItems: "center", gap: 12, marginTop: 24, padding: 12, border: "1px solid rgba(0,0,0,0.1)", borderRadius: 6 }}>
