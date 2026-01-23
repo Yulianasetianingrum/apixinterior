@@ -6028,7 +6028,6 @@ export default async function TokoPengaturanPage({
                                 kategori: (p.kategori as string) || undefined,
                                 subkategori: (p.subkategori as string) || undefined,
                                 mainImageId: p.mainImageId ?? null,
-                                mainImageId: p.mainImageId ?? null,
                                 galleryImageIds: Array.isArray((p as any).galeri)
                                   ? ((p as any).galeri as any[])
                                     .map((v: any) => Number(v.gambarId))
@@ -6201,7 +6200,6 @@ export default async function TokoPengaturanPage({
 
                                   kategori: (p.kategori as string) || undefined,
                                   subkategori: (p.subkategori as string) || undefined,
-                                  mainImageId: p.mainImageId ?? null,
                                   mainImageId: p.mainImageId ?? null,
                                   galleryImageIds: Array.isArray((p as any).galeri)
                                     ? ((p as any).galeri as any[])
