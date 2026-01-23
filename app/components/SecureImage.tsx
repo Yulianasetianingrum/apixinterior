@@ -72,6 +72,12 @@ export default function SecureImage({
         finalSrc = `${finalSrc}&w=${w}`;
     }
 
+    // Determine if we should optimize
+    // 1. External images (!isInternal) -> unoptimized=true (Safe)
+    // 2. /api/img paths -> unoptimized=true (Already optimized by API, avoid double-work/loopback issues)
+    const isApiImg = typeof finalSrc === "string" && finalSrc.includes("/api/img");
+    const shouldUnoptimize = !isInternal || isApiImg;
+
     return (
         <Image
             {...props}
@@ -83,8 +89,8 @@ export default function SecureImage({
             style={style}
             priority={priority}
             loading={priority ? undefined : (loading || "lazy")}
-            // ONLY optimize internal images to avoid crashing on unknown external domains
-            unoptimized={!isInternal}
+            // ONLY optimize standard internal assets. Skip external & API routes.
+            unoptimized={shouldUnoptimize}
             className={className}
             sizes={sizes || (fill ? "100vw" : undefined)}
             onLoadingComplete={() => {
