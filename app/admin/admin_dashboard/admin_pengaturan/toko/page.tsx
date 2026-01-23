@@ -6590,58 +6590,6 @@ export default async function TokoPengaturanPage({
                     </div>
                   )}
 
-                  {/* TESTIMONIALS */}
-                  {section.type === "TESTIMONIALS" && (
-                    <div className={styles.sectionEditForm}>
-                      <form
-                        id={`testimonialsForm-${section.id}`}
-                        action={saveTestimonialsConfig}
-                        className={styles.sectionEditForm}
-                        data-section-form="1"
-                      >
-                        <input type="hidden" name="id" value={section.id.toString()} />
-                        <TestimonialsEditor
-                          initialConfig={cfg}
-                          sectionId={section.id.toString()}
-                        />
-                      </form>
-
-                      {/* Footer Actions */}
-                      <div className={styles.highlightFooterActions}>
-                        <button type="submit" form={`testimonialsForm-${section.id}`} className={styles.secondaryButton}>
-                          Simpan
-                        </button>
-                        {activeThemeKey ? (
-                          <a
-                            className={styles.primaryButton}
-                            href={`/admin/admin_dashboard/admin_pengaturan/toko/preview?theme=${encodeURIComponent(
-                              activeThemeKey
-                            )}&focus=TESTIMONIALS&sectionId=${section.id}`}
-                          >
-                            Preview
-                          </a>
-                        ) : (
-                          <span className={styles.primaryButton} style={{ opacity: 0.5, cursor: "not-allowed" }}>
-                            Preview
-                          </span>
-                        )}
-                        <form action={toggleDraft} style={{ display: "inline" }}>
-                          <input type="hidden" name="id" value={section.id.toString()} />
-                          <input type="hidden" name="currentEnabled" value={section.enabled ? "true" : "false"} />
-                          <button type="submit" className={styles.secondaryButton}>
-                            {section.enabled ? "Nonaktifkan" : "Aktifkan"}
-                          </button>
-                        </form>
-                        <form action={deleteDraft} style={{ display: "inline" }}>
-                          <input type="hidden" name="id" value={section.id.toString()} />
-                          <button type="submit" className={styles.dangerButton}>
-                            Hapus
-                          </button>
-                        </form>
-                      </div>
-                    </div>
-                  )}
-
                   {/* SOCIAL */}
                   {section.type === "SOCIAL" && (
                     <form action={saveSocialConfig} className={styles.sectionEditForm} data-section-form="1">
