@@ -464,6 +464,9 @@ export default async function HomePage({
     ? resolvedParams.theme[0]
     : (resolvedParams.theme ?? "");
 
+  const info = await prisma.informasiToko.findUnique({ where: { id: 1 } });
+  const namaToko = info?.namaToko ?? "Apix Interior";
+
   // If no theme in URL, read the active theme from database (last published theme)
   let themeKey: string | null = null;
   if (requestedThemeKey) {
