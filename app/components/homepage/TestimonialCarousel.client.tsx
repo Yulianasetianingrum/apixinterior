@@ -321,22 +321,25 @@ export default function TestimonialCarousel({ config }: { config: TestimonialCon
 
                                     {/* Author */}
                                     <div style={{ display: "flex", alignItems: "center", gap: "16px", marginTop: "auto", borderTop: `1px solid ${cardStyle.border}`, paddingTop: "24px" }}>
-                                        {review.profile_photo_url ? (
-                                            <img
-                                                src={review.profile_photo_url}
-                                                alt={review.author_name}
-                                                style={{ width: "48px", height: "48px", borderRadius: "50%", objectFit: "cover", backgroundColor: "#f1f5f9" }}
-                                            />
-                                        ) : (
-                                            <div style={{
-                                                width: "48px", height: "48px", borderRadius: "50%",
-                                                display: "flex", alignItems: "center", justifyContent: "center",
-                                                fontSize: "14px", fontWeight: "bold", textTransform: "uppercase",
-                                                backgroundColor: "rgba(0,0,0,0.05)", color: cardStyle.text, border: `1px solid ${cardStyle.border}`
-                                            }}>
-                                                {review.author_name?.substring(0, 2) || "AN"}
-                                            </div>
-                                        )}
+                                        {(() => {
+                                            const avatarUrl = review.profile_photo_url
+                                                || `https://ui-avatars.com/api/?name=${encodeURIComponent(review.author_name || "AN")}&background=d4af37&color=0b1f3b&size=128&bold=true`;
+
+                                            return (
+                                                <img
+                                                    src={avatarUrl}
+                                                    alt={review.author_name}
+                                                    style={{
+                                                        width: "48px",
+                                                        height: "48px",
+                                                        borderRadius: "50%",
+                                                        objectFit: "cover",
+                                                        backgroundColor: "#f1f5f9",
+                                                        border: `2px solid ${cardStyle.border}`
+                                                    }}
+                                                />
+                                            );
+                                        })()}
                                         <div>
                                             <div style={{ fontSize: "16px", fontWeight: "bold", color: cardStyle.text }}>{review.author_name || "Pelanggan"}</div>
                                             <div style={{ fontSize: "12px", color: cardStyle.subtext }}>{review.relative_time_description || "Pelanggan Terverifikasi"}</div>
@@ -354,16 +357,29 @@ export default function TestimonialCarousel({ config }: { config: TestimonialCon
                 .no-scrollbar::-webkit-scrollbar { display: none; }
                 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-                /* Connected Padding Logic for centered snap */
+                /* Desktop & Tablet: Max 5 cards visible, proper spacing from edges */
                 @media (min-width: 768px) {
-                    .carousel-item { width: 400px !important; margin: 0 20px !important; }
-                    .no-scrollbar { padding-left: calc(50vw - 220px) !important; padding-right: calc(50vw - 220px) !important; }
+                    .carousel-item { 
+                        width: 340px !important; 
+                        margin: 0 16px !important; 
+                    }
+                    .no-scrollbar { 
+                        padding-left: calc(50vw - 170px) !important; 
+                        padding-right: calc(50vw - 170px) !important; 
+                    }
                 }
                 
+                /* Mobile: Optimized for single card view */
                 @media (max-width: 767px) {
                    .arrows-desktop-only { display: none !important; }
-                   .carousel-item { width: 80vw !important; margin: 0 10px !important; }
-                   .no-scrollbar { padding-left: calc(50vw - 40vw - 10px) !important; padding-right: calc(50vw - 40vw - 10px) !important; }
+                   .carousel-item { 
+                       width: 85vw !important; 
+                       margin: 0 8px !important; 
+                   }
+                   .no-scrollbar { 
+                       padding-left: calc(50vw - 42.5vw - 8px) !important; 
+                       padding-right: calc(50vw - 42.5vw - 8px) !important; 
+                   }
                 }
             `}</style>
         </section>
