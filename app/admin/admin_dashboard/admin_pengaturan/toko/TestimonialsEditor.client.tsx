@@ -13,12 +13,14 @@ type Review = {
 };
 
 type Props = {
-    config: any;
-    onChange: (newConfig: any) => void;
+    initialConfig: any;
+    sectionId?: string; // Optional, might be useful later
+    onSave?: (formData: FormData) => void; // Optional, if we want to support direct saving
+    onChange?: (newConfig: any) => void;
 };
 
-export default function TestimonialsEditor({ config, onChange }: Props) {
-    const safeConfig = config || {};
+export default function TestimonialsEditor({ initialConfig, onChange }: Props) {
+    const safeConfig = initialConfig || {};
 
     const [title, setTitle] = useState(safeConfig.title ?? "Apa Kata Mereka?");
     const [subtitle, setSubtitle] = useState(safeConfig.subtitle ?? "Ulasan dari pelanggan setia kami");
@@ -39,14 +41,10 @@ export default function TestimonialsEditor({ config, onChange }: Props) {
     const [reviews, setReviews] = useState<any[]>(initialReviews);
     const [isFetching, setIsFetching] = useState(false);
 
-    if (!config) {
-        return <div style={{ color: "red", padding: 10 }}>Error: Loading Config...</div>;
-    }
-
     // Sync changes to parent
     const updateConfig = (key: string, value: any) => {
         const next = { ...safeConfig, title, subtitle, mapsUrl, reviews, [key]: value };
-        onChange(next);
+        if (onChange) onChange(next);
     };
 
     const handleFetch = async () => {
