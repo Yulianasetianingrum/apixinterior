@@ -263,40 +263,97 @@ async function RecommendedPosts({ currentSlug }: { currentSlug: string }) {
             slug: { not: currentSlug },
             isPublished: true
         },
-        take: 3,
+        take: 12,
         orderBy: { createdAt: "desc" }
     });
 
     if (others.length === 0) return null;
 
     return (
-        <section style={{ background: "#f9fafb", padding: "80px 24px", marginTop: "60px" }}>
-            <div style={{ maxWidth: "1000px", margin: "0 auto" }}>
-                <h3 style={{ fontSize: "24px", fontWeight: "800", color: "#0f172a", marginBottom: "40px", textAlign: "center", letterSpacing: "-0.02em" }}>
-                    Artikel Pilihan Lainnya
-                </h3>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "32px" }}>
+        <section style={{ background: "#f9fafb", padding: "80px 24px", marginTop: "60px", borderTop: "1px solid #e2e8f0" }}>
+            <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "40px" }}>
+                    <div>
+                        <h3 style={{ fontSize: "28px", fontWeight: "800", color: "#0f172a", marginBottom: "8px", letterSpacing: "-0.02em" }}>
+                            Artikel Lainnya
+                        </h3>
+                        <p style={{ color: "#64748b", fontSize: "16px" }}>
+                            Jelajahi inspirasi dan tips menarik lainnya.
+                        </p>
+                    </div>
+                    <Link
+                        href="/artikel"
+                        style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "8px",
+                            color: "#d4af37",
+                            fontWeight: "700",
+                            textDecoration: "none",
+                            fontSize: "15px"
+                        }}
+                    >
+                        Lihat Semua <span style={{ fontSize: "18px" }}>→</span>
+                    </Link>
+                </div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "32px" }}>
                     {others.map((p: any) => (
-                        <Link key={p.id} href={`/artikel/${p.slug}`} className={styles.hoverCard}>
-                            <div style={{ aspectRatio: "16/9", background: "#f1f5f9", borderRadius: "10px", overflow: "hidden", position: "relative" }}>
+                        <Link key={p.id} href={`/artikel/${p.slug}`} className={styles.hoverCard} style={{ textDecoration: "none" }}>
+                            <div style={{ aspectRatio: "16/9", background: "#f1f5f9", borderRadius: "16px", overflow: "hidden", position: "relative", marginBottom: "16px", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.05)" }}>
                                 {p.coverImage ? (
-                                    <SecureImage src={p.coverImage} alt={p.title} fill style={{ objectFit: "cover" }} sizes="(max-width: 1000px) 100vw, 33vw" />
+                                    <SecureImage
+                                        src={p.coverImage}
+                                        alt={p.title}
+                                        fill
+                                        style={{ objectFit: "cover" }}
+                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                    />
                                 ) : (
-                                    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", color: "#94a3b8", fontSize: "14px" }}>
+                                    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", color: "#94a3b8", fontSize: "14px", fontWeight: "500" }}>
                                         No Image
                                     </div>
                                 )}
                             </div>
                             <div>
-                                <h4 className={styles.title}>{p.title}</h4>
-                                <div className={styles.meta}>
+                                <div style={{ fontSize: "12px", color: "#d97706", fontWeight: "700", textTransform: "uppercase", marginBottom: "8px", letterSpacing: "0.05em" }}>
+                                    Article
+                                </div>
+                                <h4 className={styles.title} style={{ fontSize: "20px", fontWeight: "700", color: "#0f172a", lineHeight: "1.4", marginBottom: "8px" }}>
+                                    {p.title}
+                                </h4>
+                                <div className={styles.meta} style={{ fontSize: "14px", color: "#64748b" }}>
                                     {new Date(p.createdAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
                                 </div>
                             </div>
                         </Link>
                     ))}
                 </div>
+
+                {/* Mobile View All Button (Visible only on small screens via CSS usually, but here just additional) */}
+                <div style={{ marginTop: "40px", textAlign: "center", display: "none" }} className="mobile-only-btn">
+                    <Link
+                        href="/artikel"
+                        style={{
+                            display: "inline-block",
+                            padding: "12px 24px",
+                            backgroundColor: "#fff",
+                            border: "1px solid #e2e8f0",
+                            borderRadius: "99px",
+                            color: "#0f172a",
+                            fontWeight: "600",
+                            textDecoration: "none"
+                        }}
+                    >
+                        Lihat Semua Artikel
+                    </Link>
+                </div>
             </div>
+            <style>{`
+                @media (max-width: 640px) {
+                    .mobile-only-btn { display: block !important; }
+                }
+            `}</style>
         </section>
     );
 }
