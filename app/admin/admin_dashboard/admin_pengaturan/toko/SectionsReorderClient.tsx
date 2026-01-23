@@ -298,10 +298,20 @@ export default function SectionsReorderClient({
                           touchAction: dragModeActive ? "none" : "auto",
                           cursor: dragModeActive ? "grab" : "pointer"
                         }}
+                        onClick={(e) => {
+                          console.log('[SectionsReorder] 🖱️ CLICK EVENT FIRED!', item.id);
+                          if (!dragModeActive) {
+                            e.stopPropagation();
+                            scrollToSection(item.id);
+                          }
+                        }}
                         onMouseDown={(e) => startLongPress(item.id, e)}
                         onMouseUp={() => cancelLongPress(item.id)}
                         onMouseLeave={() => cancelLongPress(item.id)}
-                        onTouchStart={(e) => startLongPress(item.id, e)}
+                        onTouchStart={(e) => {
+                          console.log('[SectionsReorder] 👆 TOUCH START!', item.id);
+                          startLongPress(item.id, e);
+                        }}
                         onTouchEnd={() => cancelLongPress(item.id)}
                         onTouchCancel={() => cancelLongPress(item.id)}
                       >
