@@ -2506,8 +2506,17 @@ export default async function TokoPreviewDraftPage({
                       }}
                     >
                       <div className={ui.footerLayout}>
+                        {/* LEFT: Product Tags Grid */}
                         <div className={ui.footerLeftStack}>
-                          {/* Tags moved below columns to match live site */}
+                          {Array.isArray((cfg as any).footerTags) && (cfg as any).footerTags.length > 0 && (
+                            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "10px 24px" }}>
+                              {(cfg as any).footerTags.map((tag: any, idx: number) => (
+                                <span key={idx} style={{ color: "inherit", opacity: 0.6, fontSize: 12, cursor: "default" }}>
+                                  {tag.label}
+                                </span>
+                              ))}
+                            </div>
+                          )}
                         </div>
 
                         {/* RIGHT: Info Stack (Split Height) */}
@@ -2633,19 +2642,6 @@ export default async function TokoPreviewDraftPage({
                         </div>
                       </div>
 
-                      {/* Tag Grid (SEO Text Only) - Match GlobalFooter.tsx */}
-                      {Array.isArray((cfg as any).footerTags) && (cfg as any).footerTags.length > 0 && (
-                        <div style={{ maxWidth: 1200, margin: "40px auto 0", borderTop: `1px solid ${colors.divider}`, paddingTop: 30 }}>
-                          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "10px 24px" }}>
-                            {(cfg as any).footerTags.map((tag: any, idx: number) => (
-                              <span key={idx} style={{ color: "inherit", opacity: 0.6, fontSize: 12, cursor: "default" }}>
-                                {tag.label}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
                       <div style={{ borderTop: `1px solid ${colors.divider}`, marginTop: 60, paddingTop: 24, textAlign: "center", fontSize: 13, opacity: 0.6 }}>
                         {(cfg as any).copyright ? (cfg as any).copyright : (
                           <>&copy; {new Date().getFullYear()} Apix Interior. All rights reserved.</>
@@ -2673,7 +2669,7 @@ export default async function TokoPreviewDraftPage({
             <div className={ui.notice}>Belum ada section aktif untuk theme ini.</div>
           </div>
         )}
-      </main>
+      </main >
     </>
   );
 }
