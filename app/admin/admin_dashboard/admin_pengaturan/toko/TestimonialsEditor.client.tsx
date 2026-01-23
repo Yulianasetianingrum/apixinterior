@@ -14,8 +14,8 @@ type Review = {
 
 type Props = {
     initialConfig: any;
-    sectionId?: string; // Optional, might be useful later
-    onSave?: (formData: FormData) => void; // Optional, if we want to support direct saving
+    sectionId?: string;
+    onSave?: (formData: FormData) => void;
     onChange?: (newConfig: any) => void;
 };
 
@@ -26,7 +26,7 @@ export default function TestimonialsEditor({ initialConfig, onChange }: Props) {
     const [subtitle, setSubtitle] = useState(safeConfig.subtitle ?? "Ulasan dari pelanggan setia kami");
     const [mapsUrl, setMapsUrl] = useState(safeConfig.mapsUrl ?? "");
 
-    // Normalize initial reviews to match Renderer structure
+    // Normalize initial reviews
     const initialReviews = Array.isArray(safeConfig.reviews)
         ? safeConfig.reviews.map((r: any) => ({
             id: r.id || String(Math.random()),
@@ -40,11 +40,12 @@ export default function TestimonialsEditor({ initialConfig, onChange }: Props) {
 
     const [reviews, setReviews] = useState<any[]>(initialReviews);
     const [isFetching, setIsFetching] = useState(false);
-    const [sectionTheme, setSectionTheme] = useState(safeConfig.sectionTheme ?? "FOLLOW_NAVBAR");
+    const [sectionTheme, setSectionTheme] = useState(safeConfig.sectionTheme ?? "NAVY_GOLD");
+    const [sectionBgTheme, setSectionBgTheme] = useState(safeConfig.sectionBgTheme ?? "NAVY");
 
-    // Sync changes to parent
+    // Sync changes
     const updateConfig = (key: string, value: any) => {
-        const next = { ...safeConfig, title, subtitle, mapsUrl, reviews, sectionTheme, [key]: value };
+        const next = { ...safeConfig, title, subtitle, mapsUrl, reviews, sectionTheme, sectionBgTheme, [key]: value };
         if (onChange) onChange(next);
     };
 
@@ -55,9 +56,7 @@ export default function TestimonialsEditor({ initialConfig, onChange }: Props) {
         }
 
         setIsFetching(true);
-
-        // SIMULATED FETCH for now
-        // In a real scenario, this would call a Server Action that uses Puppeteer/Cheerio/Places API
+        // SIMULATED FETCH
         setTimeout(() => {
             const dummyReviews = [
                 { id: "r1", author_name: "Budi Santoso", rating: 5, text: "Pelayanan sangat ramah, furniture kualitas premium. Sangat puas!", relative_time_description: "2 hari lalu", profile_photo_url: "" },
@@ -106,14 +105,15 @@ export default function TestimonialsEditor({ initialConfig, onChange }: Props) {
 
     return (
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            {/* Hidden Inputs for Server Action - syncing with new field names */}
+            {/* Hidden Inputs */}
             <input type="hidden" name="title" value={title} />
             <input type="hidden" name="subtitle" value={subtitle} />
             <input type="hidden" name="mapsUrl" value={mapsUrl} />
             <input type="hidden" name="reviews" value={JSON.stringify(reviews)} />
             <input type="hidden" name="sectionTheme" value={sectionTheme} />
+            <input type="hidden" name="sectionBgTheme" value={sectionBgTheme} />
 
-            {/* Config Header */}
+            {/* Grid Config */}
             <div className={styles.sectionEditGrid}>
                 <div className={styles.fieldGroup}>
                     <label className={styles.label}>Judul Section</label>
@@ -122,20 +122,35 @@ export default function TestimonialsEditor({ initialConfig, onChange }: Props) {
                         value={title} onChange={(e) => { setTitle(e.target.value); updateConfig("title", e.target.value); }}
                     />
                 </div>
+
+                {/* Background Section */}
                 <div className={styles.fieldGroup}>
-                    <label className={styles.label}>Tema Section</label>
+                    <label className={styles.label}>Warna Background</label>
+                    <select
+                        className={styles.select}
+                        value={sectionBgTheme}
+                        onChange={(e) => { setSectionBgTheme(e.target.value); updateConfig("sectionBgTheme", e.target.value); }}
+                    >
+                        <option value="NAVY">NAVY (Biru Gelap)</option>
+                        <option value="GOLD">GOLD (Emas)</option>
+                        <option value="WHITE">WHITE (Putih)</option>
+                    </select>
+                </div>
+
+                {/* Card Theme */}
+                <div className={styles.fieldGroup}>
+                    <label className={styles.label}>Tema Kartu (Bg + Teks)</label>
                     <select
                         className={styles.select}
                         value={sectionTheme}
                         onChange={(e) => { setSectionTheme(e.target.value); updateConfig("sectionTheme", e.target.value); }}
                     >
-                        <option value="FOLLOW_NAVBAR">Ikuti tema Navbar (default)</option>
-                        <option value="NAVY_GOLD">NAVY + GOLD</option>
-                        <option value="WHITE_GOLD">WHITE + GOLD</option>
-                        <option value="NAVY_WHITE">NAVY + WHITE</option>
-                        <option value="GOLD_NAVY">GOLD + NAVY</option>
-                        <option value="GOLD_WHITE">GOLD + WHITE</option>
-                        <option value="WHITE_NAVY">WHITE + NAVY</option>
+                        <option value="NAVY_GOLD">Card: NAVY, Teks: GOLD</option>
+                        <option value="NAVY_WHITE">Card: NAVY, Teks: WHITE</option>
+                        <option value="WHITE_GOLD">Card: WHITE, Teks: GOLD</option>
+                        <option value="WHITE_NAVY">Card: WHITE, Teks: NAVY</option>
+                        <option value="GOLD_NAVY">Card: GOLD, Teks: NAVY</option>
+                        <option value="GOLD_WHITE">Card: GOLD, Teks: WHITE</option>
                     </select>
                 </div>
             </div>
@@ -148,9 +163,9 @@ export default function TestimonialsEditor({ initialConfig, onChange }: Props) {
                 />
             </div>
 
-            {/* Maps URL Fetcher */}
+            {/* Maps URL Fetcher - ONLY ONE INSTANCE */}
             <div className={styles.fieldGroup} style={{ background: "#f0fdf4", padding: 12, borderRadius: 8, border: "1px solid #bbf7d0" }}>
-                <label className={styles.label}>Link Google Maps</label>
+                <label className={styles.label}>Link Google Maps (Sumber Ulasan)</label>
                 <div style={{ display: "flex", gap: 8 }}>
                     <input
                         type="text" className={styles.input}
@@ -164,7 +179,8 @@ export default function TestimonialsEditor({ initialConfig, onChange }: Props) {
                         style={{
                             padding: "0 16px", background: "#166534", color: "white",
                             border: "none", borderRadius: 6, cursor: "pointer", fontWeight: 600,
-                            opacity: isFetching ? 0.7 : 1
+                            opacity: isFetching ? 0.7 : 1,
+                            whiteSpace: "nowrap"
                         }}
                     >
                         {isFetching ? "Loading..." : "Fetch"}
@@ -224,6 +240,6 @@ export default function TestimonialsEditor({ initialConfig, onChange }: Props) {
                     </p>
                 )}
             </div>
-        </div >
+        </div>
     );
 }
