@@ -1,7 +1,7 @@
 ﻿"use client";
 
-import React, { useState, useEffect } from "react";
-import { FaGripVertical } from "react-icons/fa6";
+import React, { useState, useEffect, useRef } from "react";
+import { FaGripVertical, FaLock, FaLockOpen } from "react-icons/fa6";
 import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
 
 type SectionItem = {
@@ -28,6 +28,8 @@ const TYPE_LABEL: Record<string, string> = {
   FOOTER: "Footer",
 };
 
+const LONG_PRESS_DURATION = 2000; // 2 seconds
+
 export default function SectionsReorderClient({
   sections,
 }: {
@@ -36,6 +38,13 @@ export default function SectionsReorderClient({
   const [items, setItems] = useState<SectionItem[]>(sections);
   const [saving, setSaving] = useState(false);
   const [enabled, setEnabled] = useState(false);
+  const [dragModeActive, setDragModeActive] = useState(false);
+  const [pressProgress, setPressProgress] = useState(0);
+  const [pressingItemId, setPressingItemId] = useState<number | null>(null);
+
+  const pressTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const pressStartTimeRef = useRef<number>(0);
+  const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Strict mode fix for dnd
   useEffect(() => {
@@ -45,6 +54,87 @@ export default function SectionsReorderClient({
       setEnabled(false);
     };
   }, []);
+
+  // Cleanup timers on unmount
+  useEffect(() => {
+    return () => {
+      if (pressTimerRef.current) clearTimeout(pressTimerRef.current);
+      if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+    };
+  }, []);
+
+  const startLongPress = (itemId: number, event: React.MouseEvent | React.TouchEvent) => {
+    if (dragModeActive) return; // Already in drag mode, ignore
+
+    event.preventDefault();
+    setPressingItemId(itemId);
+    setPressProgress(0);
+    pressStartTimeRef.current = Date.now();
+
+    // Progress animation
+    progressIntervalRef.current = setInterval(() => {
+      const elapsed = Date.now() - pressStartTimeRef.current;
+      const progress = Math.min((elapsed / LONG_PRESS_DURATION) * 100, 100);
+      setPressProgress(progress);
+    }, 50);
+
+    // Long press timer
+    pressTimerRef.current = setTimeout(() => {
+      setDragModeActive(true);
+      setPressingItemId(null);
+      setPressProgress(0);
+      if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+    }, LONG_PRESS_DURATION);
+  };
+
+  const cancelLongPress = (itemId: number) => {
+    if (pressTimerRef.current) clearTimeout(pressTimerRef.current);
+    if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+
+    const wasPressingThisItem = pressingItemId === itemId;
+    setPressingItemId(null);
+    setPressProgress(0);
+
+    // If released before 2s and not in drag mode, trigger auto-scroll
+    if (wasPressingThisItem && !dragModeActive) {
+      scrollToSection(itemId);
+    }
+  };
+
+  const scrollToSection = (sectionId: number) => {
+    // Try multiple selectors since different sections have different form ID patterns
+    const selectors = [
+      `#heroForm-${sectionId}`,
+      `#categoryGridForm-${sectionId}`,
+      `#highlightForm-${sectionId}`,
+      `#testimonialsForm-${sectionId}`,
+      `form[data-section-form][id*="${sectionId}"]`,
+      `[data-section-id="${sectionId}"]`
+    ];
+
+    let targetElement: Element | null = null;
+    for (const selector of selectors) {
+      targetElement = document.querySelector(selector);
+      if (targetElement) break;
+    }
+
+    if (targetElement) {
+      targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      // Flash highlight effect on the form or its parent
+      const highlightTarget = targetElement.closest('[class*="sectionEditForm"]') || targetElement;
+      highlightTarget.classList.add('section-flash-highlight');
+      setTimeout(() => {
+        highlightTarget.classList.remove('section-flash-highlight');
+      }, 2000);
+    } else {
+      console.warn(`[SectionsReorder] Section form with id ${sectionId} not found. Tried selectors:`, selectors);
+    }
+  };
+
+  const exitDragMode = () => {
+    setDragModeActive(false);
+  };
 
   const onDragEnd = (result: DropResult) => {
     if (!result.destination) return;
@@ -104,89 +194,152 @@ export default function SectionsReorderClient({
   }
 
   return (
-    <div className="border rounded-xl p-4 bg-white shadow-sm space-y-3">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p className="text-sm font-semibold">Urutan Section (Drag & Drop)</p>
-          <p className="text-[11px] text-gray-500">
-            Tarik handle <span className="font-mono"></span> ke atas/bawah
-            untuk mengubah urutan section di homepage.
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={handleSave}
-          disabled={saving}
-          className="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded-md bg-black text-white hover:opacity-90 disabled:opacity-50"
-        >
-          {saving ? "Menyimpan..." : "Simpan Urutan"}
-        </button>
-      </div>
+    <>
+      <style jsx>{`
+        @keyframes flash-highlight {
+          0%, 100% { background-color: transparent; }
+          50% { background-color: rgba(59, 130, 246, 0.2); }
+        }
+        :global(.section-flash-highlight) {
+          animation: flash-highlight 0.6s ease-in-out 3;
+        }
+      `}</style>
 
-      <DragDropContext onDragEnd={onDragEnd}>
-        <Droppable droppableId="sections-list">
-          {(provided) => (
-            <div
-              {...provided.droppableProps}
-              ref={provided.innerRef}
-              className="space-y-2"
-            >
-              {items.map((item, index) => (
-                <Draggable key={item.id} draggableId={String(item.id)} index={index}>
-                  {(provided, snapshot) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      className={`flex items-center justify-between rounded-lg border px-3 py-3 text-xs ${snapshot.isDragging ? "bg-blue-50 border-blue-200 shadow-lg z-50" : "bg-gray-50 border-gray-200"
-                        }`}
-                      style={{
-                        ...provided.draggableProps.style,
-                        touchAction: "none" // Crucial for mobile
-                      }}
-                    >
-                      <div className="flex items-center gap-3 flex-1 min-w-0">
-                        {/* HANDLE */}
-                        <div
-                          {...provided.dragHandleProps}
-                          className="text-gray-400 hover:text-gray-600 p-2 -ml-2 cursor-grab active:cursor-grabbing touch-none"
-                          style={{ touchAction: "none" }}
-                          aria-label="Drag handle"
-                        >
-                          <FaGripVertical size={16} />
-                        </div>
-
-                        <span className="w-5 text-[11px] text-gray-400 text-right flex-shrink-0">
-                          {index + 1}
-                        </span>
-
-                        <div className="flex flex-col min-w-0 flex-1">
-                          <span className="font-medium truncate">{item.title || "(Tanpa Judul)"}</span>
-                          <span className="text-[10px] text-gray-500 truncate">
-                            {TYPE_LABEL[item.type] ?? item.type}
-                          </span>
-                        </div>
-                      </div>
-
-                      <span
-                        className={
-                          "text-[10px] rounded-full px-2 py-0.5 border ml-2 flex-shrink-0 " +
-                          (item.enabled
-                            ? "border-emerald-200 text-emerald-700 bg-emerald-50"
-                            : "border-gray-200 text-gray-500 bg-white")
-                        }
-                      >
-                        {item.enabled ? "Aktif" : "Nonaktif"}
-                      </span>
-                    </div>
-                  )}
-                </Draggable>
-              ))}
-              {provided.placeholder}
+      <div className="border rounded-xl p-4 bg-white shadow-sm space-y-3">
+        {/* Drag Mode Banner */}
+        {dragModeActive && (
+          <div className="flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg px-3 py-2">
+            <div className="flex items-center gap-2">
+              <FaLockOpen className="text-blue-600" size={14} />
+              <span className="text-xs font-medium text-blue-700">
+                🔓 Drag Mode Aktif - Drag section untuk reorder
+              </span>
             </div>
-          )}
-        </Droppable>
-      </DragDropContext>
-    </div>
+            <button
+              type="button"
+              onClick={exitDragMode}
+              className="text-xs px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+              Exit Drag Mode
+            </button>
+          </div>
+        )}
+
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm font-semibold">Urutan Section (Drag & Drop)</p>
+            <p className="text-[11px] text-gray-500">
+              {dragModeActive
+                ? "Drag handle ke atas/bawah untuk mengubah urutan"
+                : "Tap untuk scroll ke section • Tahan 2 detik untuk drag mode"
+              }
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={saving}
+            className="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded-md bg-black text-white hover:opacity-90 disabled:opacity-50"
+          >
+            {saving ? "Menyimpan..." : "Simpan Urutan"}
+          </button>
+        </div>
+
+        <DragDropContext onDragEnd={onDragEnd}>
+          <Droppable droppableId="sections-list" isDropDisabled={!dragModeActive}>
+            {(provided) => (
+              <div
+                {...provided.droppableProps}
+                ref={provided.innerRef}
+                className="space-y-2"
+              >
+                {items.map((item, index) => (
+                  <Draggable
+                    key={item.id}
+                    draggableId={String(item.id)}
+                    index={index}
+                    isDragDisabled={!dragModeActive}
+                  >
+                    {(provided, snapshot) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        className={`flex items-center justify-between rounded-lg border px-3 py-3 text-xs transition-all ${snapshot.isDragging
+                          ? "bg-blue-50 border-blue-200 shadow-lg z-50"
+                          : pressingItemId === item.id
+                            ? "bg-yellow-50 border-yellow-300"
+                            : "bg-gray-50 border-gray-200 hover:border-gray-300"
+                          }`}
+                        style={{
+                          ...provided.draggableProps.style,
+                          touchAction: dragModeActive ? "none" : "auto",
+                          cursor: dragModeActive ? "grab" : "pointer"
+                        }}
+                        onMouseDown={(e) => startLongPress(item.id, e)}
+                        onMouseUp={() => cancelLongPress(item.id)}
+                        onMouseLeave={() => cancelLongPress(item.id)}
+                        onTouchStart={(e) => startLongPress(item.id, e)}
+                        onTouchEnd={() => cancelLongPress(item.id)}
+                        onTouchCancel={() => cancelLongPress(item.id)}
+                      >
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                          {/* HANDLE */}
+                          <div
+                            {...(dragModeActive ? provided.dragHandleProps : {})}
+                            className={`text-gray-400 p-2 -ml-2 relative ${dragModeActive
+                              ? "hover:text-gray-600 cursor-grab active:cursor-grabbing"
+                              : "cursor-pointer"
+                              }`}
+                            style={{ touchAction: dragModeActive ? "none" : "auto" }}
+                            aria-label={dragModeActive ? "Drag handle" : "Press and hold to enable drag"}
+                          >
+                            {pressingItemId === item.id && (
+                              <div
+                                className="absolute inset-0 rounded-full border-2 border-blue-500"
+                                style={{
+                                  background: `conic-gradient(#3b82f6 ${pressProgress}%, transparent ${pressProgress}% 100%)`
+                                }}
+                              />
+                            )}
+                            {dragModeActive ? (
+                              <FaGripVertical size={16} />
+                            ) : (
+                              <FaLock size={14} className="opacity-50" />
+                            )}
+                          </div>
+
+                          <span className="w-5 text-[11px] text-gray-400 text-right flex-shrink-0">
+                            {index + 1}
+                          </span>
+
+                          <div className="flex flex-col min-w-0 flex-1">
+                            <span className="font-medium truncate">{item.title || "(Tanpa Judul)"}</span>
+                            <span className="text-[10px] text-gray-500 truncate">
+                              {TYPE_LABEL[item.type] ?? item.type}
+                            </span>
+                          </div>
+                        </div>
+
+                        <span
+                          className={
+                            "text-[10px] rounded-full px-2 py-0.5 border ml-2 flex-shrink-0 " +
+                            (item.enabled
+                              ? "border-emerald-200 text-emerald-700 bg-emerald-50"
+                              : "border-gray-200 text-gray-500 bg-white")
+                          }
+                        >
+                          {item.enabled ? "Aktif" : "Nonaktif"}
+                        </span>
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
+      </div>
+    </>
   );
 }
-

@@ -5232,291 +5232,286 @@ export default async function TokoPengaturanPage({
 
                   {/* === CONFIG FORMS (BY TYPE) === */}
 
-                  {/* HERO */}
-                  {section.type === "HERO" && (
-                    <div className={styles.sectionEditForm}>
-                      {(() => {
-                        const heroContent = ((cfg as any).heroContent ?? {}) as any;
-                        const badgesValue = Array.isArray((heroContent as any).badges)
-                          ? (heroContent as any).badges
-                          : Array.isArray((cfg as any).badges)
-                            ? (cfg as any).badges
-                            : [];
-                        const highlightsValue = Array.isArray((heroContent as any).highlights)
-                          ? (heroContent as any).highlights
-                          : Array.isArray((cfg as any).highlights)
-                            ? (cfg as any).highlights
-                            : [];
-                        const trustValue = Array.isArray((heroContent as any).trustChips)
-                          ? (heroContent as any).trustChips
-                          : Array.isArray((cfg as any).trustChips)
-                            ? (cfg as any).trustChips
-                            : [];
-                        const miniValue = Array.isArray((heroContent as any).miniInfo)
-                          ? (heroContent as any).miniInfo
-                          : Array.isArray((cfg as any).miniInfo)
-                            ? (cfg as any).miniInfo
-                            : [];
+                  {/* FOOTER */}
+                  {section.type === "FOOTER" && (
+                    <div className={styles.sectionEditForm} data-section-id={section.id}>
+                      ? (cfg as any).badges
+                      : [];
+                      const highlightsValue = Array.isArray((heroContent as any).highlights)
+                      ? (heroContent as any).highlights
+                      : Array.isArray((cfg as any).highlights)
+                      ? (cfg as any).highlights
+                      : [];
+                      const trustValue = Array.isArray((heroContent as any).trustChips)
+                      ? (heroContent as any).trustChips
+                      : Array.isArray((cfg as any).trustChips)
+                      ? (cfg as any).trustChips
+                      : [];
+                      const miniValue = Array.isArray((heroContent as any).miniInfo)
+                      ? (heroContent as any).miniInfo
+                      : Array.isArray((cfg as any).miniInfo)
+                      ? (cfg as any).miniInfo
+                      : [];
                         const miniAt = (idx: number, key: "title" | "desc") =>
-                          String(miniValue[idx]?.[key] ?? "").trim();
-                        const lookbookTitle =
-                          String((heroContent as any).floatLookbookTitle ?? (cfg as any).floatLookbookTitle ?? "").trim();
-                        const lookbookSubtitle =
-                          String((heroContent as any).floatLookbookSubtitle ?? (cfg as any).floatLookbookSubtitle ?? "").trim();
-                        const promoTitle =
-                          String((heroContent as any).floatPromoTitle ?? (cfg as any).floatPromoTitle ?? "").trim();
-                        const promoText =
-                          String((heroContent as any).floatPromoText ?? (cfg as any).floatPromoText ?? "").trim();
+                      String(miniValue[idx]?.[key] ?? "").trim();
+                      const lookbookTitle =
+                      String((heroContent as any).floatLookbookTitle ?? (cfg as any).floatLookbookTitle ?? "").trim();
+                      const lookbookSubtitle =
+                      String((heroContent as any).floatLookbookSubtitle ?? (cfg as any).floatLookbookSubtitle ?? "").trim();
+                      const promoTitle =
+                      String((heroContent as any).floatPromoTitle ?? (cfg as any).floatPromoTitle ?? "").trim();
+                      const promoText =
+                      String((heroContent as any).floatPromoText ?? (cfg as any).floatPromoText ?? "").trim();
 
-                        return (
-                          <>
-                            {/* Form utama HERO (konsep mengikuti HIGHLIGHT_COLLECTION): slug + config disimpan dari tombol utama */}
-                            <form id={`heroForm-${section.id}`} action={saveHeroConfig} className={styles.sectionEditForm} data-section-form="1">
-                              <input type="hidden" name="id" value={section.id.toString()} />
-                              <input type="hidden" name="currentEnabled" value={section.enabled ? "true" : "false"} />
+                      return (
+                      <>
+                        {/* Form utama HERO (konsep mengikuti HIGHLIGHT_COLLECTION): slug + config disimpan dari tombol utama */}
+                        <form id={`heroForm-${section.id}`} action={saveHeroConfig} className={styles.sectionEditForm} data-section-form="1">
+                          <input type="hidden" name="id" value={section.id.toString()} />
+                          <input type="hidden" name="currentEnabled" value={section.enabled ? "true" : "false"} />
 
-                              {/* Slug (opsional) */}
-                              <div style={{ maxWidth: 520 }}>
-                                <div className={styles.fieldGroup}>
-                                  <label className={styles.label}>Slug (opsional)</label>
-                                  <input name="slug" type="text" defaultValue={section.slug ?? ""} className={styles.input} />
-                                  <p className={styles.helperText}>Boleh kosong (slug akan jadi null).</p>
-                                </div>
-                              </div>
+                          {/* Slug (opsional) */}
+                          <div style={{ maxWidth: 520 }}>
+                            <div className={styles.fieldGroup}>
+                              <label className={styles.label}>Slug (opsional)</label>
+                              <input name="slug" type="text" defaultValue={section.slug ?? ""} className={styles.input} />
+                              <p className={styles.helperText}>Boleh kosong (slug akan jadi null).</p>
+                            </div>
+                          </div>
 
-                              <div className={styles.fieldGroup}>
-                                <label className={styles.label}>Eyebrow (chip atas)</label>
-                                <input name="eyebrow" defaultValue={(heroContent as any).eyebrow ?? cfg.eyebrow ?? ""} className={styles.input} />
-                                <p className={styles.helperText}>Contoh: Interior Essentials.</p>
-                              </div>
+                          <div className={styles.fieldGroup}>
+                            <label className={styles.label}>Eyebrow (chip atas)</label>
+                            <input name="eyebrow" defaultValue={(heroContent as any).eyebrow ?? cfg.eyebrow ?? ""} className={styles.input} />
+                            <p className={styles.helperText}>Contoh: Interior Essentials.</p>
+                          </div>
 
-                              <div className={styles.fieldGroup}>
-                                <label className={styles.label}>Judul</label>
-                                <input name="headline" defaultValue={cfg.headline ?? ""} className={styles.input} />
-                              </div>
+                          <div className={styles.fieldGroup}>
+                            <label className={styles.label}>Judul</label>
+                            <input name="headline" defaultValue={cfg.headline ?? ""} className={styles.input} />
+                          </div>
 
-                              <div className={styles.fieldGroup}>
-                                <label className={styles.label}>Deskripsi</label>
-                                <input name="subheadline" defaultValue={cfg.subheadline ?? ""} className={styles.input} />
-                              </div>
+                          <div className={styles.fieldGroup}>
+                            <label className={styles.label}>Deskripsi</label>
+                            <input name="subheadline" defaultValue={cfg.subheadline ?? ""} className={styles.input} />
+                          </div>
 
-                              <div className={styles.fieldGroup}>
-                                <label className={styles.label}>Tema Warna Hero</label>
-                                <select
-                                  name="sectionTheme"
-                                  defaultValue={String((cfg as any).sectionTheme ?? (cfg as any).heroTheme ?? "FOLLOW_NAVBAR")}
-                                  className={styles.select}
-                                >
-                                  <option value="FOLLOW_NAVBAR">Ikuti tema Navbar (default)</option>
-                                  <option value="NAVY_GOLD">NAVY + GOLD</option>
-                                  <option value="WHITE_GOLD">WHITE + GOLD</option>
-                                  <option value="NAVY_WHITE">NAVY + WHITE</option>
-                                  <option value="GOLD_NAVY">GOLD + NAVY</option>
-                                  <option value="GOLD_WHITE">GOLD + WHITE</option>
-                                  <option value="WHITE_NAVY">WHITE + NAVY</option>
-                                </select>
-                                <p className={styles.helperText}>
-                                  Mengatur warna background, card, elemen (teks/garis/simbol/logo), dan CTA pada HERO.
-                                  Jika Ikuti tema Navbar, warna hero otomatis mengikuti tema navbar yang aktif.
-                                </p>
-                              </div>
+                          <div className={styles.fieldGroup}>
+                            <label className={styles.label}>Tema Warna Hero</label>
+                            <select
+                              name="sectionTheme"
+                              defaultValue={String((cfg as any).sectionTheme ?? (cfg as any).heroTheme ?? "FOLLOW_NAVBAR")}
+                              className={styles.select}
+                            >
+                              <option value="FOLLOW_NAVBAR">Ikuti tema Navbar (default)</option>
+                              <option value="NAVY_GOLD">NAVY + GOLD</option>
+                              <option value="WHITE_GOLD">WHITE + GOLD</option>
+                              <option value="NAVY_WHITE">NAVY + WHITE</option>
+                              <option value="GOLD_NAVY">GOLD + NAVY</option>
+                              <option value="GOLD_WHITE">GOLD + WHITE</option>
+                              <option value="WHITE_NAVY">WHITE + NAVY</option>
+                            </select>
+                            <p className={styles.helperText}>
+                              Mengatur warna background, card, elemen (teks/garis/simbol/logo), dan CTA pada HERO.
+                              Jika Ikuti tema Navbar, warna hero otomatis mengikuti tema navbar yang aktif.
+                            </p>
+                          </div>
 
-                              <div className={styles.sectionEditGrid}>
-                                <div className={styles.fieldGroup}>
-                                  <label className={styles.label}>CTA Label</label>
-                                  <input name="ctaLabel" defaultValue={cfg.ctaLabel ?? ""} className={styles.input} />
-                                </div>
-                                <div className={styles.fieldGroup}>
-                                  <label className={styles.label}>CTA Href</label>
-                                  <input
-                                    name="ctaHref"
-                                    defaultValue={cfg.ctaHref ?? ""}
-                                    placeholder="contoh: /cari atau https://wa.me/..."
-                                    className={styles.input}
-                                  />
-                                  <p className={styles.helperText}>Jika kosong, tombol CTA tidak ditampilkan.</p>
-                                </div>
-                              </div>
+                          <div className={styles.sectionEditGrid}>
+                            <div className={styles.fieldGroup}>
+                              <label className={styles.label}>CTA Label</label>
+                              <input name="ctaLabel" defaultValue={cfg.ctaLabel ?? ""} className={styles.input} />
+                            </div>
+                            <div className={styles.fieldGroup}>
+                              <label className={styles.label}>CTA Href</label>
+                              <input
+                                name="ctaHref"
+                                defaultValue={cfg.ctaHref ?? ""}
+                                placeholder="contoh: /cari atau https://wa.me/..."
+                                className={styles.input}
+                              />
+                              <p className={styles.helperText}>Jika kosong, tombol CTA tidak ditampilkan.</p>
+                            </div>
+                          </div>
 
-                              <div className={styles.sectionEditActions}>
-                                <button type="button" className={styles.secondaryButton + " js-hero-autofill"} data-hero-form-id={`heroForm-${section.id}`}>
-                                  Auto-generate HERO
-                                </button>
-                                <p className={styles.helperText} style={{ margin: "6px 0 0" }}>
-                                  Isi cepat dengan contoh teks (rating , produk , CS , pengiriman ).
-                                </p>
-                              </div>
+                          <div className={styles.sectionEditActions}>
+                            <button type="button" className={styles.secondaryButton + " js-hero-autofill"} data-hero-form-id={`heroForm-${section.id}`}>
+                              Auto-generate HERO
+                            </button>
+                            <p className={styles.helperText} style={{ margin: "6px 0 0" }}>
+                              Isi cepat dengan contoh teks (rating , produk , CS , pengiriman ).
+                            </p>
+                          </div>
 
-                              <div className={styles.sectionEditGrid}>
-                                <div className={styles.fieldGroup}>
-                                  <label className={styles.label}>Badges (tiap baris 1 item, maks 6)</label>
-                                  <textarea name="badges" defaultValue={badgesValue.join("\n")} rows={4} className={styles.input} />
-                                  <p className={styles.helperText}>Contoh default: Ready Stock, Kurasi Interior, Material Premium.</p>
-                                </div>
-                                <div className={styles.fieldGroup}>
-                                  <label className={styles.label}>Highlight bullets (maks 6)</label>
-                                  <textarea name="highlights" defaultValue={highlightsValue.join("\n")} rows={4} className={styles.input} />
-                                  <p className={styles.helperText}>Tiap baris = 1 bullet (contoh: Gratis konsultasi styling).</p>
-                                </div>
-                              </div>
+                          <div className={styles.sectionEditGrid}>
+                            <div className={styles.fieldGroup}>
+                              <label className={styles.label}>Badges (tiap baris 1 item, maks 6)</label>
+                              <textarea name="badges" defaultValue={badgesValue.join("\n")} rows={4} className={styles.input} />
+                              <p className={styles.helperText}>Contoh default: Ready Stock, Kurasi Interior, Material Premium.</p>
+                            </div>
+                            <div className={styles.fieldGroup}>
+                              <label className={styles.label}>Highlight bullets (maks 6)</label>
+                              <textarea name="highlights" defaultValue={highlightsValue.join("\n")} rows={4} className={styles.input} />
+                              <p className={styles.helperText}>Tiap baris = 1 bullet (contoh: Gratis konsultasi styling).</p>
+                            </div>
+                          </div>
 
-                              <div className={styles.sectionEditGrid}>
-                                <div className={styles.fieldGroup}>
-                                  <label className={styles.label}>Trust chips (maks 8)</label>
-                                  <textarea name="trustChips" defaultValue={trustValue.join("\n")} rows={3} className={styles.input} />
-                                  <p className={styles.helperText}>Contoh: Pembayaran Aman, Garansi, Support CS.</p>
-                                </div>
-                                <div className={styles.fieldGroup}>
-                                  <label className={styles.label}>Mini info cards</label>
-                                  <div style={{ display: "grid", gap: 10 }}>
-                                    {[1, 2, 3].map((idx) => (
-                                      <div key={idx} style={{ display: "grid", gap: 6 }}>
-                                        <input
-                                          name={`miniTitle${idx}`}
-                                          placeholder={`Judul ${idx}`}
-                                          defaultValue={miniAt(idx - 1, "title")}
-                                          className={styles.input}
-                                        />
-                                        <input
-                                          name={`miniDesc${idx}`}
-                                          placeholder={`Deskripsi ${idx}`}
-                                          defaultValue={miniAt(idx - 1, "desc")}
-                                          className={styles.input}
-                                        />
-                                      </div>
-                                    ))}
+                          <div className={styles.sectionEditGrid}>
+                            <div className={styles.fieldGroup}>
+                              <label className={styles.label}>Trust chips (maks 8)</label>
+                              <textarea name="trustChips" defaultValue={trustValue.join("\n")} rows={3} className={styles.input} />
+                              <p className={styles.helperText}>Contoh: Pembayaran Aman, Garansi, Support CS.</p>
+                            </div>
+                            <div className={styles.fieldGroup}>
+                              <label className={styles.label}>Mini info cards</label>
+                              <div style={{ display: "grid", gap: 10 }}>
+                                {[1, 2, 3].map((idx) => (
+                                  <div key={idx} style={{ display: "grid", gap: 6 }}>
+                                    <input
+                                      name={`miniTitle${idx}`}
+                                      placeholder={`Judul ${idx}`}
+                                      defaultValue={miniAt(idx - 1, "title")}
+                                      className={styles.input}
+                                    />
+                                    <input
+                                      name={`miniDesc${idx}`}
+                                      placeholder={`Deskripsi ${idx}`}
+                                      defaultValue={miniAt(idx - 1, "desc")}
+                                      className={styles.input}
+                                    />
                                   </div>
-                                  <p className={styles.helperText}>Kosongkan jika tidak perlu; maksimal 3 kartu kecil.</p>
-                                </div>
+                                ))}
                               </div>
-
-                              <div className={styles.sectionEditGrid}>
-                                <div className={styles.fieldGroup}>
-                                  <label className={styles.label}>Floating card Lookbook</label>
-                                  <input
-                                    name="floatLookbookTitle"
-                                    defaultValue={lookbookTitle}
-                                    className={styles.input}
-                                    placeholder="Lookbook Minggu Ini"
-                                  />
-                                  <input
-                                    name="floatLookbookSubtitle"
-                                    defaultValue={lookbookSubtitle}
-                                    className={styles.input}
-                                    placeholder="Inspirasi ruang & koleksi pilihan"
-                                    style={{ marginTop: 6 }}
-                                  />
-                                </div>
-                                <div className={styles.fieldGroup}>
-                                  <label className={styles.label}>Floating card Promo</label>
-                                  <input
-                                    name="floatPromoTitle"
-                                    defaultValue={promoTitle}
-                                    className={styles.input}
-                                    placeholder="Promo"
-                                  />
-                                  <input
-                                    name="floatPromoText"
-                                    defaultValue={promoText}
-                                    className={styles.input}
-                                    placeholder="Gratis ongkir* untuk area tertentu"
-                                    style={{ marginTop: 6 }}
-                                  />
-                                </div>
-                              </div>
-                            </form>
-
-                            {/* HERO MEDIA: hanya picker (hapus upload + dropdown gambar_upload) */}
-                            <div className={styles.innerCard}>
-                              <div style={{ fontWeight: 800, color: "rgba(17,17,17,0.9)" }}>
-                                Pilih gambar dari galeri
-                              </div>
-                              <div style={{ color: "rgba(17,17,17,0.7)", fontSize: 12, marginTop: 6 }}>
-                                Klik tombol untuk buka picker, cari (id/title/tags), lalu pilih thumbnail.
-                              </div>
-
-                              <div style={{ marginTop: 10 }}>
-                                <ImagePickerCaptcha
-                                  action={uploadImageToGalleryAndAttach}
-                                  sectionId={section.id.toString()}
-                                  attach="HERO:imageId"
-                                  endpoint="/api/admin/admin_dashboard/admin_galeri/list_gambar"
-                                  limit={40}
-                                  buttonLabel="Buka Picker Gambar"
-                                  currentImageId={Number((cfg as any)?.imageId ?? (cfg as any)?.heroImageId ?? 0) || undefined}
-                                />
-
-                                {/* Status terpasang: tetap tampil setelah sukses attach (biar tidak "hilang") */}
-                                {(() => {
-                                  const heroId = Number((cfg as any)?.imageId ?? (cfg as any)?.heroImageId ?? 0) || 0;
-                                  if (!heroId) return null;
-                                  return (
-                                    <div style={{ marginTop: 10, padding: 12, background: "rgba(212, 175, 55, 0.1)", borderRadius: 12, border: "2px solid #D4AF37" }}>
-                                      <div style={{ fontSize: 13, fontWeight: 900, color: "#D4AF37", marginBottom: 6 }}>
-                                        ✓ HERO Image Terpasang
-                                      </div>
-                                      <div style={{ fontSize: 12, color: "rgba(17,17,17,0.85)" }}>
-                                        Image ID: <b>#{heroId}</b>
-                                      </div>
-                                      <div style={{ fontSize: 11, color: "rgba(17,17,17,0.6)", marginTop: 4 }}>
-                                        Klik "Buka Picker Gambar" untuk melihat atau mengganti
-                                      </div>
-                                    </div>
-                                  );
-                                })()}
-
-
-                                {/* Hapus image: form terpisah (tidak nested) */}
-                                <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 10 }}>
-                                  <form action={saveHeroConfig}>
-                                    <input type="hidden" name="id" value={section.id.toString()} />
-                                    <input type="hidden" name="clearHero" value="1" />
-                                    <button type="submit" className={styles.secondaryButton}>
-                                      Hapus Hero Image
-                                    </button>
-                                  </form>
-                                </div>
-                              </div>
+                              <p className={styles.helperText}>Kosongkan jika tidak perlu; maksimal 3 kartu kecil.</p>
                             </div>
+                          </div>
 
-                            {/* Tombol aksi HERO: kanan bawah section */}
-                            <div className={styles.highlightFooterActions}>
-                              <button type="submit" form={`heroForm-${section.id}`} className={styles.secondaryButton}>
-                                Simpan
-                              </button>
+                          <div className={styles.sectionEditGrid}>
+                            <div className={styles.fieldGroup}>
+                              <label className={styles.label}>Floating card Lookbook</label>
+                              <input
+                                name="floatLookbookTitle"
+                                defaultValue={lookbookTitle}
+                                className={styles.input}
+                                placeholder="Lookbook Minggu Ini"
+                              />
+                              <input
+                                name="floatLookbookSubtitle"
+                                defaultValue={lookbookSubtitle}
+                                className={styles.input}
+                                placeholder="Inspirasi ruang & koleksi pilihan"
+                                style={{ marginTop: 6 }}
+                              />
+                            </div>
+                            <div className={styles.fieldGroup}>
+                              <label className={styles.label}>Floating card Promo</label>
+                              <input
+                                name="floatPromoTitle"
+                                defaultValue={promoTitle}
+                                className={styles.input}
+                                placeholder="Promo"
+                              />
+                              <input
+                                name="floatPromoText"
+                                defaultValue={promoText}
+                                className={styles.input}
+                                placeholder="Gratis ongkir* untuk area tertentu"
+                                style={{ marginTop: 6 }}
+                              />
+                            </div>
+                          </div>
+                        </form>
 
-                              {activeThemeKey ? (
-                                <a
-                                  className={styles.primaryButton}
-                                  href={`/admin/admin_dashboard/admin_pengaturan/toko/preview?theme=${encodeURIComponent(
-                                    activeThemeKey
-                                  )}&focus=HERO&sectionId=${section.id}`}
-                                >
-                                  Preview
-                                </a>
-                              ) : (
-                                <span className={styles.primaryButton} style={{ opacity: 0.5, cursor: "not-allowed" }}>
-                                  Preview
-                                </span>
-                              )}
+                        {/* HERO MEDIA: hanya picker (hapus upload + dropdown gambar_upload) */}
+                        <div className={styles.innerCard}>
+                          <div style={{ fontWeight: 800, color: "rgba(17,17,17,0.9)" }}>
+                            Pilih gambar dari galeri
+                          </div>
+                          <div style={{ color: "rgba(17,17,17,0.7)", fontSize: 12, marginTop: 6 }}>
+                            Klik tombol untuk buka picker, cari (id/title/tags), lalu pilih thumbnail.
+                          </div>
 
-                              <form action={toggleDraft} style={{ display: "inline" }}>
+                          <div style={{ marginTop: 10 }}>
+                            <ImagePickerCaptcha
+                              action={uploadImageToGalleryAndAttach}
+                              sectionId={section.id.toString()}
+                              attach="HERO:imageId"
+                              endpoint="/api/admin/admin_dashboard/admin_galeri/list_gambar"
+                              limit={40}
+                              buttonLabel="Buka Picker Gambar"
+                              currentImageId={Number((cfg as any)?.imageId ?? (cfg as any)?.heroImageId ?? 0) || undefined}
+                            />
+
+                            {/* Status terpasang: tetap tampil setelah sukses attach (biar tidak "hilang") */}
+                            {(() => {
+                              const heroId = Number((cfg as any)?.imageId ?? (cfg as any)?.heroImageId ?? 0) || 0;
+                              if (!heroId) return null;
+                              return (
+                                <div style={{ marginTop: 10, padding: 12, background: "rgba(212, 175, 55, 0.1)", borderRadius: 12, border: "2px solid #D4AF37" }}>
+                                  <div style={{ fontSize: 13, fontWeight: 900, color: "#D4AF37", marginBottom: 6 }}>
+                                    ✓ HERO Image Terpasang
+                                  </div>
+                                  <div style={{ fontSize: 12, color: "rgba(17,17,17,0.85)" }}>
+                                    Image ID: <b>#{heroId}</b>
+                                  </div>
+                                  <div style={{ fontSize: 11, color: "rgba(17,17,17,0.6)", marginTop: 4 }}>
+                                    Klik "Buka Picker Gambar" untuk melihat atau mengganti
+                                  </div>
+                                </div>
+                              );
+                            })()}
+
+
+                            {/* Hapus image: form terpisah (tidak nested) */}
+                            <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 10 }}>
+                              <form action={saveHeroConfig}>
                                 <input type="hidden" name="id" value={section.id.toString()} />
-                                <input type="hidden" name="currentEnabled" value={section.enabled ? "true" : "false"} />
+                                <input type="hidden" name="clearHero" value="1" />
                                 <button type="submit" className={styles.secondaryButton}>
-                                  {section.enabled ? "Nonaktifkan" : "Aktifkan"}
-                                </button>
-                              </form>
-
-                              <form action={deleteDraft} style={{ display: "inline" }}>
-                                <input type="hidden" name="id" value={section.id.toString()} />
-                                <button type="submit" className={styles.dangerButton}>
-                                  Hapus
+                                  Hapus Hero Image
                                 </button>
                               </form>
                             </div>
-                          </>
-                        );
+                          </div>
+                        </div>
+
+                        {/* Tombol aksi HERO: kanan bawah section */}
+                        <div className={styles.highlightFooterActions}>
+                          <button type="submit" form={`heroForm-${section.id}`} className={styles.secondaryButton}>
+                            Simpan
+                          </button>
+
+                          {activeThemeKey ? (
+                            <a
+                              className={styles.primaryButton}
+                              href={`/admin/admin_dashboard/admin_pengaturan/toko/preview?theme=${encodeURIComponent(
+                                activeThemeKey
+                              )}&focus=HERO&sectionId=${section.id}`}
+                            >
+                              Preview
+                            </a>
+                          ) : (
+                            <span className={styles.primaryButton} style={{ opacity: 0.5, cursor: "not-allowed" }}>
+                              Preview
+                            </span>
+                          )}
+
+                          <form action={toggleDraft} style={{ display: "inline" }}>
+                            <input type="hidden" name="id" value={section.id.toString()} />
+                            <input type="hidden" name="currentEnabled" value={section.enabled ? "true" : "false"} />
+                            <button type="submit" className={styles.secondaryButton}>
+                              {section.enabled ? "Nonaktifkan" : "Aktifkan"}
+                            </button>
+                          </form>
+
+                          <form action={deleteDraft} style={{ display: "inline" }}>
+                            <input type="hidden" name="id" value={section.id.toString()} />
+                            <button type="submit" className={styles.dangerButton}>
+                              Hapus
+                            </button>
+                          </form>
+                        </div>
+                      </>
+                      );
                       })()}
                     </div>
                   )}
@@ -5655,7 +5650,7 @@ export default async function TokoPengaturanPage({
 
                   {/* CATEGORY_GRID */}
                   {section.type === "CATEGORY_GRID" && (
-                    <div className={styles.sectionEditForm}>
+                    <div className={styles.sectionEditForm} data-section-id={section.id}>
                       <form id={`categoryGridForm-${section.id}`} action={saveCategoryGridConfig} className={styles.sectionEditForm} data-section-form="1">
                         <input type="hidden" name="id" value={section.id.toString()} />
 
@@ -7429,7 +7424,7 @@ export default async function TokoPengaturanPage({
 
                   {/* TESTIMONIALS */}
                   {section.type === "TESTIMONIALS" && (
-                    <div className={styles.sectionEditForm}>
+                    <div className={styles.sectionEditForm} data-section-id={section.id}>
                       <form id={`testimonialsForm-${section.id}`} action={saveTestimonialsConfig} className={styles.sectionEditForm}>
                         <input type="hidden" name="id" value={section.id.toString()} />
                         <TestimonialsEditor
@@ -7468,7 +7463,7 @@ export default async function TokoPengaturanPage({
 
                   {/* HIGHLIGHT_COLLECTION */}
                   {section.type === "HIGHLIGHT_COLLECTION" && (
-                    <div className={styles.sectionEditForm}>
+                    <div className={styles.sectionEditForm} data-section-id={section.id}>
                       <form id={`highlightForm-${section.id}`} action={saveHighlightCollectionConfig} className={styles.sectionEditForm} data-section-form="1">
                         <input type="hidden" name="id" value={section.id.toString()} />
 
