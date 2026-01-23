@@ -901,10 +901,10 @@ async function saveHeroConfig(formData: FormData) {
         : "FOLLOW_NAVBAR";
   const imageId = parseNum(formData.get("imageId"));
 
-  try {
-    await validateExistence({ imageIds: imageId ? [imageId] : [] });
-  } catch (e: any) {
-    return redirectBack({ error: encodeURIComponent(e?.message ?? "Validasi gagal.") });
+  let validImageId = imageId;
+  if (imageId) {
+    const check = await filterExistingIds({ imageIds: [imageId] });
+    if (!check.imageIds?.length) validImageId = null;
   }
 
   await updateDraftConfigPreserveTheme(id, {
@@ -913,7 +913,7 @@ async function saveHeroConfig(formData: FormData) {
     ctaLabel,
     ctaHref,
     heroTheme,
-    imageId: imageId ?? null,
+    imageId: validImageId ?? null,
   });
 
   revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko");
