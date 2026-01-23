@@ -40,10 +40,11 @@ export default function TestimonialsEditor({ initialConfig, onChange }: Props) {
 
     const [reviews, setReviews] = useState<any[]>(initialReviews);
     const [isFetching, setIsFetching] = useState(false);
+    const [sectionTheme, setSectionTheme] = useState(safeConfig.sectionTheme ?? "FOLLOW_NAVBAR");
 
     // Sync changes to parent
     const updateConfig = (key: string, value: any) => {
-        const next = { ...safeConfig, title, subtitle, mapsUrl, reviews, [key]: value };
+        const next = { ...safeConfig, title, subtitle, mapsUrl, reviews, sectionTheme, [key]: value };
         if (onChange) onChange(next);
     };
 
@@ -110,15 +111,35 @@ export default function TestimonialsEditor({ initialConfig, onChange }: Props) {
             <input type="hidden" name="subtitle" value={subtitle} />
             <input type="hidden" name="mapsUrl" value={mapsUrl} />
             <input type="hidden" name="reviews" value={JSON.stringify(reviews)} />
+            <input type="hidden" name="sectionTheme" value={sectionTheme} />
 
-            {/* Header Config */}
-            <div className={styles.fieldGroup}>
-                <label className={styles.label}>Judul Section</label>
-                <input
-                    type="text" className={styles.input}
-                    value={title} onChange={(e) => { setTitle(e.target.value); updateConfig("title", e.target.value); }}
-                />
+            {/* Config Header */}
+            <div className={styles.sectionEditGrid}>
+                <div className={styles.fieldGroup}>
+                    <label className={styles.label}>Judul Section</label>
+                    <input
+                        type="text" className={styles.input}
+                        value={title} onChange={(e) => { setTitle(e.target.value); updateConfig("title", e.target.value); }}
+                    />
+                </div>
+                <div className={styles.fieldGroup}>
+                    <label className={styles.label}>Tema Section</label>
+                    <select
+                        className={styles.select}
+                        value={sectionTheme}
+                        onChange={(e) => { setSectionTheme(e.target.value); updateConfig("sectionTheme", e.target.value); }}
+                    >
+                        <option value="FOLLOW_NAVBAR">Ikuti tema Navbar (default)</option>
+                        <option value="NAVY_GOLD">NAVY + GOLD</option>
+                        <option value="WHITE_GOLD">WHITE + GOLD</option>
+                        <option value="NAVY_WHITE">NAVY + WHITE</option>
+                        <option value="GOLD_NAVY">GOLD + NAVY</option>
+                        <option value="GOLD_WHITE">GOLD + WHITE</option>
+                        <option value="WHITE_NAVY">WHITE + NAVY</option>
+                    </select>
+                </div>
             </div>
+
             <div className={styles.fieldGroup}>
                 <label className={styles.label}>Sub-judul (Opsional)</label>
                 <input

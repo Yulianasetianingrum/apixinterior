@@ -1243,13 +1243,22 @@ async function createDraftSection(formData: FormData) {
   }
 
   // Final Safety Check
-  if (!def.type) {
+  if (!def || !def.type) {
+    console.error("[CreateDraft] Def or Def.Type missing", { typeRaw, def });
     return redirectBack({ error: encodeURIComponent("Type definition is missing.") });
   }
 
+  const sectionType = String(def.type).trim();
+  if (!sectionType) {
+    console.error("[CreateDraft] Empty section type resolved", { typeRaw, def });
+    return redirectBack({ error: encodeURIComponent("Invalid section type (empty).") });
+  }
+
+  console.log("[CreateDraft] Creating section:", { type: sectionType, title: titleRaw });
+
   const created = await prisma.homepageSectionDraft.create({
     data: {
-      type: def.type as any,
+      type: sectionType as any,
       title: titleRaw,
       slug: slug.length ? slug : null,
       enabled: true,

@@ -2111,9 +2111,12 @@ export default async function TokoPreviewDraftPage({
                 // TESTIMONIALS
                 if (t === "TESTIMONIALS") {
                   const cfg = normalizeConfig(t, section.config) as any;
+                  // Resolve "FOLLOW_NAVBAR" to the actual theme color (e.g. NAVY_GOLD) so the preview shows the correct color
+                  const sectionThemeResolved = resolveEffectiveTheme((cfg as any).sectionTheme ?? "FOLLOW_NAVBAR", navbarTheme);
+
                   return (
                     <div key={section.id}>
-                      <TestimonialCarousel config={cfg} />
+                      <TestimonialCarousel config={{ ...cfg, sectionTheme: sectionThemeResolved }} />
                     </div>
                   );
                 }

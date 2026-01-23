@@ -1171,9 +1171,11 @@ export default async function HomePage({
           // --- TESTIMONIALS ---
           if (t === "TESTIMONIALS") {
             const cfg = normalizeConfig(t, section.config) as any;
+            // Resolve Theme to match preview behavior
+            const sectionThemeResolved = resolveEffectiveTheme((cfg as any).sectionTheme ?? "FOLLOW_NAVBAR", navbarTheme);
             return (
               <div key={section.id}>
-                <TestimonialCarousel config={cfg} />
+                <TestimonialCarousel config={{ ...cfg, sectionTheme: sectionThemeResolved }} />
               </div>
             );
           }
