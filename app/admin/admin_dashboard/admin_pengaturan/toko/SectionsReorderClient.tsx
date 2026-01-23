@@ -288,58 +288,21 @@ export default function SectionsReorderClient({
                         {...provided.draggableProps}
                         className={`flex items-center justify-between rounded-lg border px-3 py-3 text-xs transition-all ${snapshot.isDragging
                           ? "bg-blue-50 border-blue-200 shadow-lg z-50"
-                          : pressingItemId === item.id
-                            ? "bg-yellow-50 border-yellow-300"
-                            : "bg-gray-50 border-gray-200 hover:border-gray-300"
+                          : "bg-gray-50 border-gray-200 hover:border-gray-300"
                           }`}
                         style={{
                           ...provided.draggableProps.style,
-                          touchAction: dragModeActive ? "none" : "auto",
-                          cursor: dragModeActive ? "grab" : "pointer"
+                          touchAction: "none"
                         }}
-                        onMouseDown={(e) => {
-                          console.log('[SectionsReorder] 🖱️ MOUSE DOWN on section', item.id);
-                          startLongPress(item.id, e);
-                        }}
-                        onMouseUp={() => {
-                          console.log('[SectionsReorder] 🖱️ MOUSE UP on section', item.id);
-                          cancelLongPress(item.id);
-                        }}
-                        onMouseLeave={() => cancelLongPress(item.id)}
-                        onTouchStart={(e) => {
-                          console.log('[SectionsReorder] 👆 TOUCH START on section', item.id);
-                          startLongPress(item.id, e);
-                        }}
-                        onTouchEnd={() => {
-                          console.log('[SectionsReorder] 👆 TOUCH END on section', item.id);
-                          cancelLongPress(item.id);
-                        }}
-                        onTouchCancel={() => cancelLongPress(item.id)}
                       >
                         <div className="flex items-center gap-3 flex-1 min-w-0">
                           {/* HANDLE */}
                           <div
-                            {...(dragModeActive ? provided.dragHandleProps : {})}
-                            className={`text-gray-400 p-2 -ml-2 relative ${dragModeActive
-                              ? "hover:text-gray-600 cursor-grab active:cursor-grabbing"
-                              : "cursor-pointer"
-                              }`}
-                            style={{ touchAction: dragModeActive ? "none" : "auto" }}
-                            aria-label={dragModeActive ? "Drag handle" : "Press and hold to enable drag"}
+                            {...provided.dragHandleProps}
+                            className="text-gray-400 hover:text-gray-600 p-2 -ml-2 cursor-grab active:cursor-grabbing"
+                            aria-label="Drag handle"
                           >
-                            {pressingItemId === item.id && (
-                              <div
-                                className="absolute inset-0 rounded-full border-2 border-blue-500"
-                                style={{
-                                  background: `conic-gradient(#3b82f6 ${pressProgress}%, transparent ${pressProgress}% 100%)`
-                                }}
-                              />
-                            )}
-                            {dragModeActive ? (
-                              <FaGripVertical size={16} />
-                            ) : (
-                              <FaLock size={14} className="opacity-50" />
-                            )}
+                            <FaGripVertical size={16} />
                           </div>
 
                           <span className="w-5 text-[11px] text-gray-400 text-right flex-shrink-0">
