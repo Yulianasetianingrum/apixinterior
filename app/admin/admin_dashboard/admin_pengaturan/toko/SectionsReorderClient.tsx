@@ -66,7 +66,12 @@ export default function SectionsReorderClient({
   const startLongPress = (itemId: number, event: React.MouseEvent | React.TouchEvent) => {
     if (dragModeActive) return; // Already in drag mode, ignore
 
-    event.preventDefault();
+    // Don't preventDefault on touch events - it blocks tap detection in mobile mode
+    // Only prevent for mouse events to avoid text selection
+    if (event.type.startsWith('mouse')) {
+      event.preventDefault();
+    }
+
     setPressingItemId(itemId);
     setPressProgress(0);
     pressStartTimeRef.current = Date.now();
@@ -102,33 +107,51 @@ export default function SectionsReorderClient({
   };
 
   const scrollToSection = (sectionId: number) => {
+    console.log('[SectionsReorder] 🎯 Auto-scroll triggered for section ID:', sectionId);
+
     // Try multiple selectors since different sections have different form ID patterns
     const selectors = [
       `#heroForm-${sectionId}`,
       `#categoryGridForm-${sectionId}`,
       `#highlightForm-${sectionId}`,
       `#testimonialsForm-${sectionId}`,
-      `form[data-section-form][id*="${sectionId}"]`,
+      `#footerForm-${sectionId}`,
+      `form[id*="${sectionId}"]`,
       `[data-section-id="${sectionId}"]`
     ];
 
+    console.log('[SectionsReorder] 🔍 Trying selectors:', selectors);
+
     let targetElement: Element | null = null;
+    let matchedSelector = '';
+
     for (const selector of selectors) {
       targetElement = document.querySelector(selector);
-      if (targetElement) break;
+      if (targetElement) {
+        matchedSelector = selector;
+        console.log('[SectionsReorder] ✅ Found element with selector:', selector, targetElement);
+        break;
+      } else {
+        console.log('[SectionsReorder] ❌ Not found:', selector);
+      }
     }
 
     if (targetElement) {
+      console.log('[SectionsReorder] 📜 Scrolling to element...', targetElement);
       targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
       // Flash highlight effect on the form or its parent
       const highlightTarget = targetElement.closest('[class*="sectionEditForm"]') || targetElement;
+      console.log('[SectionsReorder] 🎨 Highlighting element:', highlightTarget);
       highlightTarget.classList.add('section-flash-highlight');
       setTimeout(() => {
         highlightTarget.classList.remove('section-flash-highlight');
       }, 2000);
     } else {
-      console.warn(`[SectionsReorder] Section form with id ${sectionId} not found. Tried selectors:`, selectors);
+      console.error('[SectionsReorder] ❌ FAILED! Section form with id', sectionId, 'not found. Tried:', selectors);
+      console.log('[SectionsReorder] 📋 Available forms on page:',
+        Array.from(document.querySelectorAll('form')).map(f => ({ id: f.id, tag: f.tagName }))
+      );
     }
   };
 
