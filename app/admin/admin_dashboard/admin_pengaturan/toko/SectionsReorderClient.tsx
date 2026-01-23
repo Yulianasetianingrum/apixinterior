@@ -269,7 +269,7 @@ export default function SectionsReorderClient({
         </div>
 
         <DragDropContext onDragEnd={onDragEnd}>
-          <Droppable droppableId="sections-list" isDropDisabled={!dragModeActive}>
+          <Droppable droppableId="sections-list">
             {(provided) => (
               <div
                 {...provided.droppableProps}
@@ -281,7 +281,6 @@ export default function SectionsReorderClient({
                     key={item.id}
                     draggableId={String(item.id)}
                     index={index}
-                    isDragDisabled={!dragModeActive}
                   >
                     {(provided, snapshot) => (
                       <div
