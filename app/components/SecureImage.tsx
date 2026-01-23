@@ -97,9 +97,14 @@ export default function SecureImage({
                 // If loaded via proxy successfully, we might want to track it
             }}
             onError={() => {
-                if (!hasErrored && fallbackToProxy) {
+                // Prevent infinite loop: if already errored once, stop.
+                if (hasErrored) return;
+
+                if (fallbackToProxy) {
                     const urlStr = String(finalSrc);
                     // Don't proxy if already proxied or base64
+                    // ALSO: If the URL is already internal /api/img, usually we shouldn't proxy it again via img_proxy unless we are sure.
+                    // But let's stick to the basic check first.
                     if (urlStr && !urlStr.includes("/api/img_proxy") && !urlStr.startsWith("data:")) {
                         let filename = "";
                         try {
@@ -110,12 +115,14 @@ export default function SecureImage({
                         }
 
                         if (filename && filename.includes(".")) {
-                            setHasErrored(true);
+                            setHasErrored(true); // MARK AS ERRORED IMMEDIATELY
                             setImgSrc(`/api/img_proxy?file=${filename}&t=${Date.now()}`);
                             return;
                         }
                     }
                 }
+                // If we get here, just mark as errored to show fallback or stop trying
+                setHasErrored(true);
             }}
         />
     );

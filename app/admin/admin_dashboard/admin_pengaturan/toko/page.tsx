@@ -7466,6 +7466,47 @@ export default async function TokoPengaturanPage({
                     </div>
                   )}
 
+                  {/* TESTIMONIALS */}
+                  {section.type === "TESTIMONIALS" && (
+                    <div className={styles.sectionEditForm}>
+                      <TestimonialsEditor
+                        initialConfig={cfg}
+                        sectionId={section.id.toString()}
+                        onSave={saveTestimonialsConfig}
+                      />
+
+                      <div className={styles.highlightFooterActions} style={{ borderTop: '1px solid #eee', paddingTop: 16, marginTop: 16 }}>
+                        {activeThemeKey ? (
+                          <a
+                            className={styles.primaryButton}
+                            href={`/admin/admin_dashboard/admin_pengaturan/toko/preview?theme=${encodeURIComponent(
+                              activeThemeKey
+                            )}&focus=TESTIMONIALS&sectionId=${section.id}`}
+                          >
+                            Preview
+                          </a>
+                        ) : (
+                          <span className={styles.primaryButton} style={{ opacity: 0.5, cursor: "not-allowed" }}>Preview</span>
+                        )}
+
+                        <form action={toggleDraft} style={{ display: "inline" }}>
+                          <input type="hidden" name="id" value={section.id.toString()} />
+                          <input type="hidden" name="currentEnabled" value={section.enabled ? "true" : "false"} />
+                          <button type="submit" className={styles.secondaryButton}>
+                            {section.enabled ? "Nonaktifkan" : "Aktifkan"}
+                          </button>
+                        </form>
+
+                        <form action={deleteDraft} style={{ display: "inline" }}>
+                          <input type="hidden" name="id" value={section.id.toString()} />
+                          <button type="submit" className={styles.dangerButton}>
+                            Hapus
+                          </button>
+                        </form>
+                      </div>
+                    </div>
+                  )}
+
                   {/* HIGHLIGHT_COLLECTION */}
                   {section.type === "HIGHLIGHT_COLLECTION" && (
                     <div className={styles.sectionEditForm}>
