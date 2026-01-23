@@ -342,7 +342,6 @@ export default function TestimonialCarousel({ config }: { config: TestimonialCon
                                         })()}
                                         <div>
                                             <div style={{ fontSize: "16px", fontWeight: "bold", color: cardStyle.text }}>{review.author_name || "Pelanggan"}</div>
-                                            <div style={{ fontSize: "12px", color: cardStyle.subtext }}>{review.relative_time_description || "Pelanggan Terverifikasi"}</div>
                                         </div>
                                     </div>
                                 </div>

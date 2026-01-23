@@ -47,6 +47,17 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
   },
+  icons: {
+    icon: [
+      { url: "/logo/logo_apixinterior_golden.png.png", type: "image/png" },
+      { url: "/logo/logo_apixinterior_biru.png.png", sizes: "192x192", type: "image/png" },
+      { url: "/logo/logo_apixinterior_biru.png.png", sizes: "512x512", type: "image/png" }
+    ],
+    apple: [
+      { url: "/logo/logo_apixinterior_golden.png.png", sizes: "180x180", type: "image/png" }
+    ],
+    shortcut: "/logo/logo_apixinterior_golden.png.png"
+  },
   openGraph: {
     type: "website",
     locale: "id_ID",
