@@ -10,6 +10,7 @@ type Review = {
     text: string;
     avatarUrl?: string;
     time?: string;
+    url?: string;
 };
 
 type Props = {
@@ -59,9 +60,9 @@ export default function TestimonialsEditor({ initialConfig, onChange }: Props) {
         // SIMULATED FETCH
         setTimeout(() => {
             const dummyReviews = [
-                { id: "r1", author_name: "Budi Santoso", rating: 5, text: "Pelayanan sangat ramah, furniture kualitas premium. Sangat puas!", relative_time_description: "2 hari lalu", profile_photo_url: "" },
-                { id: "r2", author_name: "Siti Aminah", rating: 5, text: "Desain interiornya modern, sesuai ekspektasi. Pengiriman juga cepat.", relative_time_description: "1 minggu lalu", profile_photo_url: "" },
-                { id: "r3", author_name: "Ahmad Dani", rating: 4, text: "Harganya bersaing, overall oke banget buat ngisi rumah baru.", relative_time_description: "2 minggu lalu", profile_photo_url: "" },
+                { id: "r1", author_name: "Budi Santoso", rating: 5, text: "Pelayanan sangat ramah, furniture kualitas premium. Sangat puas!", relative_time_description: "2 hari lalu", profile_photo_url: "", url: mapsUrl },
+                { id: "r2", author_name: "Siti Aminah", rating: 5, text: "Desain interiornya modern, sesuai ekspektasi. Pengiriman juga cepat.", relative_time_description: "1 minggu lalu", profile_photo_url: "", url: mapsUrl },
+                { id: "r3", author_name: "Ahmad Dani", rating: 4, text: "Harganya bersaing, overall oke banget buat ngisi rumah baru.", relative_time_description: "2 minggu lalu", profile_photo_url: "", url: mapsUrl },
             ];
 
             const nextReviews = [...reviews, ...dummyReviews];
@@ -69,7 +70,7 @@ export default function TestimonialsEditor({ initialConfig, onChange }: Props) {
             updateConfig("reviews", nextReviews);
 
             setIsFetching(false);
-            alert("Berhasil mengambil 3 ulasan contoh dari Google Maps (Simulasi). Silakan edit sesuai kebutuhan.");
+            alert("Berhasil mengambil 3 ulasan contoh (Simulasi Demo). Mohon edit/input manual jika butuh data real spesifik.");
         }, 1500);
     };
 
@@ -80,7 +81,8 @@ export default function TestimonialsEditor({ initialConfig, onChange }: Props) {
             rating: 5,
             text: "Tulis ulasan disini...",
             relative_time_description: "Baru saja",
-            profile_photo_url: ""
+            profile_photo_url: "",
+            url: ""
         };
         const next = [...reviews, newRev];
         setReviews(next);
@@ -183,7 +185,7 @@ export default function TestimonialsEditor({ initialConfig, onChange }: Props) {
                             whiteSpace: "nowrap"
                         }}
                     >
-                        {isFetching ? "Loading..." : "Fetch"}
+                        {isFetching ? "Loading..." : "Fetch (Simulasi)"}
                     </button>
                 </div>
                 <p style={{ fontSize: 12, color: "#166534", marginTop: 6 }}>
@@ -224,6 +226,13 @@ export default function TestimonialsEditor({ initialConfig, onChange }: Props) {
                                 <button type="button" onClick={() => removeReview(idx)} style={{ marginLeft: 8, color: "red", border: "none", background: "transparent", cursor: "pointer" }}>🗑️</button>
                             </div>
                         </div>
+                        <input
+                            type="text"
+                            value={r.url || ""}
+                            onChange={(e) => updateReview(idx, "url", e.target.value)}
+                            style={{ width: "100%", fontSize: 11, marginBottom: 6, color: "blue", border: "none", borderBottom: "1px dotted #ccc" }}
+                            placeholder="Link Ulasan (Opsional)..."
+                        />
                         <textarea
                             value={r.text}
                             onChange={(e) => updateReview(idx, "text", e.target.value)}

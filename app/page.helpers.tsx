@@ -548,6 +548,7 @@ export function normalizeConfig(sectionType: string, raw: any): JsonObject {
             text: String(r?.text ?? ""),
             relative_time_description: String(r?.relative_time_description ?? r?.time ?? ""),
             profile_photo_url: String(r?.profile_photo_url ?? r?.avatarUrl ?? ""),
+            url: String(r?.url ?? r?.reviewUrl ?? ""),
         }));
 
         return {
@@ -556,6 +557,7 @@ export function normalizeConfig(sectionType: string, raw: any): JsonObject {
             mapsUrl,
             reviews,
             sectionTheme: parseSectionTheme((cfg as any).sectionTheme ?? null),
+            sectionBgTheme: parseCustomPromoBgTheme((cfg as any).sectionBgTheme ?? null),
             __themeKey: getThemeKeyFromConfig(cfg)
         };
     }

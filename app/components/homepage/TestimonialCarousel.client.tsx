@@ -10,6 +10,7 @@ interface Review {
     text: string;
     relative_time_description?: string;
     profile_photo_url?: string;
+    url?: string;
 }
 
 interface TestimonialConfig {
@@ -294,7 +295,13 @@ export default function TestimonialCarousel({ config }: { config: TestimonialCon
                                     height: "100%", minHeight: "360px",
                                     boxShadow: isActive ? "0 20px 40px -12px rgba(0,0,0,0.25)" : "0 4px 12px rgba(0,0,0,0.05)",
                                     position: "relative",
-                                }}>
+                                    cursor: review.url ? "pointer" : "default",
+                                    textDecoration: "none"
+                                }}
+                                    onClick={() => {
+                                        if (review.url) window.open(review.url, "_blank");
+                                    }}
+                                >
                                     {/* Quote Icon */}
                                     <div style={{ position: "absolute", top: "24px", right: "24px", opacity: 0.15, color: cardStyle.accent }}>
                                         <FaQuoteLeft size={48} />
