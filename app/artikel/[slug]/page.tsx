@@ -180,100 +180,39 @@ export default async function ArticlePage({ params }: Props) {
                         <div dangerouslySetInnerHTML={{ __html: post.content }} />
                     </div>
 
-                    {/* CONTACT CTA SECTION */}
+                    {/* SIMPLIFIED CONTACT SECTION */}
                     <div style={{
-                        marginTop: "64px",
-                        padding: "48px 32px",
-                        backgroundColor: "#c5a02e", // Golden Premium
-                        borderRadius: "24px",
+                        marginTop: "56px",
+                        padding: "32px",
                         textAlign: "center",
-                        color: "#001f3f", // Navy
-                        boxShadow: "0 25px 50px -12px rgba(197, 160, 46, 0.25)",
-                        border: "1px solid rgba(0, 31, 63, 0.1)",
-                        position: "relative",
-                        overflow: "hidden"
+                        borderTop: "1px solid #f1f5f9",
                     }}>
-                        {/* Decorative background element */}
-                        <div style={{
-                            position: "absolute",
-                            top: "-50px",
-                            right: "-50px",
-                            width: "150px",
-                            height: "150px",
-                            backgroundColor: "rgba(0, 31, 63, 0.05)",
-                            borderRadius: "50%",
-                            zIndex: 0
-                        }}></div>
-
-                        <div style={{ position: "relative", zIndex: 1 }}>
-                            <h3 style={{ fontSize: "28px", fontWeight: "900", marginBottom: "16px", color: "#001f3f", letterSpacing: "-0.5px" }}>
-                                Ingin Interior Seperti Ini?
-                            </h3>
-                            <p style={{ fontSize: "17px", marginBottom: "32px", fontWeight: "500", color: "rgba(0, 31, 63, 0.8)", lineHeight: "1.6" }}>
-                                Hubungi tim <strong>Apix Interior</strong> sekarang untuk konsultasi desain gratis dan estimasi biaya pengerjaan mebel custom Anda.
-                            </p>
-
-                            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "20px" }}>
-                                <a
-                                    href={waLink}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    style={{
-                                        backgroundColor: "#001f3f", // Navy
-                                        color: "#c5a02e", // Golden
-                                        padding: "18px 56px",
-                                        borderRadius: "16px",
-                                        textDecoration: "none",
-                                        fontSize: "20px",
-                                        fontWeight: "900",
-                                        display: "inline-flex",
-                                        alignItems: "center",
-                                        gap: "12px",
-                                        boxShadow: "0 10px 15px -3px rgba(0, 31, 63, 0.4)",
-                                        border: "none",
-                                        cursor: "pointer",
-                                    }}
-                                >
-                                    <span>HUBUNGI KAMI SEKARANG</span>
-                                </a>
-
-                                {allContacts.length > 1 && (
-                                    <div style={{
-                                        marginTop: "16px",
-                                        width: "100%",
-                                        maxWidth: "400px",
-                                        padding: "16px",
-                                        backgroundColor: "rgba(0, 31, 63, 0.05)",
-                                        borderRadius: "12px",
-                                        border: "1px dashed rgba(0, 31, 63, 0.2)"
-                                    }}>
-                                        <p style={{ fontSize: "14px", fontWeight: "700", marginBottom: "8px", opacity: 0.8 }}>Nomor Layanan Lainnya:</p>
-                                        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "8px" }}>
-                                            {allContacts.slice(1).map(c => (
-                                                <a
-                                                    key={c.id}
-                                                    href={`https://wa.me/${c.nomor}`}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    style={{
-                                                        fontSize: "13px",
-                                                        padding: "4px 10px",
-                                                        backgroundColor: "white",
-                                                        borderRadius: "6px",
-                                                        textDecoration: "none",
-                                                        color: "#001f3f",
-                                                        fontWeight: "600",
-                                                        border: "1px solid rgba(0, 31, 63, 0.1)"
-                                                    }}
-                                                >
-                                                    +{c.nomor.slice(0, 2)} {c.nomor.slice(2)}
-                                                </a>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
+                        <p style={{ fontSize: "15px", color: "#64748b", fontWeight: "600", marginBottom: "20px" }}>
+                            Tertarik dengan desain ini? Konsultasi gratis sekarang:
+                        </p>
+                        <a
+                            href={waLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                                backgroundColor: "#c5a02e", // Golden
+                                color: "#001f3f", // Navy
+                                padding: "14px 48px",
+                                borderRadius: "12px",
+                                textDecoration: "none",
+                                fontSize: "16px",
+                                fontWeight: "800",
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "10px",
+                                boxShadow: "0 10px 15px -3px rgba(197, 160, 46, 0.3)",
+                                border: "none",
+                                cursor: "pointer",
+                                textTransform: "uppercase"
+                            }}
+                        >
+                            <span>HUBUNGI KAMI</span>
+                        </a>
                     </div>
 
                     {/* SHARE SECTION */}

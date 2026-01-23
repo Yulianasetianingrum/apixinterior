@@ -191,6 +191,15 @@
   padding: 0.4rem 0.75rem;
   font-size: 0.85rem;
   background: #f9fafb;
+  color: #1f2937;
+}
+
+[data-theme='dark'] .select,
+.modalDark .select,
+.modalDark .searchInput {
+  background: #0f172a !important;
+  color: #ffffff !important;
+  border-color: #334155 !important;
 }
 
 /* Grid produk di sisi kiri modal */
@@ -205,13 +214,23 @@
 }
 
 .modalItem {
-  background: #f9fafb;
+  background: var(--item-bg, #f9fafb);
   border-radius: 1rem;
   padding: 0.75rem;
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
   font-size: 0.85rem;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+[data-theme='dark'] .modalItem,
+.modalDark .modalItem {
+  background: #1e293b !important;
+  /* Slate 800 */
+  border-color: #334155 !important;
+  color: #ffffff !important;
 }
 
 .modalItem input[type="checkbox"] {
@@ -233,7 +252,13 @@
 }
 
 .modalName {
-  font-weight: 600;
+  font-weight: 700;
+  color: inherit;
+}
+
+[data-theme='dark'] .modalName,
+.modalDark .modalName {
+  color: #ffffff !important;
 }
 
 .modalPrice {
@@ -241,9 +266,19 @@
   color: #4b5563;
 }
 
+[data-theme='dark'] .modalPrice,
+.modalDark .modalPrice {
+  color: #e2e8f0 !important;
+}
+
 .modalMeta {
   font-size: 0.75rem;
   color: #6b7280;
+}
+
+[data-theme='dark'] .modalMeta,
+.modalDark .modalMeta {
+  color: #94a3b8 !important;
 }
 
 /* Kanan: selected list (produk dalam kategori) */
