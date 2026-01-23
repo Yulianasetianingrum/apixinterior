@@ -25,8 +25,8 @@ import Image from "next/image";
 import { type CSSProperties } from "react";
 import { OrganizationSchema, WebSiteSchema, LocalBusinessSchema } from "./components/seo/StructuredData";
 
-// export const dynamic = "force-dynamic";
-export const revalidate = 60; // Revalidate every 60 seconds (1 minute) for production performance
+export const dynamic = "force-dynamic";
+// export const revalidate = 60; // Revalidate every 60 seconds (1 minute) for production performance
 
 import {
   themeMetaSlug,
