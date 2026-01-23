@@ -8,6 +8,7 @@ import TokoClient from "./toko-client";
 import ProductCarouselPicker from "./ProductCarouselPicker";
 import fs from "fs/promises";
 import path from "path";
+import { filterExistingIds } from "./toko-utils";
 
 // selalu ambil data terbaru
 export const dynamic = "force-dynamic";
@@ -355,100 +356,7 @@ function clampInt(n: number, min: number, max: number) {
   return Math.max(min, Math.min(max, Math.trunc(n)));
 }
 
-async function validateExistence(opts: {
-  imageIds?: number[];
-  productIds?: number[];
-  kategoriIds?: number[];
-  branchIds?: number[];
-  hubungiIds?: number[];
-  mediaIconKeys?: string[];
-}) {
-  const {
-    imageIds = [],
-    productIds = [],
-    kategoriIds = [],
-    branchIds = [],
-    hubungiIds = [],
-    mediaIconKeys = [],
-  } = opts;
 
-  const checks: { ok: boolean; msg: string }[] = [];
-
-  if (imageIds.length) {
-    const found = await prisma.gambarUpload.findMany({
-      where: { id: { in: imageIds } },
-      select: { id: true },
-    });
-    const foundIds = new Set(found.map((f) => f.id));
-    const missing = imageIds.filter((id) => !foundIds.has(id));
-    if (missing.length > 0) {
-      checks.push({ ok: false, msg: `Ada gambar yang tidak ditemukan (ID: ${missing.join(", ")}). Periksa pilihan gambar.` });
-    }
-  }
-
-  if (productIds.length) {
-    const found = await prisma.produk.findMany({
-      where: { id: { in: productIds } },
-      select: { id: true },
-    });
-    const foundIds = new Set(found.map((p) => p.id));
-    const missing = productIds.filter((id) => !foundIds.has(id));
-    if (missing.length > 0) {
-      checks.push({ ok: false, msg: `Ada produk yang tidak ditemukan (ID: ${missing.join(", ")}). Periksa pilihan produk.` });
-    }
-  }
-
-  if (kategoriIds.length) {
-    const found = await prisma.kategoriProduk.findMany({
-      where: { id: { in: kategoriIds } },
-      select: { id: true },
-    });
-    const foundIds = new Set(found.map((k) => k.id));
-    const missing = kategoriIds.filter((id) => !foundIds.has(id));
-    if (missing.length > 0) {
-      checks.push({ ok: false, msg: `Ada kategori yang tidak ditemukan (ID: ${missing.join(", ")}). Periksa pilihan kategori.` });
-    }
-  }
-
-  if (branchIds.length) {
-    const found = await prisma.cabangToko.findMany({
-      where: { id: { in: branchIds } },
-      select: { id: true },
-    });
-    const foundIds = new Set(found.map((b) => b.id));
-    const missing = branchIds.filter((id) => !foundIds.has(id));
-    if (missing.length > 0) {
-      checks.push({ ok: false, msg: `Ada cabang yang tidak ditemukan (ID: ${missing.join(", ")}). Periksa pilihan cabang.` });
-    }
-  }
-
-  if (hubungiIds.length) {
-    const found = await prisma.hubungi.findMany({
-      where: { id: { in: hubungiIds } },
-      select: { id: true },
-    });
-    const foundIds = new Set(found.map((h) => h.id));
-    const missing = hubungiIds.filter((id) => !foundIds.has(id));
-    if (missing.length > 0) {
-      checks.push({ ok: false, msg: `Ada kontak yang tidak ditemukan (ID: ${missing.join(", ")}). Periksa pilihan kontak.` });
-    }
-  }
-
-  if (mediaIconKeys.length) {
-    const found = await prisma.mediaSosial.findMany({
-      where: { iconKey: { in: mediaIconKeys } },
-      select: { iconKey: true },
-    });
-    const foundKeys = new Set(found.map((m) => m.iconKey));
-    const missing = mediaIconKeys.filter((k) => !foundKeys.has(k));
-    if (missing.length > 0) {
-      checks.push({ ok: false, msg: `Ada media sosial yang tidak ditemukan (${missing.join(", ")}). Periksa pilihan medsos.` });
-    }
-  }
-
-  const firstFail = checks.find((c) => !c.ok);
-  if (firstFail) throw new Error(firstFail.msg);
-}
 
 
 
@@ -1034,13 +942,16 @@ async function saveCategoryGridConfig(formData: FormData) {
 
   const coverIds = items.map((it) => it.coverImageId).filter((v): v is number => typeof v === "number");
 
-  try {
-    await validateExistence({ kategoriIds: selectedKategoriIds, imageIds: coverIds });
-  } catch (e: any) {
-    return redirectBack({ error: encodeURIComponent(e?.message ?? "Validasi gagal.") });
-  }
+  const check = await filterExistingIds({ kategoriIds: selectedKategoriIds, imageIds: coverIds });
+  const validKategoriIds = check.kategoriIds ?? [];
+  const validImageIds = check.imageIds ?? [];
 
-  const finalItems = maxItems ? items.slice(0, maxItems) : items;
+  const validItems = items.filter((it) => validKategoriIds.includes(it.kategoriId)).map((it) => ({
+    ...it,
+    coverImageId: it.coverImageId && validImageIds.includes(it.coverImageId) ? it.coverImageId : null
+  }));
+
+  const finalItems = maxItems ? validItems.slice(0, maxItems) : validItems;
 
   await updateDraftConfigPreserveTheme(id, {
     layout: { columns, ...(maxItems ? { maxItems } : {}) },
@@ -1065,13 +976,10 @@ async function saveProductCarouselConfig(formData: FormData) {
   // ordered: hidden inputs in <li> with name="productIds"
   const productIds = parseNumArray((formData.getAll("productIds") as string[]) ?? []);
 
-  try {
-    await validateExistence({ productIds });
-  } catch (e: any) {
-    return redirectBack({ error: encodeURIComponent(e?.message ?? "Validasi gagal.") });
-  }
+  const check = await filterExistingIds({ productIds });
+  const validProductIds = check.productIds ?? [];
 
-  await updateDraftConfigPreserveTheme(id, { title, description, productIds, showPrice, showCta });
+  await updateDraftConfigPreserveTheme(id, { title, description, productIds: validProductIds, showPrice, showCta });
   revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko");
   return redirectBack({ notice: encodeURIComponent("Config PRODUCT_CAROUSEL tersimpan.") });
 }
@@ -1088,14 +996,14 @@ async function saveCustomPromoConfig(formData: FormData) {
   const buttonHref = (formData.get("buttonHref") as string | null)?.trim() ?? "";
   const imageId = parseNum(formData.get("imageId"));
 
-  try {
-    await validateExistence({ imageIds: imageId ? [imageId] : [] });
-  } catch (e: any) {
-    return redirectBack({ error: encodeURIComponent(e?.message ?? "Validasi gagal.") });
+  let validImageId = imageId;
+  if (imageId) {
+    const check = await filterExistingIds({ imageIds: [imageId] });
+    if (!check.imageIds?.length) validImageId = null;
   }
 
   // selalu simpan format baru (menghapus ketergantungan bannerPromoId)
-  await updateDraftConfigPreserveTheme(id, { title, subtitle, buttonLabel, buttonHref, imageId: imageId ?? null });
+  await updateDraftConfigPreserveTheme(id, { title, subtitle, buttonLabel, buttonHref, imageId: validImageId });
 
   revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko");
   return redirectBack({ notice: encodeURIComponent("Config CUSTOM_PROMO tersimpan.") });
@@ -1109,18 +1017,15 @@ async function saveSocialConfig(formData: FormData) {
 
   const iconKeys = ((formData.getAll("iconKeys") as string[]) ?? []).filter(Boolean);
 
-  try {
-    await validateExistence({ mediaIconKeys: iconKeys });
-  } catch (e: any) {
-    return redirectBack({ error: encodeURIComponent(e?.message ?? "Validasi gagal.") });
-  }
+  const check = await filterExistingIds({ mediaIconKeys: iconKeys });
+  const validIconKeys = check.mediaIconKeys ?? [];
 
   const rows = await prisma.mediaSosial.findMany({
-    where: { iconKey: { in: iconKeys } },
+    where: { iconKey: { in: validIconKeys } },
     select: { iconKey: true, nama: true },
   });
 
-  const selected = iconKeys
+  const selected = validIconKeys
     .map((k) => rows.find((r) => r.iconKey === k))
     .filter(Boolean)
     .map((r) => ({ iconKey: (r as any).iconKey, nama: (r as any).nama ?? (r as any).iconKey }));
@@ -1140,13 +1045,10 @@ async function saveBranchesConfig(formData: FormData) {
   const branchIds = parseNumArray((formData.getAll("branchIds") as string[]) ?? []);
   const layout = ((formData.get("layout") as string | null) ?? "carousel") === "carousel" ? "carousel" : "grid";
 
-  try {
-    await validateExistence({ branchIds });
-  } catch (e: any) {
-    return redirectBack({ error: encodeURIComponent(e?.message ?? "Validasi gagal.") });
-  }
+  const check = await filterExistingIds({ branchIds });
+  const validBranchIds = check.branchIds ?? [];
 
-  await updateDraftConfigPreserveTheme(id, { branchIds, layout });
+  await updateDraftConfigPreserveTheme(id, { branchIds: validBranchIds, layout });
 
   revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko");
   return redirectBack({ notice: encodeURIComponent("Config BRANCHES tersimpan.") });
@@ -1161,13 +1063,10 @@ async function saveContactConfig(formData: FormData) {
   const hubungiIds = parseNumArray((formData.getAll("hubungiIds") as string[]) ?? []);
   const primaryOnly = (formData.get("primaryOnly") as string | null) === "true";
 
-  try {
-    await validateExistence({ hubungiIds });
-  } catch (e: any) {
-    return redirectBack({ error: encodeURIComponent(e?.message ?? "Validasi gagal.") });
-  }
+  const check = await filterExistingIds({ hubungiIds });
+  const validHubungiIds = check.hubungiIds ?? [];
 
-  await updateDraftConfigPreserveTheme(id, { hubungiIds, primaryOnly });
+  await updateDraftConfigPreserveTheme(id, { hubungiIds: validHubungiIds, primaryOnly });
 
   revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko");
   return redirectBack({ notice: encodeURIComponent("Config CONTACT tersimpan.") });
@@ -1182,13 +1081,10 @@ async function saveGalleryConfig(formData: FormData) {
   const imageIds = parseNumArray((formData.getAll("imageIds") as string[]) ?? []);
   const layout = ((formData.get("layout") as string | null) ?? "grid") === "grid" ? "grid" : "carousel";
 
-  try {
-    await validateExistence({ imageIds });
-  } catch (e: any) {
-    return redirectBack({ error: encodeURIComponent(e?.message ?? "Validasi gagal.") });
-  }
+  const check = await filterExistingIds({ imageIds });
+  const validImageIds = check.imageIds ?? [];
 
-  await updateDraftConfigPreserveTheme(id, { imageIds, layout });
+  await updateDraftConfigPreserveTheme(id, { imageIds: validImageIds, layout });
 
   revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko");
   return redirectBack({ notice: encodeURIComponent("Config GALLERY tersimpan.") });
@@ -1214,13 +1110,17 @@ async function saveRoomCategoryConfig(formData: FormData) {
   const kategoriIds = cards.map((c) => c.kategoriId).filter((v): v is number => typeof v === "number");
   const imageIds = cards.map((c) => c.imageId).filter((v): v is number => typeof v === "number");
 
-  try {
-    await validateExistence({ kategoriIds, imageIds });
-  } catch (e: any) {
-    return redirectBack({ error: encodeURIComponent(e?.message ?? "Validasi gagal.") });
-  }
+  const check = await filterExistingIds({ kategoriIds, imageIds });
+  const validKategoriIds = new Set(check.kategoriIds);
+  const validImageIds = new Set(check.imageIds);
 
-  await updateDraftConfigPreserveTheme(id, { cards });
+  const validCards = cards.map((c) => ({
+    ...c,
+    kategoriId: c.kategoriId && validKategoriIds.has(c.kategoriId) ? c.kategoriId : null,
+    imageId: c.imageId && validImageIds.has(c.imageId) ? c.imageId : null,
+  }));
+
+  await updateDraftConfigPreserveTheme(id, { cards: validCards });
 
   revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko");
   return redirectBack({ notice: encodeURIComponent("Config ROOM_CATEGORY tersimpan.") });
@@ -1251,24 +1151,24 @@ async function saveHighlightCollectionConfig(formData: FormData) {
 
   // Validasi: produk + hero image (kalau ada)
   const imageIdsToValidate = heroImageId ? [heroImageId] : [];
-  try {
-    await validateExistence({ productIds, imageIds: imageIdsToValidate });
-  } catch (e: any) {
-    return redirectBack({ error: encodeURIComponent(e?.message ?? "Validasi gagal.") });
-  }
+  const check = await filterExistingIds({ productIds, imageIds: imageIdsToValidate });
+  const validProductIds = check.productIds ?? [];
+  const validImageIds = check.imageIds ?? [];
+
+  const finalHeroImageId = heroImageId && validImageIds.includes(heroImageId) ? heroImageId : null;
 
   // New: items campuran (future-proof). Saat ini diisi dari productIds.
-  const items = productIds.map((pid) => ({ type: "product", refId: pid, enabled: true }));
+  const items = validProductIds.map((pid) => ({ type: "product", refId: pid, enabled: true }));
 
   await updateDraftConfigPreserveTheme(id, {
     // Backward compatible keys
     mode: "products",
     title,
-    productIds,
+    productIds: validProductIds,
 
     // New keys
     layout,
-    heroImageId,
+    heroImageId: finalHeroImageId,
     badgeText,
     headline,
     description,
@@ -1421,8 +1321,10 @@ async function uploadImageToGalleryAndAttach(formData: FormData) {
     }
 
     // Validate basic references so config tetap aman
-    const ref = collectExistenceArgs(type, cfg);
-    await validateExistence(ref);
+    // const ref = collectExistenceArgs(type, cfg);
+    // await validateExistence(ref);
+    // REMOVED STRICT VALIDATION: We allow attaching an image even if other parts of the config are invalid.
+    // The next specific save of that section will clean it up.
 
     const existing = await prisma.homepageSectionDraft.findUnique({ where: { id: sectionId } });
     const themeKey = getThemeKeyFromRow(existing);

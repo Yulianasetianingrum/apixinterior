@@ -19,7 +19,6 @@ import {
     slugify,
     parseSectionTheme,
     parseNumArray,
-    validateExistence,
     filterExistingIds,
     updateDraftConfigPreserveTheme,
     normalizeThemeAttr,
