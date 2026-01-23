@@ -536,6 +536,30 @@ export function normalizeConfig(sectionType: string, raw: any): JsonObject {
         return { ...(cfg as any), useGlobalContact, __themeKey: getThemeKeyFromConfig(cfg) };
     }
 
+    if (sectionType === "TESTIMONIALS") {
+        const title = typeof (cfg as any).title === "string" ? String((cfg as any).title).trim() : "Apa Kata Mereka?";
+        const subtitle = typeof (cfg as any).subtitle === "string" ? String((cfg as any).subtitle).trim() : "Ulasan dari pelanggan setia kami";
+        const mapsUrl = typeof (cfg as any).mapsUrl === "string" ? String((cfg as any).mapsUrl).trim() : "";
+        const reviewsRaw = Array.isArray((cfg as any).reviews) ? (cfg as any).reviews : [];
+        const reviews = reviewsRaw.map((r: any, idx: number) => ({
+            id: String(r?.id ?? idx),
+            author_name: String(r?.author_name ?? r?.author ?? "Pelanggan"),
+            rating: Number(r?.rating ?? 5),
+            text: String(r?.text ?? ""),
+            relative_time_description: String(r?.relative_time_description ?? r?.time ?? ""),
+            profile_photo_url: String(r?.profile_photo_url ?? r?.avatarUrl ?? ""),
+        }));
+
+        return {
+            title,
+            subtitle,
+            mapsUrl,
+            reviews,
+            sectionTheme: parseSectionTheme((cfg as any).sectionTheme ?? null),
+            __themeKey: getThemeKeyFromConfig(cfg)
+        };
+    }
+
     return { ...(cfg as any), __themeKey: getThemeKeyFromConfig(cfg) };
 }
 

@@ -18,18 +18,34 @@ type Props = {
 };
 
 export default function TestimonialsEditor({ config, onChange }: Props) {
-    if (!config) return <div style={{ color: "red", padding: 10 }}>Error: Config is missing.</div>;
+    const safeConfig = config || {};
 
-    const [title, setTitle] = useState(config.title ?? "Apa Kata Mereka?");
-    const [subtitle, setSubtitle] = useState(config.subtitle ?? "Ulasan dari pelanggan setia kami");
-    const [mapsUrl, setMapsUrl] = useState(config.mapsUrl ?? "");
-    const [reviews, setReviews] = useState<Review[]>(Array.isArray(config.reviews) ? config.reviews : []);
+    const [title, setTitle] = useState(safeConfig.title ?? "Apa Kata Mereka?");
+    const [subtitle, setSubtitle] = useState(safeConfig.subtitle ?? "Ulasan dari pelanggan setia kami");
+    const [mapsUrl, setMapsUrl] = useState(safeConfig.mapsUrl ?? "");
 
+    // Normalize initial reviews to match Renderer structure
+    const initialReviews = Array.isArray(safeConfig.reviews)
+        ? safeConfig.reviews.map((r: any) => ({
+            id: r.id || String(Math.random()),
+            author_name: r.author_name || r.author || "Pelanggan",
+            rating: typeof r.rating === 'number' ? r.rating : 5,
+            text: r.text || "",
+            relative_time_description: r.relative_time_description || r.time || "",
+            profile_photo_url: r.profile_photo_url || r.avatarUrl || ""
+        }))
+        : [];
+
+    const [reviews, setReviews] = useState<any[]>(initialReviews);
     const [isFetching, setIsFetching] = useState(false);
+
+    if (!config) {
+        return <div style={{ color: "red", padding: 10 }}>Error: Loading Config...</div>;
+    }
 
     // Sync changes to parent
     const updateConfig = (key: string, value: any) => {
-        const next = { ...config, title, subtitle, mapsUrl, reviews, [key]: value };
+        const next = { ...safeConfig, title, subtitle, mapsUrl, reviews, [key]: value };
         onChange(next);
     };
 
@@ -44,15 +60,12 @@ export default function TestimonialsEditor({ config, onChange }: Props) {
         // SIMULATED FETCH for now
         // In a real scenario, this would call a Server Action that uses Puppeteer/Cheerio/Places API
         setTimeout(() => {
-            const dummyReviews: Review[] = [
-                { id: "r1", author: "Budi Santoso", rating: 5, text: "Pelayanan sangat ramah, furniture kualitas premium. Sangat puas!", time: "2 hari lalu", avatarUrl: "" },
-                { id: "r2", author: "Siti Aminah", rating: 5, text: "Desain interiornya modern, sesuai ekspektasi. Pengiriman juga cepat.", time: "1 minggu lalu", avatarUrl: "" },
-                { id: "r3", author: "Ahmad Dani", rating: 4, text: "Harganya bersaing, overall oke banget buat ngisi rumah baru.", time: "2 minggu lalu", avatarUrl: "" },
+            const dummyReviews = [
+                { id: "r1", author_name: "Budi Santoso", rating: 5, text: "Pelayanan sangat ramah, furniture kualitas premium. Sangat puas!", relative_time_description: "2 hari lalu", profile_photo_url: "" },
+                { id: "r2", author_name: "Siti Aminah", rating: 5, text: "Desain interiornya modern, sesuai ekspektasi. Pengiriman juga cepat.", relative_time_description: "1 minggu lalu", profile_photo_url: "" },
+                { id: "r3", author_name: "Ahmad Dani", rating: 4, text: "Harganya bersaing, overall oke banget buat ngisi rumah baru.", relative_time_description: "2 minggu lalu", profile_photo_url: "" },
             ];
 
-            // Append or Replace? Let's confirm logic. For now, replace or append depending on user needs. 
-            // Better to append to avoid losing manual ones, or ask.
-            // Let's just append for safety.
             const nextReviews = [...reviews, ...dummyReviews];
             setReviews(nextReviews);
             updateConfig("reviews", nextReviews);
@@ -63,12 +76,13 @@ export default function TestimonialsEditor({ config, onChange }: Props) {
     };
 
     const addManualReview = () => {
-        const newRev: Review = {
+        const newRev = {
             id: Date.now().toString(),
-            author: "Nama Pelanggan",
+            author_name: "Nama Pelanggan",
             rating: 5,
             text: "Tulis ulasan disini...",
-            time: "Baru saja"
+            relative_time_description: "Baru saja",
+            profile_photo_url: ""
         };
         const next = [...reviews, newRev];
         setReviews(next);
@@ -82,7 +96,7 @@ export default function TestimonialsEditor({ config, onChange }: Props) {
         updateConfig("reviews", next);
     };
 
-    const updateReview = (idx: number, field: keyof Review, val: any) => {
+    const updateReview = (idx: number, field: string, val: any) => {
         const next = [...reviews];
         if (next[idx]) {
             (next[idx] as any)[field] = val;
@@ -93,7 +107,7 @@ export default function TestimonialsEditor({ config, onChange }: Props) {
 
     return (
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            {/* Hidden Inputs for Server Action */}
+            {/* Hidden Inputs for Server Action - syncing with new field names */}
             <input type="hidden" name="title" value={title} />
             <input type="hidden" name="subtitle" value={subtitle} />
             <input type="hidden" name="mapsUrl" value={mapsUrl} />
@@ -159,8 +173,8 @@ export default function TestimonialsEditor({ config, onChange }: Props) {
                         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
                             <input
                                 type="text"
-                                value={r.author}
-                                onChange={(e) => updateReview(idx, "author", e.target.value)}
+                                value={r.author_name}
+                                onChange={(e) => updateReview(idx, "author_name", e.target.value)}
                                 style={{ fontWeight: 600, border: "none", borderBottom: "1px dashed #cbd5e1", width: "40%" }}
                                 placeholder="Nama"
                             />
