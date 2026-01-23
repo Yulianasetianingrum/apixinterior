@@ -67,7 +67,7 @@ export const metadata: Metadata = {
     description: "Wujudkan rumah impian dengan Jasa Desain Interior & Furniture Custom terbaik. Kualitas premium, harga kompetitif, dan hasil memuaskan.",
     images: [
       {
-        url: "/logo/logo_apixinterior_biru.png",
+        url: "/logo/logo_apixinterior_golden.png.png",
         width: 1200,
         height: 630,
         alt: "Apix Interior - Jasa Desain Interior & Furniture",
@@ -78,7 +78,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Apix Interior - Jasa Desain Interior & Furniture Custom",
     description: "Jasa Desain Interior & Furniture Custom No. 1. Spesialis Kitchen Set, Lemari, & Dekorasi Rumah Modern.",
-    images: ["/logo/logo_apixinterior_biru.png"],
+    images: ["/logo/logo_apixinterior_golden.png.png"],
   },
   robots: {
     index: true,
@@ -136,6 +136,32 @@ export default async function RootLayout({
 
   return (
     <html lang="id" className={inter.variable}>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              "name": "Apix Interior",
+              "url": "https://apixinterior.com",
+              "logo": "https://apixinterior.com/logo/logo_apixinterior_golden.png.png",
+              "image": "https://apixinterior.com/logo/logo_apixinterior_golden.png.png",
+              "description": "Jasa Desain Interior & Furniture Custom No. 1. Spesialis Kitchen Set, Lemari, Renovasi Rumah & Dekorasi Interior Modern di Jabodetabek.",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Jakarta",
+                "addressRegion": "DKI Jakarta",
+                "addressCountry": "ID"
+              },
+              "sameAs": [
+                "https://www.facebook.com/apixinterior",
+                "https://www.instagram.com/apixinterior"
+              ]
+            })
+          }}
+        />
+      </head>
       <body className={`bg-white ${inter.className}`}>
         <SettingsProvider waNumber={waNumber}>
           <CartProvider>

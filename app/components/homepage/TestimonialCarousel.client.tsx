@@ -325,10 +325,17 @@ export default function TestimonialCarousel({ config }: { config: TestimonialCon
                                             const avatarUrl = review.profile_photo_url
                                                 || `https://ui-avatars.com/api/?name=${encodeURIComponent(review.author_name || "AN")}&background=d4af37&color=0b1f3b&size=128&bold=true`;
 
+                                            console.log('[TestimonialCarousel] Avatar URL:', avatarUrl);
+                                            console.log('[TestimonialCarousel] Author:', review.author_name);
+
                                             return (
                                                 <img
                                                     src={avatarUrl}
                                                     alt={review.author_name}
+                                                    onError={(e) => {
+                                                        console.error('[TestimonialCarousel] Avatar failed to load:', avatarUrl);
+                                                        console.error('[TestimonialCarousel] Error:', e);
+                                                    }}
                                                     style={{
                                                         width: "48px",
                                                         height: "48px",
