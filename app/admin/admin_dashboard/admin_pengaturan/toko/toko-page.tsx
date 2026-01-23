@@ -379,8 +379,10 @@ async function validateExistence(opts: {
       where: { id: { in: imageIds } },
       select: { id: true },
     });
-    if (found.length !== new Set(imageIds).size) {
-      checks.push({ ok: false, msg: "Ada gambar yang tidak ditemukan (gambar_upload). Periksa pilihan gambar." });
+    const foundIds = new Set(found.map((f) => f.id));
+    const missing = imageIds.filter((id) => !foundIds.has(id));
+    if (missing.length > 0) {
+      checks.push({ ok: false, msg: `Ada gambar yang tidak ditemukan (ID: ${missing.join(", ")}). Periksa pilihan gambar.` });
     }
   }
 
@@ -389,8 +391,10 @@ async function validateExistence(opts: {
       where: { id: { in: productIds } },
       select: { id: true },
     });
-    if (found.length !== new Set(productIds).size) {
-      checks.push({ ok: false, msg: "Ada produk yang tidak ditemukan (produk). Periksa pilihan produk." });
+    const foundIds = new Set(found.map((p) => p.id));
+    const missing = productIds.filter((id) => !foundIds.has(id));
+    if (missing.length > 0) {
+      checks.push({ ok: false, msg: `Ada produk yang tidak ditemukan (ID: ${missing.join(", ")}). Periksa pilihan produk.` });
     }
   }
 
@@ -399,8 +403,10 @@ async function validateExistence(opts: {
       where: { id: { in: kategoriIds } },
       select: { id: true },
     });
-    if (found.length !== new Set(kategoriIds).size) {
-      checks.push({ ok: false, msg: "Ada kategori yang tidak ditemukan (kategori_produk). Periksa pilihan kategori." });
+    const foundIds = new Set(found.map((k) => k.id));
+    const missing = kategoriIds.filter((id) => !foundIds.has(id));
+    if (missing.length > 0) {
+      checks.push({ ok: false, msg: `Ada kategori yang tidak ditemukan (ID: ${missing.join(", ")}). Periksa pilihan kategori.` });
     }
   }
 
@@ -409,8 +415,10 @@ async function validateExistence(opts: {
       where: { id: { in: branchIds } },
       select: { id: true },
     });
-    if (found.length !== new Set(branchIds).size) {
-      checks.push({ ok: false, msg: "Ada cabang yang tidak ditemukan (cabang_toko). Periksa pilihan cabang." });
+    const foundIds = new Set(found.map((b) => b.id));
+    const missing = branchIds.filter((id) => !foundIds.has(id));
+    if (missing.length > 0) {
+      checks.push({ ok: false, msg: `Ada cabang yang tidak ditemukan (ID: ${missing.join(", ")}). Periksa pilihan cabang.` });
     }
   }
 
@@ -419,8 +427,10 @@ async function validateExistence(opts: {
       where: { id: { in: hubungiIds } },
       select: { id: true },
     });
-    if (found.length !== new Set(hubungiIds).size) {
-      checks.push({ ok: false, msg: "Ada kontak yang tidak ditemukan (hubungi). Periksa pilihan kontak." });
+    const foundIds = new Set(found.map((h) => h.id));
+    const missing = hubungiIds.filter((id) => !foundIds.has(id));
+    if (missing.length > 0) {
+      checks.push({ ok: false, msg: `Ada kontak yang tidak ditemukan (ID: ${missing.join(", ")}). Periksa pilihan kontak.` });
     }
   }
 
@@ -429,8 +439,10 @@ async function validateExistence(opts: {
       where: { iconKey: { in: mediaIconKeys } },
       select: { iconKey: true },
     });
-    if (found.length !== new Set(mediaIconKeys).size) {
-      checks.push({ ok: false, msg: "Ada media sosial yang tidak ditemukan (media_sosial). Periksa pilihan medsos." });
+    const foundKeys = new Set(found.map((m) => m.iconKey));
+    const missing = mediaIconKeys.filter((k) => !foundKeys.has(k));
+    if (missing.length > 0) {
+      checks.push({ ok: false, msg: `Ada media sosial yang tidak ditemukan (${missing.join(", ")}). Periksa pilihan medsos.` });
     }
   }
 
