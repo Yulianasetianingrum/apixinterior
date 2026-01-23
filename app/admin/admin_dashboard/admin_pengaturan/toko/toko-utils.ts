@@ -527,7 +527,7 @@ export function collectExistenceArgs(type: string, cfg: any) {
     return args;
 }
 
-export async function validateExistence(args: {
+export async function filterExistingIds(args: {
     productIds?: number[];
     kategoriIds?: number[];
     imageIds?: number[];
@@ -535,30 +535,33 @@ export async function validateExistence(args: {
     hubungiIds?: number[];
     mediaIconKeys?: string[];
 }) {
+    const res: typeof args = {};
+
     if (args.productIds?.length) {
-        const count = await prisma.produk.count({ where: { id: { in: args.productIds } } });
-        if (count < args.productIds.length) throw new Error("Beberapa produk tidak ditemukan.");
+        const rows = await prisma.produk.findMany({ where: { id: { in: args.productIds } }, select: { id: true } });
+        res.productIds = rows.map((r) => r.id);
     }
     if (args.kategoriIds?.length) {
-        const count = await prisma.kategoriProduk.count({ where: { id: { in: args.kategoriIds } } });
-        if (count < args.kategoriIds.length) throw new Error("Beberapa kategori tidak ditemukan.");
+        const rows = await prisma.kategoriProduk.findMany({ where: { id: { in: args.kategoriIds } }, select: { id: true } });
+        res.kategoriIds = rows.map((r) => r.id);
     }
     if (args.imageIds?.length) {
-        const count = await prisma.gambarUpload.count({ where: { id: { in: args.imageIds } } });
-        if (count < args.imageIds.length) throw new Error("Beberapa gambar tidak ditemukan.");
+        const rows = await prisma.gambarUpload.findMany({ where: { id: { in: args.imageIds } }, select: { id: true } });
+        res.imageIds = rows.map((r) => r.id);
     }
     if (args.branchIds?.length) {
-        const count = await prisma.cabangToko.count({ where: { id: { in: args.branchIds } } });
-        if (count < args.branchIds.length) throw new Error("Beberapa cabang tidak ditemukan.");
+        const rows = await prisma.cabangToko.findMany({ where: { id: { in: args.branchIds } }, select: { id: true } });
+        res.branchIds = rows.map((r) => r.id);
     }
     if (args.hubungiIds?.length) {
-        const count = await prisma.hubungi.count({ where: { id: { in: args.hubungiIds } } });
-        if (count < args.hubungiIds.length) throw new Error("Beberapa kontak tidak ditemukan.");
+        const rows = await prisma.hubungi.findMany({ where: { id: { in: args.hubungiIds } }, select: { id: true } });
+        res.hubungiIds = rows.map((r) => r.id);
     }
     if (args.mediaIconKeys?.length) {
-        const count = await prisma.mediaSosial.count({ where: { iconKey: { in: args.mediaIconKeys } } });
-        if (count < args.mediaIconKeys.length) throw new Error("Beberapa ikon sosmed tidak ditemukan.");
+        const rows = await prisma.mediaSosial.findMany({ where: { iconKey: { in: args.mediaIconKeys } }, select: { iconKey: true } });
+        res.mediaIconKeys = rows.map((r) => r.iconKey);
     }
+    return res;
 }
 
 export function legacyToNewConfig(type: string, cfg: any) {

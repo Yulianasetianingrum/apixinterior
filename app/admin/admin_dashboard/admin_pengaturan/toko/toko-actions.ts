@@ -20,6 +20,7 @@ import {
     parseSectionTheme,
     parseNumArray,
     validateExistence,
+    filterExistingIds,
     updateDraftConfigPreserveTheme,
     normalizeThemeAttr,
     ALLOWED_THEMES,
@@ -135,12 +136,11 @@ export async function saveHeroConfig(formData: FormData) {
     const sectionTheme = parseSectionTheme(formData.get("sectionTheme") as string | null);
 
     const heroImageIdRaw = (formData.get("heroImageId") as string | null);
-    const heroImageId = heroImageIdRaw && heroImageIdRaw.trim() ? Number(heroImageIdRaw) : null;
+    let heroImageId = heroImageIdRaw && heroImageIdRaw.trim() ? Number(heroImageIdRaw) : null;
 
-    try {
-        if (heroImageId) await validateExistence({ imageIds: [heroImageId] });
-    } catch (e: any) {
-        return redirectBack({ error: encodeURIComponent(e?.message ?? "Validasi gagal.") });
+    if (heroImageId) {
+        const check = await filterExistingIds({ imageIds: [heroImageId] });
+        if (!check.imageIds?.length) heroImageId = null;
     }
 
     await updateDraftConfigPreserveTheme(
@@ -213,14 +213,11 @@ export async function saveProductListingConfig(formData: FormData) {
             : "FOLLOW_NAVBAR";
 
     const clearProducts = ((formData.get("clearProducts") as string | null) ?? "").trim() === "1";
-    const productIds = clearProducts ? [] : parseNumArray((formData.getAll("productIds") as string[]) ?? []);
+    let productIds = clearProducts ? [] : parseNumArray((formData.getAll("productIds") as string[]) ?? []);
 
     if (productIds.length > 0) {
-        try {
-            await validateExistence({ productIds });
-        } catch (e: any) {
-            return redirectBack({ error: encodeURIComponent(e?.message ?? "Validasi gagal."), anchor, sectionId: id });
-        }
+        const check = await filterExistingIds({ productIds });
+        productIds = check.productIds ?? [];
     }
 
     const sectionBgTheme = parseCustomPromoBgTheme(formData.get("sectionBgTheme") as string | null);
@@ -258,7 +255,7 @@ export async function saveCustomPromoConfig(formData: FormData) {
             : {};
 
     const formVoucherIds = parseNumArray((formData.getAll("voucherImageIds") as string[]) ?? []);
-    const voucherImageIds = normalizeVoucherImageIds(
+    let voucherImageIds = normalizeVoucherImageIds(
         formVoucherIds.length ? formVoucherIds : existingCfg?.voucherImageIds,
     );
 
@@ -279,10 +276,15 @@ export async function saveCustomPromoConfig(formData: FormData) {
         }
     }
 
-    try {
-        await validateExistence({ imageIds: voucherImageIds });
-    } catch (e: any) {
-        return redirectBack({ error: encodeURIComponent(e?.message ?? "Validasi gagal.") });
+    if (voucherImageIds.length > 0) {
+        const check = await filterExistingIds({ imageIds: voucherImageIds });
+        const validIds = check.imageIds ?? [];
+        // Only keep vouchers whose images exist
+        voucherImageIds = voucherImageIds.filter((id) => validIds.includes(id));
+        // Cleanup links for removed images
+        for (const id of Object.keys(voucherLinks)) {
+            if (!validIds.includes(Number(id))) delete voucherLinks[Number(id)];
+        }
     }
 
     await updateDraftConfigPreserveTheme(
@@ -313,12 +315,11 @@ export async function saveSocialConfig(formData: FormData) {
     const slug = slugRaw ? slugify(slugRaw) : null;
 
     const sectionTheme = parseSectionTheme(formData.get("sectionTheme") as string | null);
-    const iconKeys = ((formData.getAll("iconKeys") as string[]) ?? []).filter(Boolean);
+    let iconKeys = ((formData.getAll("iconKeys") as string[]) ?? []).filter(Boolean);
 
-    try {
-        await validateExistence({ mediaIconKeys: iconKeys });
-    } catch (e: any) {
-        return redirectBack({ error: encodeURIComponent(e?.message ?? "Validasi gagal.") });
+    if (iconKeys.length > 0) {
+        const check = await filterExistingIds({ mediaIconKeys: iconKeys });
+        iconKeys = check.mediaIconKeys ?? [];
     }
 
     const rows = await prisma.mediaSosial.findMany({
@@ -403,13 +404,12 @@ export async function saveBranchesConfig(formData: FormData) {
     const slug = slugRaw ? slugify(slugRaw) : null;
 
     const sectionTheme = parseSectionTheme(formData.get("sectionTheme") as string | null);
-    const branchIds = parseNumArray((formData.getAll("branchIds") as string[]) ?? []);
+    let branchIds = parseNumArray((formData.getAll("branchIds") as string[]) ?? []);
     const layout = ((formData.get("layout") as string | null) ?? "carousel") === "carousel" ? "carousel" : "grid";
 
-    try {
-        await validateExistence({ branchIds });
-    } catch (e: any) {
-        return redirectBack({ error: encodeURIComponent(e?.message ?? "Validasi gagal.") });
+    if (branchIds.length > 0) {
+        const check = await filterExistingIds({ branchIds });
+        branchIds = check.branchIds ?? [];
     }
 
     await updateDraftConfigPreserveTheme(
@@ -603,17 +603,25 @@ export async function saveCategoryGridConfig(formData: FormData) {
     const columns = clampInt(Number(formData.get("columns") ?? 3), 1, 6);
     const maxItems = clampInt(Number(formData.get("maxItems") ?? 6), 1, 30);
 
-    const kategoriIds = parseNumArray((formData.getAll("kategoriIds") as string[]) ?? []);
-    const items = kategoriIds.map((kid) => {
+    let kategoriIds = parseNumArray((formData.getAll("kategoriIds") as string[]) ?? []);
+    const imageIdsToCheck: number[] = [];
+
+    const rawItems = kategoriIds.map((kid) => {
         const coverImageId = parseNum(formData.get(`coverImageId_${kid}`));
+        if (coverImageId) imageIdsToCheck.push(coverImageId);
         return { kategoriId: kid, coverImageId };
     });
 
-    try {
-        await validateExistence({ kategoriIds, imageIds: items.map((it) => it.coverImageId).filter((v): v is number => !!v) });
-    } catch (e: any) {
-        return redirectBack({ error: encodeURIComponent(e?.message ?? "Validasi gagal.") });
-    }
+    const check = await filterExistingIds({ kategoriIds, imageIds: imageIdsToCheck });
+    const validKategoriIds = check.kategoriIds ?? [];
+    const validImageIds = check.imageIds ?? [];
+
+    const items = rawItems
+        .filter((it) => validKategoriIds.includes(it.kategoriId))
+        .map((it) => ({
+            ...it,
+            coverImageId: it.coverImageId && validImageIds.includes(it.coverImageId) ? it.coverImageId : null,
+        }));
 
     await updateDraftConfigPreserveTheme(
         id,
@@ -667,12 +675,11 @@ export async function saveProductCarouselConfig(formData: FormData) {
     const showPrice = formData.get("showPrice") === "1";
     const showCta = formData.get("showCta") === "1";
 
-    const productIds = parseNumArray((formData.getAll("productIds") as string[]) ?? []);
+    let productIds = parseNumArray((formData.getAll("productIds") as string[]) ?? []);
 
-    try {
-        if (productIds.length > 0) await validateExistence({ productIds });
-    } catch (e: any) {
-        return redirectBack({ error: encodeURIComponent(e?.message ?? "Validasi gagal.") });
+    if (productIds.length > 0) {
+        const check = await filterExistingIds({ productIds });
+        productIds = check.productIds ?? [];
     }
 
     const sectionBgTheme = parseCustomPromoBgTheme(formData.get("sectionBgTheme") as string | null);
@@ -759,18 +766,17 @@ export async function saveHighlightCollectionConfig(formData: FormData) {
     const theme = (formData.get("theme") as string | null)?.trim();
     const headline = (formData.get("headline") as string | null)?.trim() ?? "";
     const layout = (formData.get("layout") as string | null) ?? "FEATURED_LEFT";
-    const heroImageId = parseNum(formData.get("heroImageId"));
+    let heroImageId = parseNum(formData.get("heroImageId"));
     const description = (formData.get("description") as string | null)?.trim() ?? "";
     const ctaText = (formData.get("ctaText") as string | null)?.trim() ?? "";
     const ctaHref = (formData.get("ctaHref") as string | null)?.trim() ?? "";
     const sectionTheme = parseSectionTheme(formData.get("sectionTheme") as string | null);
-    const productIds = parseNumArray(formData.getAll("productIds") as string[]);
+    let productIds = parseNumArray(formData.getAll("productIds") as string[]);
 
-    try {
-        const images = heroImageId ? [heroImageId] : [];
-        await validateExistence({ productIds, imageIds: images });
-    } catch (e: any) {
-        return redirectBack({ error: encodeURIComponent(e?.message ?? "Validasi gagal.") });
+    if (productIds.length > 0 || heroImageId) {
+        const check = await filterExistingIds({ productIds, imageIds: heroImageId ? [heroImageId] : [] });
+        productIds = check.productIds ?? [];
+        if (heroImageId && !check.imageIds?.length) heroImageId = null;
     }
 
     const items = productIds.map(pid => ({ type: "product", refId: pid, enabled: true }));
