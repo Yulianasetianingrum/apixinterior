@@ -2775,6 +2775,7 @@ async function saveTestimonialsConfig(formData: FormData) {
   const title = (formData.get("title") as string | null)?.trim() ?? "";
   const subtitle = (formData.get("subtitle") as string | null)?.trim() ?? "";
   const mapsUrl = (formData.get("mapsUrl") as string | null)?.trim() ?? "";
+  const sectionTheme = parseSectionTheme(formData.get("sectionTheme") as string | null);
 
   const reviewsJson = (formData.get("reviews") as string | null) ?? "[]";
   let reviews: any[] = [];
@@ -2794,7 +2795,8 @@ async function saveTestimonialsConfig(formData: FormData) {
     title,
     subtitle,
     mapsUrl,
-    reviews
+    reviews,
+    sectionTheme,
   };
 
   await updateDraftConfigPreserveTheme(id, withThemeKey(newConfig, themeKey));
