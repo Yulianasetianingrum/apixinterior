@@ -22,6 +22,7 @@ export default function SecureImage({
     height,
     style,
     priority,
+    loading,
     className,
     sizes,
     ...props
@@ -81,6 +82,7 @@ export default function SecureImage({
             height={fill ? undefined : finalHeight}
             style={style}
             priority={priority}
+            loading={priority ? undefined : (loading || "lazy")}
             unoptimized={isInternal}
             className={className}
             sizes={sizes || (fill ? "100vw" : undefined)}

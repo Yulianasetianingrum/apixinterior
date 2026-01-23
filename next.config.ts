@@ -30,6 +30,16 @@ const nextConfig: NextConfig = {
   },
   compress: true,
   poweredByHeader: false, // Security + bit of performance
+
+  // Production optimizations
+  productionBrowserSourceMaps: false, // Disable source maps in production for smaller bundles
+
+  // Optimize output
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production' ? {
+      exclude: ['error', 'warn'],
+    } : false,
+  },
 };
 
 export default nextConfig;

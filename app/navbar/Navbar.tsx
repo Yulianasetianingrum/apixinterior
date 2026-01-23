@@ -19,7 +19,7 @@ const searchGold = "/uploads/search_gold.png";
 const searchNavy = "/uploads/search_navy.png";
 const searchWhite = "/uploads/search_white.png";
 
-export const dynamic = "force-dynamic";
+// export const dynamic = "force-dynamic";
 
 export type NavbarTheme =
     | "NAVY_GOLD"
@@ -72,11 +72,6 @@ export default async function Navbar(props: { themeOverride?: string }) {
 
     const navbarTheme = rawTheme as NavbarTheme;
 
-    // DEBUG: Log untuk trace masalah
-    console.log("🎨 NAVBAR DEBUG:");
-    console.log("  - themeOverride:", props?.themeOverride);
-    console.log("  - navbarSetting?.theme:", navbarSetting?.theme);
-    console.log("  - navbarTheme (final):", navbarTheme);
 
     const themeClass =
         navbarTheme === "NAVY_GOLD"
@@ -194,6 +189,7 @@ export default async function Navbar(props: { themeOverride?: string }) {
                                 alt={namaToko}
                                 fill
                                 sizes="120px"
+                                priority={true}
                                 className={styles.apixLogoImg}
                             />
                         </div>

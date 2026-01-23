@@ -25,7 +25,8 @@ import Image from "next/image";
 import { type CSSProperties } from "react";
 import { OrganizationSchema, WebSiteSchema, LocalBusinessSchema } from "./components/seo/StructuredData";
 
-export const dynamic = "force-dynamic";
+// export const dynamic = "force-dynamic";
+export const revalidate = 60; // Revalidate every 60 seconds (1 minute) for production performance
 
 import {
   themeMetaSlug,
@@ -1332,39 +1333,31 @@ export default async function HomePage({
             return (
               <section key={section.id} className={styles.footerSection} style={{ backgroundColor: colors.bg, color: colors.element }}>
                 <div className={styles.footerLayout}>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 30 }}>
-                    {(() => {
-                      const tags = Array.isArray(cfg.footerTags) ? cfg.footerTags : [];
-
-                      const mid = Math.ceil(tags.length / 2);
-                      const leftTags = tags.slice(0, mid);
-                      const rightTags = tags.slice(mid);
-
-                      return (
-                        <>
-                          <div className={styles.footerTagsGrid}>
-                            {leftTags.map((tag: any, i: number) => (
-                              <span key={i} style={{ color: "inherit", opacity: 0.6, fontSize: 12, fontWeight: "bold" }}>{tag.label}</span>
-                            ))}
-                          </div>
-                          {rightTags.length > 0 && (
-                            <div className={styles.footerTagsGrid}>
-                              {rightTags.map((tag: any, i: number) => (
-                                <span key={i} style={{ color: "inherit", opacity: 0.6, fontSize: 12, fontWeight: "bold" }}>{tag.label}</span>
-                              ))}
-                            </div>
-                          )}
-                        </>
-                      );
-                    })()}
+                  <div className={styles.footerLeftStack}>
+                    {Array.isArray(cfg.footerTags) && cfg.footerTags.length > 0 && (
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "10px 24px" }}>
+                        {cfg.footerTags.map((tag: any, idx: number) => (
+                          <span key={idx} style={{ color: "inherit", opacity: 0.6, fontSize: 12, cursor: "default" }}>
+                            {tag.label}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                   <div className={styles.footerRightStack}>
                     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                      {/* Logo and Icon */}
-                      <img src={getFooterIconPath("LOGO", colors.element)} alt="Apix Interior" style={{ height: 32, width: "auto", objectFit: "contain", alignSelf: "flex-start" }} />
+                      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                        <span style={{
+                          fontSize: "0.9rem",
+                          fontWeight: 600,
+                          letterSpacing: "0.04em",
+                          textTransform: "uppercase",
+                          color: colors.element
+                        }}>{namaToko}</span>
+                      </div>
                       <div style={{ display: "flex", gap: 8 }}>
-                        <img src={getFooterIconPath("LOC", colors.element)} alt="Loc" style={{ width: 14, height: 14 }} />
-                        <address style={{ fontStyle: "normal", fontSize: 12, opacity: 0.8 }}>
+                        <img src={getFooterIconPath("LOC", colors.element)} alt="Loc" style={{ width: 14, height: 14, marginTop: 3, opacity: 0.8 }} />
+                        <address style={{ fontStyle: "normal", lineHeight: 1.4, opacity: 0.8, whiteSpace: "pre-line", fontSize: 12 }}>
                           {(() => {
                             const manualAddr = cfg.address;
                             if (useGlobal) {
@@ -1464,11 +1457,13 @@ export default async function HomePage({
                   </div>
                 </div>
                 {/* Copyright Bar */}
-                {cfg.copyright && (
-                  <div style={{ borderTop: "1px solid rgba(0,0,0,0.08)", marginTop: 30, paddingTop: 16, textAlign: "center", fontSize: 12, opacity: 0.6 }}>
-                    {cfg.copyright}
-                  </div>
-                )}
+                {
+                  cfg.copyright && (
+                    <div style={{ borderTop: "1px solid rgba(0,0,0,0.08)", marginTop: 30, paddingTop: 16, textAlign: "center", fontSize: 12, opacity: 0.6 }}>
+                      {cfg.copyright}
+                    </div>
+                  )
+                }
               </section>
             );
           }
@@ -1476,6 +1471,6 @@ export default async function HomePage({
           return null;
         })}
       </main>
-    </div>
+    </div >
   );
 }

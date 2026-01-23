@@ -48,15 +48,21 @@ export async function GET(request: Request) {
         else if (safeFilename.endsWith('.jpg') || safeFilename.endsWith('.jpeg')) contentType = 'image/jpeg';
         else if (safeFilename.endsWith('.svg')) contentType = 'image/svg+xml';
 
-        // Performance: Resize on the fly if width is requested
-        if (width && width > 0 && contentType.startsWith('image/') && !contentType.includes('svg')) {
+        // Performance: Resize and convert to WebP on the fly
+        if (contentType.startsWith('image/') && !contentType.includes('svg')) {
             try {
                 const sharp = require('sharp');
-                fileBuffer = await sharp(fileBuffer)
-                    .resize({ width, withoutEnlargement: true })
-                    .toBuffer();
+                let pipeline = sharp(fileBuffer);
+
+                if (width && width > 0) {
+                    pipeline = pipeline.resize({ width, withoutEnlargement: true });
+                }
+
+                // Always convert to webp for better performance
+                fileBuffer = await pipeline.webp({ quality: 80 }).toBuffer();
+                contentType = 'image/webp';
             } catch (sharpError) {
-                console.error("[ImgRoute] Resize failed:", sharpError);
+                console.error("[ImgRoute] Sharp processing failed:", sharpError);
                 // Continue with original buffer if sharp fails
             }
         }
