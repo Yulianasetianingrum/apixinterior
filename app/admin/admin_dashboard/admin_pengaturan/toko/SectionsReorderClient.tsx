@@ -298,21 +298,23 @@ export default function SectionsReorderClient({
                           touchAction: dragModeActive ? "none" : "auto",
                           cursor: dragModeActive ? "grab" : "pointer"
                         }}
-                        onClick={(e) => {
-                          console.log('[SectionsReorder] 🖱️ CLICK EVENT FIRED!', item.id);
-                          if (!dragModeActive) {
-                            e.stopPropagation();
-                            scrollToSection(item.id);
-                          }
-                        }}
-                        onMouseDown={(e) => startLongPress(item.id, e)}
-                        onMouseUp={() => cancelLongPress(item.id)}
-                        onMouseLeave={() => cancelLongPress(item.id)}
-                        onTouchStart={(e) => {
-                          console.log('[SectionsReorder] 👆 TOUCH START!', item.id);
+                        onMouseDown={(e) => {
+                          console.log('[SectionsReorder] 🖱️ MOUSE DOWN on section', item.id);
                           startLongPress(item.id, e);
                         }}
-                        onTouchEnd={() => cancelLongPress(item.id)}
+                        onMouseUp={() => {
+                          console.log('[SectionsReorder] 🖱️ MOUSE UP on section', item.id);
+                          cancelLongPress(item.id);
+                        }}
+                        onMouseLeave={() => cancelLongPress(item.id)}
+                        onTouchStart={(e) => {
+                          console.log('[SectionsReorder] 👆 TOUCH START on section', item.id);
+                          startLongPress(item.id, e);
+                        }}
+                        onTouchEnd={() => {
+                          console.log('[SectionsReorder] 👆 TOUCH END on section', item.id);
+                          cancelLongPress(item.id);
+                        }}
                         onTouchCancel={() => cancelLongPress(item.id)}
                       >
                         <div className="flex items-center gap-3 flex-1 min-w-0">
