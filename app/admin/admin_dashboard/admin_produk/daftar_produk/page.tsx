@@ -465,6 +465,74 @@ export default function DaftarProdukPage() {
 
   const [draggingId, setDraggingId] = useState<number | null>(null);
 
+  // ========== SELECTION & BULK DELETE ==========
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [deletingSelected, setDeletingSelected] = useState(false);
+
+  const handleToggleSelect = (id: number) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const handleToggleAll = () => {
+    const allFilteredIds = filteredProducts.map((p) => p.id);
+    const allSelected =
+      allFilteredIds.length > 0 &&
+      allFilteredIds.every((id) => selectedIds.has(id));
+
+    if (allSelected) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(allFilteredIds));
+    }
+  };
+
+  const handleDeleteSelected = async () => {
+    if (selectedIds.size === 0) return;
+
+    const ok = await openConfirm({
+      title: `Hapus ${selectedIds.size} produk?`,
+      description:
+        "Produk yang dipilih akan dihapus permanen. Tindakan ini tidak bisa dibatalkan.",
+      confirmText: "Hapus Terpilih",
+      cancelText: "Batal",
+      tone: "danger",
+    });
+    if (!ok) return;
+
+    try {
+      setDeletingSelected(true);
+      const res = await fetch(
+        "/api/admin/admin_dashboard/admin_produk/daftar_produk",
+        {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ids: Array.from(selectedIds) }),
+        }
+      );
+
+      if (!res.ok) {
+        throw new Error("Gagal menghapus produk terpilih.");
+      }
+
+      const data = await res.json();
+      pushToast(data.message || "Produk berhasil dihapus.", "success");
+
+      // Update local state
+      setProducts((prev) => prev.filter((p) => !selectedIds.has(p.id)));
+      setSelectedIds(new Set());
+    } catch (err: any) {
+      console.error(err);
+      pushToast(err.message || "Gagal bulk delete.", "error");
+    } finally {
+      setDeletingSelected(false);
+    }
+  };
+
 
 
   // ========== PREVIEW STATE ==========
@@ -1247,6 +1315,39 @@ export default function DaftarProdukPage() {
 
         <div className={styles.headerRight}>
 
+          {/* SELECT ALL (Checkbox + Label) */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              background: isDark ? "#1e293b" : "#fff",
+              padding: "6px 12px",
+              borderRadius: 999,
+              border: "1px solid " + (isDark ? "#334155" : "#d1d5db"),
+            }}
+          >
+            <input
+              type="checkbox"
+              checked={
+                filteredProducts.length > 0 &&
+                filteredProducts.every((p) => selectedIds.has(p.id))
+              }
+              onChange={handleToggleAll}
+              style={{
+                width: 16,
+                height: 16,
+                cursor: "pointer",
+                accentColor: "#f5c542",
+              }}
+            />
+            <span style={{ fontSize: 13, userSelect: "none", fontWeight: 600 }}>
+              {selectedIds.size > 0 ? `${selectedIds.size} Dipilih` : "Pilih Semua"}
+            </span>
+          </div>
+
+          <div style={{ width: 1, height: 28, background: isDark ? "#334155" : "#e5e7eb", margin: "0 4px" }}></div>
+
           <input
 
             type="text"
@@ -1258,25 +1359,28 @@ export default function DaftarProdukPage() {
 
           />
 
+          {/* DELETE SELECTED BUTTON */}
+          {selectedIds.size > 0 && (
+            <button
+              type="button"
+              className={styles.dangerButton}
+              disabled={deletingSelected}
+              onClick={handleDeleteSelected}
+              title="Hapus produk yang dipilih"
+            >
+              {deletingSelected ? "Menghapus..." : `Hapus (${selectedIds.size})`}
+            </button>
+          )}
+
           <button
-
             type="button"
-
             className={styles.primaryButton}
-
             disabled={droppingAll}
-
             onClick={() =>
-
-              router.push(
-
-                "/admin/admin_dashboard/admin_produk/tambah_produk"
-
-              )
-
-            }>
+              router.push("/admin/admin_dashboard/admin_produk/tambah_produk")
+            }
+          >
             + Tambah Produk
-
           </button>
 
           <button
@@ -1413,6 +1517,21 @@ export default function DaftarProdukPage() {
                 onDragStart={() => handleDragStart(p.id)}
                 onDragOver={(e) => handleDragOver(e, p.id)}
               >
+                {/* CHECKBOX SELECTION */}
+                <div style={{ paddingLeft: 10 }}>
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.has(p.id)}
+                    onChange={() => handleToggleSelect(p.id)}
+                    style={{
+                      width: 18,
+                      height: 18,
+                      cursor: "pointer",
+                      accentColor: "#f5c542",
+                    }}
+                  />
+                </div>
+
                 <div className={styles.dragHandle}>::</div>
 
 
