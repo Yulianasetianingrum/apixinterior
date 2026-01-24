@@ -9,6 +9,14 @@ import fs from "fs/promises";
 
 // sharp butuh Node.js runtime (bukan Edge)
 export const runtime = "nodejs";
+export const maxDuration = 60; // 60 seconds timeout
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '10mb',
+    },
+  },
+};
 
 const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads");
 

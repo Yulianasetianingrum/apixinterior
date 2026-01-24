@@ -4315,6 +4315,64 @@ export default function TambahProdukPage() {
     }
     setLoading(true);
 
+
+
+    // --- HELPER KOMPRESI CLIENT-SIDE ---
+    const compressImage = async (file: File): Promise<File> => {
+      // Skip jika bukan gambar
+      if (!file.type.startsWith("image/")) return file;
+      // Skip jika size kecil (< 1MB)
+      if (file.size < 1024 * 1024) return file;
+
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (event) => {
+          const img = new Image();
+          img.src = event.target?.result as string;
+          img.onload = () => {
+            const canvas = document.createElement("canvas");
+            let width = img.width;
+            let height = img.height;
+            const MAX_WIDTH = 1920;
+            const MAX_HEIGHT = 1920;
+
+            if (width > height) {
+              if (width > MAX_WIDTH) {
+                height *= MAX_WIDTH / width;
+                width = MAX_WIDTH;
+              }
+            } else {
+              if (height > MAX_HEIGHT) {
+                width *= MAX_HEIGHT / height;
+                height = MAX_HEIGHT;
+              }
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext("2d");
+            ctx?.drawImage(img, 0, 0, width, height);
+
+            canvas.toBlob((blob) => {
+              if (!blob) {
+                resolve(file); // fallback
+                return;
+              }
+              // Re-create file with same name but maybe new extension if needed, currently keep jpg/webp
+              const newFile = new File([blob], file.name, {
+                type: "image/jpeg",
+                lastModified: Date.now(),
+              });
+              resolve(newFile);
+            }, "image/jpeg", 0.8); // Kualitas 80%
+          };
+          img.onerror = (err) => resolve(file); // fallback on error
+        };
+        reader.onerror = (err) => resolve(file);
+      });
+    };
+
     try {
       const formData = new FormData();
 
@@ -4338,8 +4396,6 @@ export default function TambahProdukPage() {
       });
 
       // --- normalisasi tags ---
-
-      // --- normalisasi tags ---
       const rawTags = raw.get("tags");
       if (typeof rawTags === "string") {
         const cleaned = rawTags
@@ -4361,14 +4417,32 @@ export default function TambahProdukPage() {
           return;
         }
 
-        // foto utama
-        formData.append("fotoUtamaUpload", uploadMainFile);
+        // Kompres foto utama
+        try {
+          notify("Memproses foto utama...");
+          const processedMain = await compressImage(uploadMainFile);
+          formData.append("fotoUtamaUpload", processedMain);
+        } catch (e) {
+          console.error("Gagal kompres foto utama:", e);
+          formData.append("fotoUtamaUpload", uploadMainFile);
+        }
 
-        // galeri tambahan (maks 4, total 5 dengan utama)
+        // galeri tambahan (maks 4)
         const maxGallery = 4;
-        uploadGalleryFiles.slice(0, maxGallery).forEach((file) => {
-          formData.append("galeriUpload", file);
-        });
+        const rawGallery = uploadGalleryFiles.slice(0, maxGallery);
+
+        if (rawGallery.length > 0) {
+          notify(`Memproses ${rawGallery.length} foto galeri...`);
+          for (const file of rawGallery) {
+            try {
+              const processed = await compressImage(file);
+              formData.append("galeriUpload", processed);
+            } catch (e) {
+              console.error("Gagal kompres foto galeri:", e);
+              formData.append("galeriUpload", file);
+            }
+          }
+        }
       } else if (fotoMode === "kolase") {
         // === MODE PILIH DARI KOLASE ===
         if (kolaseImages.length === 0) {
@@ -4403,13 +4477,23 @@ export default function TambahProdukPage() {
       setLoading(false);
 
       if (!res.ok) {
-        const data = await res.json().catch(() => null);
-        notify(
-          data?.error ??
-          (isEditMode
-            ? "Gagal menyimpan perubahan produk."
-            : "Gagal menyimpan produk baru."),
-        );
+        const text = await res.text().catch(() => "");
+        let data: any = null;
+        try {
+          data = JSON.parse(text);
+        } catch { /* ignore non-JSON response */ }
+
+        const baseMsg = isEditMode
+          ? "Gagal menyimpan perubahan produk"
+          : "Gagal menyimpan produk baru";
+
+        const detail = data?.error || `Status ${res.status} (${res.statusText})`;
+
+        // Shorten html response if any
+        const safeDetail = detail.length > 200 ? detail.substring(0, 200) + "..." : detail;
+
+        notify(`${baseMsg}: ${safeDetail}`);
+        console.error("[handleSubmit] Error:", res.status, res.statusText, text);
         return;
       }
 
