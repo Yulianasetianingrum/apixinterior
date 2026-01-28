@@ -49,14 +49,12 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/logo/logo_apixinterior_golden.png.png", type: "image/png" },
-      { url: "/logo/logo_apixinterior_biru.png.png", sizes: "192x192", type: "image/png" },
-      { url: "/logo/logo_apixinterior_biru.png.png", sizes: "512x512", type: "image/png" }
+      { url: "/logo/faviconsite.png", sizes: "180x180", type: "image/png" }
     ],
     apple: [
-      { url: "/logo/logo_apixinterior_golden.png.png", sizes: "180x180", type: "image/png" }
+      { url: "/logo/faviconsite.png", sizes: "180x180", type: "image/png" }
     ],
-    shortcut: "/logo/logo_apixinterior_golden.png.png"
+    shortcut: "/logo/faviconsite.png"
   },
   openGraph: {
     type: "website",
@@ -137,8 +135,8 @@ export default async function RootLayout({
   return (
     <html lang="id" className={inter.variable}>
       <head>
-        <link rel="icon" href="/logo/logo_apixinterior_golden.png.png" type="image/png" />
-        <link rel="apple-touch-icon" href="/logo/logo_apixinterior_golden.png.png" type="image/png" />
+        <link rel="icon" href="/logo/faviconsite.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/logo/faviconsite.png" type="image/png" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
