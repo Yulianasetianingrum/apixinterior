@@ -235,9 +235,7 @@ const VariasiKombinasiWidget = memo(function VariasiKombinasiWidget({
   const varKolasePickedRef = useRef<any>(null);
   const broadcastVarMediaRef = useRef<any>(null);
 
-  if (!mounted) {
-    return <div className="apixVCombo" style={{ padding: 20, textAlign: 'center', color: '#888' }}>Memuat Editor Variasi...</div>;
-  }
+
 
   useEffect(() => {
     if (bootedRef.current) {
@@ -2995,7 +2993,13 @@ const VariasiKombinasiWidget = memo(function VariasiKombinasiWidget({
 
   return (
     <div id="vcomboRoot" className="apixVCombo">
-      <style>{`
+      {!mounted ? (
+        <div style={{ padding: 40, textAlign: 'center', color: '#6b7280', fontStyle: 'italic', background: '#f9fafb', borderRadius: 8, border: '1px dashed #e5e7eb' }}>
+          ⟳ Memuat Editor Variasi...
+        </div>
+      ) : (
+        <>
+          <style>{`
 .apixVCombo {
       --bg:#f6f7fb; --card:#fff; --text:#111827; --muted:#6b7280; --line:#e5e7eb;
       --shadow: 0 10px 30px rgba(17,24,39,.08);
@@ -3578,56 +3582,58 @@ const VariasiKombinasiWidget = memo(function VariasiKombinasiWidget({
   background: linear-gradient(180deg, rgba(255,255,255,.65), rgba(255,255,255,1));
 }
 `}
-      </style>
+          </style>
 
-      {/* Hidden fields untuk submit ke API */}
-      <input id="vcombo_hidden_enabled" type="hidden" name="variasiEnabled" defaultValue="0" />
-      <input id="vcombo_hidden_clear" type="hidden" name="variasiClear" defaultValue="1" />
-      <input id="vcombo_hidden_json" type="hidden" name="variasiJson" defaultValue="" />
-      <input id="vcombo_hidden_unit" type="hidden" name="product_unit" defaultValue="" />
+          {/* Hidden fields untuk submit ke API */}
+          <input id="vcombo_hidden_enabled" type="hidden" name="variasiEnabled" defaultValue="0" />
+          <input id="vcombo_hidden_clear" type="hidden" name="variasiClear" defaultValue="1" />
+          <input id="vcombo_hidden_json" type="hidden" name="variasiJson" defaultValue="" />
+          <input id="vcombo_hidden_unit" type="hidden" name="product_unit" defaultValue="" />
 
-      <div className="wrap">
-        <div className="card">
-          <div className="head">
-            <div className="brand">
-              <div className="logo">A</div>
-              <div style={{ minWidth: 0 }}>
-                <p className="title">apixinterior — Variasi &amp; Kombinasi (Lv1–Lv3)</p>
-                <p className="sub">
-                  Rule: Variasi harga opsional = replace harga produk. Unit override opsional. Kombinasi
-                  (Lv1/Lv2/Lv3) = add-on.
-                </p>
+          <div className="wrap">
+            <div className="card">
+              <div className="head">
+                <div className="brand">
+                  <div className="logo">A</div>
+                  <div style={{ minWidth: 0 }}>
+                    <p className="title">apixinterior — Variasi &amp; Kombinasi (Lv1–Lv3)</p>
+                    <p className="sub">
+                      Rule: Variasi harga opsional = replace harga produk. Unit override opsional. Kombinasi
+                      (Lv1/Lv2/Lv3) = add-on.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="btnRow">
+                  <label
+                    className="btn toggleBtn"
+                    title="Jika OFF: variasi tidak ikut tersimpan ke produk (data tetap aman di sini)."
+                  >
+                    <input id="vcomboEnabled" type="checkbox" />
+                    Aktifkan Variasi
+                  </label>
+
+                  <button className="btn" id="btnExport" type="button">
+                    Export JSON
+                  </button>
+                  <button className="btn" id="btnImport" type="button">
+                    Import JSON
+                  </button>
+                  <button className="btn danger" id="btnReset" type="button">
+                    Reset
+                  </button>
+                </div>
               </div>
-            </div>
 
-            <div className="btnRow">
-              <label
-                className="btn toggleBtn"
-                title="Jika OFF: variasi tidak ikut tersimpan ke produk (data tetap aman di sini)."
-              >
-                <input id="vcomboEnabled" type="checkbox" />
-                Aktifkan Variasi
-              </label>
-
-              <button className="btn" id="btnExport" type="button">
-                Export JSON
-              </button>
-              <button className="btn" id="btnImport" type="button">
-                Import JSON
-              </button>
-              <button className="btn danger" id="btnReset" type="button">
-                Reset
-              </button>
+              <div className="steps" id="steps"></div>
+              <div className="body" id="page"></div>
+              <div className="vcomboVault" id="vcomboVault" aria-hidden="true"></div>
             </div>
           </div>
 
-          <div className="steps" id="steps"></div>
-          <div className="body" id="page"></div>
-          <div className="vcomboVault" id="vcomboVault" aria-hidden="true"></div>
-        </div>
-      </div>
-
-      <div className="toast" id="toast"></div>
+          <div className="toast" id="toast"></div>
+        </>
+      )}
     </div>
   );
 });
