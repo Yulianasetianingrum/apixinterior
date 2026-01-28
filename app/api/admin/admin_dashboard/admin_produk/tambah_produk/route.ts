@@ -526,7 +526,7 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      galleryIds = uploadedGalleries.map(g => g.id);
+
 
     } else {
       // kolase
