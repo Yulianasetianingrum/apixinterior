@@ -5,6 +5,8 @@ import fs from 'fs/promises';
 import path from 'path';
 
 export const runtime = 'nodejs';
+export const maxDuration = 300; // 5 minutes for large files
+
 
 export async function POST(req: Request) {
   try {

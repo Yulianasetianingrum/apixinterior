@@ -59,23 +59,23 @@ export default function KolaseFotoPage() {
   const [formTags, setFormTags] = useState<string[]>([]);
   const [formTagInput, setFormTagInput] = useState('');
   const [formSubmitting, setFormSubmitting] = useState(false);
+  const [progressString, setProgressString] = useState('');
+  const [failedFiles, setFailedFiles] = useState<File[]>([]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (addOpen && formFiles && formFiles.length > 0 && fileInputRef.current) {
       const dt = new DataTransfer();
-      // Calculate limit to avoid performance issues if someone drops 1000 files, though DataTransfer is fast.
-      // Copy files from state to DataTransfer
       for (let i = 0; i < formFiles.length; i++) {
         dt.items.add(formFiles[i]);
       }
       fileInputRef.current.files = dt.files;
     }
-  }, [addOpen, formFiles]); // Sync whenever modal opens or files change
+    // Don't reset failedFiles here, only on new open
+  }, [addOpen, formFiles]);
 
   const { isDarkMode } = useAdminTheme();
-  // sidebarOpen & isDarkMode local removed
 
   // Load Data
   async function loadData() {
@@ -97,7 +97,6 @@ export default function KolaseFotoPage() {
 
   // --- ACTIONS ---
 
-  // Add Model Logic
   function openAddModal() {
     setFormFiles(null);
     setFormTitle('');
@@ -105,8 +104,224 @@ export default function KolaseFotoPage() {
     setFormSubcategory('');
     setFormTags([]);
     setFormTagInput('');
+    setFailedFiles([]); // Reset failed
     setAddOpen(true);
   }
+
+  // ... (handleAutoGenerate is unchanged, omitting for brevity in this replace block if possible, but replace tool needs contiguous. 
+  // Wait, I can't skip handleAutoGenerate if I'm replacing a block that includes it or if I'm targeting surrounding code.
+  // actually `handleAutoGenerate` is NOT inside `doAddSubmit`.
+  // `doAddSubmit` starts around line 135.
+  // The state defs are around line 60.
+  // I should use `multi_replace` to do both cleanly.
+  // BUT the instruction says "Replace the entire doAddSubmit". I can do that with `replace_file_content`.
+  // I will assume `handleAutoGenerate` is between state and doAddSubmit.
+  // Let's stick to modifying `doAddSubmit` and adding the state in a separate call? No, `multi_replace` is better.
+
+  // Actually, I'll use `multi_replace` to:
+  // 1. Add `failedFiles` state.
+  // 2. Replace `doAddSubmit` with the new robust version and the `doRetry` function.
+
+  // Let's create the robust `runUploadBatch` inside the component scope (or inside doAddSubmit and reused? No, needs to be component scope or called by both).
+  // I'll define `runBatch` inside `doAddSubmit`? No, `doRetry` needs it.
+  // I'll put `runBatch` as a standalone function inside the component.
+
+  // Implementation Plan for this tool call:
+  // 1. Insert `failedFiles` state.
+  // 2. Insert `runUploadBatch` function BEFORE `doAddSubmit`.
+  // 3. Replace `doAddSubmit` to use `runUploadBatch`.
+  // Actually, I can replace `doAddSubmit` with all of this new logic.
+
+  // Refactored `doAddSubmit` and `doRetryFailed` + `runUploadBatch`
+
+  // --- HELPER: Client-side Compression ---
+  const compressImage = async (file: File): Promise<File> => {
+    // Skip if small enough (e.g. < 1MB)? No, always compress for consistency & dimensions.
+    // Maybe skip if not image
+    if (!file.type.startsWith('image/')) return file;
+
+    return new Promise((resolve) => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.src = url;
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return resolve(file);
+
+        // Resize (Max 1920px)
+        let width = img.width;
+        let height = img.height;
+        const MAX_DIM = 1920;
+
+        if (width > MAX_DIM || height > MAX_DIM) {
+          const ratio = width / height;
+          if (width > height) {
+            width = MAX_DIM;
+            height = Math.round(width / ratio);
+          } else {
+            height = MAX_DIM;
+            width = Math.round(height * ratio);
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Compress to JPEG 80%
+        canvas.toBlob((blob) => {
+          if (!blob) return resolve(file);
+          // Rename to .jpg for consistency? Or keep name? Server handles it manually anyway.
+          // Let's keep original name but content is jpeg.
+          const newFile = new File([blob], file.name, { type: 'image/jpeg', lastModified: Date.now() });
+          resolve(newFile);
+        }, 'image/jpeg', 0.8);
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        resolve(file); // Fallback to original
+      };
+    });
+  };
+
+  async function runUploadBatch(filesToUpload: File[]) {
+    const MAX_CONCURRENT = 2;
+    let nextIndex = 0;
+    const total = filesToUpload.length;
+    const failures: File[] = [];
+    let successCount = 0;
+
+    setFormSubmitting(true);
+    setProgressString(`Menyiapkan ${total} file...`);
+
+    const uploadSingle = async (originalFile: File) => {
+      // Compress first
+      let fileToUpload = originalFile;
+      try {
+        // Update progress to show compression? Maybe too noisy.
+        // just do it silently or log
+        console.log(`Compressing ${originalFile.name}...`);
+        fileToUpload = await compressImage(originalFile);
+        console.log(`Compressed: ${(originalFile.size / 1024).toFixed(0)}KB -> ${(fileToUpload.size / 1024).toFixed(0)}KB`);
+      } catch (e) {
+        console.error("Compression error", e);
+      }
+
+      const formData = new FormData();
+      formData.append('foto', fileToUpload); // Use compressed
+      formData.append('title', formTitle);
+      formData.append('tags', formTags.join(', '));
+      formData.append('category', formCategory);
+      formData.append('subcategory', formSubcategory);
+
+      // Retry Loop (Persistent)
+      let attempts = 0;
+
+      while (true) {
+        attempts++;
+        try {
+          const res = await fetch('/api/admin/admin_dashboard/admin_galeri/upload_foto', {
+            method: 'POST',
+            body: formData
+          });
+
+          if (res.ok) {
+            successCount++;
+            return true;
+          }
+
+          if (res.status >= 400 && res.status < 500) {
+            if (res.status === 429 || res.status === 408) {
+              console.warn(`Rate limit/Timeout for ${originalFile.name}`);
+            } else {
+              console.error(`Fatal error ${res.status} for ${originalFile.name}`);
+              failures.push(originalFile); // Push original to retry list if failed
+              return false;
+            }
+          }
+        } catch (err) {
+          console.error(`Network error for ${originalFile.name}`, err);
+        }
+
+        const delay = Math.min(1000 * Math.pow(2, Math.min(attempts, 6)), 30000);
+        await new Promise(r => setTimeout(r, delay));
+      }
+      return false;
+    };
+
+    const worker = async (): Promise<void> => {
+      if (nextIndex >= total) return;
+      const idx = nextIndex++;
+      const file = filesToUpload[idx];
+
+      // Update progress string with "Compressing/Uploading X/Y"
+      setProgressString(`Memproses: ${idx + 1}/${total}`); // "Processing" is generic enough
+
+      await uploadSingle(file);
+
+      // After done
+      const finished = successCount + failures.length;
+      setProgressString(`Selesai: ${finished}/${total}`);
+
+      await worker();
+    };
+
+    const threads = [];
+    for (let i = 0; i < Math.min(MAX_CONCURRENT, total); i++) {
+      threads.push(worker());
+    }
+
+    await Promise.all(threads);
+
+    return { successCount, failures };
+  }
+
+  async function doAddSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!formFiles || formFiles.length === 0) {
+      alert("Pilih minimal satu foto.");
+      return;
+    }
+
+    // Convert to array
+    const files = Array.from(formFiles);
+
+    // Run
+    const { successCount, failures } = await runUploadBatch(files);
+
+    setFormSubmitting(false);
+    loadData();
+
+    if (failures.length > 0) {
+      setFailedFiles(failures);
+      alert(`Selesai dengan catatan.\nBerhasil: ${successCount}\nGagal: ${failures.length}\n\nSilakan klik tombol "Coba Lagi (Gagal)" untuk mengulang yang gagal.`);
+    } else {
+      setFailedFiles([]);
+      setAddOpen(false);
+      alert(`Sukses! ${successCount} foto terupload.`);
+    }
+  }
+
+  async function doRetryFailed() {
+    if (failedFiles.length === 0) return;
+
+    const { successCount, failures } = await runUploadBatch(failedFiles);
+
+    setFormSubmitting(false);
+    loadData();
+
+    if (failures.length > 0) {
+      setFailedFiles(failures);
+      alert(`Retry selesai.\nBerhasil: ${successCount}\nMasih Gagal: ${failures.length}`);
+    } else {
+      setFailedFiles([]);
+      setAddOpen(false);
+      alert(`Semua file gagal berhasil diupload! (${successCount})`);
+    }
+  }
+
 
   function handleAutoGenerate(file: File) {
     if (!file) return;
@@ -139,14 +354,21 @@ export default function KolaseFotoPage() {
       return;
     }
     setFormSubmitting(true);
+    setProgressString('Memulai unggahan...');
 
-    let uploadSuccessCount = 0;
-    let uploadFailCount = 0;
-    const failedFilenames: string[] = [];
+    // --- CONCURRENT UPLOAD LOGIC ---
+    const MAX_CONCURRENT = 5; // VPS should handle 5 easily
+    let activeUploads = 0;
+    let nextIndex = 0;
 
-    for (let i = 0; i < formFiles.length; i++) {
-      const file = formFiles[i];
+    // Convert FileList to Array
+    const files = Array.from(formFiles);
+    const totalFiles = files.length;
 
+    const results: { name: string; ok: boolean }[] = [];
+
+    // Helper to upload a single file
+    const uploadFile = async (file: File) => {
       const formData = new FormData();
       formData.append('foto', file);
       formData.append('title', formTitle);
@@ -161,26 +383,50 @@ export default function KolaseFotoPage() {
         });
         if (!res.ok) {
           console.error(`Failed to upload ${file.name}`);
-          uploadFailCount++;
-          failedFilenames.push(file.name);
+          results.push({ name: file.name, ok: false });
         } else {
-          uploadSuccessCount++;
+          results.push({ name: file.name, ok: true });
         }
       } catch (err) {
         console.error(err);
-        uploadFailCount++;
-        failedFilenames.push(file.name);
+        results.push({ name: file.name, ok: false });
       }
+
+      // Update progress
+      const done = results.length;
+      setProgressString(`Mengunggah: ${done}/${totalFiles}`);
+    };
+
+    // Worker function for concurrency
+    const next = async (): Promise<void> => {
+      if (nextIndex >= totalFiles) return;
+      const file = files[nextIndex++];
+      await uploadFile(file);
+      await next();
+    };
+
+    // Start initial batch
+    const workers = [];
+    for (let i = 0; i < Math.min(MAX_CONCURRENT, totalFiles); i++) {
+      workers.push(next());
     }
+
+    // Wait all
+    await Promise.all(workers);
+
+    // Calculate stats
+    const successCount = results.filter(r => r.ok).length;
+    const failCount = results.filter(r => !r.ok).length;
+    const failedNames = results.filter(r => !r.ok).map(r => r.name);
 
     setFormSubmitting(false);
     setAddOpen(false);
     loadData(); // Refresh
 
-    if (uploadFailCount > 0) {
-      alert(`Selesai.\nBerhasil: ${uploadSuccessCount}\nGagal: ${uploadFailCount}\n\nFile yang gagal:\n${failedFilenames.join('\n')}`);
+    if (failCount > 0) {
+      alert(`Selesai.\nBerhasil: ${successCount}\nGagal: ${failCount}\n\nFile yang gagal:\n${failedNames.join('\n')}`);
     } else {
-      alert(`Berhasil mengupload ${uploadSuccessCount} foto.`);
+      alert(`Berhasil mengupload ${successCount} foto.`);
     }
   }
 
@@ -774,9 +1020,17 @@ export default function KolaseFotoPage() {
                   className={`${styles.modalBtn} ${isDarkMode ? styles.modalBtnSecondaryNight : styles.modalBtnSecondaryDay}`}>
                   Batal
                 </button>
+
+                {failedFiles.length > 0 && (
+                  <button type="button" onClick={doRetryFailed}
+                    className={`${styles.modalBtn}`} style={{ background: '#dc2626', color: 'white', marginRight: 'auto' }}>
+                    Coba Lagi ({failedFiles.length} Gagal)
+                  </button>
+                )}
+
                 <button type="submit" disabled={formSubmitting}
                   className={`${styles.modalBtn}`} style={{ background: '#2563eb', color: 'white' }}>
-                  {formSubmitting ? 'Mengupload...' : 'Upload'}
+                  {formSubmitting ? (progressString || 'Mengupload...') : 'Upload'}
                 </button>
               </div>
             </form>

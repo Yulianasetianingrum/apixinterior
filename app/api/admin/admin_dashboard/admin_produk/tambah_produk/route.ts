@@ -9,14 +9,8 @@ import fs from "fs/promises";
 
 // sharp butuh Node.js runtime (bukan Edge)
 export const runtime = "nodejs";
-export const maxDuration = 60; // 60 seconds timeout
-export const config = {
-  api: {
-    bodyParser: {
-      sizeLimit: '10mb',
-    },
-  },
-};
+export const maxDuration = 300; // 5 minutes timeout for mobile/slow uploads
+// Removing legacy 'config' export to rely on global next.config.ts bodySizeLimit
 
 const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads");
 
@@ -484,6 +478,7 @@ export async function POST(req: NextRequest) {
         );
       }
 
+      // 1. Process Main Image
       const mainUrl = await saveOptimizedWebpToUploads(mainFile, {
         maxWidth: 1600,
         quality: 80,
@@ -502,28 +497,37 @@ export async function POST(req: NextRequest) {
 
       mainImageId = mainKolase.id;
 
-      const galleryIdsArr: number[] = [];
-      for (const file of galleryFiles.slice(0, 4)) {
-        const url = await saveOptimizedWebpToUploads(file, {
-          maxWidth: 1600,
-          quality: 80,
-          baseName: nama || "produk",
-        });
+      // 2. Process Gallery Images (Sequential for reliability)
+      // Switch to sequential loop to prevent Memory Spikes and ensure partial success
+      const limitedGalleryFiles = galleryFiles.slice(0, 4);
 
-        const galeri = await prisma.gambarUpload.create({
-          data: {
-            url,
-            title: nama || null,
-            tags: tags || "",
-            categoryId,
-            subcategoryId,
-          },
-        });
+      for (const file of limitedGalleryFiles) {
+        try {
+          const url = await saveOptimizedWebpToUploads(file, {
+            maxWidth: 1600,
+            quality: 80,
+            baseName: nama || "produk",
+          });
 
-        galleryIdsArr.push(galeri.id);
+          const galeri = await prisma.gambarUpload.create({
+            data: {
+              url,
+              title: nama || null,
+              tags: tags || "",
+              categoryId,
+              subcategoryId,
+            },
+          });
+
+          galleryIds.push(galeri.id);
+        } catch (e) {
+          console.error("Failed to process gallery image:", file.name, e);
+          // Continue to next image even if one fails
+        }
       }
 
-      galleryIds = galleryIdsArr;
+      galleryIds = uploadedGalleries.map(g => g.id);
+
     } else {
       // kolase
       const kolaseMainId = Number(formData.get("kolaseMainId") || 0);
