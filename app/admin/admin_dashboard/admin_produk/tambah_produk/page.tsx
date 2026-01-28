@@ -3002,8 +3002,8 @@ const VariasiKombinasiWidget = memo(function VariasiKombinasiWidget({
         if (appSave) appSave();
         if (appRender) appRender();
         else {
-          // If render unavailable, reload to recover UI
-          try { window.location.reload(); } catch { }
+          // If render unavailable, just log error. Do NOT reload to avoid loops.
+          console.error("VCombo: Render function unavailable during recovery.");
         }
         console.log("VCombo auto-recovered from init error.");
       } catch (err2) {
@@ -3019,7 +3019,7 @@ const VariasiKombinasiWidget = memo(function VariasiKombinasiWidget({
       // try { if (mainFormSyncCleanup) mainFormSyncCleanup(); } catch { }
     };
 
-  }, [notify]);
+  }, []);
 
   return (
     <div id="vcomboRoot" className="apixVCombo">
