@@ -5865,7 +5865,7 @@ export default function TambahProdukPage() {
           }`}
       >
         <div className={styles.cardWrapper}>
-          <div className={`${layoutStyles.card} ${styles.card} ${darkMode ? styles.cardNight : styles.cardDay} ${styles.noCardHover}`}>
+          <div className={`${styles.card} ${darkMode ? styles.cardNight : styles.cardDay} ${styles.noCardHover}`}>
 
             {/* AI TOOLBAR */}
             <div className={styles.aiToolbar}>
