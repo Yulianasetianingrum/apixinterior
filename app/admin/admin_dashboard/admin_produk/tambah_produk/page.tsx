@@ -261,6 +261,10 @@ const VariasiKombinasiWidget = memo(function VariasiKombinasiWidget({
     bootedRef.current = true;
 
     let onVarKolasePicked: any = null;
+    let appSave: any = null;
+    let appRender: any = null;
+
+    let state: any = null;
 
     try {
       const d: any = document;
@@ -584,6 +588,7 @@ const VariasiKombinasiWidget = memo(function VariasiKombinasiWidget({
         } catch { }
         syncHidden();
       }
+      appSave = save;
       function load() {
         if (!LS_KEY) return null;
         try {
@@ -725,7 +730,7 @@ const VariasiKombinasiWidget = memo(function VariasiKombinasiWidget({
       }, true);
 
       // === state ===
-      let state = load() || null;
+      state = load() || null;
       if (!state) {
         state = {
           enabled: false,
@@ -2975,6 +2980,7 @@ const VariasiKombinasiWidget = memo(function VariasiKombinasiWidget({
       syncHidden();
 
 
+      appRender = render;
       render();
 
     } catch (e) {
@@ -2993,22 +2999,27 @@ const VariasiKombinasiWidget = memo(function VariasiKombinasiWidget({
           ui: { selLv1ByVar: {}, selLv2ByVarLv1: {} },
           optClip: null
         };
-        save();
-        render();
+        if (appSave) appSave();
+        if (appRender) appRender();
+        else {
+          // If render unavailable, reload to recover UI
+          try { window.location.reload(); } catch { }
+        }
         console.log("VCombo auto-recovered from init error.");
       } catch (err2) {
         console.error("VCombo recovery failed", err2);
       }
       // notify("Gagal inisialisasi Variasi & Kombinasi."); // Suppressed per user request
+    }
 
 
-      return () => {
-        try { if (onVarKolasePicked) window.removeEventListener("apix:varKolasePicked", onVarKolasePicked as any); } catch { }
-        // try { window.removeEventListener("apix:requestVarMedia", broadcastVarMedia as any); } catch { }
-        // try { if (mainFormSyncCleanup) mainFormSyncCleanup(); } catch { }
-      };
+    return () => {
+      try { if (onVarKolasePicked) window.removeEventListener("apix:varKolasePicked", onVarKolasePicked as any); } catch { }
+      // try { window.removeEventListener("apix:requestVarMedia", broadcastVarMedia as any); } catch { }
+      // try { if (mainFormSyncCleanup) mainFormSyncCleanup(); } catch { }
+    };
 
-    }, [notify]);
+  }, [notify]);
 
   return (
     <div id="vcomboRoot" className="apixVCombo">
