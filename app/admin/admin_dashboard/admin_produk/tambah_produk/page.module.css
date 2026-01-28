@@ -4,22 +4,36 @@
 
 /* --- VARIABLES --- */
 .cardAreaDay {
-  --bg-page: #f8fafc;
-  --bg-card: #ffffff;
-  --bg-panel: #f1f5f9;
-  --border-subtle: #e2e8f0;
-  --border-focus: #3b82f6;
-  --text-primary: #0f172a;
-  --text-secondary: #64748b;
-  --text-muted: #94a3b8;
-  --primary: #0f172a;
-  --primary-fg: #ffffff;
-  --accent: #d4af37;
-  --danger: #ef4444;
-  --success: #22c55e;
-  --input-bg: #ffffff;
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  /* -- PREMIUM GOLDEN NAVY THEME -- */
+  --bg-page: #FDFCF8;
+  /* Warm luxe white */
+  --bg-card: #FFFFFF;
+  --bg-panel: #FFFCF2;
+  /* Very light cream/gold tint */
+  --border-subtle: #E8E0C5;
+  /* Soft beige/gold border */
+  --border-focus: #D4AF37;
+  /* Metallic Gold */
+
+  --text-primary: #0B1531;
+  /* Deep Navy */
+  --text-secondary: #334155;
+  /* Slate for readability */
+  --text-muted: #94A3B8;
+
+  --primary: #0B1531;
+  /* Navy Button Background */
+  --primary-fg: #FFD700;
+  /* Gold Text */
+
+  --accent: #D4AF37;
+  --danger: #EF4444;
+  --success: #22C55E;
+
+  --input-bg: #FFFFFF;
+  --shadow-sm: 0 1px 3px rgba(11, 21, 49, 0.05);
+  /* Slight navy shadow tint */
+  --shadow-md: 0 4px 12px rgba(11, 21, 49, 0.08);
 }
 
 .cardAreaNight {
@@ -138,6 +152,14 @@
   border: 1px solid var(--border-subtle);
   border-radius: 8px;
   padding: 20px;
+  /* Subtle left accent */
+  border-left: 3px solid var(--border-subtle);
+}
+
+.enterprisePanel:hover {
+  border-left-color: var(--border-focus);
+  /* Gold on hover */
+  transition: border-color 0.3s ease;
 }
 
 .sectionTitle {
@@ -200,7 +222,8 @@
 .select:focus {
   border-color: var(--border-focus);
   box-shadow: 0 0 0 1px var(--border-focus);
-  /* Solid focus ring */
+  background: #FFFDF5;
+  /* Warm focus background */
 }
 
 .textarea {
