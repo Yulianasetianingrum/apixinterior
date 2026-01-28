@@ -11,7 +11,7 @@ import {
 } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import layoutStyles from "../../admin_dashboard.module.css";
-import styles from "./tambah_produk.module.css";
+import styles from "./page.module.css";
 import { useAdminTheme } from "../../AdminThemeContext";
 
 import Link from "next/link";
