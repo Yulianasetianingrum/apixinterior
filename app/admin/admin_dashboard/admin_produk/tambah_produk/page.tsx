@@ -2979,17 +2979,36 @@ const VariasiKombinasiWidget = memo(function VariasiKombinasiWidget({
 
     } catch (e) {
       console.error("VCombo init error", e);
-      notify("Gagal inisialisasi Variasi & Kombinasi.");
-    }
+      // Auto-recovery: Reset state to defaults to ensure widget is usable
+      try {
+        state = {
+          enabled: false,
+          step: 0,
+          comboTab: 1,
+          combo: { lv2Enabled: false, lv3Enabled: false },
+          titles: { varTitle: "", lv1Title: "", lv2Title: "", lv3Title: "" },
+          product: { title: "", unit: "M", basePrice: "", status: "" },
+          variations: [],
+          preview: { varId: null, lv1Id: null, lv2Id: null, lv3Id: null, qty: 1 },
+          ui: { selLv1ByVar: {}, selLv2ByVarLv1: {} },
+          optClip: null
+        };
+        save();
+        render();
+        console.log("VCombo auto-recovered from init error.");
+      } catch (err2) {
+        console.error("VCombo recovery failed", err2);
+      }
+      // notify("Gagal inisialisasi Variasi & Kombinasi."); // Suppressed per user request
 
 
-    return () => {
-      try { if (onVarKolasePicked) window.removeEventListener("apix:varKolasePicked", onVarKolasePicked as any); } catch { }
-      // try { window.removeEventListener("apix:requestVarMedia", broadcastVarMedia as any); } catch { }
-      // try { if (mainFormSyncCleanup) mainFormSyncCleanup(); } catch { }
-    };
+      return () => {
+        try { if (onVarKolasePicked) window.removeEventListener("apix:varKolasePicked", onVarKolasePicked as any); } catch { }
+        // try { window.removeEventListener("apix:requestVarMedia", broadcastVarMedia as any); } catch { }
+        // try { if (mainFormSyncCleanup) mainFormSyncCleanup(); } catch { }
+      };
 
-  }, [notify]);
+    }, [notify]);
 
   return (
     <div id="vcomboRoot" className="apixVCombo">
