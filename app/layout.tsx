@@ -137,6 +137,8 @@ export default async function RootLayout({
   return (
     <html lang="id" className={inter.variable}>
       <head>
+        <link rel="icon" href="/logo/logo_apixinterior_golden.png.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/logo/logo_apixinterior_golden.png.png" type="image/png" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

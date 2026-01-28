@@ -2007,11 +2007,9 @@ async function saveHeroConfig(formData: FormData) {
 
   const finalImageId = clearHero ? null : (incomingImageId ?? existingImageId);
 
-  try {
-    await validateExistence({ imageIds: finalImageId ? [finalImageId] : [] });
-  } catch (e: any) {
-    return redirectBack({ error: encodeURIComponent(e?.message ?? "Validasi gagal.") });
-  }
+  const { imageIds: validImageIds } = await filterExistingIds({ imageIds: finalImageId ? [finalImageId] : [] });
+  const finalImageIdToSave = validImageIds && validImageIds.length > 0 ? validImageIds[0] : null;
+  const removedImage = finalImageId && !finalImageIdToSave;
 
   const heroContent = {
     eyebrow,
@@ -2032,8 +2030,8 @@ async function saveHeroConfig(formData: FormData) {
     subheadline,
     ctaLabel,
     ctaHref,
-    imageId: finalImageId,
-    heroImageId: finalImageId,
+    imageId: finalImageIdToSave,
+    heroImageId: finalImageIdToSave,
     badges,
     highlights,
     trustChips,
@@ -2070,7 +2068,10 @@ async function saveHeroConfig(formData: FormData) {
 
   revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko");
   revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko/preview");
-  return redirectBack({ notice: encodeURIComponent("Config HERO tersimpan.") });
+  const notice = removedImage
+    ? "Config HERO tersimpan (gambar tidak ditemukan telah direset)."
+    : "Config HERO tersimpan.";
+  return redirectBack({ notice: encodeURIComponent(notice) });
 }
 
 
@@ -2134,11 +2135,20 @@ async function saveCategoryGridConfig(formData: FormData) {
     .map((it) => it.coverImageId)
     .filter((v): v is number => typeof v === "number" && v > 0);
 
-  try {
-    await validateExistence({ kategoriIds: finalKategoriIds, imageIds: coverIds });
-  } catch (e: any) {
-    return redirectBack({ error: encodeURIComponent(e?.message ?? "Validasi gagal.") });
-  }
+  const { kategoriIds: validKategoriIds, imageIds: validCoverIds } = await filterExistingIds({ kategoriIds: finalKategoriIds, imageIds: coverIds });
+  const finalKategoriIdsToSave = validKategoriIds ?? [];
+  const finalCoverIdsToSave = validCoverIds ?? [];
+
+  const removedKategoriCount = finalKategoriIds.length - finalKategoriIdsToSave.length;
+  const removedCoverCount = coverIds.length - finalCoverIdsToSave.length;
+
+  // Re-filter items based on valid categories
+  const filteredItems = finalItems.filter(it => finalKategoriIdsToSave.includes(it.kategoriId)).map(it => {
+    if (it.coverImageId && !finalCoverIdsToSave.includes(it.coverImageId)) {
+      return { ...it, coverImageId: null };
+    }
+    return it;
+  });
 
   await updateDraftConfigPreserveTheme(
     id,
@@ -2147,14 +2157,18 @@ async function saveCategoryGridConfig(formData: FormData) {
       sectionBgTheme,
       titleTextColor,
       layout: { columns, ...(maxItems ? { maxItems } : {}) },
-      items: finalItems,
+      items: filteredItems,
     },
     { title, slug },
   );
 
   revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko");
   revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko/preview");
-  return redirectBack({ notice: encodeURIComponent("Config CATEGORY_GRID tersimpan.") });
+  let msg = "Config CATEGORY_GRID tersimpan.";
+  if (removedKategoriCount > 0 || removedCoverCount > 0) {
+    msg += ` (Dibersihkan: ${removedKategoriCount} kategori, ${removedCoverCount} cover tak ditemukan).`;
+  }
+  return redirectBack({ notice: encodeURIComponent(msg) });
 }
 
 async function saveCategoryGridCommerceConfig(formData: FormData) {
@@ -2343,34 +2357,45 @@ async function saveCategoryGridCommerceConfig(formData: FormData) {
     .map((it) => it.imageId)
     .filter((v): v is number => typeof v === "number" && v > 0);
 
-  try {
-    await validateExistence({ kategoriIds: items.map((it) => it.kategoriId), imageIds });
-    if (imageIds.length) {
-      // Validasi keberadaan gambar saja, format bebas (JPG/PNG/WEBP ok)
-      await prisma.gambarUpload.findMany({
-        where: { id: { in: imageIds } },
-        select: { id: true },
-      });
+  const { kategoriIds: validKategoriIds, imageIds: validImageIds } = await filterExistingIds({
+    kategoriIds: items.map((it) => it.kategoriId).filter((v): v is number => typeof v === "number"),
+    imageIds,
+  });
+  const finalKategoriIdsToSave = validKategoriIds ?? [];
+  const finalImageIdsToSave = validImageIds ?? [];
+
+  const removedKategoriCount = items.filter(it => it.type === 'category').length - items.filter(it => it.type === 'category' && finalKategoriIdsToSave.includes(it.kategoriId as number)).length;
+  const removedImageCount = imageIds.length - finalImageIdsToSave.length;
+
+  const filteredItems = items.filter(it => {
+    if (it.type === 'category') return finalKategoriIdsToSave.includes(it.kategoriId as number);
+    return true;
+  }).map(it => {
+    if (it.imageId && !finalImageIdsToSave.includes(it.imageId)) {
+      return { ...it, imageId: null };
     }
-  } catch (e: any) {
-    return redirectBack({ error: encodeURIComponent(e?.message ?? "Validasi gagal.") });
-  }
+    return it;
+  });
 
   await updateDraftConfigPreserveTheme(id, {
     sectionTheme: sectionThemeValue,
     sectionBgTheme,
     description: descriptionRaw,
     layout: { columns: 4, tabletColumns: 3, mobileColumns: 2, maxItems: 16, mode },
-    items,
+    items: filteredItems,
     tabs,
   });
 
   revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko");
   revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko/preview");
 
-  const notice = warnings.length
+  let notice = warnings.length
     ? `Config Grid Category Commerce tersimpan. Warning: ${warnings.join(" ")}`
     : "Config Grid Category Commerce tersimpan.";
+
+  if (removedKategoriCount > 0 || removedImageCount > 0) {
+    notice += ` (Dibersihkan: ${removedKategoriCount} kategori, ${removedImageCount} icon/gambar tak ditemukan).`;
+  }
 
   return redirectBack({ notice: encodeURIComponent(notice), anchor, sectionId: id });
 }
@@ -2508,11 +2533,9 @@ async function saveProductCarouselConfig(formData: FormData) {
   // ordered: hidden inputs in <li> with name="productIds"
   const productIds = clearProducts ? [] : parseNumArray((formData.getAll("productIds") as string[]) ?? []);
 
-  try {
-    await validateExistence({ productIds });
-  } catch (e: any) {
-    return redirectBack({ error: encodeURIComponent(e?.message ?? "Validasi gagal.") });
-  }
+  const { productIds: validProductIds } = await filterExistingIds({ productIds });
+  const finalProductIdsToSave = validProductIds ?? [];
+  const removedCount = productIds.length - finalProductIdsToSave.length;
 
   await updateDraftConfigPreserveTheme(
     id,
@@ -2520,7 +2543,7 @@ async function saveProductCarouselConfig(formData: FormData) {
       ...(sectionTheme ? { sectionTheme } : {}),
       title,
       description,
-      productIds,
+      productIds: finalProductIdsToSave,
       showPrice,
       showCta,
       sectionBgTheme: parseBgThemeLocal(formData.get("sectionBgTheme")),
@@ -2528,7 +2551,10 @@ async function saveProductCarouselConfig(formData: FormData) {
     { title: metaTitle, slug: metaSlug },
   );
   revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko");
-  return redirectBack({ notice: encodeURIComponent("Config PRODUCT_CAROUSEL tersimpan.") });
+  const notice = removedCount > 0
+    ? `Config PRODUCT_CAROUSEL tersimpan (${removedCount} produk tak ditemukan dihapus).`
+    : "Config PRODUCT_CAROUSEL tersimpan.";
+  return redirectBack({ notice: encodeURIComponent(notice) });
 }
 
 async function clearProductListingProducts(formData: FormData) {
@@ -2611,21 +2637,16 @@ async function saveProductListingConfig(formData: FormData) {
   // Parse productIds from multiple hidden inputs
   const productIds = clearProducts ? [] : parseNumArray((formData.getAll("productIds") as string[]) ?? []);
 
-  // Validate existence (optional but good practice)
-  if (productIds.length > 0) {
-    try {
-      await validateExistence({ productIds });
-    } catch (e: any) {
-      return redirectBack({ error: encodeURIComponent(e?.message ?? "Validasi gagal."), anchor, sectionId: id });
-    }
-  }
+  const { productIds: validProductIds } = await filterExistingIds({ productIds });
+  const finalProductIdsToSave = validProductIds ?? [];
+  const removedCount = productIds.length - finalProductIdsToSave.length;
 
   await updateDraftConfigPreserveTheme(
     id,
     {
       sectionTheme: sectionThemeValue,
       title: titleRaw,
-      productIds,
+      productIds: finalProductIdsToSave,
       sectionBgTheme: parseBgThemeLocal(formData.get("sectionBgTheme")),
     },
     { title: titleRaw, slug },
@@ -2633,7 +2654,10 @@ async function saveProductListingConfig(formData: FormData) {
 
   revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko");
   revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko/preview");
-  return redirectBack({ notice: encodeURIComponent("Config PRODUCT_LISTING tersimpan."), anchor, sectionId: id });
+  const notice = removedCount > 0
+    ? `Config PRODUCT_LISTING tersimpan (${removedCount} produk tak ditemukan dihapus).`
+    : "Config PRODUCT_LISTING tersimpan.";
+  return redirectBack({ notice: encodeURIComponent(notice), anchor, sectionId: id });
 }
 
 async function saveCustomPromoConfig(formData: FormData) {
@@ -2693,17 +2717,23 @@ async function saveCustomPromoConfig(formData: FormData) {
     }
   }
 
-  try {
-    await validateExistence({ imageIds: voucherImageIds });
-  } catch (e: any) {
-    return redirectBack({ error: encodeURIComponent(e?.message ?? "Validasi gagal.") });
-  }
+  const { imageIds: validVoucherIds } = await filterExistingIds({ imageIds: voucherImageIds });
+  const finalVoucherIds = validVoucherIds ?? [];
+  const removedCount = voucherImageIds.length - finalVoucherIds.length;
+
+  // Cleanup voucherLinks from removed IDs
+  const finalVoucherLinks = { ...voucherLinks };
+  Object.keys(finalVoucherLinks).forEach((key) => {
+    if (!finalVoucherIds.includes(Number(key))) {
+      delete finalVoucherLinks[Number(key)];
+    }
+  });
 
   // Validasi ketat ukuran sesuai mode meskipun gambar dipilih dari galeri
-  if (voucherImageIds.length) {
+  if (finalVoucherIds.length) {
     let firstSize: { width: number; height: number } | null = null;
     const checks = await Promise.all(
-      voucherImageIds.map(async (imgId) => {
+      finalVoucherIds.map(async (imgId) => {
         const rec = await prisma.gambarUpload.findUnique({ where: { id: imgId }, select: { url: true } });
         if (!rec || !rec.url) return { ok: false, msg: `Gambar #${imgId} tidak ditemukan.` };
         const filePath = path.join(process.cwd(), "public", rec.url.replace(/^\//, ""));
@@ -2743,7 +2773,7 @@ async function saveCustomPromoConfig(formData: FormData) {
   }
 
   const normalizedVouchers =
-    layout === "hero" && voucherImageIds.length > 0 ? [voucherImageIds[0]] : voucherImageIds;
+    layout === "hero" && finalVoucherIds.length > 0 ? [finalVoucherIds[0]] : finalVoucherIds;
 
   // selalu simpan format baru (menghapus ketergantungan bannerPromoId)
   await updateDraftConfigPreserveTheme(
@@ -2752,7 +2782,7 @@ async function saveCustomPromoConfig(formData: FormData) {
       layout,
       sectionBgTheme,
       voucherImageIds: normalizedVouchers,
-      ...(Object.keys(voucherLinks).length ? { voucherLinks } : {}),
+      ...(Object.keys(finalVoucherLinks).length ? { voucherLinks: finalVoucherLinks } : {}),
       ...(existingCfg?._legacyBannerPromoId !== undefined ? { _legacyBannerPromoId: existingCfg._legacyBannerPromoId } : {}),
     },
     { title, slug },
@@ -2764,7 +2794,10 @@ async function saveCustomPromoConfig(formData: FormData) {
 
   revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko");
   revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko/preview");
-  return redirectBack({ notice: encodeURIComponent("Config CUSTOM_PROMO tersimpan."), forceReload: true });
+  const notice = removedCount > 0
+    ? `Config CUSTOM_PROMO tersimpan (${removedCount} voucher tak ditemukan dihapus).`
+    : "Config CUSTOM_PROMO tersimpan.";
+  return redirectBack({ notice: encodeURIComponent(notice), forceReload: true });
 }
 
 async function saveTestimonialsConfig(formData: FormData) {
@@ -3213,18 +3246,16 @@ async function saveSocialConfig(formData: FormData) {
   const sectionTheme = parseSectionTheme(formData.get("sectionTheme") as string | null);
   const iconKeys = ((formData.getAll("iconKeys") as string[]) ?? []).filter(Boolean);
 
-  try {
-    await validateExistence({ mediaIconKeys: iconKeys });
-  } catch (e: any) {
-    return redirectBack({ error: encodeURIComponent(e?.message ?? "Validasi gagal.") });
-  }
+  const { mediaIconKeys: validIconKeys } = await filterExistingIds({ mediaIconKeys: iconKeys });
+  const finalIconKeys = validIconKeys ?? [];
+  const removedCount = iconKeys.length - finalIconKeys.length;
 
   const rows = await prisma.mediaSosial.findMany({
-    where: { iconKey: { in: iconKeys } },
+    where: { iconKey: { in: finalIconKeys } },
     select: { iconKey: true, nama: true },
   });
 
-  const selected = iconKeys
+  const selected = finalIconKeys
     .map((k) => rows.find((r) => r.iconKey === k))
     .filter(Boolean)
     .map((r) => ({ iconKey: (r as any).iconKey, nama: (r as any).nama ?? (r as any).iconKey }));
@@ -3236,7 +3267,10 @@ async function saveSocialConfig(formData: FormData) {
   );
 
   revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko");
-  return redirectBack({ notice: encodeURIComponent("Config SOCIAL tersimpan.") });
+  const notice = removedCount > 0
+    ? `Config SOCIAL tersimpan (${removedCount} icon tak ditemukan dihapus).`
+    : "Config SOCIAL tersimpan.";
+  return redirectBack({ notice: encodeURIComponent(notice) });
 }
 
 async function saveFooterConfig(formData: FormData) {
@@ -3330,20 +3364,21 @@ async function saveBranchesConfig(formData: FormData) {
   const branchIds = parseNumArray((formData.getAll("branchIds") as string[]) ?? []);
   const layout = ((formData.get("layout") as string | null) ?? "carousel") === "carousel" ? "carousel" : "grid";
 
-  try {
-    await validateExistence({ branchIds });
-  } catch (e: any) {
-    return redirectBack({ error: encodeURIComponent(e?.message ?? "Validasi gagal.") });
-  }
+  const { branchIds: validBranchIds } = await filterExistingIds({ branchIds });
+  const finalBranchIds = validBranchIds ?? [];
+  const removedCount = branchIds.length - finalBranchIds.length;
 
   await updateDraftConfigPreserveTheme(
     id,
-    { ...(sectionTheme ? { sectionTheme } : {}), branchIds, layout },
+    { ...(sectionTheme ? { sectionTheme } : {}), branchIds: finalBranchIds, layout },
     { title, slug },
   );
 
   revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko");
-  return redirectBack({ notice: encodeURIComponent("Config BRANCHES tersimpan.") });
+  const notice = removedCount > 0
+    ? `Config BRANCHES tersimpan (${removedCount} cabang tak ditemukan dihapus).`
+    : "Config BRANCHES tersimpan.";
+  return redirectBack({ notice: encodeURIComponent(notice) });
 }
 
 async function saveContactConfig(formData: FormData) {
@@ -3381,13 +3416,17 @@ async function saveContactConfig(formData: FormData) {
     if (v) buttonLabels[key] = v;
   }
 
-  try {
-    await validateExistence({ hubungiIds, ...(imageId ? { imageIds: [imageId] } : {}) });
-  } catch (e: any) {
-    return redirectBack({ error: encodeURIComponent(e?.message ?? "Validasi gagal.") });
-  }
+  const { hubungiIds: validHubungiIds, imageIds: validImageIds } = await filterExistingIds({
+    hubungiIds,
+    ...(imageId ? { imageIds: [imageId] } : {}),
+  });
+  const finalHubungiIdsToSave = validHubungiIds ?? [];
+  const finalImageIdToSave = validImageIds && validImageIds.length > 0 ? validImageIds[0] : null;
 
-  // SPLIT_IMAGE_STACK selalu butuh gambar
+  const removedHubungiCount = hubungiIds.length - finalHubungiIdsToSave.length;
+  const removedImage = !!(imageId && !finalImageIdToSave);
+
+  // SPLIT_IMAGE_STACK selalu butuh gambar (untuk input baru)
   if (!imageId) {
     return redirectBack({ error: encodeURIComponent("Section Hubungi Kami membutuhkan gambar. Silakan pilih gambar dulu.") });
   }
@@ -3396,11 +3435,11 @@ async function saveContactConfig(formData: FormData) {
     id,
     {
       ...(sectionTheme ? { sectionTheme } : {}),
-      hubungiIds,
+      hubungiIds: finalHubungiIdsToSave,
       ...(Object.keys(buttonLabels).length ? { buttonLabels } : { buttonLabels: {} }),
       mode,
       showImage,
-      imageId,
+      imageId: finalImageIdToSave,
       ...(headerText ? { headerText } : {}),
       ...(bodyText ? { bodyText } : {}),
     },
@@ -3408,7 +3447,11 @@ async function saveContactConfig(formData: FormData) {
   );
 
   revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko");
-  return redirectBack({ notice: encodeURIComponent("Config CONTACT tersimpan.") });
+  let notice = "Config CONTACT tersimpan.";
+  if (removedHubungiCount > 0 || removedImage) {
+    notice += ` (Dibersihkan: ${removedHubungiCount} kontak, ${removedImage ? "gambar" : ""} tak ditemukan).`;
+  }
+  return redirectBack({ notice: encodeURIComponent(notice) });
 }
 
 function generateContactCopy(brandRaw: string, seed: number) {
@@ -3507,20 +3550,21 @@ async function saveGalleryConfig(formData: FormData) {
   const imageIds = parseNumArray((formData.getAll("imageIds") as string[]) ?? []);
   const layout = ((formData.get("layout") as string | null) ?? "grid") === "grid" ? "grid" : "carousel";
 
-  try {
-    await validateExistence({ imageIds });
-  } catch (e: any) {
-    return redirectBack({ error: encodeURIComponent(e?.message ?? "Validasi gagal.") });
-  }
+  const { imageIds: validImageIds } = await filterExistingIds({ imageIds });
+  const finalImageIdsToSave = validImageIds ?? [];
+  const removedCount = imageIds.length - finalImageIdsToSave.length;
 
   await updateDraftConfigPreserveTheme(
     id,
-    { ...(sectionTheme ? { sectionTheme } : {}), imageIds, layout },
+    { ...(sectionTheme ? { sectionTheme } : {}), imageIds: finalImageIdsToSave, layout },
     { title, slug },
   );
 
   revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko");
-  return redirectBack({ notice: encodeURIComponent("Config GALLERY tersimpan.") });
+  const notice = removedCount > 0
+    ? `Config GALLERY tersimpan (${removedCount} gambar tak ditemukan dihapus).`
+    : "Config GALLERY tersimpan.";
+  return redirectBack({ notice: encodeURIComponent(notice) });
 }
 
 async function saveRoomCategoryConfig(formData: FormData) {
@@ -3563,21 +3607,35 @@ async function saveRoomCategoryConfig(formData: FormData) {
   const kategoriIds = cards.map((c) => c.kategoriId).filter((v): v is number => typeof v === "number");
   const imageIds = cards.map((c) => c.imageId).filter((v): v is number => typeof v === "number");
 
-  try {
-    await validateExistence({ kategoriIds, imageIds });
-  } catch (e: any) {
-    return redirectBack({ error: encodeURIComponent(e?.message ?? "Validasi gagal.") });
-  }
+  const { kategoriIds: validKategoriIds, imageIds: validImageIds } = await filterExistingIds({
+    kategoriIds,
+    imageIds,
+  });
+  const finalKategoriIdsToSave = validKategoriIds ?? [];
+  const finalImageIdsToSave = validImageIds ?? [];
+
+  const removedKategoriCount = kategoriIds.length - finalKategoriIdsToSave.length;
+  const removedImageCount = imageIds.length - finalImageIdsToSave.length;
+
+  const filteredCards = cards.map((c) => ({
+    ...c,
+    kategoriId: c.kategoriId && finalKategoriIdsToSave.includes(c.kategoriId) ? c.kategoriId : null,
+    imageId: c.imageId && finalImageIdsToSave.includes(c.imageId) ? c.imageId : null,
+  }));
 
   await updateDraftConfigPreserveTheme(
     id,
-    { ...(sectionTheme ? { sectionTheme } : {}), cards },
+    { ...(sectionTheme ? { sectionTheme } : {}), cards: filteredCards },
     { title, slug },
   );
 
   revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko");
   revalidatePath("/admin/admin_dashboard/admin_pengaturan/toko/preview");
-  return redirectBack({ notice: encodeURIComponent("Config ROOM_CATEGORY tersimpan.") });
+  let notice = "Config ROOM_CATEGORY tersimpan.";
+  if (removedKategoriCount > 0 || removedImageCount > 0) {
+    notice += ` (Dibersihkan: ${removedKategoriCount} kategori, ${removedImageCount} gambar tak ditemukan).`;
+  }
+  return redirectBack({ notice: encodeURIComponent(notice) });
 }
 
 async function addRoomCategoryCard(formData: FormData) {
@@ -3790,19 +3848,22 @@ async function saveHighlightCollectionConfig(formData: FormData) {
   const rawProductIds = clearProducts ? [] : hasProductIdsField ? productIdsFromForm : existingProductIds;
   const productIds = Array.from(new Set(rawProductIds));
 
-  // Validasi
-  const imageIdsToValidate = nextHeroImageId ? [nextHeroImageId] : [];
-  try {
-    await validateExistence({ productIds, imageIds: imageIdsToValidate });
-  } catch (e: any) {
-    return redirectBack({ error: encodeURIComponent(e?.message ?? "Validasi gagal.") });
-  }
+  const { productIds: validProductIds, imageIds: validImageIds } = await filterExistingIds({
+    productIds,
+    imageIds: imageIdsToValidate,
+  });
+  const finalProductIdsToSave = validProductIds ?? [];
+  const finalImageIdsToSave = validImageIds ?? [];
+  const finalHeroImageIdToSave = nextHeroImageId && finalImageIdsToSave.includes(nextHeroImageId) ? nextHeroImageId : null;
+
+  const removedProductCount = productIds.length - finalProductIdsToSave.length;
+  const removedHeroImage = !!(nextHeroImageId && !finalHeroImageIdToSave);
 
   // items
   const existingItems = Array.isArray((existingConfigForMerge as any)?.items) ? (existingConfigForMerge as any).items : null;
   const shouldRegenerateItems = clearProducts || hasProductIdsField || !existingItems;
   const items = shouldRegenerateItems
-    ? productIds.map((pid) => ({ type: "product", refId: pid, enabled: true }))
+    ? finalProductIdsToSave.map((pid) => ({ type: "product", refId: pid, enabled: true }))
     : existingItems;
 
   const slugRaw = (formData.get("slug") as string | null)?.trim() ?? "";
@@ -3814,11 +3875,11 @@ async function saveHighlightCollectionConfig(formData: FormData) {
       // Backward compatible keys
       mode: "products",
       title,
-      productIds,
+      productIds: finalProductIdsToSave,
 
       // New keys
       layout,
-      heroImageId: nextHeroImageId,
+      heroImageId: finalHeroImageIdToSave,
 
       badgeText: "",
       headline,
@@ -3847,9 +3908,10 @@ async function saveHighlightCollectionConfig(formData: FormData) {
 
   // Slug already saved via updateDraftConfigPreserveTheme above
 
-  const noticeEnc = encodeURIComponent(msg);
+  const noticeEnc = encodeURIComponent(
+    msg + (removedProductCount > 0 || removedHeroImage ? ` (${removedProductCount} produk/hero tak ditemukan dihapus).` : "")
+  );
   return redirect(`/admin/admin_dashboard/admin_pengaturan/toko?notice=${noticeEnc}&theme=${encodeURIComponent(themeKey)}`);
-
 }
 async function clearHighlightCollectionHero(formData: FormData) {
   "use server";
@@ -4270,8 +4332,10 @@ async function uploadImageToGalleryAndAttach(formData: FormData): Promise<{ ok: 
     }
 
     // Validate basic references so config tetap aman
-    const ref = collectExistenceArgs(type, cfg);
-    await validateExistence(ref);
+    // STACK SYNC: We skip strict validation here to avoid blocking simple attachments.
+    // Full sync/cleaning happens when user clicks "Simpan" on the section.
+    // const ref = collectExistenceArgs(type, cfg);
+    // await validateExistence(ref);
 
     if (!imageIdToUse || !Number.isFinite(imageIdToUse)) {
       return { ok: false, error: "ImageId tidak valid setelah proses upload/pilih." };
@@ -4444,15 +4508,14 @@ export default async function TokoPengaturanPage({
   // Collect used product IDs to ensure they are fetched
   const usedProductIds = new Set<number>();
   for (const row of draftSections) {
-    const t = String((row as any).type ?? "").trim().toUpperCase();
-    if (t === "PRODUCT_LISTING" || t === "PRODUCT_CAROUSEL" || t === "HIGHLIGHT_COLLECTION") {
-      const cfg = (row as any).config ?? {};
-      const ids = Array.isArray(cfg.productIds) ? cfg.productIds : [];
-      ids.forEach((id: any) => {
-        const n = Number(id);
-        if (Number.isFinite(n) && n > 0) usedProductIds.add(n);
-      });
-    }
+    const t = String((row as any).type ?? "").trim().toUpperCase() as SectionTypeId;
+    const cfg = (row as any).config ?? {};
+    const ref = collectExistenceArgs(t, cfg);
+    const ids = Array.isArray(ref?.productIds) ? ref.productIds : [];
+    ids.forEach((id: any) => {
+      const n = Number(id);
+      if (Number.isFinite(n) && n > 0) usedProductIds.add(n);
+    });
   }
 
   // Fetch products (latest 200 + used ones)
@@ -4483,6 +4546,62 @@ export default async function TokoPengaturanPage({
   }
 
   const productItems = [...latestProducts, ...extraProducts];
+
+  // Auto-clean missing product references in draft config
+  const validProductIdSet = new Set<number>(productItems.map((p: any) => Number(p.id)));
+  const missingProductIds = Array.from(usedProductIds).filter((id) => !validProductIdSet.has(id));
+  if (missingProductIds.length > 0) {
+    const missingSet = new Set<number>(missingProductIds);
+    const updates: { id: number; config: any }[] = [];
+
+    for (const row of draftSections) {
+      const cfg = (row as any).config ?? {};
+      let changed = false;
+      const nextCfg: any = { ...(cfg ?? {}) };
+
+      if (Array.isArray(cfg?.productIds)) {
+        const nextIds = (cfg.productIds as any[])
+          .map((v) => Number(v))
+          .filter((n) => Number.isFinite(n) && n > 0 && !missingSet.has(n));
+        if (nextIds.length !== cfg.productIds.length) {
+          nextCfg.productIds = nextIds;
+          changed = true;
+        }
+      }
+
+      if (Array.isArray(cfg?.items)) {
+        const nextItems = (cfg.items as any[]).filter((it: any) => {
+          const t = String(it?.type ?? "").toLowerCase();
+          if (t !== "product") return true;
+          const id = Number(it?.refId);
+          if (!Number.isFinite(id)) return true;
+          return !missingSet.has(id);
+        });
+        if (nextItems.length !== cfg.items.length) {
+          nextCfg.items = nextItems;
+          changed = true;
+        }
+      }
+
+      if (changed) {
+        const themeKey = getThemeKeyFromRow(row);
+        const finalCfg = withThemeKey(nextCfg, themeKey);
+        (row as any).config = finalCfg;
+        updates.push({ id: Number(row.id), config: finalCfg });
+      }
+    }
+
+    if (updates.length > 0) {
+      await prisma.$transaction(
+        updates.map((u) =>
+          prisma.homepageSectionDraft.update({
+            where: { id: u.id },
+            data: { config: u.config },
+          })
+        )
+      );
+    }
+  }
 
   // Map gambar_upload by id (dipakai untuk preview selection di HERO)
   const imageMap = new Map<number, { id: number; url: string; title: string; tags: string }>(
