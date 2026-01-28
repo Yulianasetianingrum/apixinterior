@@ -2811,6 +2811,9 @@ async function saveTestimonialsConfig(formData: FormData) {
   const mapsUrl = (formData.get("mapsUrl") as string | null)?.trim() ?? "";
   const sectionTheme = parseSectionTheme(formData.get("sectionTheme") as string | null);
   const sectionBgTheme = (formData.get("sectionBgTheme") as string | null) ?? "NAVY";
+  const maxReviewsRaw = (formData.get("maxReviews") as string | null) ?? "";
+  const maxReviewsNum = Number(maxReviewsRaw);
+  const maxReviews = Number.isFinite(maxReviewsNum) && maxReviewsNum > 0 ? Math.min(200, Math.round(maxReviewsNum)) : 0;
 
   const reviewsJson = (formData.get("reviews") as string | null) ?? "[]";
   let reviews: any[] = [];
@@ -2833,6 +2836,7 @@ async function saveTestimonialsConfig(formData: FormData) {
     reviews,
     sectionTheme,
     sectionBgTheme,
+    maxReviews,
   };
 
   await updateDraftConfigPreserveTheme(id, withThemeKey(newConfig, themeKey));

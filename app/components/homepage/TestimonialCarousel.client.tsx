@@ -25,6 +25,7 @@ export default function TestimonialCarousel({ config }: { config: TestimonialCon
     const scrollRef = useRef<HTMLDivElement>(null);
     const [activeIndex, setActiveIndex] = useState(0);
     const reviews = Array.isArray(config?.reviews) ? config.reviews : [];
+    const didInitScroll = useRef(false);
 
     // --- 1. RESOLVE SECTION BACKGROUND (Independent) ---
     // Options: NAVY, GOLD, WHITE
@@ -179,6 +180,25 @@ export default function TestimonialCarousel({ config }: { config: TestimonialCon
         handleScroll();
         return () => container.removeEventListener("scroll", handleScroll);
     }, [reviews]);
+
+    useEffect(() => {
+        const container = scrollRef.current;
+        if (!container || reviews.length === 0) return;
+        if (didInitScroll.current) return;
+
+        const targetIndex = reviews.length >= 3 ? 1 : 0;
+        const children = container.children;
+        const targetChild = children[targetIndex] as HTMLElement | undefined;
+        if (!targetChild) return;
+
+        requestAnimationFrame(() => {
+            const containerCenter = container.clientWidth / 2;
+            const childCenter = targetChild.offsetLeft + targetChild.offsetWidth / 2;
+            container.scrollLeft = Math.max(0, childCenter - containerCenter);
+            setActiveIndex(targetIndex);
+            didInitScroll.current = true;
+        });
+    }, [reviews.length]);
 
     const scroll = (direction: "left" | "right") => {
         if (!scrollRef.current) return;

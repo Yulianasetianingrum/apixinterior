@@ -44,10 +44,13 @@ export default function TestimonialsEditor({ initialConfig, onChange }: Props) {
     const [isFetching, setIsFetching] = useState(false);
     const [sectionTheme, setSectionTheme] = useState(safeConfig.sectionTheme ?? "NAVY_GOLD");
     const [sectionBgTheme, setSectionBgTheme] = useState(safeConfig.sectionBgTheme ?? "NAVY");
+    const [maxReviews, setMaxReviews] = useState<number>(
+        Number.isFinite(Number(safeConfig.maxReviews)) ? Number(safeConfig.maxReviews) : 0
+    );
 
     // Sync changes
     const updateConfig = (key: string, value: any) => {
-        const next = { ...safeConfig, title, subtitle, mapsUrl, reviews, sectionTheme, sectionBgTheme, [key]: value };
+        const next = { ...safeConfig, title, subtitle, mapsUrl, reviews, sectionTheme, sectionBgTheme, maxReviews, [key]: value };
         if (onChange) onChange(next);
     };
 
@@ -157,6 +160,7 @@ export default function TestimonialsEditor({ initialConfig, onChange }: Props) {
             <input type="hidden" name="reviews" value={JSON.stringify(reviews)} />
             <input type="hidden" name="sectionTheme" value={sectionTheme} />
             <input type="hidden" name="sectionBgTheme" value={sectionBgTheme} />
+            <input type="hidden" name="maxReviews" value={String(maxReviews)} />
 
             {/* Grid Config */}
             <div className={styles.sectionEditGrid}>
@@ -205,6 +209,23 @@ export default function TestimonialsEditor({ initialConfig, onChange }: Props) {
                 <input
                     type="text" className={styles.input}
                     value={subtitle} onChange={(e) => { setSubtitle(e.target.value); updateConfig("subtitle", e.target.value); }}
+                />
+            </div>
+
+            <div className={styles.fieldGroup}>
+                <label className={styles.label}>Jumlah Ulasan Ditampilkan (0 = Semua)</label>
+                <input
+                    type="number"
+                    min={0}
+                    max={200}
+                    className={styles.input}
+                    value={maxReviews}
+                    onChange={(e) => {
+                        const raw = Number(e.target.value);
+                        const next = Number.isFinite(raw) ? Math.max(0, Math.min(200, Math.round(raw))) : 0;
+                        setMaxReviews(next);
+                        updateConfig("maxReviews", next);
+                    }}
                 />
             </div>
 

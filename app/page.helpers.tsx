@@ -540,6 +540,8 @@ export function normalizeConfig(sectionType: string, raw: any): JsonObject {
         const title = typeof (cfg as any).title === "string" ? String((cfg as any).title).trim() : "Apa Kata Mereka?";
         const subtitle = typeof (cfg as any).subtitle === "string" ? String((cfg as any).subtitle).trim() : "Ulasan dari pelanggan setia kami";
         const mapsUrl = typeof (cfg as any).mapsUrl === "string" ? String((cfg as any).mapsUrl).trim() : "";
+        const maxReviewsRaw = Number((cfg as any).maxReviews);
+        const maxReviews = Number.isFinite(maxReviewsRaw) && maxReviewsRaw > 0 ? Math.min(200, Math.round(maxReviewsRaw)) : 0;
         const reviewsRaw = Array.isArray((cfg as any).reviews) ? (cfg as any).reviews : [];
         const reviews = reviewsRaw.map((r: any, idx: number) => ({
             id: String(r?.id ?? idx),
@@ -550,14 +552,16 @@ export function normalizeConfig(sectionType: string, raw: any): JsonObject {
             profile_photo_url: String(r?.profile_photo_url ?? r?.avatarUrl ?? ""),
             url: String(r?.url ?? r?.reviewUrl ?? ""),
         }));
+        const finalReviews = maxReviews > 0 ? reviews.slice(0, maxReviews) : reviews;
 
         return {
             title,
             subtitle,
             mapsUrl,
-            reviews,
+            reviews: finalReviews,
             sectionTheme: parseSectionTheme((cfg as any).sectionTheme ?? null),
             sectionBgTheme: parseCustomPromoBgTheme((cfg as any).sectionBgTheme ?? null),
+            maxReviews,
             __themeKey: getThemeKeyFromConfig(cfg)
         };
     }
