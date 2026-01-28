@@ -270,7 +270,7 @@ const VariasiKombinasiWidget = memo(function VariasiKombinasiWidget({
       const d: any = document;
 
       const LS_KEY = storageKey;
-      const toastEl = d.getElementById("toast");
+      const toastEl = d.getElementById("vcombo_toast");
       let lastAutoFocusKey = null;
       const uid = () => "id_" + Math.random().toString(16).slice(2) + "_" + Date.now().toString(16);
 
@@ -299,7 +299,7 @@ const VariasiKombinasiWidget = memo(function VariasiKombinasiWidget({
       }
 
       function vaultEl() {
-        return d.getElementById("vcomboVault");
+        return d.getElementById("vcombo_vault");
       }
 
       function ensureVarUploadInput(varId: string) {
@@ -560,15 +560,15 @@ const VariasiKombinasiWidget = memo(function VariasiKombinasiWidget({
         } catch { }
       }
       function syncHidden() {
-        const fEnabled = d.getElementById("vcombo_hidden_enabled");
-        const fJson = d.getElementById("vcombo_hidden_json");
-        const fClear = d.getElementById("vcombo_hidden_clear");
+        const fEnabled = d.getElementById("vcombo_hidden_enabled") as HTMLInputElement;
+        const fJson = d.getElementById("vcombo_hidden_json") as HTMLInputElement;
+        const fClear = d.getElementById("vcombo_hidden_clear") as HTMLInputElement;
+        const fUnit = d.getElementById("vcombo_hidden_unit") as HTMLInputElement;
         try {
           if (fEnabled) fEnabled.value = state.enabled ? "1" : "0";
           if (fClear) fClear.value = state.enabled ? "0" : "1";
           if (fJson) fJson.value = state.enabled ? JSON.stringify(state) : "";
 
-          const fUnit = d.getElementById("vcombo_hidden_unit");
           if (fUnit) fUnit.value = state.product?.unit || "";
 
           // jika variasi dimatikan, file upload variasi jangan ikut tersubmit
@@ -988,8 +988,8 @@ const VariasiKombinasiWidget = memo(function VariasiKombinasiWidget({
         return { added, skipped };
       }
 
-      const stepsEl = d.getElementById("steps");
-      const pageEl = d.getElementById("page");
+      const stepsEl = d.getElementById("vcombo_steps");
+      const pageEl = d.getElementById("vcombo_page");
 
       function esc(s) {
         return String(s || "")
@@ -1237,9 +1237,9 @@ const VariasiKombinasiWidget = memo(function VariasiKombinasiWidget({
             </div>
           </div>
           <div style="height:12px;"></div>
-          <div id="previewMount"></div>
+          <div id="vcombo_previewMount"></div>
         `;
-          const pm = d.getElementById("previewMount");
+          const pm = d.getElementById("vcombo_previewMount");
           pm.innerHTML = "";
           pm.appendChild(renderPreviewEcommerce());
           return;
@@ -1250,19 +1250,19 @@ const VariasiKombinasiWidget = memo(function VariasiKombinasiWidget({
 
         // Layout: form/tab dulu, preview selalu di bawah
         pageEl.innerHTML = `
-        <div id="formMount"></div>
+        <div id="vcombo_formMount"></div>
         <div style="height:12px;"></div>
-        <div id="previewMount"></div>
+        <div id="vcombo_previewMount"></div>
       `;
 
         // Render konten form sesuai step/tab
-        const fm = d.getElementById("formMount");
+        const fm = d.getElementById("vcombo_formMount");
         if (state.step === 0) renderProduk(fm);
         else if (state.step === 1) renderVariasi(fm);
         else renderKombinasi(fm);
 
         // Render preview (selalu tampil di bawah)
-        const pm = d.getElementById("previewMount");
+        const pm = d.getElementById("vcombo_previewMount");
         pm.innerHTML = "";
         pm.appendChild(renderPreviewEcommerce());
       }
@@ -2716,7 +2716,7 @@ const VariasiKombinasiWidget = memo(function VariasiKombinasiWidget({
           <div class="previewGrid">
             <div>
               <div class="pvMedia">
-                <div class="pvThumb" id="pvThumb"></div>
+                <div class="pvThumb" id="vcombo_pvThumb"></div>
                 <div class="pvMediaText">
                   <div class="pvTitle">${esc(state.product.title || "Produk")}</div>
                   <div class="pvSub">Foto variasi (opsional)</div>
@@ -2724,41 +2724,41 @@ const VariasiKombinasiWidget = memo(function VariasiKombinasiWidget({
               </div>
 
               <label>${esc(tVar())}</label>
-              <div class="chips" id="pvVars"></div>
+              <div class="chips" id="vcombo_pvVars"></div>
 
               <div style="height:10px;"></div>
 
-              <label id="pvLv1Label">${esc(tLv1())}</label>
-              <div class="chips" id="pvLv1"></div>
+              <label id="vcombo_pvLv1Label">${esc(tLv1())}</label>
+              <div class="chips" id="vcombo_pvLv1"></div>
 
               <div style="height:10px;"></div>
 
-              <label id="pvLv2Label">${esc(tLv2())}</label>
-              <div id="pvLv2Mount"></div>
+              <label id="vcombo_pvLv2Label">${esc(tLv2())}</label>
+              <div id="vcombo_pvLv2Mount"></div>
 
               <div style="height:10px;"></div>
 
-              <label id="pvLv3Label">${esc(tLv3())}</label>
-              <div id="pvLv3Mount"></div>
+              <label id="vcombo_pvLv3Label">${esc(tLv3())}</label>
+              <div id="vcombo_pvLv3Mount"></div>
 
               <div style="height:12px;"></div>
 
-              <div class="priceLine" id="pvPrice"></div>
+              <div class="priceLine" id="vcombo_pvPrice"></div>
             </div>
           </div>
         </div>
       `;
 
-        const pvVars = box.querySelector("#pvVars");
-        const pvLv1 = box.querySelector("#pvLv1");
-        const pvLv2M = box.querySelector("#pvLv2Mount");
-        const pvLv3M = box.querySelector("#pvLv3Mount");
-        const pvThumb = box.querySelector("#pvThumb") as any;
+        const pvVars = box.querySelector("#vcombo_pvVars");
+        const pvLv1 = box.querySelector("#vcombo_pvLv1");
+        const pvLv2M = box.querySelector("#vcombo_pvLv2Mount");
+        const pvLv3M = box.querySelector("#vcombo_pvLv3Mount");
+        const pvThumb = box.querySelector("#vcombo_pvThumb") as any;
 
-        const pvLv1Label = box.querySelector("#pvLv1Label");
-        const pvLv2Label = box.querySelector("#pvLv2Label");
-        const pvLv3Label = box.querySelector("#pvLv3Label");
-        const pvPrice = box.querySelector("#pvPrice");
+        const pvLv1Label = box.querySelector("#vcombo_pvLv1Label");
+        const pvLv2Label = box.querySelector("#vcombo_pvLv2Label");
+        const pvLv3Label = box.querySelector("#vcombo_pvLv3Label");
+        const pvPrice = box.querySelector("#vcombo_pvPrice");
         pvVars.innerHTML = "";
         const activeVars = (state.variations || []).filter(x => x.enabled !== false);
         activeVars.forEach(v => {
@@ -2921,17 +2921,17 @@ const VariasiKombinasiWidget = memo(function VariasiKombinasiWidget({
         return box;
       }
 
-      d.getElementById("btnReset").onclick = () => {
+      d.getElementById("vcombo_btnReset").onclick = () => {
         if (!confirm("Reset semua?")) return;
         localStorage.removeItem(LS_KEY);
         location.reload();
       };
-      d.getElementById("btnExport").onclick = () => {
+      d.getElementById("vcombo_btnExport").onclick = () => {
         const payload = JSON.stringify(state, null, 2);
         navigator.clipboard?.writeText(payload).catch(() => { });
         alert(payload);
       };
-      d.getElementById("btnImport").onclick = () => {
+      d.getElementById("vcombo_btnImport").onclick = () => {
         const raw = prompt("Paste JSON state:");
         if (!raw) return;
         try {
@@ -2975,7 +2975,7 @@ const VariasiKombinasiWidget = memo(function VariasiKombinasiWidget({
       };
 
       // === Toggle global aktifkan variasi ===
-      const enabledToggle = d.getElementById("vcomboEnabled");
+      const enabledToggle = d.getElementById("vcombo_enabled");
       if (enabledToggle) {
         enabledToggle.checked = !!state.enabled;
         enabledToggle.onchange = () => {
@@ -3018,11 +3018,11 @@ const VariasiKombinasiWidget = memo(function VariasiKombinasiWidget({
         <>
           <style>{`
 .apixVCombo {
-      --bg:#f6f7fb; --card:#fff; --text:#111827; --muted:#6b7280; --line:#e5e7eb;
-      --shadow: 0 10px 30px rgba(17,24,39,.08);
+      --bg:#FDFCF8; --card:#fff; --text:#0B1531; --muted:#64748b; --line:#E8E0C5;
+      --shadow: 0 10px 30px rgba(11,21,49,.08);
       --r:18px; --r2:14px;
 
-      --green:#03ac0e; --greenSoft: rgba(3,172,14,.10);
+      --green:#0B1531; --greenSoft: rgba(11,21,49,.10);
       --danger:#ef4444;
 
       --gold:#d4af37;
@@ -3050,7 +3050,7 @@ const VariasiKombinasiWidget = memo(function VariasiKombinasiWidget({
 .apixVCombo .head {
       padding: 14px 16px; border-bottom:1px solid var(--line);
       display:flex; align-items:center; justify-content:space-between; gap:12px;
-      background: linear-gradient(180deg, rgba(3,172,14,.06), transparent 65%);
+      background: linear-gradient(180deg, rgba(11,21,49,.06), transparent 65%);
       border-top-left-radius: var(--r);
       border-top-right-radius: var(--r);
       overflow: hidden;
@@ -3058,7 +3058,7 @@ const VariasiKombinasiWidget = memo(function VariasiKombinasiWidget({
 .apixVCombo .brand { display:flex; align-items:center; gap:10px; min-width:0; }
 .apixVCombo .logo {
       width:38px;height:38px;border-radius:14px; display:grid; place-items:center;
-      background: var(--greenSoft); border:1px solid rgba(3,172,14,.2); color: var(--green); font-weight: 1000;
+      background: var(--greenSoft); border:1px solid rgba(212,175,55,.3); color: var(--gold); font-weight: 1000;
     }
 .apixVCombo .title { margin:0; font-size:14px; font-weight:1000; }
 .apixVCombo .sub { margin:2px 0 0; font-size:12px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -3071,9 +3071,9 @@ const VariasiKombinasiWidget = memo(function VariasiKombinasiWidget({
 .apixVCombo .btn:hover { border-color:#d1d5db; box-shadow: 0 8px 18px rgba(17,24,39,.08); }
 .apixVCombo .btn:active { transform: translateY(1px); }
 .apixVCombo .btn.primary {
-      border-color: rgba(3,172,14,.35);
-      background: linear-gradient(180deg, rgba(3,172,14,.14), rgba(3,172,14,.08));
-      font-weight: 900; color:#0b3d10;
+      border-color: rgba(212,175,55,.45);
+      background: #0B1531;
+      font-weight: 900; color: var(--gold);
     }
 .apixVCombo .btn.danger {
       border-color: rgba(239,68,68,.35);
@@ -3101,9 +3101,9 @@ const VariasiKombinasiWidget = memo(function VariasiKombinasiWidget({
     }
 .apixVCombo .dot { width:22px;height:22px;border-radius:999px; display:grid;place-items:center; font-size:12px; border:1px solid var(--line); color:var(--muted); }
 .apixVCombo .step .lbl { font-size:12px; font-weight:900; color:var(--muted); white-space:nowrap; }
-.apixVCombo .step.active { border-color: rgba(3,172,14,.35); background: rgba(3,172,14,.07); }
-.apixVCombo .step.active .dot { border-color: rgba(3,172,14,.35); background: rgba(3,172,14,.12); color: var(--green); font-weight: 1000; }
-.apixVCombo .step.active .lbl { color:#0b3d10; }
+.apixVCombo .step.active { border-color: rgba(11,21,49,.35); background: rgba(11,21,49,.07); }
+.apixVCombo .step.active .dot { border-color: rgba(11,21,49,.35); background: rgba(11,21,49,.12); color: var(--text); font-weight: 1000; }
+.apixVCombo .step.active .lbl { color:#0B1531; }
 .apixVCombo .body { padding:16px; }
 .apixVCombo .disabledBox{
       border:1px dashed rgba(3,172,14,.35);
@@ -3626,29 +3626,29 @@ const VariasiKombinasiWidget = memo(function VariasiKombinasiWidget({
                     className="btn toggleBtn"
                     title="Jika OFF: variasi tidak ikut tersimpan ke produk (data tetap aman di sini)."
                   >
-                    <input id="vcomboEnabled" type="checkbox" />
+                    <input id="vcombo_enabled" type="checkbox" />
                     Aktifkan Variasi
                   </label>
 
-                  <button className="btn" id="btnExport" type="button">
+                  <button className="btn" id="vcombo_btnExport" type="button">
                     Export JSON
                   </button>
-                  <button className="btn" id="btnImport" type="button">
+                  <button className="btn" id="vcombo_btnImport" type="button">
                     Import JSON
                   </button>
-                  <button className="btn danger" id="btnReset" type="button">
+                  <button className="btn danger" id="vcombo_btnReset" type="button">
                     Reset
                   </button>
                 </div>
               </div>
 
-              <div className="steps" id="steps"></div>
-              <div className="body" id="page"></div>
-              <div className="vcomboVault" id="vcomboVault" aria-hidden="true"></div>
+              <div className="steps" id="vcombo_steps"></div>
+              <div className="body" id="vcombo_page"></div>
+              <div className="vcomboVault" id="vcombo_vault" aria-hidden="true"></div>
             </div>
           </div>
 
-          <div className="toast" id="toast"></div>
+          <div className="toast" id="vcombo_toast"></div>
         </>
       )}
     </div>
