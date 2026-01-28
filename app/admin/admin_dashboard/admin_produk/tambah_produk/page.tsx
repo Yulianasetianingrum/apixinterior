@@ -12,6 +12,7 @@ import {
 import { useRouter, useSearchParams } from "next/navigation";
 import layoutStyles from "../../admin_dashboard.module.css";
 import styles from "./page.module.css";
+import "./legacy_widget.css";
 import { useAdminTheme } from "../../AdminThemeContext";
 
 import Link from "next/link";

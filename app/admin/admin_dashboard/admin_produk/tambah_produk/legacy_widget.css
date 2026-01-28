@@ -1,0 +1,194 @@
+/* LEGACY WIDGET STYLES - Compatibility Layer */
+/* Matches the class names used in VariasiKombinasiWidget (raw HTML strings) */
+
+.box {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    margin-bottom: 12px;
+    overflow: hidden;
+}
+
+.globalBox {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 1px var(--border-focus) inset;
+}
+
+.boxHead {
+    background: var(--bg-panel);
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border-subtle);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+}
+
+.boxBody {
+    padding: 14px;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid var(--border-subtle);
+    background: var(--bg-panel);
+    color: var(--text-primary);
+}
+
+.btn.primary {
+    background: var(--primary);
+    color: var(--primary-fg);
+    border-color: var(--primary);
+}
+
+.btn.danger {
+    background: var(--danger);
+    color: white;
+    border-color: var(--danger);
+}
+
+.btn.small {
+    padding: 4px 10px;
+    font-size: 0.8rem;
+}
+
+.btnRow {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+}
+
+.subtabs {
+    margin-bottom: 16px;
+}
+
+.stabRow {
+    display: flex;
+    gap: 4px;
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.stab {
+    padding: 8px 16px;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.stab.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+}
+
+.badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 99px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border-subtle);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.empty {
+    text-align: center;
+    padding: 24px;
+    color: var(--text-muted);
+    font-style: italic;
+    border: 1px dashed var(--border-subtle);
+    border-radius: 8px;
+}
+
+.divider {
+    height: 1px;
+    background: var(--border-subtle);
+    margin: 16px 0;
+}
+
+.hint {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.grid2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+/* Card for options (cCard) */
+.cCard {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 12px;
+    padding: 12px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border-subtle);
+    border-radius: 6px;
+    margin-bottom: 8px;
+    align-items: start;
+}
+
+.cNameCol,
+.cPriceCol,
+.cSideCol {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Inputs inside widget */
+#comboBody input,
+#comboBody select {
+    width: 100%;
+    padding: 8px;
+    font-size: 0.9rem;
+    border: 1px solid var(--border-subtle);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border-radius: 4px;
+}
+
+/* Promo Box */
+.promoBox {
+    border: 1px solid var(--border-subtle);
+    border-radius: 6px;
+    padding: 10px;
+    background: var(--bg-card);
+}
+
+.promoHdr {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+}
+
+.promoGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.promoRow {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.promoVal {
+    width: 100%;
+}
