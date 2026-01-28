@@ -6188,7 +6188,7 @@ export default function TambahProdukPage() {
                 </button>
               </div>
 
-              <div style={{ padding: 14, color: "#e5e7eb", fontSize: 14, lineHeight: 1.6 }}>
+              <div className={styles.modalBody}>
                 {infoMsg}
               </div>
 

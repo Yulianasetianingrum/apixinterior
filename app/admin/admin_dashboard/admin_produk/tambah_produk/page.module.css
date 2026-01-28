@@ -425,11 +425,16 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background: linear-gradient(135deg, #f5c542, #ffe497);
+  /* Golden Gradient */
+  color: #0b1531;
+  /* Dark Navy text for contrast */
 }
 
 .modalTitle {
   font-size: 1.1rem;
   font-weight: 700;
+  color: #0b1531;
 }
 
 .modalCloseBtn {
@@ -437,7 +442,8 @@
   border: none;
   font-size: 24px;
   line-height: 1;
-  color: var(--text-muted);
+  color: #0b1531;
+  opacity: 0.7;
   cursor: pointer;
 }
 
@@ -450,13 +456,26 @@
 }
 
 .modalConfirm {
-  background: var(--primary);
-  color: var(--primary-fg);
+  background: linear-gradient(135deg, #f5c542, #ffe08d);
+  color: #0b1531;
   border: none;
-  padding: 10px 20px;
-  border-radius: 6px;
-  font-weight: 600;
+  padding: 10px 24px;
+  border-radius: 99px;
+  font-weight: 700;
   cursor: pointer;
+  box-shadow: 0 4px 12px rgba(245, 197, 66, 0.3);
+  transition: transform 0.1s;
+}
+
+.modalConfirm:active {
+  transform: scale(0.96);
+}
+
+.modalBody {
+  padding: 20px;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  line-height: 1.6;
 }
 
 /* --- PAGE TITLES (Legacy Hooks) --- */
