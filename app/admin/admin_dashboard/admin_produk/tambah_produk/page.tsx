@@ -5985,10 +5985,7 @@ export default function TambahProdukPage() {
                       )}
                     </div>
 
-                    <div className={styles.field} style={{ marginTop: 20 }}>
-                      <label className={styles.label}>Video URL (Youtube/etc)</label>
-                      <input type="text" name="videoUrl" className={styles.input} placeholder="https://..." />
-                    </div>
+
                   </div>
 
                   {/* SECTION 3: VARIASI (WIDGET LAMA) */}
@@ -6021,14 +6018,7 @@ export default function TambahProdukPage() {
                   {/* PANEL 1: PUBLISH & STATUS */}
                   <div className={styles.enterprisePanel}>
                     <h3 className={styles.panelTitle}>Status & Kategori</h3>
-                    <div className={styles.field}>
-                      <label className={styles.label}>Status</label>
-                      <select name="status" className={styles.select}>
-                        <option value="aktif">Aktif (Tampil)</option>
-                        <option value="draft">Draft (Sembunyi)</option>
-                        <option value="habis">Habis</option>
-                      </select>
-                    </div>
+
                     <div className={styles.field} style={{ marginTop: 12 }}>
                       <label className={styles.label}>Kategori</label>
                       <input type="text" name="kategori" className={styles.input} placeholder="Furniture..." />
@@ -6041,7 +6031,7 @@ export default function TambahProdukPage() {
 
                   {/* PANEL 2: PRICING */}
                   <div className={styles.enterprisePanel}>
-                    <h3 className={styles.panelTitle}>Harga & Stok</h3>
+                    <h3 className={styles.panelTitle}>Harga</h3>
                     <div className={styles.field}>
                       <label className={styles.label}>Harga Dasar (Rp)</label>
                       <input type="number" name="harga" className={styles.input} placeholder="0" />
