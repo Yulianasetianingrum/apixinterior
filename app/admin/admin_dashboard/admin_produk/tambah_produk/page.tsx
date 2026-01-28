@@ -6124,87 +6124,88 @@ export default function TambahProdukPage() {
             </form>
           </div>
         </div>
-      </div>
 
 
-      <ImagePickerModal
-        open={pickerOpen}
-        onClose={() => setPickerOpen(false)}
-        initialSelectedIds={kolaseImages.map((img) => img.id)}
-        onNotify={notify}
-        onSelect={(imgs) => {
-          setKolaseImages(imgs.slice(0, 15));
-        }}
-      />
 
-      <ImagePickerModal
-        open={varPickerOpen}
-        maxPick={1}
-        onClose={() => {
-          setVarPickerOpen(false);
-          setVarPickerVarId(null);
-          setVarPickerInitialIds([]);
-        }}
-        initialSelectedIds={varPickerInitialIds}
-        onNotify={notify}
-        onSelect={(imgs) => {
-          const picked = imgs?.[0];
-          const varId = varPickerVarId;
-          setVarPickerOpen(false);
-          setVarPickerVarId(null);
-          setVarPickerInitialIds([]);
+        <ImagePickerModal
+          open={pickerOpen}
+          onClose={() => setPickerOpen(false)}
+          initialSelectedIds={kolaseImages.map((img) => img.id)}
+          onNotify={notify}
+          onSelect={(imgs) => {
+            setKolaseImages(imgs.slice(0, 15));
+          }}
+        />
 
-          if (!picked || !varId) return;
+        <ImagePickerModal
+          open={varPickerOpen}
+          maxPick={1}
+          onClose={() => {
+            setVarPickerOpen(false);
+            setVarPickerVarId(null);
+            setVarPickerInitialIds([]);
+          }}
+          initialSelectedIds={varPickerInitialIds}
+          onNotify={notify}
+          onSelect={(imgs) => {
+            const picked = imgs?.[0];
+            const varId = varPickerVarId;
+            setVarPickerOpen(false);
+            setVarPickerVarId(null);
+            setVarPickerInitialIds([]);
 
-          window.dispatchEvent(
-            new CustomEvent("apix:varKolasePicked", {
-              detail: { varId, imageId: picked.id, url: picked.url },
-            })
-          );
-        }}
-      />
+            if (!picked || !varId) return;
+
+            window.dispatchEvent(
+              new CustomEvent("apix:varKolasePicked", {
+                detail: { varId, imageId: picked.id, url: picked.url },
+              })
+            );
+          }}
+        />
 
 
-      {
-        infoMsg && (
-          <div
-            className={styles.modalOverlay}
-            onMouseDown={() => setInfoMsg(null)}
-          >
+        {
+          infoMsg && (
             <div
-              className={styles.modal}
-              style={{ width: "min(560px, 100%)", maxHeight: "none" }}
-              onMouseDown={(e) => e.stopPropagation()}
+              className={styles.modalOverlay}
+              onMouseDown={() => setInfoMsg(null)}
             >
-              <div className={styles.modalHeader}>
-                <div className={styles.modalTitle}>Info</div>
-                <button
-                  type="button"
-                  className={styles.modalCloseBtn}
-                  onClick={() => setInfoMsg(null)}
-                  aria-label="Tutup"
-                >
-                  ×
-                </button>
-              </div>
+              <div
+                className={styles.modal}
+                style={{ width: "min(560px, 100%)", maxHeight: "none" }}
+                onMouseDown={(e) => e.stopPropagation()}
+              >
+                <div className={styles.modalHeader}>
+                  <div className={styles.modalTitle}>Info</div>
+                  <button
+                    type="button"
+                    className={styles.modalCloseBtn}
+                    onClick={() => setInfoMsg(null)}
+                    aria-label="Tutup"
+                  >
+                    ×
+                  </button>
+                </div>
 
-              <div className={styles.modalBody}>
-                {infoMsg}
-              </div>
+                <div className={styles.modalBody}>
+                  {infoMsg}
+                </div>
 
-              <div className={styles.modalFooter}>
-                <button
-                  type="button"
-                  className={styles.modalConfirm}
-                  onClick={() => setInfoMsg(null)}
-                >
-                  OK
-                </button>
+                <div className={styles.modalFooter}>
+                  <button
+                    type="button"
+                    className={styles.modalConfirm}
+                    onClick={() => setInfoMsg(null)}
+                  >
+                    OK
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        )
-      }
+          )
+        }
+      </div >
     </>
   );
 }
