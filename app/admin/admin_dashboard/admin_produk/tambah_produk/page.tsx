@@ -228,9 +228,16 @@ const VariasiKombinasiWidget = memo(function VariasiKombinasiWidget({
   notify: (msg: string) => void;
   storageKey: string | null;
 }) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   const bootedRef = useRef(false);
   const varKolasePickedRef = useRef<any>(null);
   const broadcastVarMediaRef = useRef<any>(null);
+
+  if (!mounted) {
+    return <div className="apixVCombo" style={{ padding: 20, textAlign: 'center', color: '#888' }}>Memuat Editor Variasi...</div>;
+  }
 
   useEffect(() => {
     if (bootedRef.current) {
