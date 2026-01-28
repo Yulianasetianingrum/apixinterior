@@ -65,26 +65,25 @@ async function saveOptimizedWebpToUploads(file: File) {
   const arrayBuffer = await file.arrayBuffer();
   const input = Buffer.from(arrayBuffer);
 
-  const filename = `${Date.now()}-${randomUUID()}.webp`;
+  const key = randomUUID();
+  const base = safeBaseName(file.name || "image") || "image";
+  const filename = `${base}-${key}-1600.webp`;
   const outPath = path.join(UPLOAD_DIR, filename);
 
   // === Target ukuran file (KB) ===
-  // Catatan: makin kecil target, makin besar kemungkinan quality turun (walau biasanya nggak terlihat).
-  const TARGET_KB = 450; // ubah sesuai selera (contoh: 350 / 300)
+  const TARGET_KB = 450;
   const targetBytes = TARGET_KB * 1024;
 
   try {
-    // Guard 2: limitInputPixels + failOnError untuk file aneh / terlalu besar
-    const base = sharp(input, { limitInputPixels: MAX_INPUT_PIXELS, failOnError: true })
+    const baseProc = sharp(input, { limitInputPixels: MAX_INPUT_PIXELS, failOnError: true })
       .rotate()
       .resize({ width: 1600, height: 1600, fit: "inside", withoutEnlargement: true });
 
-    // Coba beberapa quality sampai nyentuh targetBytes (atau mentok quality minimum).
     const qualitySteps = [82, 80, 78, 76, 74, 72, 70];
     let outBuf: Buffer | null = null;
 
     for (const q of qualitySteps) {
-      const buf = await base
+      const buf = await baseProc
         .clone()
         .webp({ quality: q, effort: 6, smartSubsample: true })
         .toBuffer();
@@ -93,20 +92,29 @@ async function saveOptimizedWebpToUploads(file: File) {
       if (buf.length <= targetBytes) break;
     }
 
-    // fallback aman (harusnya tidak kejadian)
     if (!outBuf) {
-      outBuf = await base
+      outBuf = await baseProc
         .webp({ quality: 80, effort: 6, smartSubsample: true })
         .toBuffer();
     }
 
     await fs.writeFile(outPath, outBuf);
-  } catch {
-    // Sharp gagal decode = bukan image beneran / corrupt / atau terlalu besar
+  } catch (err) {
+    console.error("[saveOptimizedWebp] sharp error:", err);
     throw httpError(400, "Gambar tidak valid / terlalu besar untuk diproses.");
   }
 
-  return `${UPLOAD_SUBDIR}/${filename}`;
+  // Use the same format as tambah_produk/route.ts
+  return `/api/img?f=${filename}`;
+}
+
+function safeBaseName(name: string) {
+  return name
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 40);
 }
 
 
@@ -793,8 +801,7 @@ export async function PUT(
       // - kalau user gak pilih foto utama baru, biarin main image lama
       // - kalau user upload galeri baru, update galeri meski main image tidak diganti
       if (mainFile) {
-        const mainRelPath = await saveOptimizedWebpToUploads(mainFile);
-        const mainUrl = `/${mainRelPath}`;
+        const mainUrl = await saveOptimizedWebpToUploads(mainFile);
 
         const mainKolase = await prisma.gambarUpload.create({
           data: {
@@ -812,8 +819,7 @@ export async function PUT(
       if (galleryFiles.length) {
         const galleryIdsArr: number[] = [];
         for (const file of galleryFiles) {
-          const rel = await saveOptimizedWebpToUploads(file);
-          const url = `/${rel}`;
+          const url = await saveOptimizedWebpToUploads(file);
 
           const galeri = await prisma.gambarUpload.create({
             data: {

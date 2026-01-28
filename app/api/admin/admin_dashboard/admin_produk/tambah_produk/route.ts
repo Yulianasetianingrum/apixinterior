@@ -37,8 +37,8 @@ async function saveOptimizedWebpToUploads(
 
   await ensureUploadDir();
 
-  const maxWidth = opts?.maxWidth ?? 1600; // aman buat detail page; next/image bisa downscale
-  const quality = opts?.quality ?? 80;
+  const maxWidth = opts?.maxWidth ?? 1600;
+  const qualityDefault = opts?.quality ?? 80;
   const base = safeBaseName(opts?.baseName || file.name || "image") || "image";
   const key = randomUUID();
   const filename = `${base}-${key}-${maxWidth}.webp`;
@@ -46,12 +46,37 @@ async function saveOptimizedWebpToUploads(
 
   const buf = Buffer.from(await file.arrayBuffer());
 
-  // rotate() supaya EXIF orientation bener, resize buat ngecilin payload, webp buat lebih ringan
-  await sharp(buf)
-    .rotate()
-    .resize({ width: maxWidth, withoutEnlargement: true })
-    .webp({ quality })
-    .toFile(outAbs);
+  const TARGET_KB = 450;
+  const targetBytes = TARGET_KB * 1024;
+
+  try {
+    const baseProc = sharp(buf)
+      .rotate()
+      .resize({ width: maxWidth, withoutEnlargement: true });
+
+    const qualitySteps = [82, 80, 78, 76, 74, 72, 70];
+    let outBuf: Buffer | null = null;
+
+    for (const q of qualitySteps) {
+      const b = await baseProc
+        .clone()
+        .webp({ quality: q, effort: 6, smartSubsample: true })
+        .toBuffer();
+      outBuf = b;
+      if (b.length <= targetBytes) break;
+    }
+
+    if (!outBuf) {
+      outBuf = await baseProc
+        .webp({ quality: qualityDefault, effort: 6, smartSubsample: true })
+        .toBuffer();
+    }
+
+    await fs.writeFile(outAbs, outBuf);
+  } catch (err) {
+    console.error("[saveOptimizedWebp] sharp error:", err);
+    throw new Error("Gagal memproses gambar.");
+  }
 
   // url publik - use API route for consistent serving
   return `/api/img?f=${filename}`;

@@ -269,6 +269,8 @@ const VariasiKombinasiWidget = memo(function VariasiKombinasiWidget({
     const LS_KEY = storageKey;
 
     const toastEl = d.getElementById("vcombo_toast");
+    const stepsEl = d.getElementById("vcombo_steps");
+    const pageEl = d.getElementById("vcombo_page");
     let lastAutoFocusKey = null;
     const uid = () => "id_" + Math.random().toString(16).slice(2) + "_" + Date.now().toString(16);
 
@@ -840,7 +842,7 @@ const VariasiKombinasiWidget = memo(function VariasiKombinasiWidget({
 
         if (changed) {
           save();
-          try { render(); } catch { }
+          try { if (appRender) appRender(); } catch { }
         }
       };
 
@@ -986,8 +988,8 @@ const VariasiKombinasiWidget = memo(function VariasiKombinasiWidget({
       return { added, skipped };
     }
 
-    const stepsEl = d.getElementById("vcombo_steps");
-    const pageEl = d.getElementById("vcombo_page");
+    // (Moved to top of useEffect to avoid TDZ)
+
 
     function esc(s) {
       return String(s || "")
