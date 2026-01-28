@@ -3848,6 +3848,7 @@ async function saveHighlightCollectionConfig(formData: FormData) {
   const rawProductIds = clearProducts ? [] : hasProductIdsField ? productIdsFromForm : existingProductIds;
   const productIds = Array.from(new Set(rawProductIds));
 
+  const imageIdsToValidate = nextHeroImageId ? [nextHeroImageId] : [];
   const { productIds: validProductIds, imageIds: validImageIds } = await filterExistingIds({
     productIds,
     imageIds: imageIdsToValidate,
