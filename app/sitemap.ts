@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next';
 import { prisma } from '@/lib/prisma';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-    const baseUrl = 'https://apixinterior.com';
+    const baseUrl = 'https://apixinterior.co.id';
 
     // Static pages
     const staticPages: MetadataRoute.Sitemap = [
@@ -56,3 +56,4 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     return [...staticPages, ...productPages, ...categoryPages];
 }
+

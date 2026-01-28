@@ -192,14 +192,14 @@ export default async function ProdukDetailPage({ params }: PageProps) {
           price: hargaFinal,
           priceCurrency: "IDR",
           availability: "https://schema.org/InStock",
-          url: `https://apixinterior.com/produk/${produk.slug}`,
+          url: `https://apixinterior.co.id/produk/${produk.slug}`,
         }}
       />
       <BreadcrumbSchema
         items={[
-          { name: "Beranda", url: "https://apixinterior.com" },
-          { name: "Produk", url: "https://apixinterior.com/produk" },
-          { name: produk.nama, url: `https://apixinterior.com/produk/${produk.slug}` },
+          { name: "Beranda", url: "https://apixinterior.co.id" },
+          { name: "Produk", url: "https://apixinterior.co.id/produk" },
+          { name: produk.nama, url: `https://apixinterior.co.id/produk/${produk.slug}` },
         ]}
       />
 
@@ -273,3 +273,4 @@ function resolveUnitLabel(code: string | null | undefined) {
   // Fallback if custom
   return s;
 }
+

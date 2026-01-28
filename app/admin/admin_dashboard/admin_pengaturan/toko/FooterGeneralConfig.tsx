@@ -125,7 +125,7 @@ export default function FooterGeneralConfig({
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className={styles.input}
-                    placeholder="admin@apixinterior.com"
+                    placeholder="admin@apixinterior.co.id"
                 />
             </div>
 
@@ -176,3 +176,4 @@ export default function FooterGeneralConfig({
         </div>
     );
 }
+

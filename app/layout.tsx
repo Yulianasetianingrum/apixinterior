@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     // BRANDING
     "apix interior", "apix furniture", "tukang furniture profesional"
   ],
-  authors: [{ name: "Apix Interior", url: "https://apixinterior.com" }],
+  authors: [{ name: "Apix Interior", url: "https://apixinterior.co.id" }],
   creator: "Apix Interior",
   publisher: "Apix Interior",
   formatDetection: {
@@ -43,23 +43,24 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL("https://apixinterior.com"),
+  metadataBase: new URL("https://apixinterior.co.id"),
   alternates: {
     canonical: "/",
   },
   icons: {
     icon: [
+      { url: "/favicon.ico", type: "image/x-icon" },
       { url: "/logo/faviconsite.png", sizes: "180x180", type: "image/png" }
     ],
     apple: [
       { url: "/logo/faviconsite.png", sizes: "180x180", type: "image/png" }
     ],
-    shortcut: "/logo/faviconsite.png"
+    shortcut: "/favicon.ico"
   },
   openGraph: {
     type: "website",
     locale: "id_ID",
-    url: "https://apixinterior.com",
+    url: "https://apixinterior.co.id",
     siteName: "Apix Interior",
     title: "Apix Interior - Jasa Desain Interior & Furniture Custom Terbaik",
     description: "Wujudkan rumah impian dengan Jasa Desain Interior & Furniture Custom terbaik. Kualitas premium, harga kompetitif, dan hasil memuaskan.",
@@ -135,6 +136,7 @@ export default async function RootLayout({
   return (
     <html lang="id" className={inter.variable}>
       <head>
+        <link rel="icon" href="/favicon.ico" type="image/x-icon" />
         <link rel="icon" href="/logo/faviconsite.png" type="image/png" />
         <link rel="apple-touch-icon" href="/logo/faviconsite.png" type="image/png" />
         <script
@@ -144,9 +146,9 @@ export default async function RootLayout({
               "@context": "https://schema.org",
               "@type": "Organization",
               "name": "Apix Interior",
-              "url": "https://apixinterior.com",
-              "logo": "https://apixinterior.com/logo/logo_apixinterior_golden.png.png",
-              "image": "https://apixinterior.com/logo/logo_apixinterior_golden.png.png",
+              "url": "https://apixinterior.co.id",
+              "logo": "https://apixinterior.co.id/logo/logo_apixinterior_golden.png.png",
+              "image": "https://apixinterior.co.id/logo/logo_apixinterior_golden.png.png",
               "description": "Jasa Desain Interior & Furniture Custom No. 1. Spesialis Kitchen Set, Lemari, Renovasi Rumah & Dekorasi Interior Modern di Jabodetabek.",
               "address": {
                 "@type": "PostalAddress",
@@ -175,3 +177,4 @@ export default async function RootLayout({
     </html>
   );
 }
+

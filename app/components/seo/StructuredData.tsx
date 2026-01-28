@@ -22,8 +22,8 @@ interface OrganizationSchemaProps {
 
 export function OrganizationSchema({
     name = "Apix Interior",
-    url = "https://apixinterior.com",
-    logo = "https://apixinterior.com/logo/logo_apixinterior_biru.png.png",
+    url = "https://apixinterior.co.id",
+    logo = "https://apixinterior.co.id/logo/logo_apixinterior_biru.png.png",
     description = "Apix Interior menyediakan furniture berkualitas, mebel custom, dan jasa desain interior profesional untuk rumah, kantor, hotel, dan bangunan komersial.",
     address,
     contactPoint,
@@ -153,8 +153,8 @@ interface WebSiteSchemaProps {
 
 export function WebSiteSchema({
     name = "Apix Interior",
-    url = "https://apixinterior.com",
-    searchUrl = "https://apixinterior.com/produk?q={search_term_string}",
+    url = "https://apixinterior.co.id",
+    searchUrl = "https://apixinterior.co.id/produk?q={search_term_string}",
 }: WebSiteSchemaProps = {}) {
     const schema = {
         "@context": "https://schema.org",
@@ -201,7 +201,7 @@ interface LocalBusinessSchemaProps {
 export function LocalBusinessSchema({
     name = "Apix Interior",
     description = "Furniture, Mebel, dan Jasa Desain Interior Profesional",
-    image = "https://apixinterior.com/logo/logo_apixinterior_biru.png.png",
+    image = "https://apixinterior.co.id/logo/logo_apixinterior_biru.png.png",
     telephone,
     email,
     address,
@@ -242,3 +242,4 @@ export function LocalBusinessSchema({
         />
     );
 }
+

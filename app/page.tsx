@@ -545,7 +545,7 @@ export default async function HomePage({
       {/* SEO Structured Data */}
       <OrganizationSchema
         name="Apix Interior"
-        url="https://apixinterior.com"
+        url="https://apixinterior.co.id"
         description="Furniture berkualitas, mebel custom, dan jasa desain interior profesional untuk rumah, kantor, hotel, dan bangunan komersial."
         sameAs={[
           // Add your social media URLs here when available
@@ -1479,3 +1479,4 @@ export default async function HomePage({
     </div >
   );
 }
+

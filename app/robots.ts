@@ -14,6 +14,7 @@ export default function robots(): MetadataRoute.Robots {
                 disallow: ['/admin/', '/api/'],
             },
         ],
-        sitemap: 'https://apixinterior.com/sitemap.xml',
+        sitemap: 'https://apixinterior.co.id/sitemap.xml',
     };
 }
+
