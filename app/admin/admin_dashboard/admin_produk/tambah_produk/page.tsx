@@ -845,7 +845,7 @@ const VariasiKombinasiWidget = memo(function VariasiKombinasiWidget({
 
         // initial + catch async prefill/edit mode lebih lama
         handler();
-        const itv = window.setInterval(() => syncOnce(), 400);
+        const itv = window.setInterval(() => syncOnce(), 1000);
         const tmo = window.setTimeout(() => window.clearInterval(itv), 12000);
 
         // event delegation (aman kalau React replace node input)
