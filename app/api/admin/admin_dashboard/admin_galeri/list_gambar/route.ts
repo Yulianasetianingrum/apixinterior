@@ -44,6 +44,20 @@ function normalizeImageUrl(raw: unknown): string {
     }
   }
 
+  // Sanitasi endpoint internal gambar: simpan hanya parameter `f`.
+  // Data lama kadang menyimpan `w`/param lain yang bikin gambar jadi strip/kecil.
+  if (/^\/api\/img\?/i.test(url)) {
+    try {
+      const q = url.split("?")[1] ?? "";
+      const sp = new URLSearchParams(q);
+      const f = String(sp.get("f") ?? "").trim();
+      if (!f) return "";
+      url = `/api/img?f=${encodeURIComponent(f)}`;
+    } catch {
+      return "";
+    }
+  }
+
   return url;
 }
 
