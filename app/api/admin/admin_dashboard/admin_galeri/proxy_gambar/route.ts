@@ -1,16 +1,5 @@
 import { NextResponse } from "next/server";
 
-const HOP_BY_HOP_HEADERS = new Set([
-  "connection",
-  "keep-alive",
-  "proxy-authenticate",
-  "proxy-authorization",
-  "te",
-  "trailer",
-  "transfer-encoding",
-  "upgrade",
-]);
-
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const target = String(searchParams.get("url") ?? "").trim();
@@ -20,8 +9,11 @@ export async function GET(req: Request) {
   }
 
   try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 8000);
     const upstream = await fetch(target, {
       cache: "no-store",
+      signal: controller.signal,
       headers: {
         // Beberapa host menolak request tanpa user-agent.
         "user-agent":
@@ -29,8 +21,9 @@ export async function GET(req: Request) {
         accept: "image/avif,image/webp,image/apng,image/*,*/*;q=0.8",
       },
     });
+    clearTimeout(timer);
 
-    if (!upstream.ok || !upstream.body) {
+    if (!upstream.ok) {
       return NextResponse.json(
         { error: "Upstream image unavailable" },
         { status: upstream.status || 502 }
@@ -42,24 +35,21 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "Upstream is not an image" }, { status: 415 });
     }
 
-    const headers = new Headers();
-    headers.set("content-type", contentType);
-    headers.set("cache-control", "public, max-age=300");
-
-    const contentLength = upstream.headers.get("content-length");
-    if (contentLength) headers.set("content-length", contentLength);
-
-    for (const [k, v] of upstream.headers.entries()) {
-      const key = k.toLowerCase();
-      if (HOP_BY_HOP_HEADERS.has(key)) continue;
-      if (key === "content-type" || key === "content-length" || key === "cache-control") continue;
-      if (key.startsWith("access-control-")) continue;
-      headers.set(k, v);
+    // Pakai buffer penuh agar tidak kena mismatch transfer/content-encoding upstream.
+    const buf = Buffer.from(await upstream.arrayBuffer());
+    if (!buf.length) {
+      return NextResponse.json({ error: "Empty upstream image" }, { status: 502 });
     }
 
-    return new NextResponse(upstream.body, { status: 200, headers });
+    return new NextResponse(buf, {
+      status: 200,
+      headers: {
+        "content-type": contentType,
+        "content-length": String(buf.length),
+        "cache-control": "public, max-age=300",
+      },
+    });
   } catch {
     return NextResponse.json({ error: "Failed to fetch upstream image" }, { status: 502 });
   }
 }
-
