@@ -570,16 +570,9 @@
   width: 100% !important;
   height: 100% !important;
   display: block !important;
-  background-size: contain !important;
-  background-position: center center !important;
-  background-repeat: no-repeat !important;
-  background-color: #f8fafc !important;
-}
-
-.modalItemImageSkeleton {
-  position: absolute;
-  inset: 0;
-  background: #e5e7eb;
+  object-fit: contain !important;
+  object-position: center center !important;
+  background: #f8fafc !important;
 }
 
 .modalItemMeta {
