@@ -36,6 +36,33 @@ type ImagePickerModalProps = {
   maxPick?: number; // default 15
 };
 
+function getProxyFallbackUrl(src: string): string | null {
+  const raw = String(src || "").trim();
+  if (!raw) return null;
+
+  // Pattern utama project ini: /api/img?f=filename
+  if (raw.startsWith("/api/img?")) {
+    try {
+      const q = raw.split("?")[1] ?? "";
+      const sp = new URLSearchParams(q);
+      const f = (sp.get("f") || "").trim();
+      if (f) return `/api/img_proxy?file=${encodeURIComponent(f)}`;
+    } catch { }
+  }
+
+  // Fallback umum: ambil basename dari path/URL.
+  try {
+    const normalized = raw.replace(/\\/g, "/");
+    const noQuery = normalized.split("?")[0].split("#")[0];
+    const parts = noQuery.split("/").filter(Boolean);
+    const file = (parts[parts.length - 1] || "").trim();
+    if (!file) return null;
+    return `/api/img_proxy?file=${encodeURIComponent(file)}`;
+  } catch {
+    return null;
+  }
+}
+
 /* ================= MODAL PILIH GAMBAR DARI KOLASE ================= */
 function ImagePickerModal({
   open,
@@ -244,7 +271,21 @@ function ImagePickerModal({
                         }
                       }}
                       onError={() => {
-                        setBrokenIds((prev) => (prev.includes(g.id) ? prev : [...prev, g.id]));
+                        if (String(g.url || "").startsWith("/api/img_proxy?")) {
+                          setBrokenIds((prev) => (prev.includes(g.id) ? prev : [...prev, g.id]));
+                          return;
+                        }
+
+                        const fallback = getProxyFallbackUrl(g.url);
+                        if (!fallback) {
+                          setBrokenIds((prev) => (prev.includes(g.id) ? prev : [...prev, g.id]));
+                          return;
+                        }
+
+                        // Coba sekali pakai fallback lokal.
+                        setData((prev) =>
+                          prev.map((it) => (it.id === g.id ? { ...it, url: fallback } : it))
+                        );
                       }}
                     />
                   </div>
