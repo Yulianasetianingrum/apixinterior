@@ -22,7 +22,6 @@ import Link from "next/link";
 type GambarKolase = {
   id: number;
   url: string;
-  thumbUrl?: string;
   title: string | null;
   tags: string;
 };
@@ -82,7 +81,6 @@ function ImagePickerModal({
             return {
               ...g,
               url,
-              thumbUrl: typeof g?.thumbUrl === "string" ? g.thumbUrl : undefined,
               title: title || null,
               tags: tags || "",
             };
@@ -182,8 +180,10 @@ function ImagePickerModal({
                 }
                 toggleSelect(g.id);
               };
-              const baseSrc = g.thumbUrl || g.url;
-              const modalImgSrc = `${baseSrc}${baseSrc.includes("?") ? "&" : "?"}cb=picker_${g.id}`;
+              const isApiImg = /^\/api\/img\?/i.test(g.url);
+              const modalImgSrc = isApiImg
+                ? `${g.url}&w=320&cb=picker_${g.id}`
+                : `${g.url}${g.url.includes("?") ? "&" : "?"}cb=picker_${g.id}`;
               return (
                 <button
                   key={g.id}

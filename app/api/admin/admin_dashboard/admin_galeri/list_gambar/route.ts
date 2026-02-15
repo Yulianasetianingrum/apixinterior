@@ -149,7 +149,6 @@ export async function GET(req: Request) {
     .map((it: any) => ({
       ...it,
       url: normalizeImageUrl(it?.url),
-      thumbUrl: `/api/admin/admin_dashboard/admin_galeri/thumb?id=${it?.id}`,
     }))
     .filter(
       (it: any) =>
