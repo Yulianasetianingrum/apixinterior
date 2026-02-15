@@ -232,6 +232,8 @@ function ImagePickerModal({
                     <img
                       src={g.url}
                       alt={g.title ?? ""}
+                      referrerPolicy="no-referrer"
+                      loading="lazy"
                       style={{
                         position: "absolute",
                         inset: 0,
