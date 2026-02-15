@@ -49,6 +49,7 @@ function ImagePickerModal({
   const [data, setData] = useState<GambarKolase[]>([]);
   const [search, setSearch] = useState("");
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [brokenIds, setBrokenIds] = useState<number[]>([]);
 
   const MAX_PICK = maxPick ?? 15;
 
@@ -99,10 +100,12 @@ function ImagePickerModal({
   useEffect(() => {
     if (open) {
       setSelectedIds(initialSelectedIds.slice(0, MAX_PICK));
+      setBrokenIds([]);
     }
   }, [open, initialSelectedIds]);
 
   const filtered = data.filter((g) => {
+    if (brokenIds.includes(g.id)) return false;
     const q = search.toLowerCase().trim();
     if (!q) return true;
     const text = `${String(g.title ?? "").trim()} ${String(g.tags ?? "").trim()}`.toLowerCase();
@@ -234,6 +237,9 @@ function ImagePickerModal({
                       alt={g.title ?? ""}
                       referrerPolicy="no-referrer"
                       loading="lazy"
+                      onError={() => {
+                        setBrokenIds((prev) => (prev.includes(g.id) ? prev : [...prev, g.id]));
+                      }}
                       style={{
                         position: "absolute",
                         inset: 0,
