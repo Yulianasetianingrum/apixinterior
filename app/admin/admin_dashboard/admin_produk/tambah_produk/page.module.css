@@ -556,6 +556,26 @@
   background: #f8fafc;
 }
 
+.modalItemImageWrap {
+  position: relative;
+  width: 100%;
+  height: 160px;
+  overflow: hidden;
+  background: #e5e7eb;
+}
+
+.modalItemImage {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 100% !important;
+  max-width: none !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+  display: block !important;
+}
+
 .modalItemMeta {
   padding: 8px 10px;
 }

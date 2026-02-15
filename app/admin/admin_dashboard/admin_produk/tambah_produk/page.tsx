@@ -222,32 +222,16 @@ function ImagePickerModal({
                       {selectedIds.indexOf(g.id) + 1}
                     </div>
                   )}
-                  <div
-                    style={{
-                      position: "relative",
-                      width: "100%",
-                      height: 160,
-                      overflow: "hidden",
-                      background: "#f8fafc",
-                    }}
-                  >
+                  <div className={styles.modalItemImageWrap}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
+                      className={styles.modalItemImage}
                       src={g.url}
                       alt={g.title ?? ""}
                       referrerPolicy="no-referrer"
-                      loading="lazy"
+                      decoding="async"
                       onError={() => {
                         setBrokenIds((prev) => (prev.includes(g.id) ? prev : [...prev, g.id]));
-                      }}
-                      style={{
-                        position: "absolute",
-                        inset: 0,
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "contain",
-                        display: "block",
-                        background: "#f8fafc",
                       }}
                     />
                   </div>
