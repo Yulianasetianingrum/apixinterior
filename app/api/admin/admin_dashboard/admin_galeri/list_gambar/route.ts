@@ -40,6 +40,26 @@ function toCanonicalUrl(filename: string): string {
   return `/api/img?f=${encodeURIComponent(path.basename(filename))}`;
 }
 
+async function isRenderableImage(filePath: string): Promise<boolean> {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const sharp = require("sharp");
+    // rotate() supaya EXIF orientation dihormati.
+    const meta = await sharp(filePath).rotate().metadata();
+    const w = Number(meta?.width || 0);
+    const h = Number(meta?.height || 0);
+    if (!w || !h) return false;
+
+    // Buang file kecil banget / anomali strip.
+    if (w < 120 || h < 120) return false;
+    const ratio = w / h;
+    if (ratio > 3.5 || ratio < 1 / 3.5) return false;
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const onlyPng = searchParams.get("png") === "1";
@@ -49,7 +69,7 @@ export async function GET(req: Request) {
     include: { category: true, subcategory: true },
   });
 
-  const data = rows
+  const mapped = rows
     .map((row: any) => {
       const filename = extractFilename(row?.url);
       if (!filename) return null;
@@ -61,9 +81,21 @@ export async function GET(req: Request) {
         ...row,
         url: canonicalUrl,
         thumbUrl: `/api/admin/admin_dashboard/admin_galeri/thumb?id=${row.id}`,
+        __filePath: filePath,
       };
     })
     .filter(Boolean) as any[];
+
+  const validated = await Promise.all(
+    mapped.map(async (it) => ((await isRenderableImage(String(it.__filePath || ""))) ? it : null))
+  );
+
+  const data = validated
+    .filter(Boolean)
+    .map((it: any) => {
+      const { __filePath, ...rest } = it;
+      return rest;
+    });
 
   const filtered = onlyPng
     ? data.filter((it) => /\.png(\?|#|$)/i.test(String(it.url ?? "")))
@@ -71,4 +103,3 @@ export async function GET(req: Request) {
 
   return NextResponse.json({ data: filtered });
 }
-
