@@ -1,8 +1,6 @@
-// app/api/admin_form/route.ts
-// Versi simple: cek admin pakai .env (ADMIN_USERNAME / ADMIN_PASSWORD)
-// Biar kamu bisa login dulu tanpa pusing Prisma/seed dulu.
-
 import { NextRequest, NextResponse } from "next/server";
+import bcrypt from "bcryptjs";
+import { prisma } from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
   try {
@@ -27,31 +25,41 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Ambil credential dari .env
-    // SECURITY: Hapus default value hardcoded agar tidak terekspos.
-    // Admin WAJIB set ADMIN_USERNAME & ADMIN_PASSWORD di .env VPS.
-    const ENV_USERNAME = process.env.ADMIN_USERNAME || process.env.ADMIN_INITIAL_USERNAME;
-    const ENV_PASSWORD = process.env.ADMIN_PASSWORD || process.env.ADMIN_INITIAL_PASSWORD;
+    let isValid = false;
 
-    if (!ENV_USERNAME || !ENV_PASSWORD) {
-      console.error("[ADMIN LOGIN] .env ADMIN_USERNAME / ADMIN_PASSWORD belum diset!");
-      return NextResponse.json(
-        { success: false, message: "Konfigurasi server belum lengkap (Missing .env)" },
-        { status: 500 }
-      );
+    // 1) Utama: validasi dari tabel admin (multi account)
+    try {
+      const admin = await prisma.admin.findUnique({
+        where: { username },
+        select: { passwordHash: true },
+      });
+
+      if (admin?.passwordHash) {
+        isValid = await bcrypt.compare(password, admin.passwordHash);
+      }
+    } catch (dbErr) {
+      // Jangan bocorkan detail ke client; fallback ke env agar admin tetap bisa masuk saat DB bermasalah
+      console.error("[ADMIN LOGIN DB] Error:", dbErr);
     }
 
-    const isValid = username === ENV_USERNAME && password === ENV_PASSWORD;
+    // 2) Fallback: credential .env (single account)
+    if (!isValid) {
+      const ENV_USERNAME = process.env.ADMIN_USERNAME || process.env.ADMIN_INITIAL_USERNAME;
+      const ENV_PASSWORD = process.env.ADMIN_PASSWORD || process.env.ADMIN_INITIAL_PASSWORD;
+      if (ENV_USERNAME && ENV_PASSWORD) {
+        isValid = username === ENV_USERNAME && password === ENV_PASSWORD;
+      }
+    }
 
     if (!isValid) {
-      console.warn("[ADMIN LOGIN ENV] Gagal login. Input:", username);
+      console.warn("[ADMIN LOGIN] Gagal login. Input:", username);
       return NextResponse.json(
         { success: false, message: "Username atau password salah" },
         { status: 401 }
       );
     }
 
-    console.log("[ADMIN LOGIN ENV] Berhasil login sebagai:", username);
+    console.log("[ADMIN LOGIN] Berhasil login sebagai:", username);
 
     const res = NextResponse.json(
       { success: true, message: "Login berhasil" },
@@ -61,13 +69,15 @@ export async function POST(req: NextRequest) {
     // Set cookie admin_logged_in = true
     res.cookies.set("admin_logged_in", "true", {
       httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
       path: "/",
       maxAge: 60 * 60 * 2, // 2 jam
     });
 
     return res;
   } catch (error) {
-    console.error("Error umum di /api/admin_form (ENV version):", error);
+    console.error("Error umum di /api/admin_form:", error);
     return NextResponse.json(
       { success: false, message: "Terjadi kesalahan di server" },
       { status: 500 }
