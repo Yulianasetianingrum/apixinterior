@@ -47,7 +47,6 @@ export async function GET(req: Request) {
     const sharp = require("sharp");
     const buf = await sharp(filePath)
       .rotate()
-      .trim()
       .resize({ width: 320, height: 320, fit: "contain", background: "#f8fafc" })
       .webp({ quality: 82 })
       .toBuffer();
