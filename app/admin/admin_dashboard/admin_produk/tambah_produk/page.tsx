@@ -15,6 +15,7 @@ import layoutStyles from "../../admin_dashboard.module.css";
 import styles from "./page.module.css";
 import "./legacy_widget.css";
 import { useAdminTheme } from "../../AdminThemeContext";
+import SecureImage from "@/app/components/SecureImage";
 
 import Link from "next/link";
 
@@ -226,12 +227,13 @@ function ImagePickerModal({
                     </div>
                   )}
                   <div className={styles.modalItemImageWrap}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      className={styles.modalItemImage}
+                    <SecureImage
                       src={modalImgSrc}
                       alt={g.title ?? ""}
-                      decoding="async"
+                      className={styles.modalItemImage}
+                      fill
+                      sizes="160px"
+                      loading="lazy"
                       onError={() => {
                         setBrokenIds((prev) => (prev.includes(g.id) ? prev : [...prev, g.id]));
                       }}
