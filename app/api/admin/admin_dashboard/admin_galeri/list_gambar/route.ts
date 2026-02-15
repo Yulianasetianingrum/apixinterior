@@ -81,6 +81,47 @@ function fileExistsForApiImgUrl(url: string): boolean {
   }
 }
 
+function resolveLocalFilePathFromApiImgUrl(url: string): string | null {
+  if (!/^\/api\/img\?f=/i.test(url)) return null;
+  try {
+    const q = url.split("?")[1] ?? "";
+    const sp = new URLSearchParams(q);
+    const f = String(sp.get("f") ?? "").trim();
+    if (!f) return null;
+    const safe = path.basename(f);
+    const root = path.join(process.cwd(), "public", "uploads");
+    const candidates = [
+      path.join(root, safe),
+      path.join(root, "gambar_upload", safe),
+      path.join(root, "banners", safe),
+    ];
+    return candidates.find((p) => fs.existsSync(p)) ?? null;
+  } catch {
+    return null;
+  }
+}
+
+async function isUsableLocalImageByMetadata(filePath: string): Promise<boolean> {
+  try {
+    const st = fs.statSync(filePath);
+    // File terlalu kecil biasanya placeholder/korup.
+    if (!st.isFile() || st.size < 10 * 1024) return false;
+
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const sharp = require("sharp");
+    const md = await sharp(filePath).metadata();
+    const w = Number(md?.width || 0);
+    const h = Number(md?.height || 0);
+    if (!w || !h) return false;
+    const ratio = w / h;
+    // Tolak dimensi anomali (strip tipis).
+    if (w < 120 || h < 120 || ratio > 6 || ratio < 1 / 6) return false;
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const onlyPng = searchParams.get("png") === "1";
@@ -102,9 +143,19 @@ export async function GET(req: Request) {
         fileExistsForApiImgUrl(String(it.url))
     );
 
+  const validated = await Promise.all(
+    normalized.map(async (it: any) => {
+      const url = String(it?.url ?? "");
+      const filePath = resolveLocalFilePathFromApiImgUrl(url);
+      if (!filePath) return it; // non-local URL (atau bukan /api/img) biarkan lewat filter sebelumnya
+      const ok = await isUsableLocalImageByMetadata(filePath);
+      return ok ? it : null;
+    })
+  );
+
   const filtered = onlyPng
-    ? normalized.filter((it: any) => /\.png(\?|#|$)/i.test(String(it.url ?? "")))
-    : normalized;
+    ? validated.filter((it: any) => it && /\.png(\?|#|$)/i.test(String(it.url ?? "")))
+    : validated.filter(Boolean);
 
   return NextResponse.json({ data: filtered });
 }
