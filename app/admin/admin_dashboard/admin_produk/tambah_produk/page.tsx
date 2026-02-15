@@ -75,9 +75,13 @@ function ImagePickerModal({
                   ? urlRaw
                   : "/" + urlRaw
                 : "";
+            const title = String(g?.title ?? "").trim();
+            const tags = String(g?.tags ?? "").trim();
             return {
               ...g,
               url,
+              title: title || null,
+              tags: tags || "",
             };
           })
           .filter((g: any) => typeof g?.id === "number" && g?.id > 0 && !!g?.url);
@@ -101,7 +105,7 @@ function ImagePickerModal({
   const filtered = data.filter((g) => {
     const q = search.toLowerCase().trim();
     if (!q) return true;
-    const text = `${g.title ?? ""} ${g.tags}`.toLowerCase();
+    const text = `${String(g.title ?? "").trim()} ${String(g.tags ?? "").trim()}`.toLowerCase();
     return text.includes(q);
   });
 
@@ -154,11 +158,12 @@ function ImagePickerModal({
             className={styles.modalGrid}
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))",
+              gridTemplateColumns: "repeat(auto-fill, 160px)",
               gap: 12,
               maxHeight: "min(62vh, 560px)",
               overflowY: "auto",
               alignContent: "start",
+              justifyContent: "start",
             }}
           >
             {filtered.map((g) => {
@@ -180,29 +185,69 @@ function ImagePickerModal({
                     }`}
                   onClick={handlePick}
                   style={{
-                    display: "block",
-                    width: "100%",
+                    position: "relative",
+                    display: "grid",
+                    gridTemplateRows: "1fr auto",
+                    width: 160,
                     textAlign: "left",
                     borderRadius: 10,
                     overflow: "hidden",
+                    minHeight: 196,
                   }}
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={g.url}
-                    alt={g.title ?? ""}
+                  {active && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        right: 8,
+                        top: 8,
+                        width: 24,
+                        height: 24,
+                        borderRadius: 999,
+                        background: "#0b1d3a",
+                        color: "#fff",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: 13,
+                        fontWeight: 800,
+                        zIndex: 2,
+                        boxShadow: "0 2px 8px rgba(0,0,0,0.25)",
+                      }}
+                      aria-label="Terpilih"
+                    >
+                      {selectedIds.indexOf(g.id) + 1}
+                    </div>
+                  )}
+                  <div
                     style={{
+                      position: "relative",
                       width: "100%",
-                      height: 120,
-                      objectFit: "cover",
-                      display: "block",
+                      height: 160,
+                      overflow: "hidden",
+                      background: "#f8fafc",
                     }}
-                  />
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={g.url}
+                      alt={g.title ?? ""}
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "contain",
+                        display: "block",
+                        background: "#f8fafc",
+                      }}
+                    />
+                  </div>
                   <div className={styles.modalItemMeta}>
                     <div className={styles.modalItemTitle}>
                       {g.title || "Tanpa judul"}
                     </div>
-                    <div className={styles.modalItemTags}>{g.tags}</div>
+                    <div className={styles.modalItemTags}>{g.tags || "tanpa tag"}</div>
                   </div>
                 </button>
               );
@@ -211,6 +256,15 @@ function ImagePickerModal({
         )}
 
         <div className={styles.modalFooter}>
+          <button
+            type="button"
+            className={styles.modalCancel}
+            disabled={selectedIds.length === 0}
+            onClick={() => setSelectedIds([])}
+            style={{ opacity: selectedIds.length === 0 ? 0.5 : 1 }}
+          >
+            Uncheck Semua
+          </button>
           <button
             type="button"
             className={styles.modalCancel}
