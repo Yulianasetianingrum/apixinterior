@@ -150,7 +150,17 @@ function ImagePickerModal({
         ) : filtered.length === 0 ? (
           <p className={styles.modalStatus}>Tidak ada gambar.</p>
         ) : (
-          <div className={styles.modalGrid}>
+          <div
+            className={styles.modalGrid}
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))",
+              gap: 12,
+              maxHeight: "min(62vh, 560px)",
+              overflowY: "auto",
+              alignContent: "start",
+            }}
+          >
             {filtered.map((g) => {
               const active = selectedIds.includes(g.id);
               const handlePick = () => {
@@ -169,9 +179,25 @@ function ImagePickerModal({
                   className={`${styles.modalItem} ${active ? styles.modalItemActive : ""
                     }`}
                   onClick={handlePick}
+                  style={{
+                    display: "block",
+                    width: "100%",
+                    textAlign: "left",
+                    borderRadius: 10,
+                    overflow: "hidden",
+                  }}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={g.url} alt={g.title ?? ""} />
+                  <img
+                    src={g.url}
+                    alt={g.title ?? ""}
+                    style={{
+                      width: "100%",
+                      height: 120,
+                      objectFit: "cover",
+                      display: "block",
+                    }}
+                  />
                   <div className={styles.modalItemMeta}>
                     <div className={styles.modalItemTitle}>
                       {g.title || "Tanpa judul"}
