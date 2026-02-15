@@ -229,6 +229,20 @@ function ImagePickerModal({
                       src={g.url}
                       alt={g.title ?? ""}
                       decoding="async"
+                      onLoad={(e) => {
+                        const el = e.currentTarget;
+                        const w = Number(el.naturalWidth || 0);
+                        const h = Number(el.naturalHeight || 0);
+                        if (!w || !h) {
+                          setBrokenIds((prev) => (prev.includes(g.id) ? prev : [...prev, g.id]));
+                          return;
+                        }
+                        const ratio = w / h;
+                        // Filter hasil hotlink/placeholder yang ukurannya anomali (mis. 1px strip)
+                        if (w < 80 || h < 80 || ratio > 6 || ratio < 1 / 6) {
+                          setBrokenIds((prev) => (prev.includes(g.id) ? prev : [...prev, g.id]));
+                        }
+                      }}
                       onError={() => {
                         setBrokenIds((prev) => (prev.includes(g.id) ? prev : [...prev, g.id]));
                       }}
