@@ -45,6 +45,18 @@ function normalizeImageUrl(raw: unknown): string {
   return url;
 }
 
+function isLikelyImageUrl(url: string): boolean {
+  if (!url) return false;
+
+  // Jalur internal utama upload di project ini.
+  if (/^\/api\/img\?f=/i.test(url)) return true;
+
+  // File image langsung (lokal atau absolute URL)
+  if (/\.(png|jpe?g|webp|gif|avif|svg)(\?|#|$)/i.test(url)) return true;
+
+  return false;
+}
+
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const onlyPng = searchParams.get("png") === "1";
@@ -59,7 +71,7 @@ export async function GET(req: Request) {
       ...it,
       url: normalizeImageUrl(it?.url),
     }))
-    .filter((it: any) => !!it.url);
+    .filter((it: any) => !!it.url && isLikelyImageUrl(String(it.url)));
 
   const filtered = onlyPng
     ? normalized.filter((it: any) => /\.png(\?|#|$)/i.test(String(it.url ?? "")))
