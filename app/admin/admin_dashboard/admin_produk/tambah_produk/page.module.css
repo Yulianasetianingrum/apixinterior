@@ -569,11 +569,16 @@
   inset: 0 !important;
   width: 100% !important;
   height: 100% !important;
-  min-width: 100% !important;
-  max-width: none !important;
-  object-fit: cover !important;
-  object-position: center center !important;
   display: block !important;
+  background-size: cover !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+}
+
+.modalItemImageSkeleton {
+  position: absolute;
+  inset: 0;
+  background: #e5e7eb;
 }
 
 .modalItemMeta {

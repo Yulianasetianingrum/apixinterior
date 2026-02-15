@@ -36,6 +36,48 @@ type ImagePickerModalProps = {
   maxPick?: number; // default 15
 };
 
+type ModalThumbProps = {
+  url: string;
+  title: string;
+  onBroken: () => void;
+};
+
+function ModalThumb({ url, title, onBroken }: ModalThumbProps) {
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    let alive = true;
+    setLoaded(false);
+
+    const img = new Image();
+    img.referrerPolicy = "no-referrer";
+    img.onload = () => {
+      if (alive) setLoaded(true);
+    };
+    img.onerror = () => {
+      if (alive) onBroken();
+    };
+    img.src = url;
+
+    return () => {
+      alive = false;
+    };
+  }, [url, onBroken]);
+
+  if (!loaded) {
+    return <div className={styles.modalItemImageSkeleton} aria-hidden="true" />;
+  }
+
+  return (
+    <div
+      className={styles.modalItemImage}
+      role="img"
+      aria-label={title}
+      style={{ backgroundImage: `url("${url.replace(/"/g, "%22")}")` }}
+    />
+  );
+}
+
 /* ================= MODAL PILIH GAMBAR DARI KOLASE ================= */
 function ImagePickerModal({
   open,
@@ -223,14 +265,10 @@ function ImagePickerModal({
                     </div>
                   )}
                   <div className={styles.modalItemImageWrap}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      className={styles.modalItemImage}
-                      src={g.url}
-                      alt={g.title ?? ""}
-                      referrerPolicy="no-referrer"
-                      decoding="async"
-                      onError={() => {
+                    <ModalThumb
+                      url={g.url}
+                      title={g.title ?? ""}
+                      onBroken={() => {
                         setBrokenIds((prev) => (prev.includes(g.id) ? prev : [...prev, g.id]));
                       }}
                     />
