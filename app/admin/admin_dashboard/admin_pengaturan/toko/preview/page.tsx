@@ -32,6 +32,7 @@ import {
   pickFirstGalleryImageId,
   formatRupiah,
   computeHargaSetelahPromo,
+  parseBooleanSetting,
   resolveGoogleMapsEmbed,
   resolveGoogleMapsNavigation,
   normalizeExternalUrl,
@@ -1370,11 +1371,26 @@ export default async function TokoPreviewDraftPage({
                             const imgUrl = pickedId ? imageMap.get(Number(pickedId))?.url ?? null : null;
                             const href = "#";
                             const pr = computeHargaSetelahPromo(p);
-                            const priceNode = cfg.showPrice ? (pr.isPromo ? <div style={{ display: "flex", flexDirection: "column", gap: 4 }}><div style={{ display: "flex", gap: 8 }}><span style={{ fontWeight: 800 }}>{formatRupiah(pr.hargaFinal)}</span></div><div style={{ display: "flex", gap: 8 }}><span style={{ textDecoration: "line-through", opacity: 0.6 }}>{formatRupiah(pr.hargaAsli)}</span><span style={{ fontWeight: 800, color: themeTokens.element }}>{pr.promoLabel}</span></div></div> : <>{formatRupiah(p.harga)}</>) : null;
+                            const showPrice = parseBooleanSetting(cfg.showPrice, true);
+                            const priceNode = showPrice ? (pr.isPromo ? (
+                              <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                                <div style={{ fontWeight: 800, fontSize: 14, lineHeight: 1.2 }}>
+                                  {formatRupiah(pr.hargaFinal)}
+                                </div>
+                                <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                                  <span style={{ textDecoration: "line-through", opacity: 0.65 }}>
+                                    {formatRupiah(pr.hargaAsli)}
+                                  </span>
+                                  <span style={{ fontWeight: 800, color: themeTokens.element }}>
+                                    Diskon {pr.promoLabel}
+                                  </span>
+                                </div>
+                              </div>
+                            ) : <>{formatRupiah(p.harga)}</>) : null;
                             return (
                               <article key={Number(p.id)} className={homeStyles.pcCard} style={{ background: themeTokens.card, border: `1px solid ${themeTokens.cardBorder}`, color: themeTokens.cardFg }}>
                                 {imgUrl ? <div className={homeStyles.pcMedia}><div className={homeStyles.pcMediaBlur} style={{ backgroundImage: `url(${imgUrl})` }} /><SecureImage className={homeStyles.pcMediaImg} src={imgUrl} alt={String(p.nama)} /></div> : <div className={homeStyles.pcMediaPlaceholder} />}
-                                <div className={homeStyles.pcBody}><div className={homeStyles.pcTitle} style={{ color: themeTokens.cardFg }}>{String(p.nama)}</div>{cfg.showPrice ? <div className={homeStyles.pcPrice} style={{ color: themeTokens.cardFg }}>{priceNode}</div> : null}
+                                <div className={homeStyles.pcBody}><div className={homeStyles.pcTitle} style={{ color: themeTokens.cardFg }}>{String(p.nama)}</div>{showPrice ? <div className={homeStyles.pcPrice} style={{ color: themeTokens.cardFg }}>{priceNode}</div> : null}
                                   <div className={homeStyles.pcCtaWrap}>{cfg.showCta ? <a className={homeStyles.pcCta} href={href} style={{ background: themeTokens.ctaBg, color: themeTokens.ctaFg, border: `1px solid ${themeTokens.ctaBg}`, pointerEvents: "none" }}>Lihat Produk</a> : null}</div></div>
                               </article>
                             );
@@ -1434,25 +1450,30 @@ export default async function TokoPreviewDraftPage({
                           const imgUrl = pickedId ? imageMap.get(Number(pickedId))?.url ?? null : null;
                           const href = "#";
                           const pr = computeHargaSetelahPromo(p);
+
+                          const showPrice = parseBooleanSetting(cfg.showPrice, false);
+                          const priceNode = showPrice ? (pr.isPromo ? (
+                            <div className={homeStyles.pcPriceDiff}>
+                              <div className={homeStyles.pcPriceCurrent}>{formatRupiah(pr.hargaFinal)}</div>
+                              <div className={homeStyles.pcPriceOldWrap}>
+                                <span className={homeStyles.pcPriceOld}>{formatRupiah(pr.hargaAsli)}</span>
+                                <span className={homeStyles.pcDiscountBadge}>Diskon {pr.promoLabel}</span>
+                              </div>
+                            </div>
+                          ) : (
+                            <>{formatRupiah(p.harga)}</>
+                          )) : null;
+
                           return (
                             <article key={Number(p.id)} className={homeStyles.productListingItem}>
                               <div className={homeStyles.pcCard} style={{ background: themeTokens.card, border: `1px solid ${themeTokens.cardBorder}`, color: themeTokens.cardFg, width: "100%", height: "100%", cursor: "default" }}>
                                 {imgUrl ? <div className={homeStyles.pcMedia}><div className={homeStyles.pcMediaBlur} style={{ backgroundImage: `url(${imgUrl})` }} /><SecureImage className={homeStyles.pcMediaImg} src={imgUrl} alt={String(p.nama)} /></div> : <div className={homeStyles.pcMediaPlaceholder} />}
                                 <div className={homeStyles.pcBody}>
                                   <div className={homeStyles.pcTitle} style={{ color: themeTokens.cardFg }}>{String(p.nama || "Nama Produk")}</div>
-                                  <div className={homeStyles.pcPrice} style={{ color: themeTokens.cardFg }}>
-                                    {pr.isPromo ? (
-                                      <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                                        <span style={{ fontWeight: 800 }}>{formatRupiah(pr.hargaFinal)}</span>
-                                        <div style={{ display: "flex", gap: 8 }}>
-                                          <span style={{ textDecoration: "line-through", opacity: 0.6 }}>{formatRupiah(pr.hargaAsli)}</span>
-                                          <span style={{ fontWeight: 800, color: themeTokens.element }}>{pr.promoLabel}</span>
-                                        </div>
-                                      </div>
-                                    ) : (
-                                      <>{formatRupiah(p.harga)}</>
-                                    )}
-                                  </div>
+                                  {/* Only render price container if showPrice is true */}
+                                  {showPrice ? <div className={homeStyles.pcPrice} style={{ color: themeTokens.cardFg }}>
+                                    {priceNode}
+                                  </div> : null}
                                 </div>
                               </div>
                             </article>
@@ -1494,6 +1515,9 @@ export default async function TokoPreviewDraftPage({
 
                   const hasOverlayContent = Boolean(headline || description || (ctaText && ctaHref));
                   const useOverlay = Boolean(heroUrl) && hasOverlayContent;
+
+                  // Default showPrice to false
+                  const showPrice = parseBooleanSetting(cfg.showPrice, false);
 
                   return (
                     <section key={section.id} className={ui.previewSection}>
@@ -1554,21 +1578,24 @@ export default async function TokoPreviewDraftPage({
 
                                   const href = p.slug ? `/produk/${p.slug}` : "#";
                                   const pr = computeHargaSetelahPromo(p);
-                                  const priceNode = pr.isPromo ? (
+
+                                  const priceNode = showPrice ? (pr.isPromo ? (
                                     <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                                      <div style={{ display: "flex", alignItems: "baseline", gap: 8, flexWrap: "wrap" }}>
-                                        <span style={{ fontWeight: 800 }}>{formatRupiah(pr.hargaFinal)}</span>
+                                      <div style={{ fontWeight: 800, fontSize: 14, lineHeight: 1.2 }}>
+                                        {formatRupiah(pr.hargaFinal)}
                                       </div>
-                                      <div style={{ display: "flex", alignItems: "baseline", gap: 8, flexWrap: "wrap" }}>
-                                        <span style={{ textDecoration: "line-through", opacity: 0.6 }}>
+                                      <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                                        <span style={{ textDecoration: "line-through", opacity: 0.65 }}>
                                           {formatRupiah(pr.hargaAsli)}
                                         </span>
-                                        <span style={{ fontWeight: 800 }}>{pr.promoLabel}</span>
+                                        <span style={{ fontWeight: 800 }}>
+                                          Diskon {pr.promoLabel}
+                                        </span>
                                       </div>
                                     </div>
                                   ) : (
                                     <>{formatRupiah(p.harga)}</>
-                                  );
+                                  )) : null;
 
                                   return (
                                     <a key={Number(p.id)} href={href} className={ui.hcItem}>
@@ -1583,7 +1610,7 @@ export default async function TokoPreviewDraftPage({
 
                                       <div className={ui.hcItemBody}>
                                         <div className={ui.hcItemTitle}>{String(p.nama ?? "Produk")}</div>
-                                        {p.harga ? <div className={ui.hcItemPrice}>{priceNode}</div> : null}
+                                        {showPrice && p.harga ? <div className={ui.hcItemPrice}>{priceNode}</div> : null}
                                       </div>
                                     </a>
                                   );

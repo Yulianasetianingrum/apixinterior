@@ -59,6 +59,17 @@ export function normalizeThemeAttr(v: any): string {
     return s.toUpperCase().replace(/[^A-Z0-9]+/g, "_").replace(/^_+|_+$/g, "");
 }
 
+export function parseBooleanSetting(v: unknown, fallback: boolean): boolean {
+    if (typeof v === "boolean") return v;
+    if (typeof v === "number") return v !== 0;
+    if (typeof v === "string") {
+        const s = v.trim().toLowerCase();
+        if (["true", "1", "yes", "ya", "on"].includes(s)) return true;
+        if (["false", "0", "no", "tidak", "off", ""].includes(s)) return false;
+    }
+    return fallback;
+}
+
 const ALLOWED_THEME_COMBOS = new Set([
     "theme_1", "theme_2", "theme_3", "theme_4", "theme_5", "theme_6",
     "NAVY_GOLD", "WHITE_GOLD", "NAVY_WHITE", "GOLD_NAVY", "GOLD_WHITE", "WHITE_NAVY",
@@ -345,10 +356,12 @@ export function normalizeConfig(sectionType: string, raw: any): JsonObject {
         const productIds = Array.isArray((cfg as any).productIds)
             ? (cfg as any).productIds.map((v: any) => Number(v)).filter((n: any) => Number.isFinite(n))
             : [];
+        const showPrice = parseBooleanSetting((cfg as any).showPrice, false);
 
         return {
             sectionTheme,
             sectionBgTheme: parseCustomPromoBgTheme((cfg as any).sectionBgTheme ?? null),
+            showPrice,
             productIds,
             __themeKey: getThemeKeyFromConfig(cfg),
         };
@@ -453,8 +466,8 @@ export function normalizeConfig(sectionType: string, raw: any): JsonObject {
 
     if (sectionType === "PRODUCT_CAROUSEL") {
         const description = typeof (cfg as any).description === "string" ? (cfg as any).description : "";
-        const showPrice = (cfg as any).showPrice === undefined ? true : Boolean((cfg as any).showPrice);
-        const showCta = (cfg as any).showCta === undefined ? true : Boolean((cfg as any).showCta);
+        const showPrice = parseBooleanSetting((cfg as any).showPrice, true);
+        const showCta = parseBooleanSetting((cfg as any).showCta, true);
         const productIds = Array.isArray((cfg as any).productIds) ? (cfg as any).productIds.map((v: any) => Number(v)).filter((n: any) => Number.isFinite(n)) : [];
         return { description, showPrice, showCta, productIds, sectionTheme: parseSectionTheme((cfg as any).sectionTheme ?? null), sectionBgTheme: parseCustomPromoBgTheme((cfg as any).sectionBgTheme ?? null), __themeKey: getThemeKeyFromConfig(cfg) };
     }
@@ -469,9 +482,10 @@ export function normalizeConfig(sectionType: string, raw: any): JsonObject {
         const heroImageIdNum = Number((cfg as any).heroImageId);
         const heroImageId = Number.isFinite(heroImageIdNum) && heroImageIdNum > 0 ? heroImageIdNum : null;
         const productIds = Array.isArray((cfg as any).productIds) ? (cfg as any).productIds.map((v: any) => Number(v)).filter((n: any) => Number.isFinite(n)) : [];
+        const showPrice = parseBooleanSetting((cfg as any).showPrice, false);
         const sectionThemeRaw = typeof (cfg as any).sectionTheme === "string" ? String((cfg as any).sectionTheme).trim() : "FOLLOW_NAVBAR";
         const sectionTheme = sectionThemeRaw === "FOLLOW_NAVBAR" ? null : parseSectionTheme(sectionThemeRaw);
-        return { headline, description, badgeText: "", layout, heroImageId, productIds, ctaText, ctaHref, sectionTheme, __themeKey: getThemeKeyFromConfig(cfg) };
+        return { headline, description, badgeText: "", layout, heroImageId, productIds, ctaText, ctaHref, showPrice, sectionTheme, __themeKey: getThemeKeyFromConfig(cfg) };
     }
 
     if (sectionType === "BRANCHES") {

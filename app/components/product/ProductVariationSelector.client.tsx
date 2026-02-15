@@ -50,6 +50,7 @@ type Props = {
     product: Product;
     onImageChange?: (url: string) => void;
     baseWaNumber?: string;
+    showPrice?: boolean;
 };
 
 // Helper: Clean Label (remove internal tags like #123)
@@ -77,7 +78,10 @@ function unitSymbolShort(u: string | null | undefined) {
     return `/ ${lower}`;
 }
 
-export default function ProductVariationSelector({ product, onImageChange }: Props) {
+export default function ProductVariationSelector({ product, onImageChange, showPrice = false }: Props) {
+    const isShowMainPrice = showPrice === true;
+    const hasVariations = Array.isArray(product.variasiProduk) && product.variasiProduk.length > 0;
+    const shouldShowTopPrice = isShowMainPrice || hasVariations;
     const { waNumber } = useSettings();
     const { addToCart } = useCart();
     const { isInWishlist, toggleWishlist } = useWishlist();
@@ -337,22 +341,24 @@ export default function ProductVariationSelector({ product, onImageChange }: Pro
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
 
             {/* PRICE DISPLAY */}
-            <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
-                <div style={{ fontSize: 24, fontWeight: 700, color: "#0b1d3a" }}>
-                    {formatIDR(finalPriceData.hargaFinal)}
-                    {displayUnit && <span style={{ fontSize: 16, fontWeight: 500, color: "#64748b", marginLeft: 4 }}>{displayUnit}</span>}
+            {shouldShowTopPrice && (
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <div style={{ fontSize: 24, fontWeight: 700, color: "#0b1d3a" }}>
+                        {formatIDR(finalPriceData.hargaFinal)}
+                        {displayUnit && <span style={{ fontSize: 16, fontWeight: 500, color: "#64748b", marginLeft: 4 }}>{displayUnit}</span>}
+                    </div>
+                    {finalPriceData.isPromo && (
+                        <>
+                            <div style={{ textDecoration: "line-through", color: "#94a3b8", fontSize: 14 }}>
+                                {formatIDR(finalPriceData.hargaAsli)}
+                            </div>
+                            <div style={{ background: "#fee2e2", color: "#ef4444", fontSize: 12, fontWeight: 700, padding: "2px 6px", borderRadius: 4 }}>
+                                {finalPriceData.promoLabel}
+                            </div>
+                        </>
+                    )}
                 </div>
-                {finalPriceData.isPromo && (
-                    <>
-                        <div style={{ textDecoration: "line-through", color: "#94a3b8", fontSize: 14 }}>
-                            {formatIDR(finalPriceData.hargaAsli)}
-                        </div>
-                        <div style={{ background: "#fee2e2", color: "#ef4444", fontSize: 12, fontWeight: 700, padding: "2px 6px", borderRadius: 4 }}>
-                            {finalPriceData.promoLabel}
-                        </div>
-                    </>
-                )}
-            </div>
+            )}
 
 
             {/* VARIATION SELECTOR */}
@@ -390,7 +396,7 @@ export default function ProductVariationSelector({ product, onImageChange }: Pro
                                         // eslint-disable-next-line @next/next/no-img-element
                                         <SecureImage src={thumb} alt="" style={{ width: 20, height: 20, borderRadius: 4, objectFit: "cover" }} />
                                     )}
-                                    {label}
+                                    <span>{label}</span>
                                 </button>
                             )
                         })}
@@ -440,7 +446,7 @@ export default function ProductVariationSelector({ product, onImageChange }: Pro
                                             // eslint-disable-next-line @next/next/no-img-element
                                             <SecureImage src={c.imageUrl} alt="" style={{ width: 20, height: 20, borderRadius: 4, objectFit: "cover" }} />
                                         )}
-                                        {cleanLabel(c.nilai)}
+                                        <span>{cleanLabel(c.nilai)}</span>
                                     </button>
                                 );
                             })}

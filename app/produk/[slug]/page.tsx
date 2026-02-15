@@ -13,6 +13,7 @@ import ProductCard from "@/app/components/product/ProductCard.client";
 import ProductRecommendations from "@/app/components/product/ProductRecommendations.client";
 import { Metadata } from "next";
 import { ProductSchema, BreadcrumbSchema } from "@/app/components/seo/StructuredData";
+import { getGlobalShowPrice } from "@/lib/product-price-visibility";
 
 type PageProps = {
   params: Promise<{ slug?: string }>;
@@ -41,15 +42,25 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
+  const showPrice = await getGlobalShowPrice();
+
   const { hargaFinal, isPromo } = computeHargaSetelahPromo(produk as any);
   const price = formatIDR(hargaFinal);
   const imageUrl = produk.mainImage?.url || "/logo/logo_apixinterior_biru.png.png";
 
   // Generate SEO-friendly description
   const deskripsi = (produk as any).deskripsi || '';
-  const description = deskripsi
-    ? `${deskripsi.substring(0, 150)}... | ${price} | ${produk.kategori || 'Furniture'} berkualitas dari Apix Interior`
-    : `${produk.nama} - ${price}. ${produk.kategori || 'Furniture'} berkualitas dari Apix Interior. Melayani Jakarta dan sekitarnya.`;
+  const description = showPrice
+    ? (
+      deskripsi
+        ? `${deskripsi.substring(0, 150)}... | ${price} | ${produk.kategori || 'Furniture'} berkualitas dari Apix Interior`
+        : `${produk.nama} - ${price}. ${produk.kategori || 'Furniture'} berkualitas dari Apix Interior. Melayani Jakarta dan sekitarnya.`
+    )
+    : (
+      deskripsi
+        ? `${deskripsi.substring(0, 150)}... | ${produk.kategori || 'Furniture'} berkualitas dari Apix Interior`
+        : `${produk.nama}. ${produk.kategori || 'Furniture'} berkualitas dari Apix Interior. Melayani Jakarta dan sekitarnya.`
+    );
 
   // Generate keywords
   const keywords = [
@@ -65,7 +76,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   ].filter(Boolean);
 
   return {
-    title: `${produk.nama} - ${price} | Apix Interior`,
+    title: showPrice ? `${produk.nama} - ${price} | Apix Interior` : `${produk.nama} | Apix Interior`,
     description,
     keywords,
     openGraph: {
@@ -152,6 +163,8 @@ export default async function ProdukDetailPage({ params }: PageProps) {
     include: { mainImage: true }
   });
 
+  const showPrice = await getGlobalShowPrice();
+
 
   // WA Number Logic
   const waRow = await prisma.hubungi.findFirst({
@@ -188,12 +201,12 @@ export default async function ProdukDetailPage({ params }: PageProps) {
         description={(produk as any).deskripsi || `${produk.nama} - ${produk.kategori || 'Furniture'} berkualitas dari Apix Interior`}
         image={mainImageUrl ? [mainImageUrl, ...galleryImageUrls] : galleryImageUrls}
         sku={produk.slug}
-        offers={{
+        offers={showPrice ? {
           price: hargaFinal,
           priceCurrency: "IDR",
           availability: "https://schema.org/InStock",
           url: `https://apixinterior.co.id/produk/${produk.slug}`,
-        }}
+        } : undefined}
       />
       <BreadcrumbSchema
         items={[
@@ -213,7 +226,7 @@ export default async function ProdukDetailPage({ params }: PageProps) {
         </div>
 
 
-        <ProductDetailClient product={productForClient} />
+        <ProductDetailClient product={productForClient} showPrice={showPrice} />
 
         <section className={styles.detailSection}>
           <h2 className={styles.sectionTitle}>Detail Lengkap</h2>
@@ -251,6 +264,7 @@ export default async function ProdukDetailPage({ params }: PageProps) {
         <ProductRecommendations
           similarProducts={similarProducts}
           otherProducts={otherProducts}
+          showPrice={showPrice}
         />
 
       </main>

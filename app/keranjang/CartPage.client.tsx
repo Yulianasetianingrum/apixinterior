@@ -12,12 +12,13 @@ import SecureImage from "@/app/components/SecureImage";
 import { useSettings } from "@/app/context/SettingsContext";
 
 interface CartPageClientProps {
+    showPrice?: boolean;
 }
 
 // Helper to ensure image URL is correct
 // Removed local ensureImageUrl in favor of centralized normalizePublicUrl
 
-export default function CartPageClient({ }: CartPageClientProps) {
+export default function CartPageClient({ showPrice = false }: CartPageClientProps) {
     const { waNumber } = useSettings();
     const { items, updateQuantity, removeFromCart, totalPrice, totalItems } = useCart();
     const router = useRouter();
@@ -32,14 +33,19 @@ export default function CartPageClient({ }: CartPageClientProps) {
     }
 
     const handleCheckout = () => {
-        let message = `Halo, saya ingin memesan dari Keranjang Belanja:\n\n`;
+        let message = `Halo, saya ingin bertanya produk dari Keranjang Belanja:\n\n`;
         items.forEach((item, index) => {
             message += `${index + 1}. *${item.name}* \n`;
             message += `   Jumlah: ${item.quantity}\n`;
-            message += `   Harga: ${formatIDR(item.price)}\n`;
-            message += `   Subtotal: ${formatIDR(item.price * item.quantity)}\n\n`;
+            if (showPrice) {
+                message += `   Harga: ${formatIDR(item.price)}\n`;
+                message += `   Subtotal: ${formatIDR(item.price * item.quantity)}\n`;
+            }
+            message += `\n`;
         });
-        message += `*Total Belanja: ${formatIDR(totalPrice)}*`;
+        if (showPrice) {
+            message += `*Total Belanja: ${formatIDR(totalPrice)}*`;
+        }
         const cleanNumber = waNumber.replace(/[^\d]/g, "");
         const url = cleanNumber
             ? `https://wa.me/${cleanNumber}?text=${encodeURIComponent(message)}`
@@ -112,9 +118,11 @@ export default function CartPageClient({ }: CartPageClientProps) {
                                                 <span><strong>Variasi:</strong> {item.variationName}</span>
                                             </div>
                                         )}
-                                        <div className={styles.price}>
-                                            {formatIDR(item.price)}
-                                        </div>
+                                        {showPrice && (
+                                            <div className={styles.price}>
+                                                {formatIDR(item.price)}
+                                            </div>
+                                        )}
                                     </div>
 
                                     <div className={styles.actions}>
@@ -165,20 +173,26 @@ export default function CartPageClient({ }: CartPageClientProps) {
                             <div className={styles.summaryContent}>
                                 <div className={styles.summaryRow}>
                                     <span className={styles.summaryLabel}>Subtotal ({items.length} item)</span>
-                                    <span className={styles.summaryValue}>{formatIDR(totalPrice)}</span>
+                                    <span className={styles.summaryValue}>
+                                        {showPrice ? formatIDR(totalPrice) : "-"}
+                                    </span>
                                 </div>
                                 <div className={`${styles.summaryRow} ${styles.summaryDivider}`}>
                                     <span className={styles.totalLabel}>Total Bayar</span>
-                                    <span className={styles.totalPrice}>{formatIDR(totalPrice)}</span>
+                                    <span className={styles.totalPrice}>
+                                        {showPrice ? formatIDR(totalPrice) : "-"}
+                                    </span>
                                 </div>
                             </div>
 
                             <button onClick={handleCheckout} className={styles.checkoutBtn}>
                                 <FaWhatsapp size={28} />
-                                Checkout Sekarang
+                                {showPrice ? "Checkout Sekarang" : "Tanya Produk Sekarang"}
                             </button>
                             <p className={styles.checkoutNote}>
-                                Konfirmasi pesanan langsung via WhatsApp
+                                {showPrice
+                                    ? "Konfirmasi pesanan langsung via WhatsApp"
+                                    : "Konsultasi produk langsung via WhatsApp"}
                             </p>
                         </div>
                     </div>

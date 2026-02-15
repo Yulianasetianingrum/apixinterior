@@ -1,7 +1,9 @@
 
 import Navbar from "@/app/navbar/Navbar";
 import CartPageClient from "./CartPage.client";
-import { prisma } from "@/lib/prisma";
+import { getGlobalShowPrice } from "@/lib/product-price-visibility";
+
+export const dynamic = "force-dynamic";
 
 export const metadata = {
     title: "Keranjang Belanja - Apix Interior",
@@ -9,10 +11,12 @@ export const metadata = {
 };
 
 export default async function CartPage() {
+    const showPrice = await getGlobalShowPrice();
+
     return (
         <div className="min-h-screen bg-white">
             <Navbar />
-            <CartPageClient />
+            <CartPageClient showPrice={showPrice} />
         </div>
     );
 }

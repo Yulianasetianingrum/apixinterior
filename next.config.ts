@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
 
+
+// Force restart: 2026-02-15
 const nextConfig: NextConfig = {
   images: {
     formats: ['image/avif', 'image/webp'],

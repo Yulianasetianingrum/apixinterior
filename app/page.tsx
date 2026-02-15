@@ -17,6 +17,7 @@ import {
   resolveCustomPromoPalette, parseCustomPromoBgTheme, getFooterIconPath,
   pickFirstGalleryImageId, formatRupiah, computeHargaSetelahPromo,
   normalizeExternalUrl, resolveGoogleMapsEmbed, resolveGoogleMapsNavigation,
+  parseBooleanSetting,
   MAX_CUSTOM_PROMO_VOUCHERS, FALLBACK_CATEGORY_IMAGE_URL,
   type SectionRow, type CategoryGridItem, type CategoryCommerceItem
 } from "./page.helpers";
@@ -820,11 +821,26 @@ export default async function HomePage({
                       const imgUrl = pickedId ? imageMap.get(Number(pickedId))?.url ?? null : null;
                       const href = p.slug ? `/produk/${p.slug}` : "#";
                       const pr = computeHargaSetelahPromo(p);
-                      const priceNode = cfg.showPrice ? (pr.isPromo ? <div style={{ display: "flex", flexDirection: "column", gap: 4 }}><div style={{ display: "flex", gap: 8 }}><span style={{ fontWeight: 800 }}>{formatRupiah(pr.hargaFinal)}</span></div><div style={{ display: "flex", gap: 8 }}><span style={{ textDecoration: "line-through", opacity: 0.6 }}>{formatRupiah(pr.hargaAsli)}</span><span style={{ fontWeight: 800, color: themeTokens.element }}>{pr.promoLabel}</span></div></div> : <>{formatRupiah(p.harga)}</>) : null;
+                      const showPrice = parseBooleanSetting(cfg.showPrice, true);
+                      const priceNode = showPrice ? (pr.isPromo ? (
+                        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                          <div style={{ fontWeight: 800, fontSize: 14, lineHeight: 1.2 }}>
+                            {formatRupiah(pr.hargaFinal)}
+                          </div>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                            <span style={{ textDecoration: "line-through", opacity: 0.65 }}>
+                              {formatRupiah(pr.hargaAsli)}
+                            </span>
+                            <span style={{ fontWeight: 800, color: themeTokens.element }}>
+                              Diskon {pr.promoLabel}
+                            </span>
+                          </div>
+                        </div>
+                      ) : <>{formatRupiah(p.harga)}</>) : null;
                       return (
                         <article key={Number(p.id)} className={styles.pcCard} style={{ background: themeTokens.card, border: `1px solid ${themeTokens.cardBorder}`, color: themeTokens.cardFg }}>
                           {imgUrl ? <div className={styles.pcMedia}><div className={styles.pcMediaBlur} aria-hidden="true" /><SecureImage className={styles.pcMediaImg} src={imgUrl} alt={String(p.nama)} /></div> : <div className={styles.pcMediaPlaceholder} />}
-                          <div className={styles.pcBody}><div className={styles.pcTitle} style={{ color: themeTokens.cardFg }}>{String(p.nama)}</div>{cfg.showPrice ? <div className={styles.pcPrice} style={{ color: themeTokens.cardFg }}>{priceNode}</div> : null}
+                          <div className={styles.pcBody}><div className={styles.pcTitle} style={{ color: themeTokens.cardFg }}>{String(p.nama)}</div>{showPrice ? <div className={styles.pcPrice} style={{ color: themeTokens.cardFg }}>{priceNode}</div> : null}
                             <div className={styles.pcCtaWrap}>{cfg.showCta ? <a className={styles.pcCta} href={href} style={{ background: themeTokens.ctaBg, color: themeTokens.ctaFg, border: `1px solid ${themeTokens.ctaBg}` }}>Lihat Produk</a> : null}</div></div>
                         </article>
                       );
@@ -878,25 +894,30 @@ export default async function HomePage({
                     const imgUrl = pickedId ? imageMap.get(Number(pickedId))?.url ?? null : null;
                     const href = p.slug ? `/produk/${p.slug}` : "#";
                     const pr = computeHargaSetelahPromo(p);
+
+                    const showPrice = parseBooleanSetting(cfg.showPrice, false);
+                    const priceNode = showPrice ? (pr.isPromo ? (
+                      <div className={styles.pcPriceDiff}>
+                        <div className={styles.pcPriceCurrent}>{formatRupiah(pr.hargaFinal)}</div>
+                        <div className={styles.pcPriceOldWrap}>
+                          <span className={styles.pcPriceOld}>{formatRupiah(pr.hargaAsli)}</span>
+                          <span className={styles.pcDiscountBadge}>Diskon {pr.promoLabel}</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <>{formatRupiah(p.harga)}</>
+                    )) : null;
+
                     return (
                       <article key={Number(p.id)} className={styles.productListingItem}>
                         <a href={href} className={styles.pcCard} style={{ background: themeTokens.card, border: `1px solid ${themeTokens.cardBorder}`, color: themeTokens.cardFg, textDecoration: "none", width: "100%", height: "100%" }}>
-                          {imgUrl ? <div className={styles.pcMedia}><div className={styles.pcMediaBlur} aria-hidden="true" /><SecureImage className={styles.pcMediaImg} src={imgUrl} alt={String(p.nama)} /></div> : <div className={styles.pcMediaPlaceholder} />}
+                          {imgUrl ? <div className={styles.pcMedia}><div className={styles.pcMediaBlur} style={{ backgroundImage: `url(${imgUrl})` }} /><SecureImage className={styles.pcMediaImg} src={imgUrl} alt={String(p.nama)} /></div> : <div className={styles.pcMediaPlaceholder} />}
                           <div className={styles.pcBody}>
                             <div className={styles.pcTitle} style={{ color: themeTokens.cardFg }}>{String(p.nama || "Nama Produk")}</div>
-                            <div className={styles.pcPrice} style={{ color: themeTokens.cardFg }}>
-                              {pr.isPromo ? (
-                                <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                                  <span style={{ fontWeight: 800 }}>{formatRupiah(pr.hargaFinal)}</span>
-                                  <div style={{ display: "flex", gap: 8 }}>
-                                    <span style={{ textDecoration: "line-through", opacity: 0.6 }}>{formatRupiah(pr.hargaAsli)}</span>
-                                    <span style={{ fontWeight: 800, color: themeTokens.element }}>{pr.promoLabel}</span>
-                                  </div>
-                                </div>
-                              ) : (
-                                <>{formatRupiah(p.harga)}</>
-                              )}
-                            </div>
+                            {/* Only render price container if showPrice is true */}
+                            {showPrice ? <div className={styles.pcPrice} style={{ color: themeTokens.cardFg }}>
+                              {priceNode}
+                            </div> : null}
                           </div>
                         </a>
                       </article>
@@ -925,24 +946,91 @@ export default async function HomePage({
             const sectionThemeResolved = resolveEffectiveTheme(cfg.sectionTheme ?? "FOLLOW_NAVBAR", navbarTheme);
             const productIds: number[] = Array.isArray(cfg.productIds) ? cfg.productIds : [];
             const products = productIds.map((id) => produkMap.get(Number(id))).filter(Boolean) as any[];
-            const hasOverlay = Boolean(cfg.headline || cfg.description || (cfg.ctaText && cfg.ctaHref));
-            const useOverlay = Boolean(heroUrl) && hasOverlay;
+            const headline = cfg.headline;
+            const description = cfg.description;
+            const ctaText = cfg.ctaText;
+            const ctaHref = cfg.ctaHref;
+            const layout = cfg.layout;
+
+            const hasOverlayContent = Boolean(headline || description || (ctaText && ctaHref));
+            const useOverlay = Boolean(heroUrl) && hasOverlayContent;
+            const showPrice = parseBooleanSetting(cfg.showPrice, false);
 
             return (
               <section key={section.id} className={styles.previewSection}>
-                <article className={styles.hcSection} data-theme={sectionThemeResolved} data-layout={cfg.layout} data-hc-layout={cfg.layout} data-hc-nohero={!heroUrl ? "1" : undefined}>
+                <article className={styles.hcSection} data-theme={sectionThemeResolved} data-layout={layout} data-hc-layout={layout} data-hc-nohero={!heroUrl ? "1" : undefined}>
                   <div className={styles.hcInner}>
-                    {!useOverlay ? <header className={styles.hcHeader}>{cfg.headline ? <div className={styles.hcTitle}>{cfg.headline}</div> : null}{cfg.description ? <div className={styles.hcDesc}>{cfg.description}</div> : null}{cfg.ctaText ? <a className={styles.hcCta} href={cfg.ctaHref}>{cfg.ctaText}</a> : null}</header> : null}
+                    {!useOverlay ? (
+                      <header className={styles.hcHeader}>
+                        {headline ? <h2 className={styles.hcTitle}>{headline}</h2> : null}
+                        {description ? <p className={styles.hcDesc}>{description}</p> : null}
+                        {ctaText && ctaHref ? <a className={styles.hcCta} href={ctaHref}>{ctaText}</a> : null}
+                      </header>
+                    ) : null}
                     <div className={styles.hcGrid}>
-                      {heroUrl ? <div className={styles.hcHero}><div className={styles.hcHeroMedia}><div className={styles.hcHeroMediaBlur} style={{ backgroundImage: `url(${heroUrl})` }} /><div style={{ position: "relative", width: "100%", height: "100%" }}><Image className={styles.hcHeroMediaImg} src={heroUrl} alt={cfg.headline || "Highlight"} fill style={{ objectFit: "cover" }} sizes="(max-width: 768px) 100vw, 50vw" /></div>{useOverlay ? <div className={styles.hcHeroOverlay}><div className={styles.hcHeroGlass}>{cfg.headline ? <div className={styles.hcHeroOverlayTitle}>{cfg.headline}</div> : null}{cfg.description ? <div className={styles.hcHeroOverlayDesc}>{cfg.description}</div> : null}{cfg.ctaText ? <a className={styles.hcHeroOverlayCta} href={cfg.ctaHref}>{cfg.ctaText}</a> : null}</div></div> : null}</div></div> : null}
-                      <div className={styles.hcItems}>{products.length ? products.map((p: any) => {
-                        const imgUrl = (p.mainImageId ? imageMap.get(Number(p.mainImageId))?.url : null) ?? null;
-                        const href = p.slug ? `/produk/${p.slug}` : "#";
-                        const pr = computeHargaSetelahPromo(p);
-                        return (
-                          <a key={Number(p.id)} href={href} className={styles.hcItem}>{imgUrl ? <div className={styles.hcItemMedia}><div className={styles.hcItemMediaBlur} style={{ backgroundImage: `url(${imgUrl})` }} /><SecureImage className={styles.hcItemMediaImg} src={imgUrl} alt={String(p.nama)} /></div> : <div className={styles.hcItemEmptyMedia} />}<div className={styles.hcItemBody}><div className={styles.hcItemTitle}>{String(p.nama)}</div><div className={styles.hcItemPrice}>{pr.isPromo ? <div style={{ display: "flex", flexDirection: "column", gap: 4 }}><div style={{ display: "flex", gap: 8 }}><span style={{ fontWeight: 800 }}>{formatRupiah(pr.hargaFinal)}</span></div><div style={{ display: "flex", gap: 8 }}><span style={{ textDecoration: "line-through", opacity: 0.6 }}>{formatRupiah(pr.hargaAsli)}</span><span style={{ fontWeight: 800 }}>{pr.promoLabel}</span></div></div> : <>{formatRupiah(p.harga)}</>}</div></div></a>
-                        );
-                      }) : null}</div>
+                      {heroUrl ? (
+                        <div className={styles.hcHero}>
+                          <div className={styles.hcHeroMedia}>
+                            <div className={styles.hcHeroMediaBlur} style={{ backgroundImage: `url(${heroUrl})` }} />
+                            <div style={{ position: "relative", width: "100%", height: "100%" }}><Image className={styles.hcHeroMediaImg} src={heroUrl} alt={headline || "Highlight"} fill style={{ objectFit: "cover" }} sizes="(max-width: 768px) 100vw, 50vw" /></div>
+                            {useOverlay ? (
+                              <div className={styles.hcHeroOverlay}>
+                                <div className={styles.hcHeroGlass}>
+                                  {headline ? <div className={styles.hcHeroOverlayTitle}>{headline}</div> : null}
+                                  {description ? <div className={styles.hcHeroOverlayDesc}>{description}</div> : null}
+                                  {ctaText && ctaHref ? <a className={styles.hcHeroOverlayCta} href={ctaHref}>{ctaText}</a> : null}
+                                </div>
+                              </div>
+                            ) : null}
+                          </div>
+                        </div>
+                      ) : null}
+                      <div className={styles.hcItems}>
+                        {products.length ? products.map((p: any) => {
+                          const mainId = p.mainImageId ? Number(p.mainImageId) : null;
+                          const gId = pickFirstGalleryImageId(p.galleryImageIds || []);
+                          const pickedId = mainId || gId;
+                          const imgUrl = pickedId ? imageMap.get(Number(pickedId))?.url ?? null : null;
+                          const href = p.slug ? `/produk/${p.slug}` : "#";
+                          const pr = computeHargaSetelahPromo(p);
+
+                          return (
+                            <a key={Number(p.id)} href={href} className={styles.hcItem}>
+                              {imgUrl ? (
+                                <div className={styles.hcItemMedia}>
+                                  <div className={styles.hcItemMediaBlur} style={{ backgroundImage: `url(${imgUrl})` }} />
+                                  <SecureImage className={styles.hcItemMediaImg} src={imgUrl} alt={String(p.nama ?? "Produk")} />
+                                </div>
+                              ) : <div className={styles.hcItemEmptyMedia} />}
+
+                              <div className={styles.hcItemBody}>
+                                <div className={styles.hcItemTitle}>{String(p.nama)}</div>
+                                {showPrice ? (
+                                  <div className={styles.hcItemPrice}>
+                                    {pr.isPromo ? (
+                                      <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                                        <div style={{ fontWeight: 800, fontSize: 14, lineHeight: 1.2 }}>
+                                          {formatRupiah(pr.hargaFinal)}
+                                        </div>
+                                        <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                                          <span style={{ textDecoration: "line-through", opacity: 0.65 }}>
+                                            {formatRupiah(pr.hargaAsli)}
+                                          </span>
+                                          <span style={{ fontWeight: 800 }}>
+                                            Diskon {pr.promoLabel}
+                                          </span>
+                                        </div>
+                                      </div>
+                                    ) : (
+                                      <>{formatRupiah(p.harga)}</>
+                                    )}
+                                  </div>
+                                ) : null}
+                              </div>
+                            </a>
+                          );
+                        }) : null}
+                      </div>
                     </div>
                   </div>
                 </article>
@@ -1479,4 +1567,3 @@ export default async function HomePage({
     </div >
   );
 }
-

@@ -6,6 +6,7 @@ import ProductPageClient from "./ProductPageClient";
 import styles from "./page.module.css";
 import GlobalFooter from "@/app/components/GlobalFooter";
 import { Metadata } from "next";
+import { getGlobalShowPrice } from "@/lib/product-price-visibility";
 
 export const dynamic = "force-dynamic";
 
@@ -155,7 +156,8 @@ export default async function ProductListingPage(props: {
 
     // D. Fetch Content
     // We need unique categories from Category table, and unique tags from Products
-    const [products, allCategories, allProductsMeta] = await Promise.all([
+    // Also fetch global showPrice setting from PRODUCT_LISTING section
+    const [products, allCategories, allProductsMeta, showPrice] = await Promise.all([
         prisma.produk.findMany({
             where: whereClause,
             orderBy,
@@ -170,7 +172,8 @@ export default async function ProductListingPage(props: {
         prisma.produk.findMany({
             select: { tags: true },
             where: { tags: { not: null } }
-        })
+        }),
+        getGlobalShowPrice(),
     ]);
 
     // Process unique filters
@@ -208,6 +211,7 @@ export default async function ProductListingPage(props: {
                                 key={p.id}
                                 product={p}
                                 index={idx}
+                                showPrice={showPrice}
                             />
                         ))}
                     </div>

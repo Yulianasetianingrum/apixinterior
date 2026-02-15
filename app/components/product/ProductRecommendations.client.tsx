@@ -6,9 +6,10 @@ import ProductCard from "@/app/components/product/ProductCard.client";
 interface RecommendationsProps {
     similarProducts: any[];
     otherProducts: any[];
+    showPrice?: boolean; // Control price visibility (default: true)
 }
 
-export default function ProductRecommendations({ similarProducts, otherProducts }: RecommendationsProps) {
+export default function ProductRecommendations({ similarProducts, otherProducts, showPrice = true }: RecommendationsProps) {
     const [currentSlide, setCurrentSlide] = useState(0);
     const [itemsPerView, setItemsPerView] = useState(4);
     const [isDragging, setIsDragging] = useState(false);
@@ -165,7 +166,7 @@ export default function ProductRecommendations({ similarProducts, otherProducts 
                                             boxSizing: "border-box"
                                         }}
                                     >
-                                        <ProductCard product={product} index={index} />
+                                        <ProductCard product={product} index={index} showPrice={showPrice} />
                                     </div>
                                 ))}
                             </div>
@@ -315,7 +316,7 @@ export default function ProductRecommendations({ similarProducts, otherProducts 
                     }}
                 >
                     {otherProducts.map((product, index) => (
-                        <ProductCard key={product.id} product={product} index={index} />
+                        <ProductCard key={product.id} product={product} index={index} showPrice={showPrice} />
                     ))}
                 </div>
                 <style jsx>{`

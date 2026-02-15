@@ -15,9 +15,10 @@ import { useSettings } from "@/app/context/SettingsContext";
 interface ProductCardProps {
     product: any;
     index: number;
+    showPrice?: boolean; // Control price visibility (default: true)
 }
 
-export default function ProductCard({ product: pRaw, index }: ProductCardProps) {
+export default function ProductCard({ product: pRaw, index, showPrice = true }: ProductCardProps) {
     const p = pRaw as any;
     const router = useRouter();
     const { isInWishlist, toggleWishlist } = useWishlist();
@@ -70,6 +71,25 @@ export default function ProductCard({ product: pRaw, index }: ProductCardProps) 
                 };
             }
         });
+    }
+
+    const hasVariasi = Array.isArray(p.variasiProduk) && p.variasiProduk.length > 0;
+    let variationStartPrice: number | null = null;
+    if (hasVariasi) {
+        for (const v of p.variasiProduk as any[]) {
+            const vHarga = v.harga && v.harga > 0 ? v.harga : p.harga;
+            const useVarPromo = (v.harga && v.harga > 0) || (v.promoAktif && (v.promoValue ?? 0) > 0);
+            const promoSource = useVarPromo ? v : p;
+            const vCalc = computeHargaSetelahPromo({
+                harga: vHarga,
+                promoAktif: promoSource.promoAktif,
+                promoTipe: promoSource.promoTipe,
+                promoValue: promoSource.promoValue
+            });
+            if (variationStartPrice === null || vCalc.hargaFinal < variationStartPrice) {
+                variationStartPrice = vCalc.hargaFinal;
+            }
+        }
     }
 
     const imageUrl = normalizePublicUrl(p.mainImage?.url);
@@ -197,17 +217,18 @@ export default function ProductCard({ product: pRaw, index }: ProductCardProps) 
                     {p.nama}
                 </Link>
 
-                <div className={styles.priceContainer}>
-                    <div className={styles.finalPrice}>
-                        {formatIDR(bestPriceInfo.final)}
-                    </div>
-                    {bestPriceInfo.isPromo && bestPriceInfo.original > bestPriceInfo.final && (
-                        <div className={styles.originalPrice}>
-                            {formatIDR(bestPriceInfo.original)}
+                {showPrice && (
+                    <div className={styles.priceContainer}>
+                        <div className={styles.finalPrice}>
+                            {formatIDR(bestPriceInfo.final)}
                         </div>
-                    )}
-                </div>
-
+                        {bestPriceInfo.isPromo && bestPriceInfo.original > bestPriceInfo.final && (
+                            <div className={styles.originalPrice}>
+                                {formatIDR(bestPriceInfo.original)}
+                            </div>
+                        )}
+                    </div>
+                )}
                 {/* Contact Button */}
                 <button className={styles.contactBtn} onClick={handleContact} title={waNumber ? `Send to: ${waNumber}` : "No Number"}>
                     <FaWhatsapp size={16} />

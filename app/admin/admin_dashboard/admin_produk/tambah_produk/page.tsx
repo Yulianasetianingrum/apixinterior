@@ -8,6 +8,7 @@ import {
   useRef,
   useCallback,
   memo,
+  Suspense,
 } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import layoutStyles from "../../admin_dashboard.module.css";
@@ -3671,10 +3672,12 @@ const VariasiKombinasiWidget = memo(function VariasiKombinasiWidget({
 });
 
 
-export default function TambahProdukPage() {
+function TambahProdukContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const editId = searchParams.get("id");
+  const editIdRaw = searchParams.get("id");
+  const editId =
+    editIdRaw && /^\d+$/.test(editIdRaw.trim()) ? editIdRaw.trim() : null;
   const isEditMode = !!editId;
 
   // Variasi & Kombinasi: tambah produk baru harus reset (tanpa localStorage), edit produk persist per-produk.
@@ -4210,16 +4213,8 @@ export default function TambahProdukPage() {
             ui: { selLv1ByVar: {}, selLv2ByVarLv1: {} },
             optClip: null,
             variations: variasi.map((v: any, idx: number) => {
-              if (v.options) {
-                // gunakan opsi tersimpan jika ada
-                return {
-                  ...(v.options || {}),
-                  id: String(v.id || `v_${idx}`),
-                  label: v.options.label || v.nama || `Variasi ${idx + 1}`,
-                };
-              }
-
-              // fallback minimal dari DB
+              // Build from DB first (safe fallback), then merge options if present.
+              // Ini mencegah kasus options lama/parsial bikin kombinasi terlihat "hilang".
               const basePromo = {
                 active: !!v.promoAktif,
                 type: v.promoTipe || "",
@@ -4273,7 +4268,7 @@ export default function TambahProdukPage() {
                   image: c.imageId ? { kolaseId: c.imageId, kolaseUrl: c.imageUrl || "" } : {},
                 }));
 
-              return {
+              const mappedFromDb = {
                 id: String(v.id || `v_${idx}`),
                 label: v.nama || `Variasi ${idx + 1}`,
                 price: v.harga != null ? String(v.harga) : "",
@@ -4290,6 +4285,25 @@ export default function TambahProdukPage() {
                 },
                 lv2Flat: lv2,
                 lv3Flat: lv3,
+              };
+
+              if (!v.options || typeof v.options !== "object") {
+                return mappedFromDb;
+              }
+
+              const options = v.options || {};
+              const optionsLv1 = Array.isArray((options as any)?.combos?.lv1)
+                ? (options as any).combos.lv1
+                : [];
+              const hasOptionsCombos = optionsLv1.length > 0;
+
+              return {
+                ...mappedFromDb,
+                ...options,
+                id: String(v.id || `v_${idx}`),
+                label: (options as any).label || v.nama || `Variasi ${idx + 1}`,
+                // If options has no combos, keep DB-derived combos to avoid disappearing data.
+                combos: hasOptionsCombos ? (options as any).combos : mappedFromDb.combos,
               };
             }),
           };
@@ -6007,6 +6021,7 @@ export default function TambahProdukPage() {
                         </button>
                       )}
                       {fotoMode === "upload" && (
+                        /* Hydration fix: ensure wrapper matches server/client */
                         <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 12 }}>
                           <div className={styles.field}>
                             <label className={styles.label}>Foto Utama *</label>
@@ -6252,5 +6267,13 @@ export default function TambahProdukPage() {
         }
       </div >
     </>
+  );
+}
+
+export default function TambahProdukPage() {
+  return (
+    <Suspense fallback={<div className={layoutStyles.loading}>Memuat...</div>}>
+      <TambahProdukContent />
+    </Suspense>
   );
 }

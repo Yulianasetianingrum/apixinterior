@@ -3,14 +3,17 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import ProductVariationSelector from "./ProductVariationSelector.client";
 import { normalizePublicUrl } from "@/lib/product-utils";
+import ProductVariationSelector from "./ProductVariationSelector.client";
+
 
 type WrapperProps = {
     product: any; // Full prisma object
+    showPrice?: boolean; // Control price visibility (default: false)
 };
 
-export default function ProductDetailClient({ product }: WrapperProps) {
+export default function ProductDetailClient({ product, showPrice = false }: WrapperProps) {
+    const isShowPrice = showPrice === true;
     // Image State
     const [activeImage, setActiveImage] = useState<string | null>(
         product.mainImage?.url ? normalizePublicUrl(product.mainImage.url) : null
@@ -136,6 +139,7 @@ export default function ProductDetailClient({ product }: WrapperProps) {
                     <ProductVariationSelector
                         product={product}
                         onImageChange={(url) => setActiveImage(normalizePublicUrl(url))}
+                        showPrice={isShowPrice}
                     />
                 </div>
 

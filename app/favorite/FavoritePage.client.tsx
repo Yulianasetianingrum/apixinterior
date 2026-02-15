@@ -14,7 +14,7 @@ import SecureImage from "@/app/components/SecureImage";
 // Helper to ensure image URL is correct
 // Removed local ensureImageUrl in favor of centralized normalizePublicUrl
 
-export default function FavoritePageClient() {
+export default function FavoritePageClient({ showPrice = false }: { showPrice?: boolean }) {
     const { items, removeFromWishlist } = useWishlist();
     // ... (rest of hook usage)
     const { addToCart } = useCart();
@@ -111,9 +111,11 @@ export default function FavoritePageClient() {
                                     <div className={styles.productName}>
                                         {item.name}
                                     </div>
-                                    <div className={styles.price}>
-                                        {formatIDR(item.price)}
-                                    </div>
+                                    {showPrice && (
+                                        <div className={styles.price}>
+                                            {formatIDR(item.price)}
+                                        </div>
+                                    )}
                                 </div>
                                 <div className={styles.actions}>
                                     <button

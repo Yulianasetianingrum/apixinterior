@@ -1172,7 +1172,10 @@ function legacyToNewConfig(type: SectionTypeId, raw: any) {
   if (type === "PRODUCT_LISTING") {
     return {
       sectionTheme: String(cfg.sectionTheme ?? "FOLLOW_NAVBAR"),
+      sectionBgTheme: parseBgThemeLocal(cfg.sectionBgTheme),
+      title: String(cfg.title ?? ""),
       productIds: Array.isArray(cfg.productIds) ? cfg.productIds : [],
+      showPrice: Boolean(cfg.showPrice ?? false),
     };
   }
 
@@ -2572,8 +2575,10 @@ async function clearProductListingProducts(formData: FormData) {
 
   const nextCfg = {
     sectionTheme: String(existingCfg?.sectionTheme ?? "FOLLOW_NAVBAR"),
+    sectionBgTheme: parseBgThemeLocal(existingCfg?.sectionBgTheme),
     title: String(existingCfg?.title ?? "").trim(),
     productIds: [] as number[],
+    showPrice: Boolean(existingCfg?.showPrice ?? false),
   };
 
   await updateDraftConfigPreserveTheme(id, nextCfg);
@@ -2600,8 +2605,10 @@ async function pickAllProductListingProducts(formData: FormData) {
 
   const nextCfg = {
     sectionTheme: String(existingCfg?.sectionTheme ?? "FOLLOW_NAVBAR"),
+    sectionBgTheme: parseBgThemeLocal(existingCfg?.sectionBgTheme),
     title: row.title ?? "",
     productIds,
+    showPrice: Boolean(existingCfg?.showPrice ?? false),
   };
 
   await updateDraftConfigPreserveTheme(id, nextCfg);
@@ -2632,14 +2639,15 @@ async function saveProductListingConfig(formData: FormData) {
       ? normalizedSectionTheme
       : "FOLLOW_NAVBAR";
 
-  const clearProducts = ((formData.get("clearProducts") as string | null) ?? "").trim() === "1";
-
   // Parse productIds from multiple hidden inputs
+  const clearProducts = ((formData.get("clearProducts") as string | null) ?? "").trim() === "1";
   const productIds = clearProducts ? [] : parseNumArray((formData.getAll("productIds") as string[]) ?? []);
 
   const { productIds: validProductIds } = await filterExistingIds({ productIds });
   const finalProductIdsToSave = validProductIds ?? [];
   const removedCount = productIds.length - finalProductIdsToSave.length;
+
+  const showPrice = (formData.get("showPrice") as string | null) === "true"; // Default behavior: unchecked = false
 
   await updateDraftConfigPreserveTheme(
     id,
@@ -2648,6 +2656,7 @@ async function saveProductListingConfig(formData: FormData) {
       title: titleRaw,
       productIds: finalProductIdsToSave,
       sectionBgTheme: parseBgThemeLocal(formData.get("sectionBgTheme")),
+      showPrice,
     },
     { title: titleRaw, slug },
   );
@@ -2992,7 +3001,7 @@ const voucherLinkScript = `
     form.querySelectorAll('[data-voucher-cat]').forEach((sel) => {
       const id = sel.getAttribute('data-voucher-cat');
       sel.addEventListener('change', () => {
-        const r = form.querySelector('[data-voucher-mode="' + id + '"][value="category"]');
+        const r = form.querySelector('[data-voucher-mode="' + id + ''][value="category"]');
         if (r) r.checked = true;
         syncVoucherModeState();
         const catVal = sel.value ? String(sel.value).trim() : '';
@@ -3002,7 +3011,7 @@ const voucherLinkScript = `
     form.querySelectorAll('[data-voucher-link]').forEach((inp) => {
       const id = inp.getAttribute('data-voucher-link');
       inp.addEventListener('input', () => {
-        const r = form.querySelector('[data-voucher-mode="' + id + '"][value="manual"]');
+        const r = form.querySelector('[data-voucher-mode="' + id + ''][value="manual"]');
         if (r) r.checked = true;
         syncVoucherModeState();
         if (autosaveTimer) clearTimeout(autosaveTimer);
@@ -3839,6 +3848,11 @@ async function saveHighlightCollectionConfig(formData: FormData) {
   const sectionThemeCandidate = formData.has("sectionTheme") ? sectionThemeFromForm : existingSectionThemeRaw;
   const sectionTheme = parseSectionTheme(sectionThemeCandidate);
 
+  const existingShowPrice = Boolean((existingConfigForMerge as any)?.showPrice ?? false);
+  // showPrice toggle (default: false = hidden)
+  const showPrice = formData.has("showPrice")
+    ? (formData.get("showPrice") as string | null) === "true"
+    : existingShowPrice;
 
   // MVP: kurasi produk (ordered)
   const productIdsFromForm = parseNumArray((formData.getAll("productIds") as string[]) ?? []);
@@ -3858,18 +3872,15 @@ async function saveHighlightCollectionConfig(formData: FormData) {
     imageIds: imageIdsToValidate,
   });
   const finalProductIdsToSave = validProductIds ?? [];
-  const finalImageIdsToSave = validImageIds ?? [];
-  const finalHeroImageIdToSave = nextHeroImageId && finalImageIdsToSave.includes(nextHeroImageId) ? nextHeroImageId : null;
-
   const removedProductCount = productIds.length - finalProductIdsToSave.length;
-  const removedHeroImage = !!(nextHeroImageId && !finalHeroImageIdToSave);
 
-  // items
-  const existingItems = Array.isArray((existingConfigForMerge as any)?.items) ? (existingConfigForMerge as any).items : null;
-  const shouldRegenerateItems = clearProducts || hasProductIdsField || !existingItems;
-  const items = shouldRegenerateItems
-    ? finalProductIdsToSave.map((pid) => ({ type: "product", refId: pid, enabled: true }))
-    : existingItems;
+  const finalHeroImageIdToSave =
+    nextHeroImageId && (validImageIds ?? []).includes(nextHeroImageId) ? nextHeroImageId : null;
+  const removedHeroImage = nextHeroImageId !== null && finalHeroImageIdToSave === null;
+
+  const items = Array.isArray((existingConfigForMerge as any)?.items)
+    ? (existingConfigForMerge as any).items
+    : [];
 
   const slugRaw = (formData.get("slug") as string | null)?.trim() ?? "";
   const slug = slugRaw ? slugify(slugRaw) : null;
@@ -3892,6 +3903,7 @@ async function saveHighlightCollectionConfig(formData: FormData) {
       ctaText,
       ctaHref,
       ...(sectionTheme ? { sectionTheme } : {}),
+      showPrice,
       items,
     },
     { title, slug }
@@ -6300,6 +6312,15 @@ export default async function TokoPengaturanPage({
                             </select>
                           </div>
 
+                          <div className={styles.fieldGroup}>
+                            <label className={styles.label}>Tampilkan harga?</label>
+                            <select name="showPrice" defaultValue={String(cfg.showPrice ?? "false")} className={styles.select}>
+                              <option value="false">Tidak (Sembunyikan harga)</option>
+                              <option value="true">Ya (Tampilkan harga)</option>
+                            </select>
+                            <p className={styles.helperText}>Default: Tidak. Pilih "Ya" untuk menampilkan harga produk.</p>
+                          </div>
+
 
                         </div>
 
@@ -6367,7 +6388,7 @@ export default async function TokoPengaturanPage({
                                 .map((v: any) => Number(v))
                                 .filter((n: any) => Number.isFinite(n))}
                               inputName="productIds"
-                              showPrice={true}
+                              showPrice={String(cfg.showPrice ?? "false") === "true"}
                               buttonLabel="Pilih Produk Listing"
                             />
                             <div className={styles.pickerExtraActions} style={{ marginTop: 8 }}>
@@ -6396,6 +6417,174 @@ export default async function TokoPengaturanPage({
                             href={`/admin/admin_dashboard/admin_pengaturan/toko/preview?theme=${encodeURIComponent(
                               activeThemeKey
                             )}&focus=PRODUCT_LISTING&sectionId=${section.id}`}
+                          >
+                            Preview
+                          </a>
+                        ) : (
+                          <span className={styles.primaryButton} style={{ opacity: 0.5, cursor: "not-allowed" }}>
+                            Preview
+                          </span>
+                        )}
+
+                        <form action={toggleDraft} style={{ display: "inline" }}>
+                          <input type="hidden" name="id" value={section.id.toString()} />
+                          <input type="hidden" name="currentEnabled" value={section.enabled ? "true" : "false"} />
+                          <button type="submit" className={styles.secondaryButton}>
+                            {section.enabled ? "Nonaktifkan" : "Aktifkan"}
+                          </button>
+                        </form>
+
+                        <form action={deleteDraft} style={{ display: "inline" }}>
+                          <input type="hidden" name="id" value={section.id.toString()} />
+                          <button type="submit" className={styles.dangerButton}>
+                            Hapus
+                          </button>
+                        </form>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* HIGHLIGHT_COLLECTION */}
+                  {section.type === "HIGHLIGHT_COLLECTION" && (
+                    <div className={styles.sectionEditForm}>
+                      <form id={`highlightCollectionForm-${section.id}`} action={saveHighlightCollectionConfig} className={styles.sectionEditForm} data-section-form="1">
+                        <input type="hidden" name="id" value={section.id.toString()} />
+
+                        <div className={styles.sectionEditGrid}>
+                          <div className={styles.fieldGroup}>
+                            <label className={styles.label}>Headline (opsional)</label>
+                            <input name="headline" type="text" defaultValue={String((cfg as any).headline ?? "")} className={styles.input} />
+                            <p className={styles.helperText}>Judul utama untuk koleksi pilihan.</p>
+                          </div>
+
+                          <div className={styles.fieldGroup}>
+                            <label className={styles.label}>Slug (opsional)</label>
+                            <input name="slug" type="text" defaultValue={section.slug ?? ""} className={styles.input} />
+                            <p className={styles.helperText}>Boleh kosong (slug akan jadi null).</p>
+                          </div>
+
+                          <div className={styles.fieldGroup} style={{ gridColumn: "1 / -1" }}>
+                            <label className={styles.label}>Deskripsi (opsional)</label>
+                            <textarea name="description" defaultValue={String((cfg as any).description ?? "")} className={styles.textarea} rows={3} />
+                          </div>
+
+                          <div className={styles.fieldGroup}>
+                            <label className={styles.label}>CTA Text (opsional)</label>
+                            <input name="ctaText" type="text" defaultValue={String((cfg as any).ctaText ?? "")} className={styles.input} placeholder="Contoh: Lihat Koleksi" />
+                          </div>
+
+                          <div className={styles.fieldGroup}>
+                            <label className={styles.label}>CTA Link (opsional)</label>
+                            <input name="ctaHref" type="text" defaultValue={String((cfg as any).ctaHref ?? "")} className={styles.input} placeholder="Contoh: /produk" />
+                          </div>
+
+                          <div className={styles.fieldGroup}>
+                            <label className={styles.label}>Tema Warna Section</label>
+                            <select
+                              name="sectionTheme"
+                              defaultValue={String((cfg as any).sectionTheme ?? "FOLLOW_NAVBAR")}
+                              className={styles.select}
+                            >
+                              <option value="FOLLOW_NAVBAR">Ikuti tema Navbar (default)</option>
+                              <option value="NAVY_GOLD">NAVY + GOLD</option>
+                              <option value="WHITE_GOLD">WHITE + GOLD</option>
+                              <option value="NAVY_WHITE">NAVY + WHITE</option>
+                              <option value="GOLD_NAVY">GOLD + NAVY</option>
+                              <option value="GOLD_WHITE">GOLD + WHITE</option>
+                              <option value="WHITE_NAVY">WHITE + NAVY</option>
+                            </select>
+                          </div>
+
+                          <div className={styles.fieldGroup}>
+                            <label className={styles.label}>Tampilkan harga?</label>
+                            <select name="showPrice" defaultValue={String((cfg as any).showPrice ?? "false")} className={styles.select}>
+                              <option value="false">Tidak (Sembunyikan harga)</option>
+                              <option value="true">Ya (Tampilkan harga)</option>
+                            </select>
+                            <p className={styles.helperText}>Default: Tidak. Pilih "Ya" untuk menampilkan harga produk.</p>
+                          </div>
+                        </div>
+
+                        <div className={styles.fieldGroup}>
+                          <label className={styles.label}>Kelola produk koleksi</label>
+                          <p className={styles.helperText}>
+                            Pilih produk pilihan untuk ditampilkan di koleksi highlight.
+                          </p>
+
+                          <ProductCarouselPicker
+                            products={(productItems as any[]).map((p: any) => {
+                              const hargaAsliNum =
+                                typeof p.harga === "number" ? p.harga : Number(p.harga) || 0;
+
+                              const pr = computeHargaSetelahPromo({
+                                harga: hargaAsliNum,
+                                promoAktif: (p.promoAktif as any) ?? null,
+                                promoTipe: (p.promoTipe as any) ?? null,
+                                promoValue: typeof p.promoValue === "number" ? p.promoValue : Number(p.promoValue) || null,
+                              });
+
+                              return {
+                                id: Number(p.id),
+                                nama:
+                                  (p.nama as string) ||
+                                  (p.namaProduk as string) ||
+                                  (p.slug as string) ||
+                                  `Produk #${String(p.id)}`,
+
+                                harga: pr.hargaFinal,
+                                hargaAsli: pr.hargaAsli,
+                                isPromo: pr.isPromo,
+                                promoLabel: pr.promoLabel,
+
+                                kategori: (p.kategori as string) || undefined,
+                                subkategori: (p.subkategori as string) || undefined,
+                                mainImageId: p.mainImageId ?? null,
+                                galleryImageIds: Array.isArray((p as any).galeri)
+                                  ? ((p as any).galeri as any[])
+                                    .map((v: any) => Number(v.gambarId))
+                                    .filter((n: any) => Number.isFinite(n))
+                                  : [],
+                              };
+                            })}
+                            images={(gambarItems as any[]).map((g: any) => ({
+                              id: Number(g.id),
+                              url: String(g.url),
+                              title: (g.title as string) || (g.nama as string) || undefined,
+                            }))}
+                            initialIds={(Array.isArray((cfg as any).productIds) ? (cfg as any).productIds : [])
+                              .map((v: any) => Number(v))
+                              .filter((n: any) => Number.isFinite(n))}
+                            inputName="productIds"
+                            showPrice={String((cfg as any).showPrice ?? "false") === "true"}
+                            buttonLabel="Pilih Produk Koleksi"
+                          />
+
+                          <div className={styles.pickerExtraActions}>
+                            <button
+                              type="submit"
+                              formAction={clearHighlightCollectionProducts}
+                              className={styles.dangerButton}
+                              disabled={!Array.isArray((cfg as any).productIds) || (cfg as any).productIds.length === 0}
+                              title="Hapus semua produk yang dipilih"
+                            >
+                              Drop Produk
+                            </button>
+                          </div>
+                        </div>
+
+                      </form>
+
+                      <div className={styles.highlightFooterActions}>
+                        <button type="submit" form={`highlightCollectionForm-${section.id}`} className={styles.secondaryButton}>
+                          Simpan
+                        </button>
+
+                        {activeThemeKey ? (
+                          <a
+                            className={styles.primaryButton}
+                            href={`/admin/admin_dashboard/admin_pengaturan/toko/preview?theme=${encodeURIComponent(
+                              activeThemeKey
+                            )}&focus=HIGHLIGHT_COLLECTION&sectionId=${section.id}`}
                           >
                             Preview
                           </a>
