@@ -22,6 +22,7 @@ import Link from "next/link";
 type GambarKolase = {
   id: number;
   url: string;
+  thumbUrl?: string;
   title: string | null;
   tags: string;
 };
@@ -82,6 +83,7 @@ function ImagePickerModal({
             return {
               ...g,
               url,
+              thumbUrl: typeof g?.thumbUrl === "string" ? g.thumbUrl : undefined,
               title: title || null,
               tags: tags || "",
             };
@@ -182,7 +184,8 @@ function ImagePickerModal({
                 }
                 toggleSelect(g.id);
               };
-              const modalImgSrc = `${g.url}${g.url.includes("?") ? "&" : "?"}cb=picker_${g.id}_${cacheNonce}`;
+              const baseSrc = g.thumbUrl || g.url;
+              const modalImgSrc = `${baseSrc}${baseSrc.includes("?") ? "&" : "?"}cb=picker_${g.id}_${cacheNonce}`;
               return (
                 <button
                   key={g.id}

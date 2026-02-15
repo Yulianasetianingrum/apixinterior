@@ -1,175 +1,74 @@
-// app/api/admin/admin_dashboard/admin_galeri/list_gambar/route.ts
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import fs from "fs";
 import path from "path";
+import { prisma } from "@/lib/prisma";
 
-const APP_HOSTS = new Set([
-  "apixinterior.co.id",
-  "www.apixinterior.co.id",
-  "localhost",
-  "127.0.0.1",
-]);
-
-function normalizeImageUrl(raw: unknown): string {
-  let url = String(raw ?? "").trim();
+function extractFilename(raw: unknown): string {
+  const url = String(raw ?? "").trim();
   if (!url) return "";
 
-  // Normalisasi path ala Windows agar valid di URL web.
-  url = url.replace(/\\/g, "/");
-  url = url.replace(/&amp;/gi, "&");
-
-  // Kadang data tersimpan sebagai "public/..." atau "/public/...".
-  if (url.startsWith("public/")) url = `/${url.slice("public/".length)}`;
-  if (url.startsWith("/public/")) url = url.slice("/public".length);
-
-  // Kalau tanpa skema dan tanpa slash, anggap path relatif aplikasi.
-  if (!/^https?:\/\//i.test(url) && !url.startsWith("/")) {
-    url = `/${url}`;
-  }
-
-  // Halaman admin pakai HTTPS, jadi URL HTTP eksternal sering diblokir browser (mixed content).
-  if (/^http:\/\//i.test(url)) {
-    url = `https://${url.slice("http://".length)}`;
-  }
-
-  // Tolak URL eksternal (anti-hotlink / link expire sering bikin tile abu-abu).
-  if (/^https?:\/\//i.test(url)) {
-    try {
-      const u = new URL(url);
-      if (!APP_HOSTS.has(u.hostname)) return "";
-      url = `${u.pathname}${u.search}${u.hash}`;
-    } catch {
-      return "";
-    }
-  }
-
-  // Sanitasi endpoint internal gambar: simpan hanya parameter `f`.
-  // Data lama kadang menyimpan `w`/param lain yang bikin gambar jadi strip/kecil.
+  // Format utama dari upload kolase: /api/img?f=<filename>
   if (/^\/api\/img\?/i.test(url)) {
     try {
       const q = url.split("?")[1] ?? "";
       const sp = new URLSearchParams(q);
-      const f = String(sp.get("f") ?? "").trim();
-      if (!f) return "";
-      url = `/api/img?f=${encodeURIComponent(f)}`;
+      return String(sp.get("f") ?? "").trim();
     } catch {
       return "";
     }
   }
 
-  return url;
+  // Fallback untuk data lama: ambil basename path/URL.
+  const normalized = url.replace(/\\/g, "/").split("?")[0].split("#")[0];
+  const parts = normalized.split("/").filter(Boolean);
+  return (parts[parts.length - 1] || "").trim();
 }
 
-function isLikelyImageUrl(url: string): boolean {
-  if (!url) return false;
-
-  // Jalur internal utama upload di project ini.
-  if (/^\/api\/img\?f=/i.test(url)) return true;
-
-  // File image langsung (lokal atau absolute URL)
-  if (/\.(png|jpe?g|webp|gif|avif|svg)(\?|#|$)/i.test(url)) return true;
-
-  return false;
+function resolveUploadFilePath(filename: string): string | null {
+  if (!filename) return null;
+  const safe = path.basename(filename);
+  const root = path.join(process.cwd(), "public", "uploads");
+  const candidates = [
+    path.join(root, safe),
+    path.join(root, "gambar_upload", safe),
+    path.join(root, "banners", safe),
+  ];
+  return candidates.find((p) => fs.existsSync(p)) ?? null;
 }
 
-function fileExistsForApiImgUrl(url: string): boolean {
-  if (!/^\/api\/img\?f=/i.test(url)) return true;
-
-  try {
-    const q = url.split("?")[1] ?? "";
-    const sp = new URLSearchParams(q);
-    const f = String(sp.get("f") ?? "").trim();
-    if (!f) return false;
-
-    const safe = path.basename(f);
-    const root = path.join(process.cwd(), "public", "uploads");
-    const candidates = [
-      path.join(root, safe),
-      path.join(root, "gambar_upload", safe),
-      path.join(root, "banners", safe),
-    ];
-    return candidates.some((p) => fs.existsSync(p));
-  } catch {
-    return false;
-  }
-}
-
-function resolveLocalFilePathFromApiImgUrl(url: string): string | null {
-  if (!/^\/api\/img\?f=/i.test(url)) return null;
-  try {
-    const q = url.split("?")[1] ?? "";
-    const sp = new URLSearchParams(q);
-    const f = String(sp.get("f") ?? "").trim();
-    if (!f) return null;
-    const safe = path.basename(f);
-    const root = path.join(process.cwd(), "public", "uploads");
-    const candidates = [
-      path.join(root, safe),
-      path.join(root, "gambar_upload", safe),
-      path.join(root, "banners", safe),
-    ];
-    return candidates.find((p) => fs.existsSync(p)) ?? null;
-  } catch {
-    return null;
-  }
-}
-
-async function isUsableLocalImageByMetadata(filePath: string): Promise<boolean> {
-  try {
-    const st = fs.statSync(filePath);
-    // File terlalu kecil biasanya placeholder/korup.
-    if (!st.isFile() || st.size < 10 * 1024) return false;
-
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const sharp = require("sharp");
-    const md = await sharp(filePath).metadata();
-    const w = Number(md?.width || 0);
-    const h = Number(md?.height || 0);
-    if (!w || !h) return false;
-    const ratio = w / h;
-    // Tolak dimensi anomali (strip tipis).
-    if (w < 120 || h < 120 || ratio > 6 || ratio < 1 / 6) return false;
-    return true;
-  } catch {
-    return false;
-  }
+function toCanonicalUrl(filename: string): string {
+  return `/api/img?f=${encodeURIComponent(path.basename(filename))}`;
 }
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const onlyPng = searchParams.get("png") === "1";
 
-  const data = await prisma.gambarUpload.findMany({
-    orderBy: { createdAt: 'desc' },
+  const rows = await prisma.gambarUpload.findMany({
+    orderBy: { createdAt: "desc" },
     include: { category: true, subcategory: true },
   });
 
-  const normalized = data
-    .map((it: any) => ({
-      ...it,
-      url: normalizeImageUrl(it?.url),
-    }))
-    .filter(
-      (it: any) =>
-        !!it.url &&
-        isLikelyImageUrl(String(it.url)) &&
-        fileExistsForApiImgUrl(String(it.url))
-    );
+  const data = rows
+    .map((row: any) => {
+      const filename = extractFilename(row?.url);
+      if (!filename) return null;
+      const filePath = resolveUploadFilePath(filename);
+      if (!filePath) return null;
 
-  const validated = await Promise.all(
-    normalized.map(async (it: any) => {
-      const url = String(it?.url ?? "");
-      const filePath = resolveLocalFilePathFromApiImgUrl(url);
-      if (!filePath) return it; // non-local URL (atau bukan /api/img) biarkan lewat filter sebelumnya
-      const ok = await isUsableLocalImageByMetadata(filePath);
-      return ok ? it : null;
+      const canonicalUrl = toCanonicalUrl(filename);
+      return {
+        ...row,
+        url: canonicalUrl,
+        thumbUrl: `/api/admin/admin_dashboard/admin_galeri/thumb?id=${row.id}`,
+      };
     })
-  );
+    .filter(Boolean) as any[];
 
   const filtered = onlyPng
-    ? validated.filter((it: any) => it && /\.png(\?|#|$)/i.test(String(it.url ?? "")))
-    : validated.filter(Boolean);
+    ? data.filter((it) => /\.png(\?|#|$)/i.test(String(it.url ?? "")))
+    : data;
 
   return NextResponse.json({ data: filtered });
 }
+

@@ -1,0 +1,20 @@
+[33m57c64da[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Use per-open cache nonce for collage modal images
+[33m729a74c[m Use direct /api/img thumbnails in collage modal
+[33m0317f72[m Force collage modal preview to use thumb endpoint
+[33m22367b9[m Simplify collage modal image loading to direct source
+[33m70f2296[m Force fresh collage thumbnails per modal open
+[33m831cad1[m Use server-generated gallery thumbnails by image id
+[33mc556ec1[m Bypass stale image cache in collage picker thumbnails
+[33m8a753f3[m Sanitize /api/img URLs to keep only file param
+[33ma30fa5c[m Strictly filter invalid collage images by file metadata
+[33me07984e[m Add robust fallback image source for collage picker
+[33mabb61f5[m Hide anomalous tiny/extreme-ratio collage thumbnails
+[33mcf4939d[m Filter collage images with missing files on server
+[33ma52c071[m Filter non-image URLs from collage list
+[33mdfdb14c[m Fix collage thumbnail sliver rendering
+[33m62d7f07[m Filter unstable external gallery URLs
+[33mccf1d76[m Fix
+[33m07e40bb[m Show full image in collage picker thumbnails
+[33m22a9fc2[m Stabilize collage modal thumbnails with preload background rendering
+[33mb26c64f[m Stabilize gallery proxy image response
+[33me404181[m Fix collage modal thumbnail rendering conflict
