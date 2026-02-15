@@ -538,9 +538,9 @@
   padding: 0;
   cursor: pointer;
   display: grid !important;
-  grid-template-rows: 160px auto !important;
+  grid-template-rows: 160px !important;
   width: 160px !important;
-  min-height: 196px !important;
+  min-height: 160px !important;
 }
 
 .modalItemActive {

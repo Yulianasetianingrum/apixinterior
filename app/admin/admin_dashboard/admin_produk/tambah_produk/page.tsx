@@ -194,12 +194,12 @@ function ImagePickerModal({
                   style={{
                     position: "relative",
                     display: "grid",
-                    gridTemplateRows: "1fr auto",
+                    gridTemplateRows: "1fr",
                     width: 160,
                     textAlign: "left",
                     borderRadius: 10,
                     overflow: "hidden",
-                    minHeight: 196,
+                    minHeight: 160,
                   }}
                 >
                   {active && (
@@ -238,12 +238,6 @@ function ImagePickerModal({
                         setBrokenIds((prev) => (prev.includes(g.id) ? prev : [...prev, g.id]));
                       }}
                     />
-                  </div>
-                  <div className={styles.modalItemMeta}>
-                    <div className={styles.modalItemTitle}>
-                      {g.title || "Tanpa judul"}
-                    </div>
-                    <div className={styles.modalItemTags}>{g.tags || "tanpa tag"}</div>
                   </div>
                 </button>
               );
