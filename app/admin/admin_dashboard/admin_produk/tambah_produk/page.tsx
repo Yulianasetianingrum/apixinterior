@@ -207,6 +207,7 @@ function ImagePickerModal({
                 }
                 toggleSelect(g.id);
               };
+              const modalImgSrc = `${g.url}${g.url.includes("?") ? "&" : "?"}cb=picker_${g.id}`;
               return (
                 <button
                   key={g.id}
@@ -253,7 +254,7 @@ function ImagePickerModal({
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       className={styles.modalItemImage}
-                      src={g.url}
+                      src={modalImgSrc}
                       alt={g.title ?? ""}
                       decoding="async"
                       onLoad={(e) => {
