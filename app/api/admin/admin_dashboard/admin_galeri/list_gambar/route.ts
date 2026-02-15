@@ -1,6 +1,8 @@
 // app/api/admin/admin_dashboard/admin_galeri/list_gambar/route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import fs from "fs";
+import path from "path";
 
 const APP_HOSTS = new Set([
   "apixinterior.co.id",
@@ -57,6 +59,28 @@ function isLikelyImageUrl(url: string): boolean {
   return false;
 }
 
+function fileExistsForApiImgUrl(url: string): boolean {
+  if (!/^\/api\/img\?f=/i.test(url)) return true;
+
+  try {
+    const q = url.split("?")[1] ?? "";
+    const sp = new URLSearchParams(q);
+    const f = String(sp.get("f") ?? "").trim();
+    if (!f) return false;
+
+    const safe = path.basename(f);
+    const root = path.join(process.cwd(), "public", "uploads");
+    const candidates = [
+      path.join(root, safe),
+      path.join(root, "gambar_upload", safe),
+      path.join(root, "banners", safe),
+    ];
+    return candidates.some((p) => fs.existsSync(p));
+  } catch {
+    return false;
+  }
+}
+
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const onlyPng = searchParams.get("png") === "1";
@@ -71,7 +95,12 @@ export async function GET(req: Request) {
       ...it,
       url: normalizeImageUrl(it?.url),
     }))
-    .filter((it: any) => !!it.url && isLikelyImageUrl(String(it.url)));
+    .filter(
+      (it: any) =>
+        !!it.url &&
+        isLikelyImageUrl(String(it.url)) &&
+        fileExistsForApiImgUrl(String(it.url))
+    );
 
   const filtered = onlyPng
     ? normalized.filter((it: any) => /\.png(\?|#|$)/i.test(String(it.url ?? "")))
