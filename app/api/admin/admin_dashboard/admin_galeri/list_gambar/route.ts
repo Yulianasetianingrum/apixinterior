@@ -2,6 +2,13 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+const APP_HOSTS = new Set([
+  "apixinterior.co.id",
+  "www.apixinterior.co.id",
+  "localhost",
+  "127.0.0.1",
+]);
+
 function normalizeImageUrl(raw: unknown): string {
   let url = String(raw ?? "").trim();
   if (!url) return "";
@@ -24,14 +31,17 @@ function normalizeImageUrl(raw: unknown): string {
     url = `https://${url.slice("http://".length)}`;
   }
 
-  return url;
-}
-
-function toDeliverableUrl(url: string): string {
-  if (!url) return "";
+  // Tolak URL eksternal (anti-hotlink / link expire sering bikin tile abu-abu).
   if (/^https?:\/\//i.test(url)) {
-    return `/api/admin/admin_dashboard/admin_galeri/proxy_gambar?url=${encodeURIComponent(url)}`;
+    try {
+      const u = new URL(url);
+      if (!APP_HOSTS.has(u.hostname)) return "";
+      url = `${u.pathname}${u.search}${u.hash}`;
+    } catch {
+      return "";
+    }
   }
+
   return url;
 }
 
@@ -44,10 +54,12 @@ export async function GET(req: Request) {
     include: { category: true, subcategory: true },
   });
 
-  const normalized = data.map((it: any) => ({
-    ...it,
-    url: toDeliverableUrl(normalizeImageUrl(it?.url)),
-  }));
+  const normalized = data
+    .map((it: any) => ({
+      ...it,
+      url: normalizeImageUrl(it?.url),
+    }))
+    .filter((it: any) => !!it.url);
 
   const filtered = onlyPng
     ? normalized.filter((it: any) => /\.png(\?|#|$)/i.test(String(it.url ?? "")))
