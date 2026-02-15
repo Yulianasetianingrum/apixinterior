@@ -22,7 +22,6 @@ import Link from "next/link";
 type GambarKolase = {
   id: number;
   url: string;
-  thumbUrl?: string;
   title: string | null;
   tags: string;
 };
@@ -36,33 +35,6 @@ type ImagePickerModalProps = {
   onNotify?: (msg: string) => void;
   maxPick?: number; // default 15
 };
-
-function getProxyFallbackUrl(src: string): string | null {
-  const raw = String(src || "").trim();
-  if (!raw) return null;
-
-  // Pattern utama project ini: /api/img?f=filename
-  if (raw.startsWith("/api/img?")) {
-    try {
-      const q = raw.split("?")[1] ?? "";
-      const sp = new URLSearchParams(q);
-      const f = (sp.get("f") || "").trim();
-      if (f) return `/api/img_proxy?file=${encodeURIComponent(f)}`;
-    } catch { }
-  }
-
-  // Fallback umum: ambil basename dari path/URL.
-  try {
-    const normalized = raw.replace(/\\/g, "/");
-    const noQuery = normalized.split("?")[0].split("#")[0];
-    const parts = noQuery.split("/").filter(Boolean);
-    const file = (parts[parts.length - 1] || "").trim();
-    if (!file) return null;
-    return `/api/img_proxy?file=${encodeURIComponent(file)}`;
-  } catch {
-    return null;
-  }
-}
 
 /* ================= MODAL PILIH GAMBAR DARI KOLASE ================= */
 function ImagePickerModal({
@@ -78,7 +50,6 @@ function ImagePickerModal({
   const [search, setSearch] = useState("");
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [brokenIds, setBrokenIds] = useState<number[]>([]);
-  const [thumbNonce, setThumbNonce] = useState<number>(0);
 
   const MAX_PICK = maxPick ?? 15;
 
@@ -110,7 +81,6 @@ function ImagePickerModal({
             return {
               ...g,
               url,
-              thumbUrl: typeof g?.thumbUrl === "string" ? g.thumbUrl : undefined,
               title: title || null,
               tags: tags || "",
             };
@@ -131,7 +101,6 @@ function ImagePickerModal({
     if (open) {
       setSelectedIds(initialSelectedIds.slice(0, MAX_PICK));
       setBrokenIds([]);
-      setThumbNonce(Date.now());
     }
   }, [open, initialSelectedIds]);
 
@@ -211,9 +180,7 @@ function ImagePickerModal({
                 }
                 toggleSelect(g.id);
               };
-              const modalImgSrc = g.thumbUrl
-                ? `${g.thumbUrl}${g.thumbUrl.includes("?") ? "&" : "?"}cb=picker_${g.id}_${thumbNonce}`
-                : `${g.url}${g.url.includes("?") ? "&" : "?"}cb=picker_${g.id}_${thumbNonce}`;
+              const modalImgSrc = `${g.url}${g.url.includes("?") ? "&" : "?"}cb=picker_${g.id}`;
               return (
                 <button
                   key={g.id}
@@ -263,36 +230,8 @@ function ImagePickerModal({
                       src={modalImgSrc}
                       alt={g.title ?? ""}
                       decoding="async"
-                      onLoad={(e) => {
-                        const el = e.currentTarget;
-                        const w = Number(el.naturalWidth || 0);
-                        const h = Number(el.naturalHeight || 0);
-                        if (!w || !h) {
-                          setBrokenIds((prev) => (prev.includes(g.id) ? prev : [...prev, g.id]));
-                          return;
-                        }
-                        const ratio = w / h;
-                        // Filter hasil hotlink/placeholder yang ukurannya anomali (mis. 1px strip)
-                        if (w < 80 || h < 80 || ratio > 6 || ratio < 1 / 6) {
-                          setBrokenIds((prev) => (prev.includes(g.id) ? prev : [...prev, g.id]));
-                        }
-                      }}
                       onError={() => {
-                        if (String(g.url || "").startsWith("/api/img_proxy?")) {
-                          setBrokenIds((prev) => (prev.includes(g.id) ? prev : [...prev, g.id]));
-                          return;
-                        }
-
-                        const fallback = getProxyFallbackUrl(g.url);
-                        if (!fallback) {
-                          setBrokenIds((prev) => (prev.includes(g.id) ? prev : [...prev, g.id]));
-                          return;
-                        }
-
-                        // Coba sekali pakai fallback lokal.
-                        setData((prev) =>
-                          prev.map((it) => (it.id === g.id ? { ...it, url: fallback } : it))
-                        );
+                        setBrokenIds((prev) => (prev.includes(g.id) ? prev : [...prev, g.id]));
                       }}
                     />
                   </div>
