@@ -54,11 +54,10 @@ export async function GET(req: Request) {
       headers: {
         "content-type": "image/webp",
         "content-length": String(buf.length),
-        "cache-control": "public, max-age=300",
+        "cache-control": "no-store, max-age=0",
       },
     });
   } catch {
     return new NextResponse("Internal Error", { status: 500 });
   }
 }
-

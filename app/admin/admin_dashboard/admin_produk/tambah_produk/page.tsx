@@ -78,6 +78,7 @@ function ImagePickerModal({
   const [search, setSearch] = useState("");
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [brokenIds, setBrokenIds] = useState<number[]>([]);
+  const [thumbNonce, setThumbNonce] = useState<number>(0);
 
   const MAX_PICK = maxPick ?? 15;
 
@@ -130,6 +131,7 @@ function ImagePickerModal({
     if (open) {
       setSelectedIds(initialSelectedIds.slice(0, MAX_PICK));
       setBrokenIds([]);
+      setThumbNonce(Date.now());
     }
   }, [open, initialSelectedIds]);
 
@@ -210,8 +212,8 @@ function ImagePickerModal({
                 toggleSelect(g.id);
               };
               const modalImgSrc = g.thumbUrl
-                ? `${g.thumbUrl}${g.thumbUrl.includes("?") ? "&" : "?"}cb=picker_${g.id}`
-                : `${g.url}${g.url.includes("?") ? "&" : "?"}cb=picker_${g.id}`;
+                ? `${g.thumbUrl}${g.thumbUrl.includes("?") ? "&" : "?"}cb=picker_${g.id}_${thumbNonce}`
+                : `${g.url}${g.url.includes("?") ? "&" : "?"}cb=picker_${g.id}_${thumbNonce}`;
               return (
                 <button
                   key={g.id}
