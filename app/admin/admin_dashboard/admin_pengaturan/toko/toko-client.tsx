@@ -95,6 +95,60 @@ export default function TokoClient() {
       console.error("TokoClient custom promo auto-clear failed", e);
     }
 
+    // ---- Sidebar nav: smooth scroll presisi + auto-close on mobile/tablet ----
+    try {
+      const sidebarToggle = document.getElementById("tokoSidebarToggle") as HTMLInputElement | null;
+      const hamburgerBtn = document.querySelector(`.${styles.hamburgerBtn}`) as HTMLElement | null;
+      const isTabletOrMobile = () => {
+        if (hamburgerBtn) {
+          return window.getComputedStyle(hamburgerBtn).display !== "none";
+        }
+        return window.matchMedia("(max-width: 1023px)").matches;
+      };
+      const closeSidebarIfNeeded = () => {
+        if (!sidebarToggle || !isTabletOrMobile()) return;
+        sidebarToggle.checked = false;
+        requestAnimationFrame(() => {
+          sidebarToggle.checked = false;
+        });
+        window.setTimeout(() => {
+          sidebarToggle.checked = false;
+        }, 120);
+      };
+
+      const navItems = document.querySelectorAll(`.${styles.sidebarNav} a, .${styles.sidebarNav} button[data-sidebar-scroll]`) as NodeListOf<HTMLElement>;
+      navItems.forEach((item) => {
+        if (item.dataset.navBound === "1") return;
+        item.dataset.navBound = "1";
+
+        item.addEventListener("click", (e) => {
+          const targetId = (item.getAttribute("data-sidebar-scroll") || "").trim();
+          if (!targetId) {
+            closeSidebarIfNeeded();
+            return;
+          }
+
+          e.preventDefault();
+          e.stopPropagation();
+
+          const target = document.getElementById(targetId) as HTMLElement | null;
+          if (!target) {
+            closeSidebarIfNeeded();
+            return;
+          }
+
+          const topbar = document.querySelector(`.${styles.pageTopbar}`) as HTMLElement | null;
+          const offset = (topbar?.offsetHeight ?? 0) + 14;
+          const targetY = target.getBoundingClientRect().top + window.scrollY - offset;
+          window.scrollTo({ top: Math.max(0, targetY), behavior: "smooth" });
+
+          closeSidebarIfNeeded();
+        });
+      });
+    } catch (e) {
+      console.error("TokoClient sidebar nav smooth scroll failed", e);
+    }
+
     // ---- DnD untuk urutan section draft ----
     const list = document.querySelector(".js-section-list-drag") as HTMLElement | null;
     if (list) {
@@ -157,6 +211,18 @@ export default function TokoClient() {
         });
       };
 
+      const scrollToDraftSection = (id: number) => {
+        if (!Number.isFinite(id) || id <= 0) return;
+        const target = document.getElementById(`section-${id}`) as HTMLElement | null;
+        if (!target) return;
+        const flashClass = styles.sectionFlashHighlight;
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+        if (flashClass) target.classList.add(flashClass);
+        window.setTimeout(() => {
+          if (flashClass) target.classList.remove(flashClass);
+        }, 1400);
+      };
+
       const moveRowByButton = (row: HTMLElement, direction: "up" | "down") => {
         const sibling =
           direction === "up"
@@ -177,10 +243,15 @@ export default function TokoClient() {
       const setupRows = () => {
         const rows = list.querySelectorAll(".js-section-row") as NodeListOf<HTMLElement>;
         rows.forEach((row) => {
-          row.draggable = !isTabletOrMobile;
+          if (row.dataset.rowBound === "1") return;
+          row.dataset.rowBound = "1";
+
+          row.style.cursor = "pointer";
+          row.draggable = false;
 
           const upBtn = row.querySelector(".js-move-up") as HTMLButtonElement | null;
           const downBtn = row.querySelector(".js-move-down") as HTMLButtonElement | null;
+          const dragHandle = row.querySelector(`.${styles.dragHandle}`) as HTMLElement | null;
           if (upBtn) {
             upBtn.type = "button";
             upBtn.addEventListener("click", (e) => {
@@ -198,9 +269,26 @@ export default function TokoClient() {
             });
           }
 
+          if (!isTabletOrMobile && dragHandle) {
+            dragHandle.addEventListener("pointerdown", () => {
+              row.draggable = true;
+            });
+            dragHandle.addEventListener("pointerup", () => {
+              if (!draggingEl) row.draggable = false;
+            });
+            dragHandle.addEventListener("pointercancel", () => {
+              if (!draggingEl) row.draggable = false;
+            });
+            dragHandle.addEventListener("mouseleave", () => {
+              if (!draggingEl) row.draggable = false;
+            });
+          }
+
           row.addEventListener("dragstart", (e) => {
-            if (isTabletOrMobile) {
+            const targetEl = e.target as HTMLElement | null;
+            if (isTabletOrMobile || !dragHandle || !targetEl?.closest(`.${styles.dragHandle}`)) {
               e.preventDefault();
+              row.draggable = false;
               return;
             }
             draggingEl = row;
@@ -221,6 +309,7 @@ export default function TokoClient() {
 
           row.addEventListener("dragend", () => {
             draggingEl = null;
+            row.draggable = false;
             // Auto-save urutan setelah drop (tanpa perlu klik "Simpan Urutan")
             syncSectionOrderLabels();
             schedulePersist();
@@ -235,6 +324,39 @@ export default function TokoClient() {
         schedulePersist();
       });
 
+      if (list.dataset.jumpLinkBound !== "1") {
+        list.dataset.jumpLinkBound = "1";
+        list.addEventListener("click", (e) => {
+          const targetEl = e.target as HTMLElement | null;
+          if (!targetEl) return;
+          const jumpLink = targetEl.closest('[data-jump-section-link="1"]') as HTMLElement | null;
+          if (!jumpLink) return;
+          e.preventDefault();
+          e.stopPropagation();
+          const idStr = (jumpLink.getAttribute("data-jump-target") || "").trim();
+          const id = Number(idStr);
+          if (Number.isNaN(id)) return;
+          scrollToDraftSection(id);
+        });
+      }
+
+      if (list.dataset.jumpBound !== "1") {
+        list.dataset.jumpBound = "1";
+        list.addEventListener("click", (e) => {
+          const targetEl = e.target as HTMLElement | null;
+          if (!targetEl) return;
+          if (targetEl.closest("button, a, input, select, textarea, label")) return;
+
+          const row = targetEl.closest(".js-section-row") as HTMLElement | null;
+          if (!row) return;
+
+          const idStr = row.getAttribute("data-id");
+          const id = idStr ? Number(idStr) : NaN;
+          if (Number.isNaN(id)) return;
+
+          scrollToDraftSection(id);
+        });
+      }
 
       const saveBtn = document.querySelector(".js-save-order") as HTMLButtonElement | null;
       if (saveBtn) {

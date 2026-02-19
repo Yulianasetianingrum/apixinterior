@@ -4922,16 +4922,16 @@ export default async function TokoPengaturanPage({
             <FaArrowLeft style={{ fontSize: '12px' }} /> Kembali ke Pengaturan
           </a>
 
-          <a href="#preview-theme" className={`${styles.sidebarLink} ${styles.sidebarLinkPreview}`}>
+          <a href="#preview-theme" data-sidebar-scroll="preview-theme" className={`${styles.sidebarLink} ${styles.sidebarLinkPreview}`}>
             Preview &amp; Theme
           </a>
-          <a href="#tema" className={`${styles.sidebarLink} ${styles.sidebarLinkTema}`}>
+          <a href="#tema" data-sidebar-scroll="tema" className={`${styles.sidebarLink} ${styles.sidebarLinkTema}`}>
             Tema (Navbar &amp; Background)
           </a>
-          <a href="#urutkan" className={`${styles.sidebarLink} ${styles.sidebarLinkUrutkan}`}>
+          <a href="#urutkan" data-sidebar-scroll="urutkan" className={`${styles.sidebarLink} ${styles.sidebarLinkUrutkan}`}>
             Urutkan Section
           </a>
-          <a href="#tambah-section" className={`${styles.sidebarLink} ${styles.sidebarLinkTambah}`}>
+          <a href="#tambah-section" data-sidebar-scroll="tambah-section" className={`${styles.sidebarLink} ${styles.sidebarLinkTambah}`}>
             Tambah Section
           </a>
         </nav>
@@ -5253,16 +5253,22 @@ export default async function TokoPengaturanPage({
                           <FaArrowDown />
                         </button>
                       </div>
-                      <span className={styles.sectionOrder}>#{index + 1}</span>
-
-
-                      <span className={`${styles.sectionTypePill} ${(styles as any)[`pill_${section.type}`] ?? ""}`}>
-                        <span className={styles.sectionTypeIcon} aria-hidden="true">{SECTION_ICON[section.type] ?? ""}</span>
-                        {label}
-                      </span>
-                      <span className={styles.themeBadge} style={{ fontSize: '10px', opacity: 0.6, background: 'rgba(0,0,0,0.05)', padding: '2px 6px', borderRadius: '4px' }}>
-                        {getThemeKeyFromRow(section)}
-                      </span>
+                      <a
+                        href={`#section-${section.id}`}
+                        data-jump-section-link="1"
+                        data-jump-target={String(section.id)}
+                        className={styles.reorderJumpLink}
+                        title="Klik untuk buka Section Draft terkait"
+                      >
+                        <span className={styles.sectionOrder}>#{index + 1}</span>
+                        <span className={`${styles.sectionTypePill} ${(styles as any)[`pill_${section.type}`] ?? ""}`}>
+                          <span className={styles.sectionTypeIcon} aria-hidden="true">{SECTION_ICON[section.type] ?? ""}</span>
+                          {label}
+                        </span>
+                        <span className={styles.themeBadge} style={{ fontSize: '10px', opacity: 0.6, background: 'rgba(0,0,0,0.05)', padding: '2px 6px', borderRadius: '4px' }}>
+                          {getThemeKeyFromRow(section)}
+                        </span>
+                      </a>
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                       <span className={section.enabled ? styles.statusBadgeActive : styles.statusBadgeInactive}>
@@ -5374,6 +5380,7 @@ export default async function TokoPengaturanPage({
                 <article
                   key={section.id}
                   id={`section-${section.id}`}
+                  data-section-id={section.id}
                   className={`${styles.sectionItem} ${(styles as any)[`sectionItem_${section.type}`] ?? ""}`}
                 >
                   <div className={styles.sectionTopRow}>
