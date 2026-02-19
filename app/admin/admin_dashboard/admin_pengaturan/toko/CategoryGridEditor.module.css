@@ -201,3 +201,54 @@
     max-height: 240px;
   }
 }
+
+/* Extra mobile tuning for category grid editor inside /toko */
+@media (max-width: 640px) {
+  .wrap {
+    padding: 10px;
+    border-radius: 12px;
+  }
+
+  .topBar {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .search {
+    width: 100%;
+    font-size: 16px;
+  }
+
+  .counter {
+    width: 100%;
+  }
+
+  .autoBtn {
+    width: 100%;
+    min-height: 40px;
+  }
+
+  .row {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .handle {
+    width: 100%;
+    min-height: 36px;
+  }
+
+  .rowControls {
+    flex-wrap: wrap;
+  }
+
+  .rowControls > * {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+
+  .iconPreview {
+    width: 40px;
+    height: 40px;
+  }
+}

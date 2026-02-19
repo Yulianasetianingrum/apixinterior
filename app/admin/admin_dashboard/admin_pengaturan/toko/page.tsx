@@ -42,6 +42,8 @@ import {
 } from "./toko-utils";
 import {
   FaArrowLeft,
+  FaArrowDown,
+  FaArrowUp,
   FaXmark,
   FaTrash,
   FaPlus,
@@ -5193,8 +5195,16 @@ export default async function TokoPengaturanPage({
           <div>
             <h2 className={styles.sectionHeading}>Urutkan Section Draft (Drag &amp; Drop)</h2>
             <p className={styles.sectionSubheading}>
-              Tarik handle <span className={styles.dragHandle}><FaGripVertical /></span> ke atas/bawah untuk mengubah urutan section di
-              homepage draft. Setelah diurutkan, klik tombol &quot;Simpan Urutan&quot;.
+              <span className={styles.reorderHintDesktop}>
+                Tarik handle <span className={styles.dragHandle}><FaGripVertical /></span> ke atas/bawah untuk mengubah urutan section di
+                homepage draft.
+              </span>
+              {" "}
+              <span className={styles.reorderHintMobile}>
+                Di tablet/HP, pakai tombol panah atas/bawah untuk geser urutan section.
+              </span>
+              {" "}
+              Urutan tersimpan otomatis.
             </p>
 
 
@@ -5225,6 +5235,24 @@ export default async function TokoPengaturanPage({
                   <div className={styles.sectionTopRow}>
                     <div className={styles.sectionTopLeft}>
                       <span className={styles.dragHandle}><FaGripVertical /></span>
+                      <div className={styles.reorderMoveControls}>
+                        <button
+                          type="button"
+                          className={`${styles.reorderMoveBtn} js-move-up`}
+                          aria-label="Geser section ke atas"
+                          title="Geser ke atas"
+                        >
+                          <FaArrowUp />
+                        </button>
+                        <button
+                          type="button"
+                          className={`${styles.reorderMoveBtn} js-move-down`}
+                          aria-label="Geser section ke bawah"
+                          title="Geser ke bawah"
+                        >
+                          <FaArrowDown />
+                        </button>
+                      </div>
                       <span className={styles.sectionOrder}>#{index + 1}</span>
 
 

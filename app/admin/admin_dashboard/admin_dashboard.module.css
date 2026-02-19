@@ -541,3 +541,85 @@
   background: #f5c542;
   color: #0b1531;
 }
+/* Responsive hardening for admin pages (including tambah_produk) */
+@media (max-width: 1023px) {
+  .main {
+    max-width: 100%;
+    width: 100%;
+    padding: 72px 12px 16px;
+  }
+
+  .mainHeader {
+    margin-bottom: 12px;
+  }
+
+  .pageTitle {
+    font-size: 20px;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+  }
+
+  .pageSubtitle {
+    font-size: 12px;
+    line-height: 1.45;
+  }
+}
+
+@media (max-width: 768px) {
+  .mobileTopBar {
+    height: 52px;
+    padding: 0 12px;
+  }
+
+  .mobileMenuButton {
+    width: 34px;
+    height: 34px;
+    font-size: 18px;
+  }
+
+  .mobileTitle {
+    font-size: 15px;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .main {
+    padding: 66px 10px 14px;
+  }
+
+  .sidebar {
+    width: min(86vw, 320px);
+    padding: 12px 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .mobileTopBar {
+    height: 50px;
+    gap: 8px;
+    padding: 0 10px;
+  }
+
+  .mobileTitle {
+    font-size: 14px;
+  }
+
+  .main {
+    padding: 62px 8px 12px;
+  }
+
+  .pageTitle {
+    font-size: 18px;
+  }
+
+  .pageSubtitle {
+    font-size: 11px;
+  }
+
+  .menuItem {
+    padding: 10px;
+    font-size: 13px;
+  }
+}

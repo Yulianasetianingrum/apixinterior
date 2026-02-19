@@ -99,6 +99,7 @@ export default function TokoClient() {
     const list = document.querySelector(".js-section-list-drag") as HTMLElement | null;
     if (list) {
       let draggingEl: HTMLElement | null = null;
+      const isTabletOrMobile = window.matchMedia("(max-width: 1023px)").matches;
 
       let saveTimer: ReturnType<typeof setTimeout> | null = null;
       let saving = false;
@@ -148,10 +149,60 @@ export default function TokoClient() {
         }, 80);
       };
 
+      const syncSectionOrderLabels = () => {
+        const rows = list.querySelectorAll(".js-section-row") as NodeListOf<HTMLElement>;
+        rows.forEach((row, idx) => {
+          const orderEl = row.querySelector('[class*="sectionOrder"]') as HTMLElement | null;
+          if (orderEl) orderEl.textContent = `#${idx + 1}`;
+        });
+      };
+
+      const moveRowByButton = (row: HTMLElement, direction: "up" | "down") => {
+        const sibling =
+          direction === "up"
+            ? (row.previousElementSibling as HTMLElement | null)
+            : (row.nextElementSibling as HTMLElement | null);
+        if (!sibling) return;
+
+        if (direction === "up") {
+          row.parentNode?.insertBefore(row, sibling);
+        } else {
+          row.parentNode?.insertBefore(sibling, row);
+        }
+
+        syncSectionOrderLabels();
+        schedulePersist();
+      };
+
       const setupRows = () => {
         const rows = list.querySelectorAll(".js-section-row") as NodeListOf<HTMLElement>;
         rows.forEach((row) => {
+          row.draggable = !isTabletOrMobile;
+
+          const upBtn = row.querySelector(".js-move-up") as HTMLButtonElement | null;
+          const downBtn = row.querySelector(".js-move-down") as HTMLButtonElement | null;
+          if (upBtn) {
+            upBtn.type = "button";
+            upBtn.addEventListener("click", (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              moveRowByButton(row, "up");
+            });
+          }
+          if (downBtn) {
+            downBtn.type = "button";
+            downBtn.addEventListener("click", (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              moveRowByButton(row, "down");
+            });
+          }
+
           row.addEventListener("dragstart", (e) => {
+            if (isTabletOrMobile) {
+              e.preventDefault();
+              return;
+            }
             draggingEl = row;
             if (e.dataTransfer) e.dataTransfer.effectAllowed = "move";
           });
@@ -171,6 +222,7 @@ export default function TokoClient() {
           row.addEventListener("dragend", () => {
             draggingEl = null;
             // Auto-save urutan setelah drop (tanpa perlu klik "Simpan Urutan")
+            syncSectionOrderLabels();
             schedulePersist();
           });
         });
@@ -179,6 +231,7 @@ export default function TokoClient() {
       setupRows();
       // Pastikan auto-save juga terpanggil pada event drop (lebih reliable di beberapa browser)
       list.addEventListener("drop", () => {
+        syncSectionOrderLabels();
         schedulePersist();
       });
 
@@ -201,6 +254,7 @@ const originalText = saveBtn.textContent || "";
 
           try {
             await persistOrder(ids);
+            syncSectionOrderLabels();
           } catch (err) {
             console.error(err);
             alert("Gagal simpan urutan (network/server error).");
@@ -210,6 +264,8 @@ const originalText = saveBtn.textContent || "";
           }
         });
       }
+
+      syncSectionOrderLabels();
     }
 
     // ---- Ordered picker untuk PRODUCT_CAROUSEL ----

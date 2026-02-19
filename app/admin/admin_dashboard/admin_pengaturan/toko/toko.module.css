@@ -744,3 +744,270 @@
   background: rgba(255, 255, 255, 0.2);
   transform: scale(1.05);
 }
+/* Mobile + tablet hardening for /admin_pengaturan/toko */
+.page {
+  overflow-x: hidden;
+}
+
+@media (max-width: 1023px) {
+  .page {
+    padding: 80px 12px 16px;
+    min-height: 100dvh;
+  }
+
+  .title {
+    font-size: 24px;
+    line-height: 1.2;
+  }
+
+  .subtitle {
+    margin-bottom: 16px;
+  }
+
+  .formCard {
+    padding: 14px;
+    margin: 10px 0;
+    border-radius: 10px;
+  }
+
+  .pageTopbar {
+    height: 56px;
+    padding: 0 12px;
+  }
+
+  .pageTopbarTitle {
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .sidebar {
+    width: min(88vw, 320px);
+  }
+
+  .sidebarHeader {
+    height: 56px;
+    padding: 0 14px;
+  }
+
+  .sidebarNav {
+    padding: 14px 10px;
+  }
+
+  .sectionsHeader {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .headerActions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .headerActions > * {
+    flex: 1 1 180px;
+    min-width: 0;
+  }
+
+  .sectionTopRow {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .sectionTopLeft {
+    min-width: 0;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .sectionTypePill {
+    max-width: 100%;
+  }
+
+  .sectionDescription {
+    margin-right: 0;
+    width: 100%;
+  }
+
+  .sectionItem,
+  .sectionEditCard {
+    padding: 14px;
+  }
+
+  .floatingActions {
+    right: 12px;
+    bottom: calc(12px + env(safe-area-inset-bottom));
+    left: 12px;
+    gap: 8px;
+  }
+
+  .floatingActions button,
+  .floatingActions a {
+    min-width: 0;
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .hamburgerBtn,
+  .sidebarClose {
+    width: 36px;
+    height: 36px;
+  }
+
+  .sectionEditGrid,
+  .newSectionGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .sectionEditActions,
+  .newSectionActions,
+  .highlightFooterActions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .sectionEditActions > *,
+  .newSectionActions > *,
+  .highlightFooterActions > * {
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding: 74px 8px 12px;
+  }
+
+  .title {
+    font-size: 21px;
+  }
+
+  .subtitle {
+    font-size: 12px;
+  }
+
+  .sectionHeading {
+    font-size: 1.05rem;
+  }
+
+  .input,
+  .select {
+    font-size: 16px;
+  }
+
+  .primaryButton,
+  .submitButton,
+  .secondaryButton,
+  .dangerButton,
+  .smallButton {
+    min-height: 42px;
+  }
+
+  .sectionList {
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .sectionOrder {
+    font-size: 13px;
+    min-width: 24px;
+  }
+
+  .sectionTypePill {
+    font-size: 11px;
+    padding: 5px 10px;
+  }
+
+  .statusBadgeActive,
+  .statusBadgeInactive {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .pageTopbar {
+    height: 52px;
+    padding: 0 10px;
+  }
+
+  .page {
+    padding: 68px 6px 10px;
+  }
+
+  .formCard {
+    padding: 12px;
+  }
+
+  .sidebar {
+    width: 92vw;
+  }
+
+  .sidebarBrandTitle {
+    font-size: 14px;
+  }
+
+.sidebarBrandSub {
+  font-size: 10px;
+}
+}
+
+/* Reorder mode hints + controls (desktop drag, mobile arrows) */
+.reorderHintDesktop {
+  display: inline;
+}
+
+.reorderHintMobile {
+  display: none;
+}
+
+.reorderMoveControls {
+  display: none;
+  align-items: center;
+  gap: 6px;
+}
+
+.reorderMoveBtn {
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgba(198, 161, 0, 0.35);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--navy);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.reorderMoveBtn:hover {
+  background: #f8fafc;
+  border-color: var(--gold);
+}
+
+@media (max-width: 1023px) {
+  .reorderHintDesktop {
+    display: none;
+  }
+
+  .reorderHintMobile {
+    display: inline;
+  }
+
+  :global(.js-section-list-drag) .dragHandle {
+    display: none;
+  }
+
+  .reorderMoveControls {
+    display: inline-flex;
+  }
+
+  .reorderMoveBtn {
+    width: 32px;
+    height: 32px;
+  }
+}

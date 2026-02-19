@@ -200,3 +200,96 @@
 .promoVal {
     width: 100%;
 }
+
+/* Responsive fixes for legacy variation widget */
+@media (max-width: 900px) {
+  .cCard {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .grid2,
+  .promoGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .boxBody {
+    padding: 12px;
+  }
+
+  .stabRow {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .stab {
+    white-space: nowrap;
+    flex: 0 0 auto;
+  }
+
+  .btnRow {
+    gap: 6px;
+  }
+
+  .btnRow .btn {
+    flex: 1 1 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .boxHead {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px 12px;
+  }
+
+  .btn {
+    min-height: 40px;
+    width: 100%;
+  }
+
+  .btn.small {
+    min-height: 36px;
+  }
+
+  #comboBody input,
+  #comboBody select {
+    font-size: 16px;
+  }
+}
+
+
+/* Extra tuning for very small phones and tablets */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .boxHead {
+    padding: 10px 14px;
+  }
+
+  .boxBody {
+    padding: 12px;
+  }
+
+  #comboBody input,
+  #comboBody select {
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .boxBody {
+    padding: 10px;
+  }
+
+  .stab {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+  }
+
+  .badge {
+    font-size: 0.7rem;
+  }
+
+  .promoHdr {
+    font-size: 0.72rem;
+  }
+}
