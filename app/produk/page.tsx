@@ -23,6 +23,8 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
 
     const q = getString(searchParams?.q) ?? "";
     const catName = getString(searchParams?.cat);
+    const catIdRaw = getString(searchParams?.catId);
+    const catId = catIdRaw ? parseInt(catIdRaw) : undefined;
     const tagName = getString(searchParams?.tag);
 
     // Dynamic title and description based on filters
@@ -77,8 +79,9 @@ export default async function ProductListingPage(props: {
 
     const q = getString(searchParams?.q) ?? "";
     const catName = getString(searchParams?.cat);
+    const catIdRaw = getString(searchParams?.catId);
+    const catId = catIdRaw ? parseInt(catIdRaw) : undefined;
     const tagName = getString(searchParams?.tag);
-    // const catId = catRaw ? parseInt(catRaw) : undefined;
     const minRaw = getString(searchParams?.min);
     const minPrice = minRaw ? parseInt(minRaw) : undefined;
     const maxRaw = getString(searchParams?.max);
@@ -96,7 +99,21 @@ export default async function ProductListingPage(props: {
     }
 
     // Category Filter
-    if (catName) {
+    if (catId && Number.isFinite(catId)) {
+        const orFilters: any[] = [
+            {
+                kategoriProdukItems: {
+                    some: {
+                        kategoriId: catId
+                    }
+                }
+            }
+        ];
+        if (catName) {
+            orFilters.push({ kategori: catName });
+        }
+        whereClause.OR = orFilters;
+    } else if (catName) {
         // Fallback to string matching or slug matching if needed (simplified for dynamic strings)
         // Since we are moving to dynamic string categories from Produk table, we check both.
         whereClause.OR = [

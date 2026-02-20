@@ -2,7 +2,6 @@
 
 import { useState, cloneElement, ReactElement } from "react";
 import styles from "./page.module.css";
-import { FaFilter } from "react-icons/fa6";
 
 export default function ProductPageClient({
     title,
@@ -30,15 +29,6 @@ export default function ProductPageClient({
        */}
             <main className={styles.container}>
                 <h1 className={styles.title}>{title}</h1>
-
-                {/* New Filter Button (Mobile Only) */}
-                <button
-                    className={styles.mobileFilterButton}
-                    onClick={() => setIsOpen(true)}
-                >
-                    <FaFilter style={{ marginRight: 8 }} />
-                    Filter Produk
-                </button>
 
                 <div className={styles.layout}>
                     <aside className={styles.sidebar}>

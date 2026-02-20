@@ -49,13 +49,14 @@ export default function ProductFilter({
     const selectedCatName = searchParams.get("cat") ?? selectedCategory ?? "";
     const selectedTagName = searchParams.get("tag") ?? selectedTag ?? "";
 
-    // Close drawer when URL changes (filter applied) and syncing state
+    const searchParamsKey = searchParams.toString();
+
+    // Close drawer when URL changes (filter applied) and sync local state
     useEffect(() => {
         setIsOpen(false);
-        // Sync local state if URL changes externally
         setSearch(searchParams.get("q") ?? "");
         setSort(searchParams.get("sort") ?? "latest");
-    }, [searchParams]);
+    }, [searchParamsKey]);
 
     // Apply Filter Helper
     function applyFilter(key: string, value: string) {
@@ -108,6 +109,7 @@ export default function ProductFilter({
             {/* Mobile Toggle Button */}
             <button className={styles.mobileToggle} onClick={() => setIsOpen(true)} aria-label="Filter Produk">
                 <FaFilter />
+                <span>Filter Produk</span>
             </button>
 
             {/* Backdrop */}

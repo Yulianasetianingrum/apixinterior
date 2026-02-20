@@ -18,17 +18,19 @@ export default async function CategoryProductPage(props: Props) {
     // Find the category by slug to get the actual name stored in products
     const category = await prisma.kategoriProduk.findFirst({
         where: { slug: slug },
-        select: { nama: true }
+        select: { id: true, nama: true }
     });
 
     // If found, use the name. If not, fallback to decoding the slug (legacy behavior)
     const categoryName = category?.nama || decodeURIComponent(slug);
+    const categoryId = category?.id ?? null;
 
     // Merge the category from slug into the searchParams
     // We treat the slug as the 'cat' filter
     const mergedSearchParams = {
         ...resolvedSearchParams,
-        cat: categoryName
+        cat: categoryName,
+        ...(categoryId ? { catId: String(categoryId) } : {})
     };
 
     // Render the original ProductListingPage with the modified params

@@ -35,26 +35,6 @@
     gap: 20px;
 }
 
-.mobileFilterButton {
-    display: none;
-    align-items: center;
-    padding: 10px 16px;
-    background-color: #fff;
-    border: 1px solid #D4AF37;
-    color: #D4AF37;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 14px;
-    cursor: pointer;
-    margin-bottom: 24px;
-    transition: all 0.2s;
-}
-
-.mobileFilterButton:hover {
-    background-color: #D4AF37;
-    color: #fff;
-}
-
 /* Tablet & Mobile Responsive */
 @media (max-width: 1024px) {
     .layout {
@@ -116,18 +96,9 @@
            Since inner is fixed, outer is effectively 0 height unless there's other content.
         */
 
-        display: none;
-        /* Hide the wrapper aside on mobile, since the inner content becomes a fixed drawer anyway? */
-        /* BUT wait, if we hide the wrapper, we hide the inner component too! display:none kills children. */
-
-        /* So we must NOT hide it. We can leave it. */
         width: 100%;
         position: static;
         margin-bottom: 0;
-    }
-
-    .mobileFilterButton {
-        display: inline-flex;
     }
 
     .grid {
