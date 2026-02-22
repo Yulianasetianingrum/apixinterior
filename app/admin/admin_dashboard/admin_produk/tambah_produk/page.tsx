@@ -3838,6 +3838,12 @@ function TambahProdukContent() {
   const [uploadGalleryPreview, setUploadGalleryPreview] = useState<string[]>(
     []
   );
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<{
+    main: number;
+    gallery: number[];
+    message: string;
+  }>({ main: 0, gallery: [], message: "" });
   const [varMediaPreview, setVarMediaPreview] = useState<
     Array<{ varId: string | number; url: string; label: string; mode?: string }>
   >([]);
@@ -4516,28 +4522,47 @@ function TambahProdukContent() {
 
       const uploadImageToGambarUpload = async (
         file: File,
-        meta?: { title?: string; tags?: string }
+        meta?: { title?: string; tags?: string },
+        onProgress?: (pct: number) => void
       ): Promise<{ id: number; url: string }> => {
         const fd = new FormData();
         fd.append("file", file);
         if (meta?.title) fd.append("title", meta.title);
         if (meta?.tags) fd.append("tags", meta.tags);
 
-        const res = await fetch(IMG_UPLOAD_ENDPOINT, { method: "POST", body: fd } as any);
-        if (!res.ok) {
-          let msg = `Upload gambar gagal (HTTP ${res.status})`;
-          try {
-            const j = await res.json();
-            msg = j?.error || j?.message || msg;
-          } catch { }
-          throw new Error(msg);
-        }
-        const json = await res.json();
-        const data = (json && (json.data ?? json)) as any;
-        if (!data || data.id == null || !data.url) {
-          throw new Error("Response upload gambar tidak valid");
-        }
-        return { id: Number(data.id), url: String(data.url) };
+        return await new Promise((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+          xhr.open("POST", IMG_UPLOAD_ENDPOINT);
+          xhr.upload.onprogress = (ev) => {
+            if (!ev.lengthComputable) return;
+            const pct = Math.max(0, Math.min(100, Math.round((ev.loaded / ev.total) * 100)));
+            if (onProgress) onProgress(pct);
+          };
+          xhr.onerror = () => reject(new Error("Upload gambar gagal (network error)"));
+          xhr.onload = () => {
+            if (xhr.status < 200 || xhr.status >= 300) {
+              let msg = `Upload gambar gagal (HTTP ${xhr.status})`;
+              try {
+                const j = JSON.parse(xhr.responseText || "{}");
+                msg = j?.error || j?.message || msg;
+              } catch { }
+              reject(new Error(msg));
+              return;
+            }
+            try {
+              const json = JSON.parse(xhr.responseText || "{}");
+              const data = (json && (json.data ?? json)) as any;
+              if (!data || data.id == null || !data.url) {
+                reject(new Error("Response upload gambar tidak valid"));
+                return;
+              }
+              resolve({ id: Number(data.id), url: String(data.url) });
+            } catch {
+              reject(new Error("Response upload gambar tidak valid"));
+            }
+          };
+          xhr.send(fd);
+        });
       };
 
       const formData = new FormData();
@@ -4579,6 +4604,7 @@ function TambahProdukContent() {
         // === MODE UPLOAD BARU ===
         if (!uploadMainFile) {
           setLoading(false);
+          setUploading(false);
           notify("Mohon pilih foto utama terlebih dahulu.");
           return;
         }
@@ -4588,6 +4614,14 @@ function TambahProdukContent() {
         const tagText = typeof rawTags === "string" ? rawTags : "";
         const titleText = String(formData.get("nama") || "produk");
 
+        const maxGallery = 4;
+        const rawGallery = uploadGalleryFiles.slice(0, maxGallery);
+        setUploading(true);
+        setUploadProgress({
+          main: 0,
+          gallery: new Array(rawGallery.length).fill(0),
+          message: "Memproses foto utama...",
+        });
         notify("Memproses foto utama...");
         let mainFile = uploadMainFile;
         try {
@@ -4596,30 +4630,38 @@ function TambahProdukContent() {
           console.error("Gagal kompres foto utama:", e);
         }
 
+        setUploadProgress((p) => ({ ...p, message: "Mengupload foto utama..." }));
         notify("Mengupload foto utama...");
-        const mainUp = await uploadImageToGambarUpload(mainFile, {
-          title: titleText,
-          tags: tagText,
-        });
+        const mainUp = await uploadImageToGambarUpload(
+          mainFile,
+          { title: titleText, tags: tagText },
+          (pct) => setUploadProgress((p) => ({ ...p, main: pct }))
+        );
 
         // galeri tambahan (maks 4)
-        const maxGallery = 4;
-        const rawGallery = uploadGalleryFiles.slice(0, maxGallery);
         const galleryIds: number[] = [];
 
         if (rawGallery.length > 0) {
+          setUploadProgress((p) => ({ ...p, message: `Mengupload ${rawGallery.length} foto galeri...` }));
           notify(`Mengupload ${rawGallery.length} foto galeri...`);
-          for (const file of rawGallery) {
+          for (let i = 0; i < rawGallery.length; i++) {
+            const file = rawGallery[i];
             let gFile = file;
             try {
               gFile = await compressImage(file);
             } catch (e) {
               console.error("Gagal kompres foto galeri:", e);
             }
-            const up = await uploadImageToGambarUpload(gFile, {
-              title: titleText,
-              tags: tagText,
-            });
+            const up = await uploadImageToGambarUpload(
+              gFile,
+              { title: titleText, tags: tagText },
+              (pct) =>
+                setUploadProgress((p) => {
+                  const next = p.gallery.slice();
+                  next[i] = pct;
+                  return { ...p, gallery: next };
+                })
+            );
             galleryIds.push(up.id);
           }
         }
@@ -4630,10 +4672,12 @@ function TambahProdukContent() {
         if (galleryIds.length > 0) {
           formData.set("kolaseGalleryIds", galleryIds.join(","));
         }
+        setUploadProgress((p) => ({ ...p, message: "Upload selesai. Menyimpan produk..." }));
       } else if (fotoMode === "kolase") {
         // === MODE PILIH DARI KOLASE ===
         if (kolaseImages.length === 0) {
           setLoading(false);
+          setUploading(false);
           notify("Pilih minimal 1 foto dari kolase.");
           return;
         }
@@ -4662,6 +4706,7 @@ function TambahProdukContent() {
       });
 
       setLoading(false);
+      setUploading(false);
 
       if (!res.ok) {
         const text = await res.text().catch(() => "");
@@ -4689,6 +4734,7 @@ function TambahProdukContent() {
     } catch (err) {
       console.error(err);
       setLoading(false);
+      setUploading(false);
       notify(
         isEditMode
           ? "Terjadi kesalahan saat menyimpan perubahan."
@@ -6122,6 +6168,56 @@ function TambahProdukContent() {
                             </div>
                           </div>
                         ))}
+                      </div>
+                    )}
+                    {uploading && (
+                      <div
+                        style={{
+                          marginTop: 12,
+                          padding: 12,
+                          borderRadius: 10,
+                          border: "1px solid rgba(0,0,0,0.12)",
+                          background: "rgba(255,255,255,0.8)",
+                        }}
+                      >
+                        <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>
+                          {uploadProgress.message || "Mengupload..."}
+                        </div>
+                        <div style={{ display: "grid", gap: 10 }}>
+                          <div>
+                            <div style={{ fontSize: 12, marginBottom: 4 }}>Foto Utama</div>
+                            <div style={{ height: 10, background: "#eee", borderRadius: 999 }}>
+                              <div
+                                style={{
+                                  height: 10,
+                                  width: `${uploadProgress.main || 0}%`,
+                                  background: "linear-gradient(90deg,#f59e0b,#fbbf24)",
+                                  borderRadius: 999,
+                                  transition: "width 120ms linear",
+                                }}
+                              />
+                            </div>
+                            <div style={{ fontSize: 11, marginTop: 4 }}>{uploadProgress.main || 0}%</div>
+                          </div>
+                          {uploadProgress.gallery.length > 0 &&
+                            uploadProgress.gallery.map((pct, idx) => (
+                              <div key={`gprog_${idx}`}>
+                                <div style={{ fontSize: 12, marginBottom: 4 }}>Galeri {idx + 1}</div>
+                                <div style={{ height: 10, background: "#eee", borderRadius: 999 }}>
+                                  <div
+                                    style={{
+                                      height: 10,
+                                      width: `${pct || 0}%`,
+                                      background: "linear-gradient(90deg,#10b981,#34d399)",
+                                      borderRadius: 999,
+                                      transition: "width 120ms linear",
+                                    }}
+                                  />
+                                </div>
+                                <div style={{ fontSize: 11, marginTop: 4 }}>{pct || 0}%</div>
+                              </div>
+                            ))}
+                        </div>
                       </div>
                     )}
 

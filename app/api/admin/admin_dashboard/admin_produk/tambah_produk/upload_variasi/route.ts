@@ -11,8 +11,8 @@ export const runtime = "nodejs";
 
 const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads");
 
-// batas aman (opsional)
-const MAX_FILE_BYTES = 12 * 1024 * 1024; // 12MB
+// batas aman (opsional) - dibuat longgar agar tidak menghalangi user
+const MAX_FILE_BYTES = 80 * 1024 * 1024; // 80MB
 
 async function ensureUploadDir() {
   await fs.mkdir(UPLOAD_DIR, { recursive: true });
@@ -42,7 +42,9 @@ async function saveOptimizedWebpToUploads(
     throw new Error("File yang diupload harus berupa gambar.");
   }
   if (typeof file.size === "number" && file.size > MAX_FILE_BYTES) {
-    throw new Error(`Ukuran file terlalu besar (maks ${Math.round(MAX_FILE_BYTES / 1024 / 1024)}MB).`);
+    throw new Error(
+      `Ukuran file terlalu besar (maks ${Math.round(MAX_FILE_BYTES / 1024 / 1024)}MB).`
+    );
   }
 
   await ensureUploadDir();

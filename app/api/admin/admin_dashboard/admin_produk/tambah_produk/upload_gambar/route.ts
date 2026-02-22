@@ -10,7 +10,8 @@ import fs from "fs/promises";
 export const runtime = "nodejs";
 
 const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads");
-const MAX_FILE_BYTES = 12 * 1024 * 1024; // 12MB per file
+// Soft cap to avoid OOM on extreme uploads. Keep generous to not block users.
+const MAX_FILE_BYTES = 80 * 1024 * 1024; // 80MB per file
 
 async function ensureUploadDir() {
   await fs.mkdir(UPLOAD_DIR, { recursive: true });
@@ -32,8 +33,11 @@ async function saveOptimizedWebpToUploads(
   if (!file.type?.startsWith("image/")) {
     throw new Error("File yang diupload harus berupa gambar.");
   }
+  // Do not hard-block large images; only guard against extreme sizes.
   if (typeof file.size === "number" && file.size > MAX_FILE_BYTES) {
-    throw new Error(`Ukuran file terlalu besar (maks ${Math.round(MAX_FILE_BYTES / 1024 / 1024)}MB).`);
+    throw new Error(
+      `Ukuran file terlalu besar (maks ${Math.round(MAX_FILE_BYTES / 1024 / 1024)}MB).`
+    );
   }
 
   await ensureUploadDir();
