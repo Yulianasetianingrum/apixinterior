@@ -4511,6 +4511,35 @@ function TambahProdukContent() {
     };
 
     try {
+      const IMG_UPLOAD_ENDPOINT =
+        "/api/admin/admin_dashboard/admin_produk/tambah_produk/upload_gambar";
+
+      const uploadImageToGambarUpload = async (
+        file: File,
+        meta?: { title?: string; tags?: string }
+      ): Promise<{ id: number; url: string }> => {
+        const fd = new FormData();
+        fd.append("file", file);
+        if (meta?.title) fd.append("title", meta.title);
+        if (meta?.tags) fd.append("tags", meta.tags);
+
+        const res = await fetch(IMG_UPLOAD_ENDPOINT, { method: "POST", body: fd } as any);
+        if (!res.ok) {
+          let msg = `Upload gambar gagal (HTTP ${res.status})`;
+          try {
+            const j = await res.json();
+            msg = j?.error || j?.message || msg;
+          } catch { }
+          throw new Error(msg);
+        }
+        const json = await res.json();
+        const data = (json && (json.data ?? json)) as any;
+        if (!data || data.id == null || !data.url) {
+          throw new Error("Response upload gambar tidak valid");
+        }
+        return { id: Number(data.id), url: String(data.url) };
+      };
+
       const formData = new FormData();
 
       // --- copy semua field non-file ---
@@ -4554,31 +4583,52 @@ function TambahProdukContent() {
           return;
         }
 
-        // Kompres foto utama
+        // Upload satu per satu agar request kecil (hindari 413)
+        const rawTags = formData.get("tags");
+        const tagText = typeof rawTags === "string" ? rawTags : "";
+        const titleText = String(formData.get("nama") || "produk");
+
+        notify("Memproses foto utama...");
+        let mainFile = uploadMainFile;
         try {
-          notify("Memproses foto utama...");
-          const processedMain = await compressImage(uploadMainFile);
-          formData.append("fotoUtamaUpload", processedMain);
+          mainFile = await compressImage(uploadMainFile);
         } catch (e) {
           console.error("Gagal kompres foto utama:", e);
-          formData.append("fotoUtamaUpload", uploadMainFile);
         }
+
+        notify("Mengupload foto utama...");
+        const mainUp = await uploadImageToGambarUpload(mainFile, {
+          title: titleText,
+          tags: tagText,
+        });
 
         // galeri tambahan (maks 4)
         const maxGallery = 4;
         const rawGallery = uploadGalleryFiles.slice(0, maxGallery);
+        const galleryIds: number[] = [];
 
         if (rawGallery.length > 0) {
-          notify(`Memproses ${rawGallery.length} foto galeri...`);
+          notify(`Mengupload ${rawGallery.length} foto galeri...`);
           for (const file of rawGallery) {
+            let gFile = file;
             try {
-              const processed = await compressImage(file);
-              formData.append("galeriUpload", processed);
+              gFile = await compressImage(file);
             } catch (e) {
               console.error("Gagal kompres foto galeri:", e);
-              formData.append("galeriUpload", file);
             }
+            const up = await uploadImageToGambarUpload(gFile, {
+              title: titleText,
+              tags: tagText,
+            });
+            galleryIds.push(up.id);
           }
+        }
+
+        // Ganti ke mode kolase agar submit produk tanpa file besar
+        formData.set("fotoMode", "kolase");
+        formData.set("kolaseMainId", String(mainUp.id));
+        if (galleryIds.length > 0) {
+          formData.set("kolaseGalleryIds", galleryIds.join(","));
         }
       } else if (fotoMode === "kolase") {
         // === MODE PILIH DARI KOLASE ===
