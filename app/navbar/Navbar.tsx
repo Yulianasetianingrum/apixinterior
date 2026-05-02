@@ -126,6 +126,11 @@ export default async function Navbar(props: { themeOverride?: string }) {
             logoSrc = logoGolden;
     }
 
+    // Override logo dengan yang ada di database (dari menu Admin Pengaturan Informasi) jika ada
+    if (info?.logoUrl) {
+        logoSrc = info.logoUrl;
+    }
+
     // Chart Icon Logic based on Theme (matching the "=" color logic which follows accent/text color usually)
     // The user said: "warnanya ikutin warna '='"
     // The "=" color is determined by the class `apixSidebarButton` which inherits color from parent or specific CSS.
