@@ -2,6 +2,7 @@
 
 import { useState, useEffect, ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import layoutStyles from "../../admin_dashboard.module.css";
 import styles from "./informasi.module.css";
 import { useAdminTheme } from "../../AdminThemeContext";
@@ -391,8 +392,8 @@ export default function InformasiPage() {
               <label className={styles.label}>Logo Toko</label>
               <div className={styles.logoUploadContainer}>
                 {logoUrl ? (
-                  <div className={styles.logoPreviewWrapper}>
-                    <img src={logoUrl} alt="Logo Toko" className={styles.logoImage} />
+                  <div className={styles.logoPreviewWrapper} style={{ position: 'relative' }}>
+                    <Image src={logoUrl} alt="Logo Toko" fill sizes="140px" className={styles.logoImage} />
                   </div>
                 ) : (
                   <div className={styles.logoPreviewWrapper}>
