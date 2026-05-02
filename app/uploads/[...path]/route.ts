@@ -5,8 +5,8 @@ import path from "node:path";
 
 export const dynamic = "force-dynamic";
 
-const BASE_DIR = path.join(process.cwd(), "app", "uploads");
-
+const BASE_DIR_APP = path.join(process.cwd(), "app", "uploads");
+const BASE_DIR_PUBLIC = path.join(process.cwd(), "public", "uploads");
 const MIME: Record<string, string> = {
   ".png": "image/png",
   ".jpg": "image/jpeg",
@@ -40,19 +40,37 @@ export async function GET(
     })
     .filter(Boolean);
 
-  const filePath = safeJoin(BASE_DIR, decoded);
-  if (!filePath) {
+  const filePathPublic = safeJoin(BASE_DIR_PUBLIC, decoded);
+  const filePathApp = safeJoin(BASE_DIR_APP, decoded);
+  
+  if (!filePathPublic && !filePathApp) {
     return NextResponse.json({ error: "Invalid path" }, { status: 400 });
   }
 
   let data: Buffer;
+  let finalFilePath = filePathPublic || filePathApp || "";
+
   try {
-    data = await fs.readFile(filePath);
+    if (filePathPublic) {
+      data = await fs.readFile(filePathPublic);
+      finalFilePath = filePathPublic;
+    } else {
+      throw new Error("Skip");
+    }
   } catch {
-    return NextResponse.json({ error: "Not found" }, { status: 404 });
+    try {
+      if (filePathApp) {
+        data = await fs.readFile(filePathApp);
+        finalFilePath = filePathApp;
+      } else {
+        throw new Error("Not found");
+      }
+    } catch {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
   }
 
-  const ext = path.extname(filePath).toLowerCase();
+  const ext = path.extname(finalFilePath).toLowerCase();
   const contentType = MIME[ext] ?? "application/octet-stream";
 
   return new NextResponse(new Uint8Array(data), {
